@@ -1,18 +1,11 @@
 import { deEntries } from "./changelog-de.js";
 import { enEntries } from "./changelog-en.js";
-import { esEntries } from "./changelog-es.js";
-import { frEntries } from "./changelog-fr.js";
-import { zhCNEntries } from "./changelog-zh-CN.js";
-import { zhTWEntries } from "./changelog-zh-TW.js";
-import { koEntries } from "./changelog-ko.js";
-import { ptBREntries } from "./changelog-pt-BR.js";
-import { trEntries } from "./changelog-tr.js";
 import { normalizeChangelogVersion, resolveChangelogLocale } from "./changelog-runtime.js";
 
 export { normalizeChangelogVersion, resolveChangelogLocale } from "./changelog-runtime.js";
 
 /**
- * Shipped-locale product changelog for PI-Desktop app releases.
+ * Shipped-locale product changelog for Slyy app releases.
  *
  * English is the source of truth (ADR 0009). The translated catalogs mirror
  * the same versions and bullet counts so in-app "what's new" can follow the
@@ -23,7 +16,7 @@ export { normalizeChangelogVersion, resolveChangelogLocale } from "./changelog-r
  * Stable product versions only — omit pre-releases.
  */
 
-export type ChangelogLocale = "en" | "zh-CN" | "zh-TW" | "tr" | "de" | "es" | "fr" | "ko" | "pt-BR";
+export type ChangelogLocale = "en" | "de";
 
 export type ChangelogEntry = {
   /** Semver without a leading `v`, matching apps/desktop package version. */
@@ -37,14 +30,7 @@ export type ChangelogEntry = {
 /** Locale → newest-first product notes. */
 export const CHANGELOG: Record<ChangelogLocale, readonly ChangelogEntry[]> = {
   en: enEntries,
-  "zh-CN": zhCNEntries,
-  "zh-TW": zhTWEntries,
-  tr: trEntries,
   de: deEntries,
-  es: esEntries,
-  fr: frEntries,
-  ko: koEntries,
-  "pt-BR": ptBREntries,
 };
 
 export function getChangelogEntry(

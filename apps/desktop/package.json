@@ -1,13 +1,13 @@
 {
   "name": "@pi-desktop/desktop",
   "version": "0.23.0-beta.2",
-  "desktopName": "pi-desktop.desktop",
+  "desktopName": "slyy-gen2.desktop",
   "private": true,
-  "description": "PI-Desktop Electron application",
-  "homepage": "https://github.com/vastsa/PI-Desktop",
+  "description": "Slyy desktop application",
+  "homepage": "https://slyy.ai",
   "author": {
-    "name": "vastsa",
-    "email": "hhxk666@gmail.com"
+    "name": "Wapsol GmbH",
+    "email": "hallo@slyy.ai"
   },
   "main": "./out/main/index.js",
   "type": "module",
@@ -32,15 +32,17 @@
   },
   "dependencies": {
     "@picovoice/pvrecorder-node": "1.2.9",
-    "transcribe-cpp": "0.2.2",
-    "electron-updater": "^6.8.9"
+    "electron-updater": "^6.8.9",
+    "transcribe-cpp": "0.2.2"
   },
   "devDependencies": {
     "@earendil-works/pi-ai": "1.5.2",
     "@earendil-works/pi-mcp": "1.5.2",
+    "@fontsource-variable/hanken-grotesk": "5.3.0",
+    "@fontsource-variable/martian-mono": "5.3.0",
     "@pi-desktop/agent-host": "workspace:*",
-    "@pi-desktop/computer-use": "workspace:*",
     "@pi-desktop/agent-runtime": "workspace:*",
+    "@pi-desktop/computer-use": "workspace:*",
     "@pi-desktop/host-runtime": "workspace:*",
     "@pi-desktop/i18n": "workspace:*",
     "@pi-desktop/plugin-devkit": "workspace:*",
@@ -69,8 +71,8 @@
     "rehype-katex": "^7.0.1",
     "rehype-raw": "^7.0.0",
     "rehype-sanitize": "^6.0.0",
-    "remark-gfm": "^4.0.1",
     "remark-cjk-friendly": "^2.3.4",
+    "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
     "remark-parse": "^11.0.0",
     "shiki": "^4.4.3",
@@ -82,20 +84,21 @@
     "zustand": "^5.0.15"
   },
   "build": {
-    "appId": "net.aiuo.pi-desktop",
-    "productName": "PI-Desktop",
+    "appId": "ai.slyy.desktop.gen2",
+    "productName": "Slyy Gen2",
     "directories": {
       "output": "release"
     },
     "publish": [
       {
         "provider": "github",
-        "owner": "vastsa",
-        "repo": "PI-Desktop"
+        "owner": "mySlyy",
+        "repo": "slyy-desktop"
       }
     ],
     "extraMetadata": {
-      "piDistribution": "installed"
+      "piDistribution": "installed",
+      "name": "slyy-gen2"
     },
     "files": [
       "out/**/*",
@@ -113,17 +116,7 @@
     ],
     "electronLanguages": [
       "en-US",
-      "zh-CN",
-      "zh_CN",
-      "zh-TW",
-      "zh_TW",
-      "tr",
-      "de",
-      "es",
-      "fr",
-      "ko",
-      "pt-BR",
-      "pt_BR"
+      "de"
     ],
     "extraResources": [
       {
@@ -152,7 +145,7 @@
       }
     ],
     "mac": {
-      "artifactName": "PI-Desktop-${version}-${arch}-mac.${ext}",
+      "artifactName": "Slyy-${version}-${arch}-mac.${ext}",
       "target": [
         {
           "target": "dmg"
@@ -168,8 +161,10 @@
       "entitlements": "build/entitlements.mac.plist",
       "entitlementsInherit": "build/entitlements.mac.plist",
       "extendInfo": {
-        "NSLocalNetworkUsageDescription": "PI-Desktop needs local network access so agents can reach OpenAI-compatible providers, Ollama, and other AI endpoints running on your LAN. / PI-Desktop 需要本地网络访问权限，以便助手请求同一局域网中的 OpenAI 兼容服务、Ollama 等本地 AI 端点。",
-        "NSMicrophoneUsageDescription": "PI-Desktop uses the microphone for Live voice calls and authorized plugin audio access. / PI-Desktop 使用麦克风进行实时语音通话，以及你已授权的插件音频访问。",
+        "CFBundleName": "Slyy",
+        "CFBundleDisplayName": "Slyy",
+        "NSLocalNetworkUsageDescription": "Slyy needs local network access so agents can reach OpenAI-compatible providers, Ollama, and other AI endpoints running on your LAN.",
+        "NSMicrophoneUsageDescription": "Slyy uses the microphone for Live voice calls and authorized plugin audio access.",
         "NSBonjourServices": [
           "_http._tcp",
           "_https._tcp"
@@ -187,7 +182,7 @@
       ]
     },
     "dmg": {
-      "artifactName": "PI-Desktop-${version}-${arch}.${ext}",
+      "artifactName": "Slyy-${version}-${arch}.${ext}",
       "background": "build/dmg-background.png",
       "icon": "build/icon.icns",
       "window": {
@@ -210,8 +205,8 @@
       ]
     },
     "win": {
-      "executableName": "PI-Desktop",
-      "artifactName": "PI-Desktop-Portable-${version}.${ext}",
+      "executableName": "Slyy Gen2",
+      "artifactName": "Slyy-Portable-${version}.${ext}",
       "target": [
         {
           "target": "nsis",
@@ -251,28 +246,29 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "shortcutName": "PI-Desktop",
-      "artifactName": "PI-Desktop-Setup-${version}.${ext}"
+      "shortcutName": "Slyy",
+      "artifactName": "Slyy-Setup-${version}.${ext}",
+      "guid": "72db17f1-8935-5bae-870f-999d4b7621a6"
     },
     "portable": {
-      "artifactName": "PI-Desktop-Portable-${version}.${ext}"
+      "artifactName": "Slyy-Portable-${version}.${ext}"
     },
     "deb": {
-      "packageName": "pi-desktop",
-      "artifactName": "pi-desktop_${version}_${arch}.${ext}"
+      "packageName": "slyy-gen2",
+      "artifactName": "slyy-gen2_${version}_${arch}.${ext}"
     },
     "rpm": {
-      "packageName": "pi-desktop",
-      "artifactName": "pi-desktop-${version}-${arch}.${ext}",
+      "packageName": "slyy-gen2",
+      "artifactName": "slyy-gen2-${version}-${arch}.${ext}",
       "fpm": [
         "--rpm-rpmbuild-define",
         "_build_id_links none"
       ]
     },
     "linux": {
-      "executableName": "pi-desktop",
+      "executableName": "slyy-gen2",
       "syncDesktopName": true,
-      "artifactName": "PI-Desktop-${version}-linux-${arch}.${ext}",
+      "artifactName": "Slyy-${version}-linux-${arch}.${ext}",
       "target": [
         {
           "target": "AppImage"

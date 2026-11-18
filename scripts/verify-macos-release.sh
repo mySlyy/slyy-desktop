@@ -6,10 +6,10 @@ set -euo pipefail
 
 RELEASE_DIR="${1:-apps/desktop/release}"
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-PRODUCT_NAME="PI-Desktop"
-# Accepts either the bare common name ("XingYu Liu (DUV63RKYTW)") or the full
-# certificate label ("Developer ID Application: XingYu Liu (DUV63RKYTW)").
-IDENTITY_NAME="${MAC_SIGNING_IDENTITY:-XingYu Liu (DUV63RKYTW)}"
+PRODUCT_NAME="Slyy Gen2"
+# Accepts either the bare common name ("<Slyy Developer ID common name>") or the full
+# certificate label ("Developer ID Application: <Slyy Developer ID common name>").
+IDENTITY_NAME="${MAC_SIGNING_IDENTITY:?set MAC_SIGNING_IDENTITY to the Slyy Developer ID common name}"
 IDENTITY_NAME="${IDENTITY_NAME#Developer ID Application: }"
 EXPECTED_IDENTITY="Developer ID Application: ${IDENTITY_NAME}"
 STAPLE_ATTEMPTS="${PI_STAPLER_MAX_ATTEMPTS:-${STAPLE_ATTEMPTS:-6}}"

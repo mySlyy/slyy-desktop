@@ -131,7 +131,7 @@ child.on("close", (code) => {
   if (
     code === 0 &&
     probe?.ok &&
-    probe.appName === "PI-Desktop" &&
+    probe.appName === "Slyy Gen2" &&
     probe.platform === process.platform &&
     (process.platform === "darwin" || probe.maximized === true) &&
     menuContractOk &&
