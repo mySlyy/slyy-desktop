@@ -27,7 +27,7 @@ export async function onLoad() {
   await pi.agent.registerTool({
     name: "Browser",
     description: [
-      "Drive PI-Desktop's work-panel browser via CDP.",
+      "Drive Slyy's work-panel browser via CDP.",
       'Call ToolSearch for "browser" or "cdp" to load this tool.',
       "Browser operations use this session's connected page, including while its side panel is hidden or another session is visible.",
       "Navigate first if no page is connected. Opening the first page adds its Browser tab automatically.",

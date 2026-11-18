@@ -23,7 +23,7 @@ pub struct SystemGrep<'a> {
     pub pattern: &'a str,
     pub search_dir: &'a Path,
     pub workspace_root: &'a Path,
-    /// Root whose `.pi-desktopignore` applies (workspace root, or the search
+    /// Root whose `.slyyignore` applies (workspace root, or the search
     /// root for scratch/external searches).
     pub ignore_root: &'a Path,
     pub root_kind: ToolRoot,

@@ -5,6 +5,14 @@
   "private": true,
   "description": "Slyy desktop application",
   "homepage": "https://slyy.ai",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mySlyy/slyy-desktop.git",
+    "directory": "apps/desktop"
+  },
+  "bugs": {
+    "url": "https://github.com/mySlyy/slyy-desktop/issues"
+  },
   "author": {
     "name": "Wapsol GmbH",
     "email": "hallo@slyy.ai"

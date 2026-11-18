@@ -178,7 +178,7 @@ try {
       { grantId: grant.grantId, sessionId: SESSION, targetId: own.targetId },
     );
   } else {
-    console.log("SKIP self-target bind — no PI-Desktop window on screen");
+    console.log("SKIP self-target bind — no Slyy window on screen");
   }
   await expectRefusal(
     "binding a window that is not in the host's list is refused",
@@ -211,7 +211,7 @@ try {
       console.log("SKIP act — that window exposes no actionable element");
     } else {
       const action = editable
-        ? { kind: "set_value", uid: node.uid, text: "PI-Desktop computer-use device probe" }
+        ? { kind: "set_value", uid: node.uid, text: "Slyy computer-use device probe" }
         : { kind: "click", uid: node.uid };
       const result = await host.call("computer.act", {
         grantId: grant.grantId,

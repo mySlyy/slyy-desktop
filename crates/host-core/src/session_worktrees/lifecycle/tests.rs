@@ -95,7 +95,7 @@ async fn an_isolated_session_works_outside_an_untouched_project() {
     assert!(!canonical(&root).starts_with(canonical(&env.project)));
     assert!(root.join("f.txt").is_file());
     assert_eq!(created.worktree.status, WorktreeStatus::Active);
-    assert!(created.worktree.branch.starts_with("pi-desktop/"));
+    assert!(created.worktree.branch.starts_with("slyy/"));
     let after: Vec<_> = fs::read_dir(&env.project)
         .unwrap()
         .map(|e| e.unwrap().file_name())
@@ -449,6 +449,34 @@ async fn pending_work_counts_commits_after_the_owner_branch_is_renamed() {
     let (session, _created, root) = isolated(&env).await;
     fs::write(root.join("f.txt"), "edit\n").unwrap();
     git_cmd(&root, &["commit", "-q", "-am", "work"]);
+    git_cmd(&env.project, &["branch", "-m", "main", "renamed"]);
+
+    let pending = pending_work(&env.state, &env.git, &session).await.unwrap();
+    assert_eq!(pending.unmerged_commits, 1);
+}
+
+/// A session created before the rebrand keeps its `pi-desktop/` branch: its
+/// own subagent branches in that namespace still do not count as keeping the
+/// work elsewhere, so the delete confirmation still reports the commits.
+#[tokio::test]
+async fn pending_work_recognizes_a_legacy_namespace_session_branch() {
+    let env = env();
+    let (session, created, root) = isolated(&env).await;
+    let legacy = format!("{LEGACY_BRANCH_NAMESPACE}/{}", short_id(&session));
+    git_cmd(&root, &["branch", "-m", &created.worktree.branch, &legacy]);
+    env.state
+        .lock()
+        .await
+        .db
+        .conn()
+        .execute(
+            "UPDATE worktrees SET branch = ?1 WHERE session_id = ?2",
+            params![legacy, session],
+        )
+        .unwrap();
+    fs::write(root.join("f.txt"), "edit\n").unwrap();
+    git_cmd(&root, &["commit", "-q", "-am", "work"]);
+    git_cmd(&root, &["branch", &format!("{legacy}-subagent")]);
     git_cmd(&env.project, &["branch", "-m", "main", "renamed"]);
 
     let pending = pending_work(&env.state, &env.git, &session).await.unwrap();

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Inventory the payload that @electron/osx-sign is about to sign.
 //
-// Why this exists: osx-sign walks the whole `PI-Desktop.app` and runs one
+// Why this exists: osx-sign walks the whole `Slyy Gen2.app` and runs one
 // `codesign --sign ... --force --timestamp --entitlements ...` per signing
 // candidate, strictly serially. "How long will signing take?" is therefore a
 // function of how many candidates and bytes the bundle contains, and of which
@@ -23,7 +23,7 @@
 //
 //   <path> is either a `*.app` directory or the electron-builder release
 //   directory, which must contain exactly one `*.app` one level down (for
-//   example `release/mac-arm64/PI-Desktop.app`). `--json` appends one
+//   example `release/mac-arm64/Slyy Gen2.app`). `--json` appends one
 //   machine-readable line prefixed with `inventory-json: `; `--top <n>` sets
 //   how many entries the `top-level-cost` and `slowest-likely` lines list
 //   (default 5).
@@ -220,7 +220,7 @@ function appBundlesIn(absoluteDirectory) {
 
 /**
  * Resolve the single `.app` bundle to inspect. A release directory holds it one
- * level down (`release/mac-arm64/PI-Desktop.app`); a build directory may hold it
+ * level down (`release/mac-arm64/Slyy Gen2.app`); a build directory may hold it
  * directly, so both levels are searched. Anything other than exactly one match
  * fails: silently inventorying the wrong bundle is worse than not running.
  */

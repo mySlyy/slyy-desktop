@@ -342,7 +342,7 @@ export type { RuntimeProviderConfig } from "./provider-binding.js";
 export type RuntimePromptAttachment = Omit<AgentPromptAttachment, "kind"> & {
   /**
    * `session` is written by Electron main for a resolved
-   * `pi-desktop://session/<id>` reference; the renderer never sends it.
+   * `slyy://session/<id>` reference; the renderer never sends it.
    */
   kind: AgentPromptAttachment["kind"] | "session";
   /** Base64 payload is transient and only crosses the sidecar for this turn. */
@@ -3397,7 +3397,7 @@ Do not invent objections or turn speculative risks into blockers. Stop when the 
       if (scheduledToolDescriptions[toolName]) return scheduledToolDescriptions[toolName];
       switch (toolName) {
         case "BrowserPreview":
-          return "Open an HTML file in PI-Desktop's built-in browser panel. `path` may be relative to a project folder or this session's scratch directory, or an absolute path inside those roots. No project is required for scratch previews. The preview live-reloads on later edits to the file or its sibling assets, so call once per page.";
+          return "Open an HTML file in Slyy's built-in browser panel. `path` may be relative to a project folder or this session's scratch directory, or an absolute path inside those roots. No project is required for scratch previews. The preview live-reloads on later edits to the file or its sibling assets, so call once per page.";
         case "Read":
           return (
             "Read a bounded window from an existing regular text file, never a directory. " +
@@ -3436,13 +3436,13 @@ Do not invent objections or turn speculative risks into blockers. Stop when the 
         case ASK_TOOL_NAME:
           return `Ask the user one or more questions. Keep each question to ${MAX_ASK_TOOL_QUESTION_CHARS} characters or fewer. Use Markdown in question text and option labels when formatting helps (for example, emphasis, inline code, or lists); the desktop card renders it safely. Plain strings and existing { label, description? } options are accepted; descriptions remain plain text and answers return the selected source label. The card always provides a custom user-input option.`;
         case "PluginScaffold":
-          return "Create a PI-Desktop plugin from a template and load it for development. `directory` is workspace-relative and must be empty or new; `template` is one of panel-basic, agent-tool-basic, skill-pack, full-demo. Use this instead of hand-writing plugin files.";
+          return "Create a Slyy plugin from a template and load it for development. `directory` is workspace-relative and must be empty or new; `template` is one of panel-basic, agent-tool-basic, skill-pack, full-demo. Use this instead of hand-writing plugin files.";
         case "PluginCheck":
-          return "Validate a PI-Desktop plugin directory against every rule the installer enforces (manifest, entry file, panel, skills, permissions, package limits). `directory` is workspace-relative. Run this before packaging.";
+          return "Validate a Slyy plugin directory against every rule the installer enforces (manifest, entry file, panel, skills, permissions, package limits). `directory` is workspace-relative. Run this before packaging.";
         case "PluginPack":
-          return "Package a PI-Desktop plugin directory into an installable dist/<id>-<version>.piplug. `directory` is workspace-relative. Runs the same validation as PluginCheck first and refuses to package a plugin with errors. Never build a .piplug with shell tools — the installer only accepts uncompressed archives.";
+          return "Package a Slyy plugin directory into an installable dist/<id>-<version>.piplug. `directory` is workspace-relative. Runs the same validation as PluginCheck first and refuses to package a plugin with errors. Never build a .piplug with shell tools — the installer only accepts uncompressed archives.";
         default:
-          return `${toolName} tool via PI-Desktop host-core`;
+          return `${toolName} tool via Slyy host-core`;
       }
     };
     // One entry per tool: the shapes diverge enough that a chain of ternaries
@@ -4454,11 +4454,11 @@ Do not invent objections or turn speculative risks into blockers. Stop when the 
       case "BrowserPreview":
         return "Preview an HTML file in the built-in browser panel.";
       case "PluginCheck":
-        return "Validate a PI-Desktop plugin directory.";
+        return "Validate a Slyy plugin directory.";
       case "PluginScaffold":
-        return "Create a PI-Desktop plugin from a template.";
+        return "Create a Slyy plugin from a template.";
       case "PluginPack":
-        return "Validate and package a PI-Desktop plugin.";
+        return "Validate and package a Slyy plugin.";
       default:
         return this.compactToolDescription(tool.description);
     }
@@ -5091,7 +5091,7 @@ Do not invent objections or turn speculative risks into blockers. Stop when the 
             if (!provider) {
               return this.subagentToolError(
                 toolCallId,
-                `The ${definition.name} subagent pins ${definition.model?.providerId}/${definition.model?.modelId}, which is not configured in PI-Desktop. Do this work yourself or delegate to another subagent.`,
+                `The ${definition.name} subagent pins ${definition.model?.providerId}/${definition.model?.modelId}, which is not configured in Slyy. Do this work yourself or delegate to another subagent.`,
               );
             }
           } else if (this.isSessionModelOverride(modelOverride)) {
@@ -5123,7 +5123,7 @@ Do not invent objections or turn speculative risks into blockers. Stop when the 
           if (!provider) {
             return this.subagentToolError(
               toolCallId,
-              `The ${definition.name} subagent pins ${definition.model?.providerId}/${definition.model?.modelId}, which is not configured in PI-Desktop. Do this work yourself or delegate to another subagent.`,
+              `The ${definition.name} subagent pins ${definition.model?.providerId}/${definition.model?.modelId}, which is not configured in Slyy. Do this work yourself or delegate to another subagent.`,
             );
           }
         }

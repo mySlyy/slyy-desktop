@@ -204,7 +204,7 @@ test("local MCP control server authenticates, discovers, and invokes desktop ope
     params: { protocolVersion: "2099-01-01" },
   });
   assert.equal(initialized.response.status, 200);
-  assert.equal(initialized.body.result.serverInfo.name, "pi-desktop");
+  assert.equal(initialized.body.result.serverInfo.name, "slyy");
   assert.equal(initialized.body.result.serverInfo.version, "test");
   assert.equal(initialized.body.result.protocolVersion, "2025-06-18");
   const sessionId = initialized.response.headers.get("mcp-session-id");
@@ -232,7 +232,9 @@ test("local MCP control server authenticates, discovers, and invokes desktop ope
     { "Mcp-Session-Id": sessionId },
   );
   const toolNames = listed.body.result.tools.map((tool) => tool.name);
-  assert.ok(toolNames.includes("pi_desktop_invoke"));
+  assert.ok(toolNames.includes("slyy_invoke"));
+  // The pre-rebrand name stays callable but is not listed twice.
+  assert.equal(toolNames.includes("pi_desktop_invoke"), false);
   assert.ok(toolNames.includes("pi_control_describe"));
   assert.ok(toolNames.includes("pi_project_open"));
   assert.ok(toolNames.includes("pi_plans_resolve"));
@@ -263,7 +265,7 @@ test("local MCP control server authenticates, discovers, and invokes desktop ope
       id: 4,
       method: "tools/call",
       params: {
-        name: "pi_desktop_invoke",
+        name: "slyy_invoke",
         arguments: { operation: "app/getVersion", args: [] },
       },
     },
@@ -286,6 +288,26 @@ test("local MCP control server authenticates, discovers, and invokes desktop ope
     { "Mcp-Session-Id": sessionId },
   );
   assert.equal(refusedDelete.body.result.isError, true);
+  assert.equal(calls.some((call) => call.channel === "pi-desktop/session/delete"), false);
+
+  // Legacy alias: the pre-rebrand tool name reaches the same tool and the
+  // same confirm gate.
+  const legacyRefused = await post(
+    info.url,
+    info.token,
+    {
+      jsonrpc: "2.0",
+      id: 51,
+      method: "tools/call",
+      params: {
+        name: "pi_desktop_invoke",
+        arguments: { operation: "session/delete", args: ["session-1"] },
+      },
+    },
+    { "Mcp-Session-Id": sessionId },
+  );
+  assert.equal(legacyRefused.body.result.isError, true);
+  assert.equal(legacyRefused.body.result.structuredContent.error.code, "CONFIRMATION_REQUIRED");
   assert.equal(calls.some((call) => call.channel === "pi-desktop/session/delete"), false);
 
   await post(
@@ -531,11 +553,36 @@ test("local MCP control server authenticates, discovers, and invokes desktop ope
     headers: {
       "Content-Type": "application/json",
       "Mcp-Session-Id": sessionId,
-      "X-Pi-Desktop-Token": info.token,
+      "X-Slyy-Token": info.token,
     },
     body: JSON.stringify({ jsonrpc: "2.0", id: 15, method: "ping" }),
   });
   assert.equal(tokenHeader.status, 200);
+
+  // The pre-rebrand header is still accepted, with the same token check.
+  const legacyTokenHeader = await fetch(info.url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Mcp-Session-Id": sessionId,
+      "X-Pi-Desktop-Token": info.token,
+    },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 16, method: "ping" }),
+  });
+  assert.equal(legacyTokenHeader.status, 200);
+
+  for (const header of ["X-Slyy-Token", "X-Pi-Desktop-Token"]) {
+    const wrongToken = await fetch(info.url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Mcp-Session-Id": sessionId,
+        [header]: `${info.token}x`,
+      },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 17, method: "ping" }),
+    });
+    assert.equal(wrongToken.status, 401, `${header} with a wrong token must be refused`);
+  }
 
   const deleted = await fetch(info.url, {
     method: "DELETE",
@@ -896,7 +943,7 @@ test("plugin-only session collaboration operations stay off the external MCP sur
   for (const id of collaborationIds) {
     assert.equal(toolNames.includes(id), false);
   }
-  const invokeTool = listed.body.result.tools.find((tool) => tool.name === "pi_desktop_invoke");
+  const invokeTool = listed.body.result.tools.find((tool) => tool.name === "slyy_invoke");
   const exposedIds = invokeTool.inputSchema.properties.operation.enum;
   for (const id of collaborationIds) {
     assert.equal(exposedIds.includes(id), false);
@@ -922,7 +969,7 @@ test("plugin-only session collaboration operations stay off the external MCP sur
       jsonrpc: "2.0",
       id: 4,
       method: "tools/call",
-      params: { name: "pi_desktop_invoke", arguments: { operation: "session/collaboration/list", args: [] } },
+      params: { name: "slyy_invoke", arguments: { operation: "session/collaboration/list", args: [] } },
     },
     { "Mcp-Session-Id": sessionId },
   );

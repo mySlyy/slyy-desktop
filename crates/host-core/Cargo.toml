@@ -3,7 +3,7 @@ name = "host-core"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "PI-Desktop Rust host core"
+description = "Slyy host core (based on PI-Desktop)"
 
 [[bin]]
 name = "pi-desktop-host-core"

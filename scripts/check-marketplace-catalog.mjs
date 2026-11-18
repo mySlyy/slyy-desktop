@@ -4,12 +4,10 @@ import { readFile } from "node:fs/promises";
 import { realpathSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
-// The distribution repository the plugin center publishes to, which is what a
-// release gate has to read: the center serves the same document with a package
-// base filled in.
+// The Slyy hub catalog, the same document the client's official channel reads
+// (OFFICIAL_CHANNEL_CATALOG_URL in crates/host-core/src/plugins/marketplace.rs).
 const DEFAULT_URL =
-  process.env.PI_DESKTOP_PLUGIN_MARKET_URL ||
-  "https://raw.githubusercontent.com/AIUO-Net/pi-desktop-plugins/main/catalog.json";
+  process.env.PI_DESKTOP_PLUGIN_MARKET_URL || "https://hub.slyy.ai/catalog.json";
 
 /**
  * Hosts a published package may be served from.

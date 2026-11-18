@@ -12,7 +12,7 @@ describe("session links", () => {
   it("round-trips the link a session row copies", () => {
     const id = "6f1d2c3b-4a59-4e7f-8a90-b1c2d3e4f506";
     const link = formatSessionLink(id);
-    expect(link).toBe(`pi-desktop://session/${id}`);
+    expect(link).toBe(`slyy://session/${id}`);
     expect(parseSessionLinks(`please look at ${link} first`)).toEqual([id]);
   });
 
@@ -36,8 +36,10 @@ describe("session links", () => {
     expect(parseSessionLinks("")).toEqual([]);
     expect(parseSessionLinks("no links here")).toEqual([]);
     // A remote session id carries a colon, so it never parses as a local link.
+    expect(parseSessionLinks("slyy://session/remote:abc")).toEqual([]);
     expect(parseSessionLinks("pi-desktop://session/remote:abc")).toEqual([]);
     expect(parseSessionLinks("https://example.com/session/abc")).toEqual([]);
+    expect(parseSessionLinks("slyy://session/")).toEqual([]);
     expect(parseSessionLinks("pi-desktop://session/")).toEqual([]);
   });
 
@@ -49,6 +51,7 @@ describe("session links", () => {
     expect(parseSessionLinkToken(formatSessionLink("abc"))).toBe("abc");
     expect(parseSessionLinkToken(`  ${formatSessionLink("abc")}  `)).toBe("abc");
     expect(parseSessionLinkToken(`see ${formatSessionLink("abc")}`)).toBeNull();
+    expect(parseSessionLinkToken("slyy://session/")).toBeNull();
     expect(parseSessionLinkToken("pi-desktop://session/")).toBeNull();
     expect(parseSessionLinkToken("@src/index.ts")).toBeNull();
   });
@@ -60,5 +63,17 @@ describe("session links", () => {
     expect(text.slice(spans[0].start, spans[0].end)).toBe(formatSessionLink("aaa"));
     expect(text.slice(spans[1].start, spans[1].end)).toBe(formatSessionLink("bbb"));
     expect(sessionLinkSpans("nothing here")).toEqual([]);
+  });
+
+  it("still accepts links copied before the rebrand, but never produces them", () => {
+    const legacy = "pi-desktop://session/abc";
+    expect(parseSessionLinks(`see ${legacy} and ${formatSessionLink("def")}`)).toEqual(["abc", "def"]);
+    expect(isSessionLinkToken(legacy)).toBe(true);
+    expect(parseSessionLinkToken(legacy)).toBe("abc");
+    const text = `first ${legacy} then ${formatSessionLink("def")}`;
+    const spans = sessionLinkSpans(text);
+    expect(spans.map((span) => span.id)).toEqual(["abc", "def"]);
+    expect(text.slice(spans[0].start, spans[0].end)).toBe(legacy);
+    expect(formatSessionLink("abc")).not.toContain("pi-desktop");
   });
 });

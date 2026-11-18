@@ -431,7 +431,7 @@ impl Refusal {
             Refusal::GrantExpired => "the computer-use grant is no longer active".into(),
             Refusal::BudgetExhausted => "the grant's action budget is exhausted".into(),
             Refusal::ScopeViolation => "the request resolved outside the granted scope".into(),
-            Refusal::SelfTargetRefused => "PI-Desktop windows are never a target".into(),
+            Refusal::SelfTargetRefused => "Slyy windows are never a target".into(),
             Refusal::TargetDenylisted => "the target is on the denylist".into(),
             Refusal::SecureInputRefused => "secure input is active".into(),
             Refusal::StaleBasis => "the coordinate basis no longer matches the scope".into(),

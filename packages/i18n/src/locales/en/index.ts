@@ -60,7 +60,7 @@ export const en = {
       detachedHead: "The project is not on a branch. Check out a branch first.",
       gitMissing: "Git was not found. Install Git to use isolated sessions.",
       gitTooOld: "Isolated sessions need Git 2.29 or newer.",
-      branchNamespaceTaken: "A branch named pi-desktop exists. Rename it to use isolated sessions.",
+      branchNamespaceTaken: "A branch named slyy exists. Rename it to use isolated sessions.",
       busy: "The session is still running. Wait for it to finish.",
       changedSincePreview: "The session or the project branch changed after the preview. Review the updated changes.",
       ownerBranchChanged: "The project is no longer on the branch this session started from. Switch back to merge.",

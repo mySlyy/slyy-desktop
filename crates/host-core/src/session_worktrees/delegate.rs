@@ -195,13 +195,7 @@ async fn reattach(
     .await?;
     git.run(
         Path::new(&row.path),
-        &[
-            "worktree",
-            "lock",
-            "--reason",
-            "PI-Desktop subagent",
-            &row.path,
-        ],
+        &["worktree", "lock", "--reason", "Slyy subagent", &row.path],
     )
     .await?;
     let st = state.lock().await;
@@ -313,7 +307,7 @@ pub async fn create_delegate_worktree(
                 "worktree",
                 "lock",
                 "--reason",
-                &format!("PI-Desktop subagent {delegation_id}"),
+                &format!("Slyy subagent {delegation_id}"),
                 &root_text,
             ],
         )

@@ -974,20 +974,24 @@ test("resolvePreviewTarget carries line/col on file chips (#681)", () => {
 });
 
 test("session links segment as their own target", () => {
-  const link = "pi-desktop://session/6f1d2c3b-4a59-4e7f-8a90-b1c2d3e4f506";
-  const segments = splitChatText(`analyze ${link} please`, ROOT);
-  assert.deepEqual(
-    segments.map((segment) => segment.text),
-    ["analyze ", link, " please"],
-  );
-  const target = segments.find((segment) => segment.kind === "target");
-  assert.deepEqual(target.target, {
-    kind: "session",
-    sessionId: "6f1d2c3b-4a59-4e7f-8a90-b1c2d3e4f506",
-  });
-  // A remote id and a bare scheme are not local conversations.
-  assert.equal(resolvePreviewTarget("pi-desktop://session/remote:abc", ROOT), null);
-  assert.equal(resolvePreviewTarget("pi-desktop://session/", ROOT), null);
+  // `slyy://` is produced today; `pi-desktop://` links copied before the
+  // rebrand must keep resolving.
+  for (const scheme of ["slyy", "pi-desktop"]) {
+    const link = `${scheme}://session/6f1d2c3b-4a59-4e7f-8a90-b1c2d3e4f506`;
+    const segments = splitChatText(`analyze ${link} please`, ROOT);
+    assert.deepEqual(
+      segments.map((segment) => segment.text),
+      ["analyze ", link, " please"],
+    );
+    const target = segments.find((segment) => segment.kind === "target");
+    assert.deepEqual(target.target, {
+      kind: "session",
+      sessionId: "6f1d2c3b-4a59-4e7f-8a90-b1c2d3e4f506",
+    });
+    // A remote id and a bare scheme are not local conversations.
+    assert.equal(resolvePreviewTarget(`${scheme}://session/remote:abc`, ROOT), null);
+    assert.equal(resolvePreviewTarget(`${scheme}://session/`, ROOT), null);
+  }
 });
 
 test("an absolute Markdown link to an extensionless file still reaches the file opener", () => {

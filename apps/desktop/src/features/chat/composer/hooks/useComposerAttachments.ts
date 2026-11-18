@@ -171,7 +171,7 @@ export function useComposerAttachments({
   };
 
   /**
-   * A pasted `pi-desktop://session/<id>` link becomes the same inline chip as
+   * A pasted `slyy://session/<id>` link becomes the same inline chip as
    * any other attachment; the prompt still carries the link text.
    */
   const pasteSessionLinks = (text: string) => {

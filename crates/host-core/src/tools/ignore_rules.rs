@@ -8,16 +8,21 @@
 //! 2. App defaults: build output and dependency trees are hidden from an
 //!    unscoped `Glob`/`Grep` walk. An explicit `path` argument opts back in,
 //!    the same way it already bypasses parent `.gitignore` rules.
-//! 3. Workspace rules: a gitignore-style `.pi-desktopignore` at the workspace
-//!    root, honored by unscoped walks.
-//! 4. User global rules: `<data_dir>/ignore` (`~/.pi-desktop/ignore` by
+//! 3. Workspace rules: a gitignore-style `.slyyignore` at the workspace root
+//!    (the pre-rebrand `.pi-desktopignore` is still honored next to it),
+//!    honored by unscoped walks.
+//! 4. User global rules: `<data_dir>/ignore` (`~/.slyy-gen2/ignore` by
 //!    default), honored by unscoped walks.
 
 use ignore::WalkBuilder;
 use std::path::{Path, PathBuf};
 
 /// Workspace-root ignore file name (spec 15 §5).
-pub const WORKSPACE_IGNORE_FILE: &str = ".pi-desktopignore";
+pub const WORKSPACE_IGNORE_FILE: &str = ".slyyignore";
+
+/// Pre-rebrand workspace ignore file name. Still read so existing projects
+/// keep their rules; when both exist, both apply.
+pub const LEGACY_WORKSPACE_IGNORE_FILE: &str = ".pi-desktopignore";
 
 /// Exact file names on the security denylist (spec 15 §3).
 const SENSITIVE_FILE_NAMES: &[&str] = &["id_rsa", "id_ed25519", "credentials.json", ".env"];
@@ -113,17 +118,21 @@ fn is_default_ignored_file_name(name: &str) -> bool {
             .any(|suffix| name.len() > suffix.len() && name.ends_with(suffix))
 }
 
-/// The workspace-root ignore file, when present.
-pub fn workspace_ignore_file(ignore_root: &Path) -> Option<PathBuf> {
-    let candidate = ignore_root.join(WORKSPACE_IGNORE_FILE);
-    candidate.is_file().then_some(candidate)
+/// The workspace-root ignore files that exist: the legacy
+/// `.pi-desktopignore` first, then `.slyyignore`.
+pub fn workspace_ignore_files(ignore_root: &Path) -> Vec<PathBuf> {
+    [LEGACY_WORKSPACE_IGNORE_FILE, WORKSPACE_IGNORE_FILE]
+        .into_iter()
+        .map(|name| ignore_root.join(name))
+        .filter(|candidate| candidate.is_file())
+        .collect()
 }
 
 /// The user's global ignore file (`<data_dir>/ignore`), when present.
 pub fn user_global_ignore_file() -> Option<PathBuf> {
     let data_dir = std::env::var_os("PI_DESKTOP_DATA_DIR")
         .map(PathBuf::from)
-        .or_else(|| dirs::home_dir().map(|home| home.join(".pi-desktop")))?;
+        .or_else(|| dirs::home_dir().map(|home| crate::state::default_data_dir(&home)))?;
     let candidate = data_dir.join("ignore");
     candidate.is_file().then_some(candidate)
 }
@@ -132,7 +141,7 @@ pub fn user_global_ignore_file() -> Option<PathBuf> {
 /// `path` argument) keep only the security denylist.
 pub fn configure_walker(walker: &mut WalkBuilder, ignore_root: &Path, scoped: bool) {
     if !scoped {
-        if let Some(file) = workspace_ignore_file(ignore_root) {
+        for file in workspace_ignore_files(ignore_root) {
             let _ = walker.add_ignore(file);
         }
         if let Some(file) = user_global_ignore_file() {
@@ -196,12 +205,9 @@ pub fn rg_args(ignore_root: &Path, scoped: bool) -> Vec<String> {
         args.push("--glob".into());
         args.push(format!("!*{suffix}"));
     }
-    for file in [
-        workspace_ignore_file(ignore_root),
-        user_global_ignore_file(),
-    ]
-    .into_iter()
-    .flatten()
+    for file in workspace_ignore_files(ignore_root)
+        .into_iter()
+        .chain(user_global_ignore_file())
     {
         args.push("--ignore-file".into());
         args.push(file.to_string_lossy().into_owned());
@@ -258,5 +264,47 @@ mod tests {
         let unscoped = rg_args(Path::new("/nonexistent"), false);
         assert!(unscoped.contains(&"!node_modules".to_string()));
         assert!(unscoped.contains(&"!*.log".to_string()));
+    }
+
+    #[test]
+    fn workspace_ignore_files_read_slyyignore_and_the_legacy_name() {
+        let dir = tempfile::tempdir().unwrap();
+        assert!(workspace_ignore_files(dir.path()).is_empty());
+
+        std::fs::write(dir.path().join(".pi-desktopignore"), "old/\n").unwrap();
+        assert_eq!(
+            workspace_ignore_files(dir.path()),
+            vec![dir.path().join(".pi-desktopignore")]
+        );
+
+        std::fs::write(dir.path().join(".slyyignore"), "new/\n").unwrap();
+        assert_eq!(
+            workspace_ignore_files(dir.path()),
+            vec![
+                dir.path().join(".pi-desktopignore"),
+                dir.path().join(".slyyignore"),
+            ]
+        );
+        let args = rg_args(dir.path(), false);
+        for name in [".pi-desktopignore", ".slyyignore"] {
+            let path = dir.path().join(name).to_string_lossy().into_owned();
+            assert!(args.contains(&path), "{name} must reach rg: {args:?}");
+        }
+        assert!(!rg_args(dir.path(), true)
+            .iter()
+            .any(|arg| arg.ends_with("ignore")));
+    }
+
+    #[test]
+    fn the_default_data_dir_is_the_slyy_one() {
+        let home = Path::new("/home/user");
+        assert_eq!(
+            crate::state::default_data_dir(home),
+            home.join(".slyy-gen2")
+        );
+        assert_ne!(
+            crate::state::default_data_dir(home),
+            home.join(".pi-desktop")
+        );
     }
 }

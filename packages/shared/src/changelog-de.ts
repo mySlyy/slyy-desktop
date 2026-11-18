@@ -152,7 +152,7 @@ export const deEntries: ChangelogEntry[] = [
       "Geplante Aufgaben können im Intervall laufen: alle 5 Minuten bis zu 24 Stunden, gezählt ab dem Zeitpunkt, an dem die Aufgabe aktiviert wurde.",
       "Die Seite „Geplant“ verbindet die Aufgabenliste mit der ausgewählten Aufgabe: letztes Ergebnis, nächste Ausführung, Anweisung und Ausführungsverlauf.",
       "Die Unterhaltung eines Laufs hat eine Zurück-Zeile zu ihrer Aufgabe und ihrem Lauf, und jede Aufgabe legt fest, ob ein Lauf eine neue Unterhaltung öffnet oder eine bestehende fortsetzt.",
-      "Fügen Sie einen Link pi-desktop://session/<id> in den Composer ein, um eine Unterhaltung an einen weiteren Turn zu übergeben.",
+      "Fügen Sie einen Link slyy://session/<id> in den Composer ein, um eine Unterhaltung an einen weiteren Turn zu übergeben.",
       "Öffnen Sie Dateiverweise der Form path:line aus dem Chat, dem Arbeitsbereich und dem mitgelieferten Dateimanager und springen Sie direkt zu dieser Zeile.",
       "Inline-Code, der auf einen echten Dateipfad verweist, ist jetzt ein anklickbarer Link; anderer Inline-Code und Codeblöcke bleiben einfacher Text.",
       "Jeder MCP-Server kann sein eigenes Verbindungs-Timeout festlegen (1–600 Sekunden), und das Zurücksetzen stellt den Standardwert wieder her.",
@@ -726,7 +726,7 @@ export const deEntries: ChangelogEntry[] = [
       "Melden Sie sich bei mehreren Anbieterkonten an und wählen Sie das für jeden Anbieter verwendete Konto aus.",
       "Nutzen Sie die Fähigkeiten jedes Modells, um zu entscheiden, wann Bildanhänge unterstützt werden.",
       "Wählen Sie den Argumentationsaufwand direkt vom Composer für Modelle aus, die ihn offenlegen.",
-      "Behalten Sie eine PI-Desktop-Instanz pro Datenverzeichnis bei, um widersprüchliche Sitzungen zu vermeiden.",
+      "Behalten Sie eine Slyy-Instanz pro Datenverzeichnis bei, um widersprüchliche Sitzungen zu vermeiden.",
       "Organisieren Sie Einstellungen in übersichtlicheren Gruppen und vereinfachen Sie die Verwaltung von Anbieterkonten.",
       "Halten Sie die integrierten Subagenten an den Berechtigungsmodus der übergeordneten Konversation angepasst."
     ]
@@ -770,7 +770,7 @@ export const deEntries: ChangelogEntry[] = [
       "Merken Sie sich kürzlich verwendete Plugins im Launcher für einen schnelleren Zugriff.",
       "Kopiersitzungspfad zum Kontextmenü für den Entwicklermodus hinzufügen.",
       "Behebung von Problemen mit dem Abschneiden der Schriftartenauswahl und dem Zurücksetzen der Systemstandards.",
-      "Lassen Sie macOS PI-Desktop nach dem Schließen des Fensters im Dock und drücken Sie Cmd+Tab.",
+      "Lassen Sie macOS Slyy nach dem Schließen des Fensters im Dock und drücken Sie Cmd+Tab.",
       "Chat-Transkript angeheftet halten, wenn Composer nach dem Senden ausgeblendet wird.",
       "Geben Sie dem Arbeitspanel einen echten leeren Zustand mit klarerer Führung."
     ]
@@ -810,7 +810,7 @@ export const deEntries: ChangelogEntry[] = [
     "date": "2026-08-12",
     "highlights": [
       "Stellen Sie den globalen Plugin-Starter „Alt+Leertaste“ von Windows wieder her, auch wenn eine andere App fokussiert ist.",
-      "Halten Sie PI-Desktop in der Taskleiste verfügbar, wenn es unter macOS, Windows und Linux minimiert ist.",
+      "Halten Sie Slyy in der Taskleiste verfügbar, wenn es unter macOS, Windows und Linux minimiert ist.",
       "Verbessern Sie die Lesbarkeit des nativen Auswahlmenüs in hellen und dunklen Designs."
     ]
   },
@@ -886,8 +886,8 @@ export const deEntries: ChangelogEntry[] = [
     "version": "0.4.1",
     "date": "2026-08-02",
     "highlights": [
-      "GitHub-Versionen aktualisieren und Links zum kanonischen PI-Desktop-Repository automatisch aktualisieren.",
-      "Aktualisieren Sie die Projekt-, Plugin- und Release-Dokumentation, um den PI-Desktop-Repository-Namen zu verwenden."
+      "GitHub-Versionen aktualisieren und Links zum kanonischen Slyy-Repository automatisch aktualisieren.",
+      "Aktualisieren Sie die Projekt-, Plugin- und Release-Dokumentation, um den Slyy-Repository-Namen zu verwenden."
     ]
   },
   {

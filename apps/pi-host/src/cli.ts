@@ -19,7 +19,7 @@ async function main(): Promise<void> {
   if (args.help === true) {
     process.stdout.write(
       [
-        "pi-host — headless PI Agent Host (RACP-WS on loopback)",
+        "pi-host — headless Slyy Agent Host (RACP-WS on loopback)",
         "  provider-import          import selected providers from SSH stdin",
         "",
         "  --data-dir <dir>          host data directory (default ~/.pi-desktop)",

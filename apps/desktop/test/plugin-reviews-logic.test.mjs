@@ -55,7 +55,7 @@ function page(overrides = {}) {
     reviews: [review()],
     nextCursor: null,
     summary: summary(),
-    reviewUrl: "https://plugins.aiuo.net/plugins/acme.todo#reviews",
+    reviewUrl: "https://hub.slyy.ai/plugins/acme.todo#reviews",
     ...overrides,
   };
 }
@@ -63,11 +63,11 @@ function page(overrides = {}) {
 test("the official review URL encodes the plugin id into the fallback page", () => {
   assert.equal(
     officialReviewUrl("acme.todo"),
-    "https://plugins.aiuo.net/plugins/acme.todo#reviews",
+    "https://hub.slyy.ai/plugins/acme.todo#reviews",
   );
   assert.equal(
     officialReviewUrl("a/b c#d"),
-    "https://plugins.aiuo.net/plugins/a%2Fb%20c%23d#reviews",
+    "https://hub.slyy.ai/plugins/a%2Fb%20c%23d#reviews",
   );
 });
 
@@ -79,7 +79,7 @@ test("the page URL wins only when it is a usable http(s) address", () => {
   for (const bad of [null, undefined, "", "   ", "javascript:alert(1)", "/relative", "data:text/plain"]) {
     assert.equal(
       effectiveReviewUrl("acme.todo", bad),
-      "https://plugins.aiuo.net/plugins/acme.todo#reviews",
+      "https://hub.slyy.ai/plugins/acme.todo#reviews",
       `expected fallback for ${String(bad)}`,
     );
   }
@@ -174,7 +174,7 @@ test("a first page fills the list and closes the load", () => {
   assert.equal(ready.nextCursor, "next-1");
   assert.deepEqual(ready.reviews.map((row) => row.id), ["r1"]);
   assert.equal(ready.summary?.ratingAvg, 4.5);
-  assert.equal(ready.reviewUrl, "https://plugins.aiuo.net/plugins/acme.todo#reviews");
+  assert.equal(ready.reviewUrl, "https://hub.slyy.ai/plugins/acme.todo#reviews");
 });
 
 test("a summary of zero reviews is carried through as zero, not as unavailable", () => {
@@ -241,7 +241,7 @@ test("a page that does not carry reviewUrl falls back to the official page", () 
     page({ reviewUrl: undefined }),
     "acme.todo",
   );
-  assert.equal(state.reviewUrl, "https://plugins.aiuo.net/plugins/acme.todo#reviews");
+  assert.equal(state.reviewUrl, "https://hub.slyy.ai/plugins/acme.todo#reviews");
 });
 
 test("an answer for another query cannot reach the list on screen", () => {

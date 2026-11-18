@@ -486,6 +486,28 @@ fn high_risk_permissions_roundtrip_on_notes_plugin() {
     });
 }
 
+/// The official channel is the Slyy hub; reviews and package resolution
+/// derive their origin from it, so no request goes to the upstream center.
+#[test]
+fn the_official_channel_is_the_slyy_hub() {
+    assert_eq!(
+        OFFICIAL_CHANNEL_CATALOG_URL,
+        "https://hub.slyy.ai/catalog.json"
+    );
+    assert_eq!(
+        MarketChannel::Official.catalog_url(),
+        Some("https://hub.slyy.ai/catalog.json")
+    );
+    assert_eq!(
+        super::reviews::review_origin_for_catalog(OFFICIAL_CHANNEL_CATALOG_URL).as_deref(),
+        Some("https://hub.slyy.ai")
+    );
+    assert_eq!(
+        super::resolve::endpoint_for(OFFICIAL_CHANNEL_CATALOG_URL).as_deref(),
+        Some("https://hub.slyy.ai/api/v1/download/resolve")
+    );
+}
+
 #[test]
 fn resolve_relative_package_urls_against_catalog() {
     let resolved = PluginManager::resolve_package_url(
@@ -495,7 +517,7 @@ fn resolve_relative_package_urls_against_catalog() {
     );
     assert_eq!(
         resolved,
-        "https://plugins.aiuo.net/packages/demo.hello-0.2.0.piplug"
+        "https://hub.slyy.ai/packages/demo.hello-0.2.0.piplug"
     );
 }
 
@@ -1767,12 +1789,12 @@ fn official_catalog_package_bases_resolve_to_approved_mirror_hosts() {
 
     let github = PluginManager::resolve_package_url(
         OFFICIAL_CHANNEL_CATALOG_URL,
-        Some("https://raw.githubusercontent.com/AIUO-Net/pi-desktop-plugins/main"),
+        Some("https://raw.githubusercontent.com/acme/plugin-mirror/main"),
         relative,
     );
     assert_eq!(
         github,
-        "https://raw.githubusercontent.com/AIUO-Net/pi-desktop-plugins/main/packages/acme.todo-1.0.0.piplug"
+        "https://raw.githubusercontent.com/acme/plugin-mirror/main/packages/acme.todo-1.0.0.piplug"
     );
 
     let mirror = PluginManager::resolve_package_url(
@@ -1788,7 +1810,7 @@ fn official_catalog_package_bases_resolve_to_approved_mirror_hosts() {
     // Both package hosts are accepted while the catalog stays official.
     package_host_allowed(&github, OFFICIAL_CHANNEL_CATALOG_URL).unwrap();
     package_host_allowed(&mirror, OFFICIAL_CHANNEL_CATALOG_URL).unwrap();
-    assert!(github.starts_with("https://raw.githubusercontent.com/AIUO-Net/"));
+    assert!(github.starts_with("https://raw.githubusercontent.com/acme/"));
     assert!(mirror.starts_with("https://cnb.cool/"));
 }
 

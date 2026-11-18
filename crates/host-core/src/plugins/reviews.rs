@@ -761,16 +761,16 @@ mod tests {
     fn ticker_url_names_the_ticker_route() {
         let ids = vec!["a.b".to_string(), "c-d".to_string()];
         assert_eq!(
-            tickers_url("https://plugins.aiuo.net", &ids),
-            "https://plugins.aiuo.net/api/v1/review-tickers?pluginIds=a.b,c-d"
+            tickers_url("https://hub.slyy.ai", &ids),
+            "https://hub.slyy.ai/api/v1/review-tickers?pluginIds=a.b,c-d"
         );
     }
 
     #[test]
     fn the_origin_keeps_only_the_catalogs_host() {
         assert_eq!(
-            review_origin_for_catalog("https://plugins.aiuo.net/catalog.json").as_deref(),
-            Some("https://plugins.aiuo.net")
+            review_origin_for_catalog("https://hub.slyy.ai/catalog.json").as_deref(),
+            Some("https://hub.slyy.ai")
         );
         assert_eq!(
             review_origin_for_catalog("http://127.0.0.1:8787/catalog.json").as_deref(),
@@ -779,12 +779,12 @@ mod tests {
         );
         assert_eq!(review_origin_for_catalog("file:///tmp/catalog.json"), None);
         assert_eq!(
-            review_origin_for_catalog("https://user:secret@plugins.aiuo.net/catalog.json"),
+            review_origin_for_catalog("https://user:secret@hub.slyy.ai/catalog.json"),
             None,
             "credentials in a catalog url are not a review origin"
         );
         assert_eq!(
-            review_origin_for_catalog("https://plugins.aiuo.net?x=1/catalog.json"),
+            review_origin_for_catalog("https://hub.slyy.ai?x=1/catalog.json"),
             None,
             "a query smuggled into the authority is not a host"
         );
@@ -814,16 +814,16 @@ mod tests {
             sort: ReviewSort::Helpful,
         };
         assert_eq!(
-            reviews_url("https://plugins.aiuo.net", &query),
-            "https://plugins.aiuo.net/api/v1/plugins/demo.hello/reviews?limit=10&sentiment=positive&sort=helpful&cursor=a%20b%2Fc%2Bd%3De"
+            reviews_url("https://hub.slyy.ai", &query),
+            "https://hub.slyy.ai/api/v1/plugins/demo.hello/reviews?limit=10&sentiment=positive&sort=helpful&cursor=a%20b%2Fc%2Bd%3De"
         );
         assert_eq!(
             summaries_url("http://127.0.0.1:8787", &["a.b".into(), "c-d".into()]),
             "http://127.0.0.1:8787/api/v1/review-summaries?pluginIds=a.b,c-d"
         );
         assert_eq!(
-            review_page_url("https://plugins.aiuo.net", "demo.hello"),
-            "https://plugins.aiuo.net/plugins/demo.hello#reviews"
+            review_page_url("https://hub.slyy.ai", "demo.hello"),
+            "https://hub.slyy.ai/plugins/demo.hello#reviews"
         );
     }
 

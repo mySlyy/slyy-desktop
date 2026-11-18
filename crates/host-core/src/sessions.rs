@@ -203,7 +203,7 @@ pub struct MessageAttachment {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub size: Option<i64>,
     /// Bounded excerpt of a referenced conversation (`kind: "session"`), written
-    /// by Electron main when the prompt carried a `pi-desktop://session/<id>`
+    /// by Electron main when the prompt carried a `slyy://session/<id>`
     /// link. Travels with the user message so the model keeps reading it.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub text: Option<String>,

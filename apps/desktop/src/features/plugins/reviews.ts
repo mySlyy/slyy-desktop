@@ -53,7 +53,7 @@ export const REVIEW_PAGE_LIMIT = 20;
  * override included); this is the fallback used when only the plugin id is
  * known, so the write link never depends on catalogue or review content.
  */
-export const OFFICIAL_PLUGIN_CENTER_ORIGIN = "https://plugins.aiuo.net";
+export const OFFICIAL_PLUGIN_CENTER_ORIGIN = "https://hub.slyy.ai";
 
 /** The public page where a review for `pluginId` is written. */
 export function officialReviewUrl(pluginId: string): string {

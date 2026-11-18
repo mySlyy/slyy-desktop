@@ -463,7 +463,7 @@ async function connectRenderer(state) {
           (target) =>
             target.type === "page" &&
             target.webSocketDebuggerUrl &&
-            (target.url.startsWith("file:") || target.title === "PI-Desktop"),
+            (target.url.startsWith("file:") || target.title === "Slyy"),
         );
       } catch {
         return null;

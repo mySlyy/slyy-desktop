@@ -4245,7 +4245,11 @@ mod tests {
         std::fs::write(dir.path().join("generated/out.txt"), "needle\n").unwrap();
         std::fs::write(dir.path().join("debug.log"), "needle\n").unwrap();
         std::fs::write(dir.path().join("src.txt"), "needle\n").unwrap();
-        std::fs::write(dir.path().join(".pi-desktopignore"), "generated/\n").unwrap();
+        std::fs::create_dir_all(dir.path().join("legacy")).unwrap();
+        std::fs::write(dir.path().join("legacy/out.txt"), "needle\n").unwrap();
+        std::fs::write(dir.path().join(".slyyignore"), "generated/\n").unwrap();
+        // The pre-rebrand file name is still honored next to `.slyyignore`.
+        std::fs::write(dir.path().join(".pi-desktopignore"), "legacy/\n").unwrap();
 
         let unscoped = execute_tool(
             Some(dir.path()),
@@ -4263,7 +4267,11 @@ mod tests {
         );
         assert!(
             !shown.contains("generated"),
-            ".pi-desktopignore is honored: {shown}"
+            ".slyyignore is honored: {shown}"
+        );
+        assert!(
+            !shown.contains("legacy"),
+            ".pi-desktopignore is still honored: {shown}"
         );
         assert!(
             !shown.contains("debug.log"),

@@ -15,8 +15,8 @@ import type { RuntimeProviderConfig } from "./provider-binding.js";
 
 export const OPENCODE_SESSION_HEADER = "x-opencode-session";
 export const OPENCODE_CLIENT_HEADER = "x-opencode-client";
-export const OPENCODE_CLIENT_VALUE = "pi-desktop";
-export const OPENCODE_USER_AGENT = `pi-desktop/${APP_VERSION}`;
+export const OPENCODE_CLIENT_VALUE = "slyy";
+export const OPENCODE_USER_AGENT = `slyy/${APP_VERSION}`;
 
 export type OpenCodeEndpointInput = {
   apiStyle?: string;

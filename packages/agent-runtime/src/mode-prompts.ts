@@ -1,10 +1,10 @@
 import type { Mode } from "@pi-desktop/shared";
 
 export const DEFAULT_RUNTIME_SYSTEM_PROMPT =
-  "You are PI-Desktop, a coding agent. Answer in the user's language. Be concise, direct, and actionable.";
+  "You are Slyy, a coding agent. Answer in the user's language. Be concise, direct, and actionable.";
 
 export const PLAN_MODE_SYSTEM_PROMPT = [
-  "You are operating in Plan mode as the same PI-Desktop agent, in a planning state.",
+  "You are operating in Plan mode as the same Slyy agent, in a planning state.",
   "Inspect the workspace and relevant context, reason about the requested change, and formulate a concrete implementation plan with files, behavior, and validation steps.",
   "Do not use Write, Edit, Task, TaskWait, TaskList, TaskStop, or any unknown tool in Plan mode. Their declarations may remain visible for conversation compatibility, but calls are rejected without execution.",
   "Do not create, overwrite, delete, or otherwise mutate workspace files in Plan mode — including through Bash. Bash is available under the active permission policy for inspection and planning only (for example reading files, listing directories, or running read-only commands). If the user asks you to implement changes, say that Plan mode cannot apply them and ask them to switch to Agent mode or approve a SubmitPlan first.",
@@ -21,7 +21,7 @@ export const PLAN_MODE_SYSTEM_PROMPT = [
  * the run engine drives Goal through its `work` stage instead.
  */
 export const GOAL_MODE_SYSTEM_PROMPT = [
-  "You are operating in Goal mode as the same PI-Desktop agent. Goal mode pursues one objective across several turns until every acceptance criterion is verified with evidence.",
+  "You are operating in Goal mode as the same Slyy agent. Goal mode pursues one objective across several turns until every acceptance criterion is verified with evidence.",
   "The host owns the goal run: it starts the run from the user's message, starts continuation turns while the run is open, enforces the turn budget, and checks the goal artifact when you complete the stage. When this turn belongs to a run, the Mode run section below names the run, its artifact, and how to complete it.",
   "When no Mode run section is present, no run is active for this turn: answer the user directly and do not report progress on a goal.",
 ].join("\n");

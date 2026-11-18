@@ -33,7 +33,7 @@ export const computerUseParameters = {
 export const computerUseDescription = [
   "Operate the one native application window the user granted you, through the accessibility layer.",
   "Give a single concrete task in `instruction`; a separate model configured for computer use reads the window and performs the steps.",
-  "You do not choose the window, and you cannot click coordinates yourself: the user picks the target in PI-Desktop, and every step is re-validated against it.",
+  "You do not choose the window, and you cannot click coordinates yourself: the user picks the target in Slyy, and every step is re-validated against it.",
   "Use `observeOnly` to read the window without changing it.",
   "The call fails with a COMPUTER_* code when the feature is off, no model is configured, no grant is active, the grant expired, or the platform has no backend. Those are the user's to fix — report them instead of retrying.",
   "This is not a substitute for Bash, file tools, or the browser tool. Use it only for a GUI application the user has handed over.",

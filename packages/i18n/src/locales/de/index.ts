@@ -62,7 +62,7 @@ export const de = {
       "detachedHead": "Das Projekt ist auf keinem Branch. Checken Sie zuerst einen Branch aus.",
       "gitMissing": "Git wurde nicht gefunden. Installieren Sie Git, um isolierte Sitzungen zu nutzen.",
       "gitTooOld": "Isolierte Sitzungen benötigen Git 2.29 oder neuer.",
-      "branchNamespaceTaken": "Ein Branch namens pi-desktop existiert. Benennen Sie ihn um, um isolierte Sitzungen zu nutzen.",
+      "branchNamespaceTaken": "Ein Branch namens slyy existiert. Benennen Sie ihn um, um isolierte Sitzungen zu nutzen.",
       "busy": "Die Sitzung läuft noch. Warten Sie, bis sie fertig ist.",
       "changedSincePreview": "Die Sitzung oder der Projekt-Branch hat sich nach der Vorschau geändert. Prüfen Sie die aktualisierten Änderungen.",
       "ownerBranchChanged": "Das Projekt ist nicht mehr auf dem Branch, auf dem diese Sitzung begann. Wechseln Sie zurück, um zusammenzuführen.",

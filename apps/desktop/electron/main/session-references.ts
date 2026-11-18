@@ -1,5 +1,5 @@
 /**
- * Session references: `pi-desktop://session/<id>` links a Composer draft carries.
+ * Session references: `slyy://session/<id>` links a Composer draft carries.
  *
  * The link is the whole interaction — no new Composer trigger symbol — and the
  * transcript shows it as a card next to the user's words. Electron main is the
