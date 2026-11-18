@@ -188,7 +188,7 @@ test("unreadable persisted state degrades to an empty store", () => {
 });
 
 test("a legacy payload with aliases is read without them and left untouched", () => {
-  const aliases = { "app:wechat": ["聊天"] };
+  const aliases = { "app:wechat": ["chat"] };
   const storage = fakeStorage({
     [STATE_KEY]: JSON.stringify({
       recents: ["app:wechat"],

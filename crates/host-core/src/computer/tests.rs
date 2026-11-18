@@ -669,7 +669,7 @@ fn labels_from_a_window_are_bounded() {
         super::MAX_LABEL_CHARS
     );
     // A multi-byte label must not be cut mid-character.
-    let wide = "字".repeat(super::MAX_LABEL_CHARS + 10);
+    let wide = "\u{5B57}".repeat(super::MAX_LABEL_CHARS + 10);
     assert_eq!(
         super::truncate_label(&wide).chars().count(),
         super::MAX_LABEL_CHARS

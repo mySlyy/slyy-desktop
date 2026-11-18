@@ -47,22 +47,6 @@ const WHITESPACE = new Set([" ", "\t", "\n", "\r"]);
 /** Characters that end the token scan-back, per pi's autocomplete. */
 const DELIMITERS = new Set([" ", "\t", "\n", "\r", '"', "'", "="]);
 
-/** U+3001 IDEOGRAPHIC COMMA — the mark a Chinese IME gives for "/" (D405). */
-export const IDEOGRAPHIC_COMMA = "、";
-
-/**
- * A Chinese IME types "、" where an ASCII "/" is meant, and switching input
- * methods to reach the slash menu breaks the flow of writing (issue #65). The
- * first character of an otherwise empty draft is rewritten to "/" so the
- * ordinary command menu opens; a mark anywhere later in the draft is text and
- * is left untouched.
- */
-export function rewriteIdeographicCommaTrigger(value: string): string {
-  return value.startsWith(IDEOGRAPHIC_COMMA)
-    ? `/${value.slice(1)}`
-    : value;
-}
-
 function isBoundary(value: string, index: number): boolean {
   if (index <= 0) return true;
   return DELIMITERS.has(value[index - 1]);
@@ -162,7 +146,7 @@ export function findAgentMentions(
 ): AgentMention[] {
   const mentions: AgentMention[] = [];
   for (const match of content.matchAll(
-    /(^|\s)@([a-z0-9][a-z0-9-]*)(?=$|\s|[,;:!?)\]，。；：！？、）]|\.(?:\s|$))/g,
+    /(^|\s)@([a-z0-9][a-z0-9-]*)(?=$|\s|[,;:!?)\]]|\.(?:\s|$))/g,
   )) {
     if (!agentNames.has(match[2])) continue;
     const start = match.index + match[1].length;

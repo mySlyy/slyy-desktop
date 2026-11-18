@@ -1,4 +1,4 @@
-﻿export type PluginViewBounds = {
+export type PluginViewBounds = {
   x: number;
   y: number;
   width: number;

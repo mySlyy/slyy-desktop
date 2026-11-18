@@ -104,7 +104,7 @@ test("the top-level header keeps only status, duration, tool count and an inline
     assert.match(failedHtml, />9 tools</);
     assert.doesNotMatch(
       failedHtml,
-      /issue|问题|turn-process-error|activityFailures/i,
+      /issue|turn-process-error|activityFailures/i,
     );
   } finally {
     await server.close();

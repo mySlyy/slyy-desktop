@@ -7,7 +7,7 @@ import { probed, propsProbe, slotSsr } from "./helpers/slot-ssr.mjs";
  * The React glue every slot outlet shares (`src/plugins/renderer-slots/
  * use-slots.tsx`): a registration's component becomes an element of its own,
  * mounts inside the element its plugin's styles are scoped to, and sits in an
- * error boundary that takes only its own region down (出错隔离). Server
+ * error boundary that takes only its own region down. Server
  * rendering has no error boundaries, so the boundary is driven here the way
  * React drives it after a throw; the Electron E2E crashes real slots.
  */

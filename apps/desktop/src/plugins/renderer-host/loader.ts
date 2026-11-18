@@ -1,6 +1,6 @@
 /**
  * Loads plugin renderer entries into the app window and hands each one the
- * `pi` API (`PiRendererApi`, `docs/plugin-plan/slot-contract.html`).
+ * `pi` API (`PiRendererApi`, `docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2).
  *
  * An entry is a plain ES module served from
  * `plugin-renderer://<id>/g<generation>/<entry>`. The generation is the main

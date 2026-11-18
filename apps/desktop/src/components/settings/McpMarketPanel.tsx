@@ -365,7 +365,7 @@ export function McpMarketPanel({
           {installFor.prerequisites?.length ? (
             <p className="mcpm-note">
               <span className="mcpm-note-label">{t("settings.mcpMarket.prerequisites")}</span>
-              {installFor.prerequisites.join("；")}
+              {installFor.prerequisites.join("; ")}
             </p>
           ) : null}
           {installFor.notes ? (
@@ -384,7 +384,7 @@ export function McpMarketPanel({
                   label={spec.name}
                   hint={
                     spec.description
-                      ? `${spec.description}${spec.optional ? `（${t("settings.mcpMarket.optionalHint")}）` : ""}`
+                      ? `${spec.description}${spec.optional ? ` (${t("settings.mcpMarket.optionalHint")})` : ""}`
                       : spec.optional
                         ? t("settings.mcpMarket.optionalHint")
                         : undefined

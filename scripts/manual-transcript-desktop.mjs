@@ -33,7 +33,7 @@ try {
   await host.call("workspace.set", { path: project });
   const { servers } = await host.call("mcp.list", { projectPath: project });
   assert.deepEqual(servers, [], "The isolated fixture must not discover user MCP servers");
-  await host.call("settings.set", { language: "zh-CN", autoGenerateTitle: false });
+  await host.call("settings.set", { language: "en", autoGenerateTitle: false });
   for (const [title, count, long] of [
     ["Scroll test — 1000 messages", 1000, false],
     ["Scroll test — long answers", 80, true],

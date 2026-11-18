@@ -10,7 +10,7 @@ declare global { var certificateUiProbe: (baseline: boolean) => Promise<unknown>
 const assert = (value: unknown, message: string) => { if (!value) throw new Error(message); };
 globalThis.certificateUiProbe = async (baseline) => {
   const i18n = createInstance();
-  await i18n.init({ lng: "zh-CN", resources: { "zh-CN": { translation: catalogs["zh-CN"] } }, interpolation: { escapeValue: false } });
+  await i18n.init({ lng: "de", resources: { de: { translation: catalogs.de } }, interpolation: { escapeValue: false } });
   const container = document.createElement("main");
   container.style.cssText = "max-width:900px;margin:60px auto;padding:24px";
   document.body.append(container);

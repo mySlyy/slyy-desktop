@@ -21,8 +21,8 @@ export type ActivityBucketId = "thinking" | ToolAction;
  * Reading order, not priority.
  *
  * Reasoning leads because it is what the reader most often probes for, and
- * `run` sits after the file work so a Chinese label ends on a verb phrase
- * ("搜索、读取并执行命令") instead of starting the list with a command.
+ * `run` sits after the file work so the label ends on running commands
+ * ("searched, read and ran commands") instead of starting the list with one.
  */
 export const ACTIVITY_BUCKET_ORDER: readonly ActivityBucketId[] = [
   "thinking",
@@ -90,7 +90,7 @@ export function activityLabelBuckets(buckets: readonly ActivityBucket[]): {
   return { named, hidden: ranked.length - named.length };
 }
 
-/** The localized "what it did" phrase, e.g. `搜索并读取文件`. */
+/** The localized "what it did" phrase, e.g. `searched and read files`. */
 export function activityBucketPhrase(
   named: readonly ActivityBucket[],
   hidden: number,

@@ -543,7 +543,7 @@ mod catalog_parsing_tests {
         "updatedAt": "2026-11-01T00:00:00Z",
         "policyVersion": "2026.10.2",
         "artifactBaseUrl": "https://cdn.example/plugins",
-        "categoryLabels": { "themes": { "en": "Themes", "zh-CN": "外观主题" } },
+        "categoryLabels": { "themes": { "en": "Themes", "zh-CN": "\u5916\u89C2\u4E3B\u9898" } },
         "plugins": [{
             "id": "pi.parchment", "name": "Parchment", "description": "warm", "author": "acme",
             "iconUrl": "https://example.test/icon.png",
@@ -573,7 +573,10 @@ mod catalog_parsing_tests {
             file.artifact_base_url.as_deref(),
             Some("https://cdn.example/plugins")
         );
-        assert_eq!(file.category_labels["themes"]["zh-CN"], "外观主题");
+        assert_eq!(
+            file.category_labels["themes"]["zh-CN"],
+            "\u{5916}\u{89C2}\u{4E3B}\u{9898}"
+        );
 
         let entry = &file.plugins[0];
         assert_eq!(entry.publisher_id.as_deref(), Some("tioit-wang"));

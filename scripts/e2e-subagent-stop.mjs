@@ -211,11 +211,11 @@ try {
   });
   console.log("PASS same-session follow-up starts immediately after Stop returns");
   if (show) {
-    const demo = await invoke("sessionCreate", { title: "子智能体停止演示 · 本地模拟模型", mode: "agent", providerId: setup.providerId, modelId: setup.modelId, projectPath: workspace });
+    const demo = await invoke("sessionCreate", { title: "Subagent stop demo · local mock model", mode: "agent", providerId: setup.providerId, modelId: setup.modelId, projectPath: workspace });
     const demoId = demo.data.session.id;
     assert.equal((await invoke("sessionConfigure", demoId, { mode: "agent", providerId: setup.providerId, modelId: setup.modelId, thinkingLevel: "medium" })).ok, true);
     await page.evaluate(`window.__PI_DESKTOP__.selectSession(${JSON.stringify(demoId)})`);
-    await invoke("agentPrompt", { sessionId: demoId, content: "这是本地模拟模型演示：启动两个子智能体，可以分别停止，或停止全部。主智能体继续运行。" });
+    await invoke("agentPrompt", { sessionId: demoId, content: "This is a local mock model demo: start two subagents that can be stopped one by one or all at once. The main agent keeps running." });
     await until(() => workers.size === 2 && parents.size > 0, "demo ready");
     await page.evaluate(`document.querySelector('.subagent-topology-node-header').click()`);
     await until(() => page.evaluate(`!!document.querySelector('.subagent-transcript-composer-controls .stop-btn')`), "demo detail stop control");

@@ -176,7 +176,8 @@ truncated tool calls retain their existing behavior.
    bound for a vision model is read into memory; larger images use streamed
    hashing/copying and the existing safe path fallback. An image whose header
    reports a longest edge above 8000 px (D675) also takes the path fallback
-   A `pi-desktop://session/<id>` link in the draft is resolved in the same step
+   A `slyy://session/<id>` link (or legacy `pi-desktop://session/<id>`) in the
+   draft is resolved in the same step
    into a bounded excerpt attachment: the same project only, the current
    conversation dropped before any read, and the runtime quotes it to the model
    as one `<session_reference name="…" session="…">` block ahead of the user's
@@ -1475,8 +1476,8 @@ those values, or whose base URL host is `opencode.ai` send:
 
 - `x-opencode-session`: the durable conversation id, or a per-call UUID when
   the caller has no session
-- `x-opencode-client: pi-desktop`
-- `User-Agent: pi-desktop/<APP_VERSION>`
+- `x-opencode-client: slyy`
+- `User-Agent: slyy/<APP_VERSION>`
 
 Caller-supplied headers override the client and User-Agent defaults. An empty
 session header is restored from the conversation id so OpenCode Go cannot

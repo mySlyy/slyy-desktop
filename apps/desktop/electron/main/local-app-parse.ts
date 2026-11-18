@@ -29,7 +29,7 @@ export interface ParsedDesktopEntry {
 const DESKTOP_FIELD_CODE = /%[fFuUdDnNickvm]/g;
 
 /** Shortcut / bundle names that are never launchable user applications. */
-const NOISE_MARKERS = ["uninstall", "readme", "help", "documentation", "卸载"] as const;
+const NOISE_MARKERS = ["uninstall", "readme", "help", "documentation"] as const;
 
 /**
  * Parse the `[Desktop Entry]` group of a `.desktop` file.

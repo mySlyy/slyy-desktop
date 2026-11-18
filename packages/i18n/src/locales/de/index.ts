@@ -839,7 +839,7 @@ export const de = {
     "reject": "Ablehnen",
     "untitled": "Unbenannter Plan",
     "openArtifact": "Offener Plan",
-    "openArtifactLabel": "Offenes Planartefakt {{path}}",
+    "openArtifactLabel": "Planartefakt öffnen {{path}}",
   },
   "goal": {
     "planning": "Ziel definieren",
@@ -1660,7 +1660,7 @@ sklm: {
     "marketProvider": "Marktplatz-Quelle",
     "marketProviderOfficial": "Offizieller Kanal",
     "marketProviderGithub": "GitHub-Backup",
-    "marketProviderMirror": "CNB-Backup",
+    "marketProviderMirror": "Backup-Spiegelserver",
     "marketProviderCustom": "Benutzerdefiniert",
     "marketCustomUrl": "Katalog-URL",
     "marketCustomUrlDesc": "Vollständige URL eines Katalogs.json. Die darin enthaltenen Paketpfade werden anhand dieser Adresse aufgelöst.",

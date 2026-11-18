@@ -15,12 +15,13 @@ import {
   pluginProviderServiceOptions,
 } from "../src/components/settings/service-catalog.ts";
 
-// Stands in for i18next with localized labels, so a label-only match is
-// distinguishable from a match on the canonical English name.
+// Stands in for i18next with localized labels that share no word with the
+// canonical English names, so a label-only match is distinguishable from a
+// match on the canonical name.
 const labels = {
-  "settings.presetMoonshotCn": "月之暗面",
-  "settings.presetStepfunPlan": "阶跃星辰 Plan（订阅）",
-  "settings.presetCustomEndpoint": "自定义端点",
+  "settings.presetMoonshotCn": "Mondschuss Festland",
+  "settings.presetStepfunPlan": "Schrittfunktion Plan (Abo)",
+  "settings.presetCustomEndpoint": "Eigener Endpunkt",
 };
 const translate = (key) => labels[key] ?? key;
 const options = [customServiceOption(translate), ...namedServiceOptions(translate)];
@@ -40,7 +41,7 @@ test("StepFun Plan is offered once and searchable by its label, vendor and endpo
   assert.equal(rows.length, 1);
   assert.equal(rows[0].label, labels["settings.presetStepfunPlan"]);
   assert.equal(rows[0].endpoint, "api.stepfun.com/step_plan/v1");
-  for (const query of ["阶跃星辰", "StepFun Plan", "stepfun-step-plan", "api.stepfun.com/step_plan/v1"]) {
+  for (const query of ["Schrittfunktion", "StepFun Plan", "stepfun-step-plan", "api.stepfun.com/step_plan/v1"]) {
     assert.ok(ids(query).includes("stepfun-plan"), query);
   }
 });
@@ -51,7 +52,7 @@ test("an empty or blank query keeps every option", () => {
 });
 
 test("a query matches the localized label, canonical name and aliases", () => {
-  assert.deepEqual(ids("月之暗面"), ["moonshotai-cn"]);
+  assert.deepEqual(ids("Mondschuss"), ["moonshotai-cn"]);
   assert.ok(ids("Moonshot").includes("moonshotai-cn"));
   assert.ok(ids("gemini").includes("google"));
   assert.ok(ids("dashscope").includes("alibaba-cn"));
@@ -69,7 +70,7 @@ test("the custom endpoint is searchable by its label and by 'custom'", () => {
   const custom = customServiceOption(translate);
   assert.equal(custom.id, CUSTOM_SERVICE);
   assert.equal(custom.endpoint, "");
-  assert.deepEqual(ids("自定义"), [CUSTOM_SERVICE]);
+  assert.deepEqual(ids("Eigener"), [CUSTOM_SERVICE]);
   assert.deepEqual(ids("custom endpoint"), [CUSTOM_SERVICE]);
 });
 
@@ -92,7 +93,7 @@ test("endpoint labels retain routes and ports without showing credentials or que
 test("plugin provider categories show only unconfigured API-key rows and search introductions", () => {
   const provider = (id, ownerPluginId, hasSecret) => ({
     id,
-    name: id.endsWith("hcnsec") ? "幻城网安公益 API" : "ChatAnywhere Free API",
+    name: id.endsWith("hcnsec") ? "HCNSec Charity API" : "ChatAnywhere Free API",
     vendorKey: "custom",
     type: "openai_compatible",
     protocol: "openai_compatible",
@@ -122,58 +123,58 @@ test("plugin provider categories show only unconfigured API-key rows and search 
       pluginId: "community.ai-sites",
       providerId: "plugin:community.ai-sites:hcnsec",
       pluginName: "PI Community AI Sites",
-      category: "公益站",
-      description: "签到获得额度的公益 API 服务。",
+      category: "Charity sites",
+      description: "Free API credits for a daily check-in.",
     },
     {
       pluginId: "community.ai-sites",
       providerId: "plugin:community.ai-sites:chatanywhere",
       pluginName: "PI Community AI Sites",
-      category: "公益站",
-      description: "签到获得额度的公益 API 服务。",
+      category: "Charity sites",
+      description: "Free API credits for a daily check-in.",
     },
     {
       pluginId: "community.ai-sites",
       providerId: "plugin:community.ai-sites:disabled",
       pluginName: "PI Community AI Sites",
-      category: "公益站",
-      description: "已停用的站点。",
+      category: "Charity sites",
+      description: "A disabled site.",
     },
     {
       pluginId: "community.ai-sites",
       providerId: "plugin:other:wrong-owner",
       pluginName: "PI Community AI Sites",
-      category: "公益站",
-      description: "其他站点。",
+      category: "Charity sites",
+      description: "Another site.",
     },
     {
       pluginId: "community.ai-sites",
       providerId: "plugin:community.ai-sites:oauth",
       pluginName: "PI Community AI Sites",
-      category: "公益站",
-      description: "OAuth 站点。",
+      category: "Charity sites",
+      description: "An OAuth site.",
     },
     {
       pluginId: "community.ai-sites",
       providerId: "plugin:community.ai-sites:no-endpoint",
       pluginName: "PI Community AI Sites",
-      category: "公益站",
-      description: "缺少地址。",
+      category: "Charity sites",
+      description: "Missing endpoint.",
     },
   ];
 
   const options = pluginProviderServiceOptions(declarations, providers);
   assert.equal(options.length, 1);
-  assert.equal(options[0].category, "公益站");
+  assert.equal(options[0].category, "Charity sites");
   assert.equal(options[0].endpoint, "api.ifivem.com/v1 · PI Community AI Sites");
-  assert.equal(options[0].description, "签到获得额度的公益 API 服务。");
+  assert.equal(options[0].description, "Free API credits for a daily check-in.");
   assert.deepEqual(filterServiceOptions(options, "deepseek-chat").map((option) => option.id), [
     "plugin:community.ai-sites:hcnsec",
   ]);
-  assert.deepEqual(filterServiceOptions(options, "公益站").map((option) => option.id), [
+  assert.deepEqual(filterServiceOptions(options, "Charity sites").map((option) => option.id), [
     "plugin:community.ai-sites:hcnsec",
   ]);
-  assert.deepEqual(filterServiceOptions(options, "签到获得额度").map((option) => option.id), [
+  assert.deepEqual(filterServiceOptions(options, "daily check-in").map((option) => option.id), [
     "plugin:community.ai-sites:hcnsec",
   ]);
 });

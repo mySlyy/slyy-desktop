@@ -681,7 +681,7 @@ globalThis.transcriptRenderProbe = async () => {
       "Task completion timing did not update to 4s",
     );
 
-    // 系统通知后重建会话时，仍运行的 Task 不应变成已停止。
+    // When the session is rebuilt after a system notice, a Task that is still running must not turn into stopped.
     for (const smoothStreaming of [false, true]) {
       for (const inlineVisualizations of [false, true]) {
         flushSync(() => useAppStore.setState({ settings: {

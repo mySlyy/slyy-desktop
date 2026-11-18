@@ -4,7 +4,9 @@
  * A selection is stored as a CSS `font-family` stack string in
  * `AppSettings.fontFamily`. Only installed system families are offered — the
  * app ships no fonts of its own — and every stack keeps system CJK fallbacks
- * so Chinese text stays readable when the selected family has no CJK glyphs.
+ * so CJK text in user content (messages, file names, model output) stays
+ * readable when the selected family has no CJK glyphs. The UI itself ships
+ * only English and German.
  */
 /**
  * CJK fallback tier appended to every custom stack. All three families are

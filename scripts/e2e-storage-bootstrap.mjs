@@ -128,7 +128,7 @@ if (process.env.STORAGE_E2E_MODE === 'seed') {
   }
   await launch("seed");
   const sourceTranscript = await readFile(join(data, "sessions/chat.jsonl"), "utf8");
-  await writeFile(pointer, JSON.stringify({ version: 1, roots: { data, browser: anchor }, backups: [], pending: { id: randomUUID(), kind: "migrate", target, language: "zh-CN" } }));
+  await writeFile(pointer, JSON.stringify({ version: 1, roots: { data, browser: anchor }, backups: [], pending: { id: randomUUID(), kind: "migrate", target, language: "de" } }));
   const migrated = await launch("maintenance");
   const preferences = JSON.parse(migrated.pointer);
   assert.equal(preferences.roots.data, join(target, "data"));
@@ -136,8 +136,8 @@ if (process.env.STORAGE_E2E_MODE === 'seed') {
   assert.equal(migrated.relaunched, true);
   assert.equal(migrated.window.sandbox, true);
   assert.equal(migrated.window.persistent, false);
-  assert.match(migrated.window.view.heading, /迁移|存储|维护/);
-  assert.match(migrated.window.view.stage, /完成/);
+  assert.match(migrated.window.view.heading, /Speicher|Migration|Wartung/);
+  assert.match(migrated.window.view.stage, /Abgeschlossen/);
   assert.equal(await readFile(join(data, "sessions/chat.jsonl"), "utf8"), sourceTranscript);
   assert.match(await readFile(join(target, "data/sessions/chat.jsonl"), "utf8"), /destination\/data\/attachments/);
   await readFile(join(scratch, "index.html"));

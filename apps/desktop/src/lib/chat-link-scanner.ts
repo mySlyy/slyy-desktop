@@ -61,7 +61,7 @@ const PROSE_BOUNDARIES = new Set([
   "copy", "create", "created", "delete", "edit", "find", "fix", "for",
   "generated", "i", "is", "move", "now", "open", "or", "please", "read",
   "remove", "review", "saved", "see", "show", "then", "this", "update",
-  "use", "view", "with", "write", "和", "与", "再看", "然后", "接着",
+  "use", "view", "with", "write",
 ]);
 
 function createStats(): ChatLinkScanStats {

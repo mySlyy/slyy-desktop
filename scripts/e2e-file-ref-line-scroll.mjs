@@ -86,8 +86,8 @@ app.whenReady().then(async () => {
   assert.equal(code, 0, output.slice(-4000));
   assert.equal(result.fileManagerAvailable, true, "fixture must use the normal project-file setup");
   assert.deepEqual(result.pluginEnableCalls, ["pi.file-manager"]);
-  assert.equal(result.fileManagerLocation, "核查报告.md");
-  assert.deepEqual(result.resolveRefs, ["src/scroll-target.txt", "核查报告.md", "src/scroll-target.txt"]);
+  assert.equal(result.fileManagerLocation, "\u6838\u67e5\u62a5\u544a.md");
+  assert.deepEqual(result.resolveRefs, ["src/scroll-target.txt", "\u6838\u67e5\u62a5\u544a.md", "src/scroll-target.txt"]);
   assert.deepEqual(result.readPaths, ["src/scroll-target.txt"]);
   assert.equal(result.selectedPath, "src/scroll-target.txt");
   assert.deepEqual(result.request, { path: "src/scroll-target.txt", seq: 1, line: 65 });

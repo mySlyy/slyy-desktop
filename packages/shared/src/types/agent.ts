@@ -264,8 +264,8 @@ export function formatAskToolOutput(
 ): string {
   return questions
     .map((question, index) => {
-      const answer = answers[index]?.join("、") ?? "";
-      return `${question.question}：${answer}`;
+      const answer = answers[index]?.join(", ") ?? "";
+      return `${question.question}: ${answer}`;
     })
     .join("\n---\n");
 }

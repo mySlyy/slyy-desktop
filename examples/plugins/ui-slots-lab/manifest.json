@@ -35,8 +35,8 @@
     "composerTransforms": [
       {
         "id": "lab-transform",
-        "title": { "en": "Lab transform", "zh-CN": "实验室转换" },
-        "undoTitle": { "en": "Undo lab transform", "zh-CN": "撤销实验室转换" }
+        "title": { "en": "Lab transform", "zh-CN": "Lab transform" },
+        "undoTitle": { "en": "Undo lab transform", "zh-CN": "Undo lab transform" }
       }
     ]
   },

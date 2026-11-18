@@ -265,8 +265,8 @@ test("Windows stderr strings stay intact and buffers decode without throwing", (
   const text = '"node" is not recognized as an internal or external command';
   assert.equal(decodeMcpStderr(text, "win32"), text);
   assert.equal(decodeMcpStderr(Buffer.from(text, "utf8"), "darwin"), text);
-  const chinese = "找不到命令: npx";
-  assert.equal(decodeMcpStderr(Buffer.from(chinese, "utf8"), "win32"), chinese);
+  const nonAscii = "\u627e\u4e0d\u5230\u547d\u4ee4: npx";
+  assert.equal(decodeMcpStderr(Buffer.from(nonAscii, "utf8"), "win32"), nonAscii);
   const gbkNode = Buffer.from([0x27, 0x6e, 0x6f, 0x64, 0x65, 0x27]);
   assert.match(decodeMcpStderr(gbkNode, "win32", true), /node/);
 });

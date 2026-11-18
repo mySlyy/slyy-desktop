@@ -251,7 +251,8 @@ export function useComposerAttachments({
       const sourceRevision = readComposerDraftRevision(sourceDraftKey);
       setPasting(true);
       try {
-        // 合成截图已有字节，无需启动系统目录探测进程；磁盘文件仍走原路径。
+        // A synthesized screenshot already has its bytes, so no system
+        // directory probe process is started; disk files keep the usual path.
         const native = !isLargeTextPaste && !screenshotPaste ? await api.readClipboardDirectories() : null;
         if (!native && !files.length && !isLargeTextPaste) {
           if (hasNativeFileTypes) throw new Error(t("chat.directoryPasteUnavailable"));

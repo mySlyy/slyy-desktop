@@ -2,7 +2,7 @@ use super::*;
 
 #[test]
 fn unicode_case_aliases_use_the_same_native_project_identity() {
-    for (name, alias) in [("Älpha", "älpha"), ("Σ", "ς")] {
+    for (name, alias) in [("\u{C4}lpha", "\u{E4}lpha"), ("\u{3A3}", "\u{3C2}")] {
         let root = tempfile::tempdir().unwrap();
         let root = root.path().canonicalize().unwrap();
         let folder = root.join(name);

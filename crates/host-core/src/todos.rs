@@ -425,7 +425,7 @@ mod tests {
 
     #[test]
     fn normalization_truncates_over_long_unicode_content_with_a_warning() {
-        let over = "日".repeat(MAX_TODO_CONTENT_CHARS + 1);
+        let over = "\u{65E5}".repeat(MAX_TODO_CONTENT_CHARS + 1);
         let normalized = normalize_input(&json!({
             "todos": [{"content": over, "status": "pending"}]
         }))
@@ -439,7 +439,7 @@ mod tests {
 
         // The boundary itself is kept verbatim: exactly 500 characters is not
         // over the limit.
-        let exact = "日".repeat(MAX_TODO_CONTENT_CHARS);
+        let exact = "\u{65E5}".repeat(MAX_TODO_CONTENT_CHARS);
         let normalized = normalize_input(&json!({
             "todos": [{"content": exact, "status": "pending"}]
         }))

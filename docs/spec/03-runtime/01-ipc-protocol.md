@@ -2521,7 +2521,7 @@ connection record to `mcp-control.json`:
 ```json
 {
   "active": true,
-  "serverName": "pi-desktop",
+  "serverName": "slyy",
   "protocol": "streamable-http",
   "url": "http://127.0.0.1:37123/mcp",
   "token": "<redacted>",
@@ -2532,7 +2532,8 @@ connection record to `mcp-control.json`:
 
 Both files are written with mode `0600` where the platform supports POSIX
 permissions. Every request must include `Authorization: Bearer <token>` (the
-`X-Pi-Desktop-Token` header is retained for simple local clients). Requests to
+`X-Slyy-Token` header is retained for simple local clients; the pre-rebrand
+`X-Pi-Desktop-Token` is still accepted with the same token check). Requests to
 other paths, requests without the token, and methods other than
 POST/DELETE/OPTIONS are rejected. The server is stopped before Electron waits
 for host shutdown and the manifest is marked inactive.
@@ -2558,8 +2559,10 @@ The named tools cover the common Agent workflow:
 - `pi_plans_pending`, `pi_plans_resolve`
 - `pi_workspace_diff`, `pi_fs_list`, `pi_fs_read`
 
-`pi_control_describe` returns the reviewed operation catalog. `pi_desktop_invoke`
-accepts an operation id and positional IPC arguments:
+`pi_control_describe` returns the reviewed operation catalog. `slyy_invoke`
+accepts an operation id and positional IPC arguments (the pre-rebrand name
+`pi_desktop_invoke` is still accepted on `tools/call` as an unlisted alias with
+the same confirm gate; `tools/list` shows only `slyy_invoke`):
 
 ```json
 {
@@ -2600,7 +2603,7 @@ The six `session/collaboration/*` operations are first-party-plugin-only: they
 require an authenticated plugin tool invocation context, so they appear in
 `pi.desktop.listOperations` and are callable through `pi.desktop.invoke`, but
 they are excluded from the MCP-visible catalog (`tools/list`,
-`pi_control_describe`, and the `pi_desktop_invoke` operation enum) and an MCP
+`pi_control_describe`, and the `slyy_invoke` operation enum) and an MCP
 caller cannot invoke them.
 
 After successful **mutating** external calls, Electron Main may emit the existing

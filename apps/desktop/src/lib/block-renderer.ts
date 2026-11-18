@@ -1,7 +1,7 @@
 import { blockRendererLanguageKey } from "@pi-desktop/plugin-sdk";
 
 /**
- * Pure helpers for the `blockRenderer` slot (`docs/plugin-plan/ui/block-renderer/`).
+ * Pure helpers for the `blockRenderer` slot (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2).
  *
  * The contract: a plugin claims the whole code block for a fence language
  * registered as `<pluginId>:lang`; the host hands `{ language, source }`

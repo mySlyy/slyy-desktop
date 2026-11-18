@@ -5,6 +5,7 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
 import { isRemoteSession } from "../lib/remote-session-safety";
+import { isDefaultSessionTitle } from "../lib/session-title-utils";
 import { normalizeProjectPath } from "../lib/sidebar-session-groups";
 import {
   KEYBOARD_SHORTCUTS,
@@ -33,12 +34,6 @@ function projectName(path?: string | null, name?: string | null) {
   if (!path) return null;
   const parts = path.split(/[/\\]/).filter(Boolean);
   return parts[parts.length - 1] || path;
-}
-
-function isDefaultSessionTitle(title?: string | null) {
-  const trimmed = (title || "").trim().toLowerCase();
-  if (!trimmed) return true;
-  return ["new task", "new chat", "新建任务", "新对话"].includes(trimmed);
 }
 
 export function ConversationTopbar({

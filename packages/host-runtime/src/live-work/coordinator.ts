@@ -1049,10 +1049,7 @@ function isBusy(state: WorkSnapshot["state"]): boolean {
 function isControlSchedulingHint(instruction: string): boolean {
   const text = instruction.trim().toLocaleLowerCase();
   return /^(?:please\s+)?(?:stop|cancel|abort)\s+(?:(?:the|my)\s+)?(?:current|active|running)\s+(?:task|work|turn)\b/u.test(text) ||
-    /^(?:what(?:'s| is)\s+the\s+status|status\s+of\s+(?:the\s+)?(?:current|active|last|previous)\s+(?:task|work)|what\s+(?:happened|did\s+the\s+(?:task|work)\s+do)|show\s+(?:the\s+)?(?:task\s+)?result)\b/u.test(text) ||
-    /^(?:请)?(?:停止|停掉|中止)(?:当前|正在运行的)?(?:任务|工作|会话)/u.test(text) ||
-    /^(?:请)?(?:取消|撤销)(?:当前|正在运行的)?(?:任务|排队任务)/u.test(text) ||
-    /^(?:查询|查看|告诉我)(?:当前|最近|刚才的)?(?:任务|工作)?(?:状态|结果|进展)/u.test(text);
+    /^(?:what(?:'s| is)\s+the\s+status|status\s+of\s+(?:the\s+)?(?:current|active|last|previous)\s+(?:task|work)|what\s+(?:happened|did\s+the\s+(?:task|work)\s+do)|show\s+(?:the\s+)?(?:task\s+)?result)\b/u.test(text);
 }
 
 function isControlIntent(intent: LiveWorkIntent): boolean {

@@ -711,7 +711,7 @@ mod tests {
             id: "rev_1".into(),
             author_name: "linzhou27".into(),
             rating_half_stars: 10,
-            body: "装上之后基本没再开过系统文件管理器。".into(),
+            body: "Since installing it I have barely opened the system file manager.".into(),
             helpful_count: 60,
             created_at: "2026-10-16T08:00:00Z".into(),
         };

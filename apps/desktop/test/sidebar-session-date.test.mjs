@@ -18,12 +18,12 @@ test("formats session activity through seven calendar days and uses a date after
     new Date(2026, 9, 16 - daysAgo, 8).toISOString();
 
   assert.equal(
-    formatSessionLastReplyDate(atLocalDay(0), now, "zh-CN"),
-    "0天前",
+    formatSessionLastReplyDate(atLocalDay(0), now, "de"),
+    "vor 0 Tagen",
   );
   assert.equal(
-    formatSessionLastReplyDate(atLocalDay(7), now, "zh-CN"),
-    "7天前",
+    formatSessionLastReplyDate(atLocalDay(7), now, "de"),
+    "vor 7 Tagen",
   );
   assert.equal(
     formatSessionLastReplyDate(atLocalDay(8), now, "en"),

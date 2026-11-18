@@ -100,7 +100,7 @@ test("session result rendering keeps literal snippets safe and selectable in eve
     const originalDocument = globalThis.document;
     const originalFilter = globalThis.NodeFilter;
     try {
-      const textNodes = ["prefix ".repeat(15_000), "NEE", "DLE 中文"].map((textContent) => ({
+      const textNodes = ["prefix ".repeat(15_000), "NEE", "DLE \u4e2d\u6587"].map((textContent) => ({
         textContent, parentElement: { closest: () => null },
       }));
       globalThis.NodeFilter = { SHOW_TEXT: 4, FILTER_ACCEPT: 1, FILTER_REJECT: 2 };

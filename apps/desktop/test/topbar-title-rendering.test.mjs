@@ -65,7 +65,7 @@ async function withTopbar(work) {
 
 test("topbar renders the session's project crumb and preserves complete titles", async () => {
   await withTopbar(async ({ render }) => {
-    for (const title of ["Draft reference check", "修复会话标题在窗口顶部的显示", "New task"]) {
+    for (const title of ["Draft reference check", "\u4FEE\u590D\u4F1A\u8BDD\u6807\u9898", "New task"]) {
       for (const sidebarCollapsed of [false, true]) {
         const html = render(
           {

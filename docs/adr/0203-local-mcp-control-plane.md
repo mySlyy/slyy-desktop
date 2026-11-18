@@ -20,7 +20,8 @@ with `PI_DESKTOP_MCP_CONTROL=1`, binds to `127.0.0.1` on `PI_DESKTOP_MCP_PORT`
 publishes its URL, bearer token, PID, and state in a mode-`0600`
 `mcp-control.json` under the user-data directory. Every exposed call delegates to
 the existing registered IPC handler, through named tools for the common
-project/session/Agent/workspace flow plus a generic `pi_desktop_invoke` over a
+project/session/Agent/workspace flow plus a generic `pi_desktop_invoke` (Slyy:
+`slyy_invoke`, old name kept as an alias; ADR slyy-downstream-branding) over a
 risk-tagged catalog discovered by `pi_control_describe`. Dangerous generic
 operations and named destructive tools, including `session/configure`, require
 `confirm: true`, which is an agent acknowledgement rather than a user prompt.

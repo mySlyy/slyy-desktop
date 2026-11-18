@@ -731,11 +731,6 @@
   text-transform: uppercase;
 }
 
-:lang(zh-CN) .composer-model-group-label {
-  letter-spacing: var(--tracking-normal);
-  text-transform: none;
-}
-
 /* Model rows share the provider heading's compact inset. Normal-weight option
    text stays distinct from the stronger provider heading. */
 .composer-model-group .composer-model-option {

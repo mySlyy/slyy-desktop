@@ -112,7 +112,7 @@ app.whenReady().then(async () => {
     const goalSubmission = await submit(goal, "goal", "goal");
     await resolve(goalSubmission.proposal, "reject");
     await host.call("session.endTurn", { turnId: goalSubmission.proposal.turnId, createNotification: false });
-    const goals = await probe("planHistoryLoad", goal.id, ["rejected"], "zh-CN");
+    const goals = await probe("planHistoryLoad", goal.id, ["rejected"], "de");
     await host.call("session.appendCompaction", { sessionId: session.id, compaction: { id: "history-compaction",
       summary: "Earlier planning condensed", throughMessageId: second.message.id, tokensBefore: 100, createdAt: new Date().toISOString() } });
     await host.call("session.appendMessage", { sessionId: session.id, message: { id: "continued", role: "assistant", content: "continued after compaction", createdAt: new Date().toISOString() } });

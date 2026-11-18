@@ -37,7 +37,7 @@ describe("normalizeProviderHeaders", () => {
       normalizeProviderHeaders({
         "X-Title": "PI\u3000Desktop",
         "X-Key": "1234567\uFF10",
-        "X-CJK": "星",
+        "X-CJK": "\u661f",
         "X-Control": "ab\u0000cd",
       }),
     ).toEqual({

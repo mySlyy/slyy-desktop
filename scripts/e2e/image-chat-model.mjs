@@ -84,7 +84,7 @@ export function imageChatModel() {
         emit({ role: "assistant", tool_calls: [{ index: 0, id: pending.id, type: "function", function: { name, arguments: JSON.stringify(args) } }] });
         emit({}, "tool_calls");
       } else {
-        const text = scenario === "batch" ? "已生成两张图片，可在对话中查看。" : scenario === "edit" ? "已将第一张图的背景改为绿色，原图保留。" : "请先到模型设置选择生图模型，再重试。";
+        const text = scenario === "batch" ? "Generated two images; view them in the chat." : scenario === "edit" ? "Changed the background of the first image to green; the original is kept." : "Choose an image model in the model settings first, then retry.";
         emit({ role: "assistant", content: text }); emit({}, "stop");
       }
       res.end("data: [DONE]\n\n");

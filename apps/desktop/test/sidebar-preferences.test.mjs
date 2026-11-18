@@ -83,8 +83,8 @@ test("project metadata uses normalized paths", () => {
 
 test("project display names are trimmed, persisted, and bounded by Unicode characters", () => {
   assert.equal(normalizeProjectName("  API workspace  "), "API workspace");
-  assert.equal(normalizeProjectName("界".repeat(80)), "界".repeat(80));
-  assert.equal(normalizeProjectName("界".repeat(81)), undefined);
+  assert.equal(normalizeProjectName("\u754c".repeat(80)), "\u754c".repeat(80));
+  assert.equal(normalizeProjectName("\u754c".repeat(81)), undefined);
   assert.equal(normalizeProjectName("   "), undefined);
 
   const values = new Map();
@@ -115,7 +115,7 @@ test("project display names are trimmed, persisted, and bounded by Unicode chara
       sessionMeta: {},
       projectMeta: {
         "/work/api/": { name: "  API workspace  ", pinned: true },
-        "/work/invalid": { name: "界".repeat(81), archived: true },
+        "/work/invalid": { name: "\u754c".repeat(81), archived: true },
       },
       projectSort: "recent",
       sessionView: { sort: "recent", archived: false },

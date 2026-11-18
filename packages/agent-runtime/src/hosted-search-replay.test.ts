@@ -6,7 +6,7 @@ function stored(replay: HostedSearch["replay"]): HostedSearch {
   return { status: "completed", rounds: [], replay };
 }
 
-/** 捕获诊断输出：降级必须可观测，而不是静默丢弃。 */
+/** Capture diagnostic output: a downgrade must stay observable, never silently dropped. */
 function withCapturedWarnings<T>(run: () => T): { result: T; warnings: unknown[] } {
   const spy = vi.spyOn(console, "warn").mockImplementation(() => {});
   try {
@@ -60,7 +60,7 @@ describe("stored hosted-search replay boundary", () => {
       { type: "hostedSearch", phase: "server_tool_use", blockId: "srv_fixture", name: "web_search", input: { query: "fixture" } },
       { type: "hostedSearch", phase: "unsupported", blockId: "fixture" },
     ])));
-    // 整条丢弃：留下配对的另一半会制造适配器无法接受的孤立块。
+    // Drop the whole pair: keeping the other half would leave an orphan block the adapter rejects.
     expect(result).toEqual([]);
     expect(warnings).toHaveLength(1);
   });

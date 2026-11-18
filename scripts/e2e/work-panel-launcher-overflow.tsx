@@ -13,7 +13,7 @@ type Scenario = {
   height: number;
   explicitTab: boolean;
   theme: "light" | "dark";
-  language: "en" | "zh-CN";
+  language: "en" | "de";
 };
 
 declare global {
@@ -45,7 +45,7 @@ const ready = i18n.init({
   lng: "en",
   resources: {
     en: { translation: catalogs.en },
-    "zh-CN": { translation: catalogs["zh-CN"] },
+    de: { translation: catalogs.de },
   },
   interpolation: { escapeValue: false },
 });
@@ -90,7 +90,7 @@ globalThis.launcherOverflowProbe = async (scenario) => {
         pluginId: `fixture.tool-${order}`,
         viewId: "main",
         ref: `fixture.tool-${order}/main`,
-        title: `${scenario.language === "en" ? "Tool" : "工具"} ${order} ${"Long localized tool name ".repeat(8)}`,
+        title: `${scenario.language === "en" ? "Tool" : "Werkzeug"} ${order} ${"Long localized tool name ".repeat(8)}`,
         pluginName: `Fixture ${order}`,
         order,
       })),

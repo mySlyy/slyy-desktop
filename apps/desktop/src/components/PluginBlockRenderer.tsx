@@ -1,5 +1,5 @@
 /**
- * The `blockRenderer` slot host (`docs/plugin-plan/ui/block-renderer/`).
+ * The `blockRenderer` slot host (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2).
  *
  * A claimed fence hands `{ language, source }` to the plugin once (props-once)
  * and the plugin owns the whole block — head, copy button, error display.

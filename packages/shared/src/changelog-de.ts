@@ -1035,7 +1035,7 @@ export const deEntries: ChangelogEntry[] = [
       "Chat- und Agent-Modi mit Streaming, Denkebenen und Modellverwaltung.",
       "Workspace-Tools mit Permission Gating, Terminal, Browser und Git-Review.",
       "Rust-Hostkern für Speicher, Geheimnisse, Sitzungen und Benachrichtigungen.",
-      "Plugin-Grundlage plus duale Englisch-/简体中文-Benutzeroberfläche.",
+      "Plugin-Grundlage plus zweisprachige Benutzeroberfläche (Englisch / vereinfachtes Chinesisch).",
       "Update prüft anhand von GitHub-Releases (in der App, sofern unterstützt)."
     ]
   }

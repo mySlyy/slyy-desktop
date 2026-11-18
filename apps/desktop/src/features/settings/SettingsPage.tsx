@@ -252,7 +252,7 @@ export function SettingsPage() {
   }, [navEntries]);
 
   // Search matches the tab label and the titles of the rows inside it, so
-  // typing e.g. "theme" or "主题" surfaces Appearance even though the tab is
+  // typing e.g. "theme" or "Design" surfaces Appearance even though the tab is
   // named differently.
   const filteredItems = useMemo(() => {
     const q = query.trim().toLowerCase();

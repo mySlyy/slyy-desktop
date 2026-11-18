@@ -76,7 +76,7 @@ test("a tile carries the name, the monogram, and nothing that explains the match
 test("a declared trigger outranks a plugin whose name merely contains the input", () => {
   const items = catalog([
     plugin("calc.name-only", "1+1 helper"),
-    plugin("calculator", "计算器", {
+    plugin("calculator", "Calculator", {
       triggers: [{ id: "expr", pattern: "^[0-9+\\-*/(). ]+$" }],
     }),
   ]);
@@ -113,11 +113,11 @@ test("trigger matching is a whole-input match, not contains", () => {
 
 test("an input longer than the trigger budget never runs a declared pattern", () => {
   const trigger = { id: "expr", pattern: "^.*$" };
-  const garbage = "乱".repeat(500);
+  const garbage = "x".repeat(500);
 
   assert.equal(matchLauncherTrigger(trigger, garbage), null);
   const result = search(
-    catalog([plugin("calculator", "计算器", { triggers: [trigger] })]),
+    catalog([plugin("calculator", "Calculator", { triggers: [trigger] })]),
     garbage,
   );
   assert.equal(result.total, 0);
@@ -136,11 +136,11 @@ test("an unusable pattern is ignored instead of throwing on every keystroke", ()
 });
 
 test("Chinese names match by full pinyin and by initials", () => {
-  const items = catalog([], [app("wechat", "微信")]);
+  const items = catalog([], [app("wechat", "\u5fae\u4fe1")]);
 
   assert.equal(search(items, "weixin").tiles[0].id, "app:wechat");
   assert.equal(search(items, "wx").tiles[0].id, "app:wechat");
-  assert.equal(search(items, "微信").tiles[0].id, "app:wechat");
+  assert.equal(search(items, "\u5fae\u4fe1").tiles[0].id, "app:wechat");
 });
 
 test("an application's icon data URL reaches the tile", () => {
@@ -162,11 +162,11 @@ test("plugins never carry an application icon", () => {
 
 test("same-named plugin and application both appear, plugins first", () => {
   const items = catalog(
-    [plugin("calculator", "计算器")],
-    [app("calculator-app", "计算器")],
+    [plugin("calculator", "Calculator")],
+    [app("calculator-app", "Calculator")],
   );
 
-  const result = search(items, "计算器");
+  const result = search(items, "Calculator");
 
   assert.equal(result.total, 2);
   assert.deepEqual(
@@ -269,7 +269,7 @@ test("a plugin the user hid from the launcher is not searchable", () => {
 
 test("a disabled trigger no longer claims the input", () => {
   const items = catalog([
-    plugin("calculator", "计算器", {
+    plugin("calculator", "Calculator", {
       triggers: [{ id: "expr", pattern: "^[0-9+]+$" }],
     }),
   ]);

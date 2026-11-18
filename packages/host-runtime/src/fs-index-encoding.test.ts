@@ -17,8 +17,8 @@ it.each([1, 2, 3, 7])("preserves UTF-8 file names across %i-byte Git chunks", as
   vi.mocked(childProcess.spawn).mockReturnValueOnce(child);
   stdout.on("end", () => child.emit("close", 0));
 
-  const paths = ["README.md", "src/café.ts", "src/竞赛.ts", "src/🚀.ts"];
-  const output = Buffer.from([...paths, "node_modules/pkg/竞赛.ts", ""].join("\0"));
+  const paths = ["README.md", "src/caf\u00e9.ts", "src/\u7ade\u8d5b.ts", "src/\u{1f680}.ts"];
+  const output = Buffer.from([...paths, "node_modules/pkg/\u7ade\u8d5b.ts", ""].join("\0"));
   const root = `/pi-index-encoding-${chunkSize}`;
   const pending = getWorkspaceFileIndex(root);
   for (let offset = 0; offset < output.length; offset += chunkSize) {
@@ -31,6 +31,6 @@ it.each([1, 2, 3, 7])("preserves UTF-8 file names across %i-byte Git chunks", as
   expect(index.entries.filter((entry) => entry.kind === "file").map((entry) => entry.path).sort())
     .toEqual([...paths].sort());
   expect(index.entries).toContainEqual({ path: "src", kind: "dir" });
-  expect((await searchWorkspaceFiles(root, "竞赛")).entries)
-    .toEqual([{ path: "src/竞赛.ts", kind: "file" }]);
+  expect((await searchWorkspaceFiles(root, "\u7ade\u8d5b")).entries)
+    .toEqual([{ path: "src/\u7ade\u8d5b.ts", kind: "file" }]);
 });

@@ -1,6 +1,5 @@
 /**
- * The composer words of `pi.dispatch` (`docs/plugin-plan/render/draft/`,
- * `docs/plugin-plan/render/attachments/`): the payload checks that need no
+ * The composer words of `pi.dispatch` (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2): the payload checks that need no
  * draft, then the draft bridge, which owns everything that does. None of them
  * leaves the renderer.
  */

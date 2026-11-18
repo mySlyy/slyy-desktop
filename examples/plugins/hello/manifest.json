@@ -3,7 +3,7 @@
  "id": "demo.hello",
  "name": "Hello",
  "version": "0.2.0",
- "description": "PI-Desktop 示例插件：命令面板 + 面板 + Echo Tool + 技能 / 主题 / 常驻服务 / 消息总线",
+ "description": "Slyy sample plugin: command palette + panel + echo tool + skill / theme / background service / message bus",
  "author": "PI-Desktop",
  "main": "main.js",
  "ui": {
@@ -12,7 +12,7 @@
  "height": 320,
  "title": {
    "en": "Hello Plugin",
-   "zh-CN": "你好插件"
+   "zh-CN": "Hello Plugin"
  }
  },
  "contributes": {
@@ -21,7 +21,7 @@
  "id": "greetings",
  "title": {
    "en": "Hello Panel",
-   "zh-CN": "你好面板"
+   "zh-CN": "Hello Panel"
  },
  "icon": "sparkles",
  "entry": "views/greetings.html",
@@ -32,7 +32,7 @@
  {
  "id": "hello.open",
  "title": "Hello: Open Panel",
- "keywords": ["hello", "你好", "demo"],
+ "keywords": ["hello", "greeting", "demo"],
  "category": "Demo"
  }
  ],

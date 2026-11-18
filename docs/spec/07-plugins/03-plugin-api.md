@@ -1320,7 +1320,7 @@ with the opt-in local MCP control plane (ADR 0203 / D370). The two catalogs
 differ only for operations marked plugin-only: the six
 `session/collaboration/*` operations are callable through this gateway but are
 deliberately absent from the MCP-visible catalog (`tools/list`,
-`pi_control_describe`, and the `pi_desktop_invoke` enum), because they require
+`pi_control_describe`, and the `slyy_invoke` enum), because they require
 an authenticated plugin invocation context and no renderer mutation channel
 exists for them. The returned catalog omits Electron channel names and the
 plugin never receives the MCP bearer token. Invocation reuses the controller,

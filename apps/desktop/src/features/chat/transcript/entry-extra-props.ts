@@ -1,6 +1,6 @@
 /**
  * Props and height contract of the `entryExtra` slot
- * (`docs/plugin-plan/ui/entry-extra/`). React-free so logic tests can drive
+ * (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2). React-free so logic tests can drive
  * it directly.
  */
 import type { PluginEntryExtraSlotProps } from "@pi-desktop/plugin-sdk";

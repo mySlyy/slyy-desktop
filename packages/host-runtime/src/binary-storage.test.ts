@@ -35,7 +35,7 @@ describe("lossless binary storage", () => {
       [1, "ordinary"],
       { content: [image()] },
       { a: { data: "A/B=" }, b: { data: "A/B=" } },
-      { content: [image("中文"), image("中文")] },
+      { content: [image("\u4e2d\u6587"), image("\u4e2d\u6587")] },
     ]) {
       expect(encodeBinaryStorage(original)).toEqual(original);
       expect(decodeBinaryStorage(original)).toEqual(original);
@@ -119,7 +119,7 @@ describe("corrupt binary storage is an explicit error", () => {
     [
       "non-base64 table data",
       (v: typeof golden.encoded) => {
-        v.binaryStorage.data[0] = "中文";
+        v.binaryStorage.data[0] = "\u4e2d\u6587";
       },
     ],
     [
@@ -185,10 +185,10 @@ describe("corrupt binary storage is an explicit error", () => {
 });
 
 function nestedMirror(depth: number): Record<string, unknown> {
-  let result: Record<string, unknown> = { source: "中文😀", content: [image()] };
+  let result: Record<string, unknown> = { source: "\u4e2d\u6587\u{1f600}", content: [image()] };
   for (let level = 0; level < depth; level++) {
     const text = JSON.stringify(result);
-    result = { source: `层${level}😀`, nested: { result, text } };
+    result = { source: `\u5c42${level}\u{1f600}`, nested: { result, text } };
   }
   return { toolResult: result, content: JSON.stringify(result) };
 }
@@ -223,7 +223,7 @@ describe("nested proven JSON mirrors", () => {
 
   it("preserves inner source spelling and escapes through canonical outer string tokens", () => {
     const inner =
-      '{"source":"earlier","source":"中文😀","content":[{"type":"image","mimeType":"image/png","data":"\\u0041\\/B="}]}';
+      '{"source":"earlier","source":"\u4e2d\u6587\u{1f600}","content":[{"type":"image","mimeType":"image/png","data":"\\u0041\\/B="}]}';
     const result = {
       nested: { result: JSON.parse(inner) as unknown, text: inner },
       exponent: 1,

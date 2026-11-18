@@ -27,7 +27,7 @@ describe("estimateOutputCapInputTokens", () => {
 
   it("counts CJK text at ~1 token per char instead of 0.25", () => {
     const context: OutputCapContext = {
-      messages: [{ role: "user", content: "中".repeat(1000) }],
+      messages: [{ role: "user", content: "\u4e2d".repeat(1000) }],
     };
     // chars/4 baseline = 250; CJK correction adds ceil(1000 * 0.75) = 750.
     expect(estimateOutputCapInputTokens(context)).toBe(1000);
@@ -35,7 +35,7 @@ describe("estimateOutputCapInputTokens", () => {
 
   it("counts CJK inside tool-call arguments at ~1 token per char", () => {
     // JSON.stringify leaves Han unescaped. "Write" (5) plus
-    // {"content":"<1000 中>"} (1014) is 1019 chars: baseline 255, and the
+    // {"content":"<1000 x U+4E2D>"} (1014) is 1019 chars: baseline 255, and the
     // correction adds ceil(1000 * 0.75) = 750.
     const context: OutputCapContext = {
       messages: [
@@ -45,7 +45,7 @@ describe("estimateOutputCapInputTokens", () => {
             {
               type: "toolCall",
               name: "Write",
-              arguments: { content: "中".repeat(1000) },
+              arguments: { content: "\u4e2d".repeat(1000) },
             },
           ],
         },
@@ -75,10 +75,10 @@ describe("estimateOutputCapInputTokens", () => {
 
   it("counts Japanese kana at ~1 token per char, same as Han", () => {
     const han = estimateOutputCapInputTokens({
-      messages: [{ role: "user", content: "中".repeat(1000) }],
+      messages: [{ role: "user", content: "\u4e2d".repeat(1000) }],
     });
     // 9-char hiragana/katakana phrase, sliced to the same 1000 chars as Han.
-    const kana = "こんにちはカタカナ".repeat(112).slice(0, 1000);
+    const kana = "\u3053\u3093\u306b\u3061\u306f\u30ab\u30bf\u30ab\u30ca".repeat(112).slice(0, 1000);
     expect(kana).toHaveLength(1000);
     // chars/4 baseline = 250; the 0.75/char correction brings this to 1000.
     expect(
@@ -88,9 +88,9 @@ describe("estimateOutputCapInputTokens", () => {
 
   it("counts Korean Hangul at ~1 token per char, same as Han", () => {
     const han = estimateOutputCapInputTokens({
-      messages: [{ role: "user", content: "中".repeat(1000) }],
+      messages: [{ role: "user", content: "\u4e2d".repeat(1000) }],
     });
-    const hangul = "안녕하세요".repeat(200);
+    const hangul = "\uc548\ub155\ud558\uc138\uc694".repeat(200);
     expect(hangul).toHaveLength(1000);
     expect(
       estimateOutputCapInputTokens({
@@ -102,7 +102,7 @@ describe("estimateOutputCapInputTokens", () => {
   it("counts Hangul jamo, katakana extensions, and compatibility ideographs like Han", () => {
     const estimate = (content: string) =>
       estimateOutputCapInputTokens({ messages: [{ role: "user", content }] });
-    const han = estimate("中".repeat(1000));
+    const han = estimate("\u4e2d".repeat(1000));
     expect({
       jamo: estimate("\u1100".repeat(1000)),
       compatJamo: estimate("\u3131".repeat(1000)),
@@ -118,11 +118,11 @@ describe("estimateOutputCapInputTokens", () => {
 
   it("does not count ASCII, Latin, or Cyrillic as CJK", () => {
     const ascii = "a".repeat(1000);
-    const latin = "café".repeat(250);
-    const cyrillic = "я".repeat(1000);
+    const latin = "caf\u00e9".repeat(250);
+    const cyrillic = "\u044f".repeat(1000);
     expect(latin).toHaveLength(1000);
     expect(cyrillic).toHaveLength(1000);
-    // chars/4 only. Counting é or я would add ceil(n * 0.75) on top of 250.
+    // chars/4 only. Counting U+00E9 or U+044F would add ceil(n * 0.75) on top of 250.
     expect(
       estimateOutputCapInputTokens({ messages: [{ role: "user", content: ascii }] }),
     ).toBe(250);
@@ -164,7 +164,7 @@ describe("estimateOutputCapInputTokens", () => {
   });
 
   it("corrects CJK in context.tools the same way as system toolsAdded", () => {
-    const description = "测".repeat(4000);
+    const description = "\u6d4b".repeat(4000);
     const tools = [{
       name: "lookup",
       description,
@@ -232,7 +232,7 @@ describe("hosted search output budget", () => {
 
   it("applies CJK correction to hosted search replay", () => {
     const ascii = estimateOutputCapInputTokens(context("a".repeat(1000)));
-    const cjk = estimateOutputCapInputTokens(context("中".repeat(1000)));
+    const cjk = estimateOutputCapInputTokens(context("\u4e2d".repeat(1000)));
     expect(cjk - ascii).toBe(750);
   });
 });
@@ -382,7 +382,7 @@ describe("hosted search target model threading", () => {
           model: "gpt-test",
           content: [
             { type: "text", text: "a".repeat(400) },
-            { type: "thinking", thinking: "中".repeat(100) },
+            { type: "thinking", thinking: "\u4e2d".repeat(100) },
             { type: "toolCall", name: "run", arguments: { a: 1 } },
           ],
         },
@@ -450,7 +450,7 @@ describe("clampOutputToContext", () => {
             {
               type: "toolCall",
               name: "Write",
-              arguments: { content: "中".repeat(110_000) },
+              arguments: { content: "\u4e2d".repeat(110_000) },
             },
           ],
         },
@@ -470,11 +470,11 @@ describe("clampOutputToContext", () => {
     // CJK char and could let a large configured output slip through.
     const context: OutputCapContext = {
       messages: [
-        { role: "user", content: "中".repeat(200_000) },
+        { role: "user", content: "\u4e2d".repeat(200_000) },
         {
           role: "assistant",
           content: [
-            { type: "text", text: "已" },
+            { type: "text", text: "\u5df2" },
             {
               type: "toolCall",
               name: "read_file",
@@ -499,11 +499,11 @@ describe("clampOutputToContext", () => {
     // leave the requested output in place and let input + output pass the window.
     const context: OutputCapContext = {
       messages: [
-        { role: "user", content: "안녕하세요".repeat(40_000) },
+        { role: "user", content: "\uc548\ub155\ud558\uc138\uc694".repeat(40_000) },
         {
           role: "assistant",
           content: [
-            { type: "text", text: "已" },
+            { type: "text", text: "\u5df2" },
             {
               type: "toolCall",
               name: "read_file",
@@ -586,7 +586,7 @@ describe("requestTranscript", () => {
 // Transcript-only Pi requests have no legacy systemPrompt/tools fields.
 it("counts instruction sections and tool declarations in transcript-only requests", () => {
   const base = { messages: [{ role: "system", content: "" }] };
-  const state = { messages: [{ role: "system", content: "", sections: { skills: "中文说明" }, toolsAdded: [{ name: "Read", parameters: { type: "object" } }] }] };
+  const state = { messages: [{ role: "system", content: "", sections: { skills: "\u4e2d\u6587\u8bf4\u660e" }, toolsAdded: [{ name: "Read", parameters: { type: "object" } }] }] };
   expect(estimateOutputCapInputTokens(state)).toBeGreaterThan(estimateOutputCapInputTokens(base));
   expect(estimateOutputCapInputTokens(state)).toBeGreaterThan(4);
 });
@@ -610,7 +610,7 @@ describe("truncateTextWithinOutputCap", () => {
 
   it("shrinks CJK that is longer than the ceiling", () => {
     const text = truncateTextWithinOutputCap(
-      "中".repeat(1_600),
+      "\u4e2d".repeat(1_600),
       budget,
       CHECKPOINT_TRUNCATION_MARKER,
       ceiling,
@@ -623,7 +623,7 @@ describe("truncateTextWithinOutputCap", () => {
 
   it("shrinks CJK that fits the character ceiling but not the token budget", () => {
     const text = truncateTextWithinOutputCap(
-      "中".repeat(600),
+      "\u4e2d".repeat(600),
       budget,
       CHECKPOINT_TRUNCATION_MARKER,
       ceiling,

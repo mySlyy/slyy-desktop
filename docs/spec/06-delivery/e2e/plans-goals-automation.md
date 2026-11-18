@@ -362,7 +362,7 @@ being fetched on every subsequent poll.
   `test:e2e:plan-ui` uses an env-gated Electron Main probe against the existing
   Host, asserts stable Electron/Host PIDs, covers pending restore, live terminal
   controls, rejected and approved/completed terminal-card absence after
-  renderer reload, EN (upstream also zh-CN), and 1280×800 / 900×700 rendering. E2E-108/E2E-109
+  renderer reload, EN and DE (case `E2E-117-de`), and 1280×800 / 900×700 rendering. E2E-108/E2E-109
   cover Host restart interruption, stale-action rejection, and no replay.
 
 ## E2E-146a: Approved Plan/Goal progress text continues once

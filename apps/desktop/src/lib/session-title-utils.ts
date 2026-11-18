@@ -1,29 +1,15 @@
 import i18n from "i18next";
 
 /**
- * Every shipped `chat.untitledTask` / `nav.newChat` label plus their historical
- * forms, so a placeholder is recognized regardless of the active locale. Kept in
- * sync with `PLACEHOLDER_TITLES` in `crates/host-core/src/sessions.rs`.
+ * Every shipped (English and German) `chat.untitledTask` / `nav.newChat`
+ * label, so a placeholder is recognized regardless of the active locale. Kept
+ * in sync with `PLACEHOLDER_TITLES` in `crates/host-core/src/sessions.rs`.
  */
 const LEGACY_DEFAULT_TITLES = new Set([
   "new task",
   "new chat",
-  "新建任务",
-  "新对话",
-  "新建任務",
-  "新對話",
-  "새 작업",
-  "새 채팅",
-  "tarefa sem título",
-  "nova conversa",
-  "yeni görev",
-  "yeni sohbet",
   "neue aufgabe",
-  "nouvelle tâche",
-  "nueva tarea",
   "neuer chat",
-  "nuevo chat",
-  "nouvelle discussion",
 ]);
 /** Sidebar/topbar title budget for the local first-prompt fallback. */
 const PROMPT_FALLBACK_TITLE_LENGTH = 48;

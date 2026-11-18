@@ -56,14 +56,13 @@ export function formatSessionTimestamp(value: string | undefined, locale?: strin
   if (!value) return "—";
   const parsed = new Date(value);
   if (!Number.isFinite(parsed.getTime())) return "—";
-  const absolute = (locale ?? "").toLowerCase().startsWith("zh");
   return new Intl.DateTimeFormat(locale || undefined, {
     year: "numeric",
-    month: absolute ? "2-digit" : "short",
+    month: "short",
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
-    hour12: !absolute,
+    hour12: true,
   }).format(parsed);
 }
 

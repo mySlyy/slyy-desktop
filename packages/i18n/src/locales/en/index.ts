@@ -1671,7 +1671,7 @@ sklm: {
     marketProvider: "Marketplace source",
     marketProviderOfficial: "Official channel",
     marketProviderGithub: "GitHub backup",
-    marketProviderMirror: "CNB backup",
+    marketProviderMirror: "Backup mirror",
     marketProviderCustom: "Custom",
     marketCustomUrl: "Catalog URL",
     marketCustomUrlDesc:

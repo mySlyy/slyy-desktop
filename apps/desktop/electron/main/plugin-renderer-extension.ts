@@ -1,6 +1,6 @@
 /**
  * The main-process half of a plugin's renderer extension
- * (`docs/plugin-plan/ui/`, `docs/plugin-plan/render/plugin-call/`).
+ * (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2).
  *
  * `PluginRuntime` owns which plugins are loaded; this module owns what a
  * loaded plugin's renderer extension may reach, so the runtime only delegates:
@@ -20,7 +20,7 @@ import type { PluginRendererDescriptor } from "@pi-desktop/shared";
 
 export const RENDERER_EXTENSION_PERMISSION = "renderer.extension";
 
-/** `plugin.call` relay limits (`docs/plugin-plan/render/plugin-call/`). */
+/** `plugin.call` relay limits (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2). */
 export const RENDERER_CALL_QPS = 10;
 /** Args and answer together, counted in UTF-8 bytes of their JSON text. */
 export const RENDERER_CALL_MAX_BYTES = 64 * 1024;

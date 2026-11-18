@@ -158,13 +158,13 @@ window.storageSettingsProbe = async () => {
   click("settings.storage.retry");
   await settled();
   assert(button("settings.storage.choose"), "Retry must restore the loaded storage controls");
-  await i18n.changeLanguage("zh-CN");
+  await i18n.changeLanguage("de");
   await settled();
   click("settings.storage.clearCache");
   click("settings.storage.cacheRestart");
   await settled();
-  assert(calls.at(-1).input.language === "zh-CN", "Restart workflow must use current UI locale");
-  assert(scope().textContent.includes("数据保存路径"), "Storage labels must translate with the UI");
+  assert(calls.at(-1).input.language === "de", "Restart workflow must use current UI locale");
+  assert(scope().textContent.includes("Datenspeicherort"), "Storage labels must translate with the UI");
   checks.push("read recovery and localization");
   root.unmount();
   return { ok: true, checks };

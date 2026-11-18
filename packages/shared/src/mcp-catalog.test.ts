@@ -10,7 +10,7 @@ import {
 const stdioTemplate: McpCatalogEntry = {
   id: "github-tools",
   name: "GitHub Tools",
-  description: "仓库操作",
+  description: "Repository operations",
   transport: "stdio",
   command: "npx",
   args: ["-y", "@example/server-${GITHUB_PAT}"],
@@ -118,7 +118,7 @@ describe("resolveCatalogEntry", () => {
     const entry: McpCatalogEntry = {
       id: "memory",
       name: "Memory",
-      description: "记忆",
+      description: "Memory",
       transport: "stdio",
       command: "npx",
       args: ["-y", "@modelcontextprotocol/server-memory"],
@@ -126,7 +126,7 @@ describe("resolveCatalogEntry", () => {
     expect(resolveCatalogEntry(entry)).toEqual({
       id: "memory",
       label: "Memory",
-      description: "记忆",
+      description: "Memory",
       enabled: true,
       transport: "stdio",
       command: "npx",

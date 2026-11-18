@@ -153,49 +153,30 @@
       const emptyBody = document.getElementById("empty-body");
       let inputFocused = false;
       let started = false;
-      let locale = "en";
 
+      // The view ships English copy only (Slyy UI: English + German shell).
       const copy = {
-        en: {
-          back: "Back",
-          forward: "Forward",
-          reload: "Reload",
-          stop: "Stop",
-          external: "Open externally",
-          placeholder: "Search or enter a URL",
-          loadingTitle: "Loading page…",
-          loadingBody: "Waiting for the website to respond. You can stop or enter another address.",
-          stoppedTitle: "Loading stopped",
-          stoppedBody: "Enter an address to try again.",
-          failedTitle: "Could not open this page",
-          failedBody: "Check the address or connection, then try again.",
-          localFileBody: "Only existing local files can be opened.",
-          emptyTitle: "No page open",
-          emptyBody: "Enter an address, or preview an HTML file from the conversation.",
-        },
-        zh: {
-          back: "后退",
-          forward: "前进",
-          reload: "重新加载",
-          stop: "停止",
-          external: "在外部打开",
-          placeholder: "搜索或输入网址",
-          loadingTitle: "正在加载网页…",
-          loadingBody: "正在等待网站响应，可以停止加载或输入其他地址。",
-          stoppedTitle: "已停止加载",
-          stoppedBody: "输入网址可重新打开页面。",
-          failedTitle: "无法打开此页面",
-          failedBody: "请检查网址或网络连接，然后重试。",
-          localFileBody: "只能打开已存在的本地文件。",
-          emptyTitle: "尚未打开页面",
-          emptyBody: "输入地址，或从对话预览 HTML 文件。",
-        },
+        back: "Back",
+        forward: "Forward",
+        reload: "Reload",
+        stop: "Stop",
+        external: "Open externally",
+        placeholder: "Search or enter a URL",
+        loadingTitle: "Loading page…",
+        loadingBody: "Waiting for the website to respond. You can stop or enter another address.",
+        stoppedTitle: "Loading stopped",
+        stoppedBody: "Enter an address to try again.",
+        failedTitle: "Could not open this page",
+        failedBody: "Check the address or connection, then try again.",
+        localFileBody: "Only existing local files can be opened.",
+        emptyTitle: "No page open",
+        emptyBody: "Enter an address, or preview an HTML file from the conversation.",
       };
 
       let navigationRequest = 0;
       let displayedContext = "";
       let navigationContext;
-      const t = (key) => copy[locale]?.[key] ?? copy.en[key] ?? key;
+      const t = (key) => copy[key] ?? key;
 
       const applyCopy = () => {
         back.title = t("back");
@@ -215,9 +196,7 @@
           base === "light" || base === "dark"
             ? base
             : window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
-        const next = String(appearance?.locale ?? navigator.language).toLowerCase();
-        locale = next.startsWith("zh") ? "zh" : "en";
-        document.documentElement.lang = locale === "zh" ? "zh-CN" : "en";
+        document.documentElement.lang = "en";
         applyCopy();
       };
 

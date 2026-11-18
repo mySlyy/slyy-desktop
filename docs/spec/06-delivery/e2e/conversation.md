@@ -929,7 +929,8 @@ folder/mixed-selection behavior. No system clipboard contents are changed.
   draft, send it, and inspect the user message. 3) Ask a follow-up in B without
   repeating the link. 4) Paste C's link into B and send. 5) In A, send A's own
   link. 6) Rename A from its conversation overflow menu, then return to B.
-- **Expected**: The clipboard holds `pi-desktop://session/<A's id>`. B's user
+  7) In B, send A's link rewritten as `pi-desktop://session/<A's id>`.
+- **Expected**: The clipboard holds `slyy://session/<A's id>`. B's user
   message keeps the link text visible and shows a chat-icon chip labelled with
   the catalog's reference label and A's title; activating the chip opens A. The
   answer uses A's content, and the follow-up still reads the same reference
@@ -939,7 +940,8 @@ folder/mixed-selection behavior. No system clipboard contents are changed.
   discards an excerpt whose conversation belongs to another project.
   Renaming A afterwards renames the chip in B, which names the conversation from
   its current title; the excerpt the model already read keeps the name recorded
-  when the reference was made.
+  when the reference was made. The legacy `pi-desktop://` link resolves to the
+  same chip and excerpt.
 - **Specs linked**: `04-ux/08-component-spec.md` §20B,
   `03-runtime/04-data-storage.md`, `03-runtime/02-agent-runtime.md`
 - **Acceptance criterion**: C — Conversation & stream
@@ -1749,7 +1751,7 @@ this does not claim an installed full-app settings journey.
 - **Specs linked**: `04-ux/06-settings-ia.md`, `04-ux/02-i18n-english-first.md`
 - **Acceptance**: A (core shell), H (localization)
 - **Milestone**: M4
-- **Status**: Partially automated in `scripts/e2e-settings-scroll.mjs` for picker selection and live copy (upstream exercised pt-BR, which Slyy no longer ships); the OS Auto-resolution matrix remains documented.
+- **Status**: Partially automated in `scripts/e2e-settings-scroll.mjs` for picker selection and live copy (switching to German); the OS Auto-resolution matrix remains documented.
 
 ## E2E-091a: Theme changes keep the Windows frameless background aligned
 

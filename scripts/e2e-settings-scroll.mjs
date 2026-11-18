@@ -55,7 +55,7 @@ app.whenReady().then(async () => {
     const segments = [];
     for (const width of [800, 1000, 1440]) {
       win.setContentSize(width, 720);
-      for (const language of ["en", "zh-CN"]) {
+      for (const language of ["en", "de"]) {
         for (const scale of [1, 1.5]) {
           segments.push(await win.webContents.executeJavaScript(
             "window.settingsSegmentProbe(" + JSON.stringify(language) + "," + scale + ")"));

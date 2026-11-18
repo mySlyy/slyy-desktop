@@ -609,9 +609,9 @@ export function Composer({
             onAcceptCompletion={completions.acceptCompletion}
             onSubmit={(steering) => void submitFromComposer(steering)}
             onInsertNewline={insertNewlineInEditor}
-            onInput={(source, caret, composing) => {
+            onInput={(source, caret) => {
               inputHistory.exitBrowsing();
-              completions.handleInput(source, caret, composing);
+              completions.handleInput(source, caret);
             }}
             onHistoryNavigate={inputHistory.navigate}
             onCompositionStart={() => setComposing(true)}

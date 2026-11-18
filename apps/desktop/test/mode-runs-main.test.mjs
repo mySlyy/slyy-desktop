@@ -482,7 +482,7 @@ test("Goal startup validates user intent without granting runtime origin", async
   const { goalStartRequested } = await import("../electron/main/runtime/goal-start.ts");
   assert.equal(goalStartRequested({ content: "normal" }), false);
   assert.equal(goalStartRequested({ content: "objective", startGoal: true }), true);
-  for (const input of [{ content: "x", startGoal: "true" }, { content: " ", startGoal: true }, { content: "中".repeat(40_000), startGoal: true }, { content: "x", startGoal: true, sessionMessageId: "delegated" }]) {
+  for (const input of [{ content: "x", startGoal: "true" }, { content: " ", startGoal: true }, { content: "\u4e2d".repeat(40_000), startGoal: true }, { content: "x", startGoal: true, sessionMessageId: "delegated" }]) {
     assert.throws(() => goalStartRequested(input), { errorCode: "INVALID_ARGUMENT" });
   }
 });

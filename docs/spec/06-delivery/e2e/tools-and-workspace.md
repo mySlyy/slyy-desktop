@@ -104,10 +104,13 @@ journeys cover successful reads, saves and directory browsing.
   into the first session without touching the project. Writing
   subagents edit in separate worktrees and completed runs merge back into the
   session. Delete warns about unmerged work and removes the worktree folder
-  and `pi-desktop/<id>` branch without touching files linked from it. After
+  and `slyy/<id>` branch without touching files linked from it. After
   restart the session reopens in its worktree; a manually removed worktree
   shows `Folder missing` and never falls back to the project. In the non-git
-  project **New isolated session** is disabled with the reason under it.
+  project **New isolated session** is disabled with the reason under it. A
+  project with a local `slyy` branch disables it with the branch-taken
+  reason; a local `pi-desktop` branch does not. A session created before the
+  rebrand on `pi-desktop/<id>` still resumes, merges, and deletes cleanly.
 - **Windows checks:** a worktree containing a directory junction is deleted
   without following the junction; a deep path beyond 260 characters is
   created and removed; deleting while a file in the worktree is locked fails
@@ -1785,9 +1788,9 @@ journeys cover successful reads, saves and directory browsing.
   header actions stay outside that scroller. The question body is keyboard
   focusable with a visible focus ring. Next, Skip, and the step indicators open
   each question at the top of that body. The tool output is
-  ordered as the question, a full-width colon (U+FF1A), then the answer; it
-  uses the ideographic comma (U+3001) between multiple answers and `\n---\n`
-  between questions, and keeps the question plus the full-width colon for the
+  ordered as the question, `: `, then the answer; it
+  uses `, ` between multiple answers and `\n---\n`
+  between questions, and keeps the question plus `: ` for the
   skipped question (`formatAskToolOutput` in `packages/shared`). Markdown renders as rich text
   without activating embedded links or loading images. Selecting a formatted
   option returns its original Markdown source label. Decline all produces empty placeholders for every
@@ -2143,8 +2146,8 @@ are withdrawn with ADR 0165.
 
 - **Preconditions**: A project containing `.env`, `.env.example`,
   `server.pem`, `keys/id_rsa`, `notes.txt`, `node_modules/pkg/index.js`,
-  `generated/out.txt`, `debug.log`, and a root `.pi-desktopignore` with
-  `generated/`. Every file contains the word `needle`. The session is Agent
+  `generated/out.txt`, `old/out.txt`, `debug.log`, a root `.slyyignore`
+  with `generated/`, and a legacy root `.pi-desktopignore` with `old/`. Every file contains the word `needle`. The session is Agent
   in `auto` permission mode.
 - **Steps**: 1) Ask for `Read` of `.env`, then of `.env.example`. 2) Ask for
   `Write` to `keys/id_rsa`. 3) Run an unscoped `Grep` and `Glob` for `needle`.
@@ -2154,7 +2157,7 @@ are withdrawn with ADR 0165.
 - **Expected**: Steps 1 and 2 fail with `WORKSPACE_PATH_DENIED`, the
   `.env.example` read succeeds, and no `keys/id_rsa` file is created. The
   unscoped search lists `notes.txt` and `.env.example` only: `.env`,
-  `server.pem`, `node_modules`, `generated`, and `debug.log` are absent. The
+  `server.pem`, `node_modules`, `generated`, `old`, and `debug.log` are absent. The
   explicit-path searches return one hit each. The in-process walker and the
   `rg` fast path produce the same file set.
 - **Specs linked**: `03-runtime/15-workspace-ignore-rules.md`,

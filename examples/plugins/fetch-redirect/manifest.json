@@ -18,7 +18,7 @@
     "panel": "panel.html",
     "title": {
       "en": "Fetch Redirect Probe",
-      "zh-CN": "重定向测试"
+      "zh-CN": "Fetch Redirect Probe"
     },
     "width": 520,
     "height": 440

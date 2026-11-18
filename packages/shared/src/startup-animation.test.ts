@@ -118,7 +118,7 @@ describe("the renderer creation argument", () => {
   it("survives a file name with spaces, quotes, and non-ASCII characters", () => {
     const awkward: StartupAnimationDescriptor = {
       ...descriptor,
-      fileName: 'o"pen ing — 启动.mp4',
+      fileName: 'o"pen ing \u2014 \u542f\u52a8.mp4',
       extension: "mp4",
     };
     expect(

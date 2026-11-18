@@ -20,7 +20,7 @@ export async function transcriptAutoCollapseProbe() {
     lng: "en",
     resources: {
       en: { translation: catalogs.en },
-      "zh-CN": { translation: catalogs["zh-CN"] },
+      de: { translation: catalogs.de },
     },
     interpolation: { escapeValue: false },
   });

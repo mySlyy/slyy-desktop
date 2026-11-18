@@ -67,17 +67,32 @@ so the synthetic filesystem events could reach Node.
 6. Slyy downstream branding: after the production build, the three
    "PI-Desktop" occurrences in the no-bridge messages of
    `views/assets/index.js` (`NO_BRIDGE` error and both `errNoBridge` copies)
-   are replaced with "Slyy" by exact string substitution. This is the only
-   post-build edit; the patches above stay byte-compatible with upstream
-   `views-src`, so reapply this substitution after every rebuild.
+   are replaced with "Slyy" by exact string substitution.
+7. Slyy English-only: after the production build, the `zh:` copy table is
+   removed from `views/assets/index.js` (the `,zh:{title:"…",…}` member of the
+   `{en:…}` copy object). Locale selection is unchanged: a Chinese host locale
+   still resolves to `zh`, and the copy lookup falls back to `en` per key. The
+   two Chinese `title` suffixes of Markdown preview links are replaced with
+   " (click to copy; does not navigate)" and " (unsupported link protocol)".
+   Third-party library code (CodeMirror bracket pairs, core-js whitespace,
+   PDF.js text normalisation) keeps its non-Latin characters. `main.js`
+   comments, `README.md`, `CHANGELOG.md` and the manifest display strings and
+   changelog are translated to English and the manifest `i18n.zh-CN` block is
+   dropped; `contributes.views[].title` is the plain string "File Manager" (a
+   localized map would need both contract locales); `main.js` code tokens are
+   unchanged.
+   Items 6 and 7 are the only post-build edits; the patches above stay
+   byte-compatible with upstream `views-src` (only their comments and test
+   labels are English), so reapply both after every rebuild.
 
-`remote-workspace.js`, `README.md`, `CHANGELOG.md`, `views/index.html`
-and `views/assets/pdfjs-LICENSES.txt` are byte-identical to the pinned integration
-commit. The manifest, rebuilt view and Desktop-local `main.js` repairs differ. The runtime pack has eight
+`remote-workspace.js`, `views/index.html` and
+`views/assets/pdfjs-LICENSES.txt` are byte-identical to the pinned integration
+commit. The manifest, rebuilt view, Desktop-local `main.js` repairs and the
+English `README.md` / `CHANGELOG.md` translations differ. The runtime pack has eight
 files; the two Desktop-local license/module files are added when vendoring.
 QA dependencies, tests and `views-src/` are not included in the shipped plugin.
-The pinned changelog contains trailing spaces; its narrow `.gitattributes`
-exception preserves those upstream bytes rather than silently rewriting them.
+The upstream changelog contained trailing spaces; the English translation
+has none, so the narrow `.gitattributes` exception for it is no longer needed.
 
 ## Shipped checksums (SHA-256)
 
@@ -86,14 +101,14 @@ is recorded here. `UPSTREAM.md` is the provenance record, not a runtime input.
 
 | File | Bytes | SHA-256 |
 | --- | --- | --- |
-| `CHANGELOG.md` | 34520 | `b7a3c06c07b2dbe5ce79577bbc6c6a53ffa00324bd64a27d0d5634493dec48b4` |
+| `CHANGELOG.md` | 37404 | `8a267874142932202ee5829cf8c892e69e942363a49cd5f5d4734502715ae4fb` |
 | `LICENSE` | 1067 | `ebaec3ae096498a39f6b86e3ac8017e39818fb5aaff80b452349f94bc275ec0d` |
-| `README.md` | 38470 | `4ecf6e3afa2051b59b479907c485d156caca54ef6d1f4e3c410805807942a268` |
-| `main.js` | 125487 | `f819c13bb8e0196e92a0cbef18ffb147a5f38fdc9a8e7fbe27d58463fd991088` |
-| `manifest.json` | 40092 | `ea3798770849c77193f16da5a582157cc07e5f756f7225dcbec1762ed591d461` |
+| `README.md` | 40639 | `f267a4816c49e604233544f0d5f7f533ddeecf2876524c162399537f1564dc45` |
+| `main.js` | 127762 | `0af675845951760c9766ba891e6da36d824f46c25ba325a7998c389b33b10718` |
+| `manifest.json` | 33708 | `4d900c279a8e0183adb68fcff7cc2b075568d7ceb910d81efbe518e24d5cdca1` |
 | `package.json` | 25 | `8005a3491db7d92f36ac66369861589f9c47123d3a7c71e643fc2c06168cd45a` |
 | `remote-workspace.js` | 3757 | `931a579801fd4b334c3d96231aafc7ff52e0c03e7baebbabaf00b4c5e17cc366` |
-| `views/assets/index.js` | 6617579 | `b5fbe46bb6216818e2e4079274a0a14ee96e7ff3d6e7a02fdeba2773454100b0` |
+| `views/assets/index.js` | 6608192 | `d47bf62c0624b6a61a4d5a39962acb67e191ac669e37ccb948c3fbd5f36cdb9a` |
 | `views/assets/pdfjs-LICENSES.txt` | 61789 | `a8b04e2e9022721482079ee5c85b9f05ae129e6a2cfd59ea67f2629a3fc23640` |
 | `views/index.html` | 345 | `771fd3d8afdea7fca75ed1f1918c1ce93ad1c87babdb321cfb85e910465cd2c1` |
 
@@ -105,7 +120,7 @@ is recorded here. `UPSTREAM.md` is the provenance record, not a runtime input.
    checkout with `git apply`.
 3. Run the source typecheck, every verification script (including native file
    watching), and `vite build` in `views-src`.
-4. Apply the three documented manifest edits, then run
+4. Apply the documented manifest edits, then run
    `node scripts/prepare-package.mjs` and the official `pi-plugin check` and
    `pi-plugin pack` against `dist/runtime`. Compare unpacked artifact files to
    the installed resource files byte for byte; retain both local metadata files.

@@ -183,7 +183,7 @@
 35. Model policy: **no closed allowlist; models.dev chat metadata, live account IDs, generic unknown IDs, and free-form model IDs**
 36. Provider storage: **Rust SQLite configs + OS secret store references**
 37. Secrets backend: **safeStorage primary + encrypted file fallback**
-38. Workspace ignore: **denylist + defaults + `.pi-desktopignore`**
+38. Workspace ignore: **denylist + defaults + `.slyyignore` (legacy `.pi-desktopignore` still read)**
 39. Tool result limits: **per-tool budgets (128KB / 4000 lines search, 96KB / 4000 lines shell); `truncated` only when a result is cut short**
 40. Settings directory: **Appearance / Conversation / Shortcuts / Voice / Behavior / Models / Instructions / Skills / MCP / Subagents / Project archive / System / Cloud sync / Remote Hosts / Info** — one destination owns one subject (D684);
     external model, skill, and MCP scans live in their owning pages; session

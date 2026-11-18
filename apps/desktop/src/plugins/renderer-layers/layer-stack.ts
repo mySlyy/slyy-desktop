@@ -1,5 +1,5 @@
 /**
- * `pi.ui.openLayer` (`docs/plugin-plan/ui/self-dialog/`).
+ * `pi.ui.openLayer` (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2).
  *
  * A self-drawn dialog cannot live inside the slot that opens it: the slot's
  * ancestors hide it (an action bar fades out until hovered), clip it

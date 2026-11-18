@@ -1,6 +1,6 @@
 /**
  * The `composerControl` outlet of one toolbar side
- * (`docs/plugin-plan/ui/composer/`). Controls stack in registration order,
+ * (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2). Controls stack in registration order,
  * each in its own boundary; their only prop is the side they are mounted on,
  * and they reach the draft through `pi.dispatch`, never through props.
  */

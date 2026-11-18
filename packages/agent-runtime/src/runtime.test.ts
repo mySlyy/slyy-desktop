@@ -3971,7 +3971,7 @@ describe("DesktopAgentRuntime deferred tool catalog", () => {
       }),
     ).toEqual({ ok: true });
     await expect(pending).resolves.toMatchObject({
-      content: [{ text: "**Color?**：**Blue**\n---\nTargets?：" }],
+      content: [{ text: "**Color?**: **Blue**\n---\nTargets?: " }],
       details: { answers: [["**Blue**"], null] },
     });
     await runtime.dispose();
@@ -4036,7 +4036,7 @@ describe("DesktopAgentRuntime deferred tool catalog", () => {
       }),
     ).toEqual({ ok: true });
     await expect(pendingAtLimit).resolves.toMatchObject({
-      content: [{ text: `${validQuestion}：Continue` }],
+      content: [{ text: `${validQuestion}: Continue` }],
       details: { answers: [["Continue"]] },
     });
     await runtime.dispose();

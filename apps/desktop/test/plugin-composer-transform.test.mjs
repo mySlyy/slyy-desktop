@@ -66,8 +66,8 @@ function makeRuntime(t, services = {}) {
 const transformContrib = [
   {
     id: "enhance",
-    title: { en: "Enhance prompt", "zh-CN": "增强提示词" },
-    undoTitle: { en: "Undo", "zh-CN": "撤销" },
+    title: { en: "Enhance prompt", "zh-CN": "Enhance prompt (zh-CN)" },
+    undoTitle: { en: "Undo", "zh-CN": "Undo (zh-CN)" },
   },
 ];
 
@@ -89,8 +89,8 @@ test("declared Composer action runs in the plugin process with only draft input"
       pluginId: "demo.composer",
       pluginName: "demo.composer",
       id: "enhance",
-      title: "增强提示词",
-      undoTitle: "撤销",
+      title: "Enhance prompt (zh-CN)",
+      undoTitle: "Undo (zh-CN)",
     },
   ]);
   assert.equal(

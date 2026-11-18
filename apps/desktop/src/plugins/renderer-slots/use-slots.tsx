@@ -1,6 +1,6 @@
 /**
  * React glue over the slot registry: subscriptions, the per-registration
- * error boundary that realizes 出错隔离 (a throwing component collapses only
+ * error boundary that realizes failure isolation (a throwing component collapses only
  * its own region), and the mount element plugin styles are scoped to.
  */
 import {

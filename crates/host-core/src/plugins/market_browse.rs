@@ -774,12 +774,21 @@ mod tests {
         let mut labels = CategoryLabels::new();
         let mut zh = std::collections::BTreeMap::new();
         zh.insert("en".to_string(), "Productivity".to_string());
-        zh.insert("zh-CN".to_string(), "效率工具".to_string());
+        zh.insert(
+            "zh-CN".to_string(),
+            "\u{6548}\u{7387}\u{5DE5}\u{5177}".to_string(),
+        );
         labels.insert("productivity".to_string(), zh);
 
-        assert_eq!(category_label(&labels, "productivity", "zh-CN"), "效率工具");
+        assert_eq!(
+            category_label(&labels, "productivity", "zh-CN"),
+            "\u{6548}\u{7387}\u{5DE5}\u{5177}"
+        );
         // Traditional Chinese reads the Simplified label rather than English.
-        assert_eq!(category_label(&labels, "productivity", "zh-TW"), "效率工具");
+        assert_eq!(
+            category_label(&labels, "productivity", "zh-TW"),
+            "\u{6548}\u{7387}\u{5DE5}\u{5177}"
+        );
         assert_eq!(
             category_label(&labels, "productivity", "de"),
             "Productivity"
@@ -794,7 +803,7 @@ mod tests {
         let payload = json!({
             "total": 1,
             "categoryLabels": {
-                "themes": { "en": "Themes", "zh-CN": "外观主题" }
+                "themes": { "en": "Themes", "zh-CN": "\u{5916}\u{89C2}\u{4E3B}\u{9898}" }
             },
             "categories": [{ "id": "themes", "count": 1 }],
             "plugins": [{
@@ -810,14 +819,19 @@ mod tests {
             payload.to_string().as_bytes(),
         )
         .unwrap();
-        assert_eq!(page.labels["themes"]["zh-CN"], "外观主题");
+        assert_eq!(
+            page.labels["themes"]["zh-CN"],
+            "\u{5916}\u{89C2}\u{4E3B}\u{9898}"
+        );
         assert_eq!(category_label(&page.labels, "themes", "en"), "Themes");
         assert_eq!(page.entries[0].categories, ["themes"]);
     }
 
     #[test]
     fn browse_url_encodes_the_query() {
-        let q = query(json!({ "query": "待办 a&b", "category": "AI Tools", "seed": 9, "page": 2 }));
+        let q = query(
+            json!({ "query": "\u{5F85}\u{529E} a&b", "category": "AI Tools", "seed": 9, "page": 2 }),
+        );
         assert_eq!(
             browse_url("https://plugins.example", &q),
             "https://plugins.example/api/v1/catalog/search?sort=recommended&page=2&pageSize=24&seed=9&q=%E5%BE%85%E5%8A%9E%20a%26b&category=AI%20Tools"

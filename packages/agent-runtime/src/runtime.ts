@@ -1166,7 +1166,6 @@ function messageRequestsTools(message: unknown): boolean {
 
 const PROGRESS_FORWARD_INTENT_PATTERNS = [
   /\b(?:about to|going to|will|next|then|still(?: need| have to)?|remaining|left to|working on|writing|reading|updating|implementing|checking|running|creating|fixing|reviewing|proceed(?:ing)?|continu(?:e|ing)|starting|moving on)\b/i,
-  /(?:接下来|下一步|还需要|仍需|剩下|正在|将要|继续|开始)/i,
 ];
 const PROGRESS_TERMINAL_LEAD =
   /^(?:done|all done|complete(?:d)?|finished|implemented|resolved|verified|successful(?:ly)?|the (?:approved )?(?:plan|goal) is complete)\b/i;
@@ -1996,7 +1995,7 @@ export class DesktopAgentRuntime {
   private providerRetryAbort?: AbortController;
   /* Silent-turn recovery: a turn that ends with no tool call and no visible
    * text is invisible to the user. 15 of 255 recorded sessions ended a turn
-   * that way, and every one of them was followed by the user typing "继续".
+   * that way, and every one of them was followed by the user typing "continue".
    * One automatic re-run per prompt, then the failure becomes visible. */
   private pendingSilentTurnRerun = false;
   private silentTurnRerunAttempted = false;
@@ -8661,7 +8660,8 @@ Do not invent objections or turn speculative risks into blockers. Stop when the 
           const steering = this.pendingSteering.get(event.message);
           const id = steering?.id ?? this.pendingUserMessageId ?? randomUUID();
           if (steering) {
-            // 后续回复必须位于已接收的用户补充之后，恢复重试也不能复用前一气泡。
+            // Later replies must follow the accepted user steering message; a
+            // recovery retry must not reuse the previous bubble either.
             if (this.currentAssistant?.status === "streaming") {
               this.emit({ type: "message_end", message: {
                 ...this.currentAssistant,

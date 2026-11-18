@@ -356,14 +356,14 @@ async function main() {
         JSON.stringify({
           schemaVersion: 1,
           id: "e2e.labels",
-          name: "小清新待办",
+          name: "Calm Todo (raw)",
           version: "0.1.0",
-          description: "作者原话",
+          description: "Author wording",
           main: "main.js",
           permissions: [],
           i18n: {
             en: { name: "Todo List", description: "A calm todo list" },
-            "zh-CN": { name: "小清新待办", description: "轻盈的待办清单" },
+            "zh-CN": { name: "Calm Todo (zh-CN entry)", description: "Light todo list (zh-CN entry)" },
           },
         }),
       );
@@ -389,8 +389,8 @@ async function main() {
         "E2E-0PLUGIN-I18N",
         loadedRow.name === "Todo List" &&
           enRow?.description === "A calm todo list" &&
-          zhRow?.name === "小清新待办" &&
-          zhRow?.description === "轻盈的待办清单" &&
+          zhRow?.name === "Calm Todo (zh-CN entry)" &&
+          zhRow?.description === "Light todo list (zh-CN entry)" &&
           twRow?.name === "Todo List" &&
           afterAuto?.locale === "zh-TW" &&
           enRow !== undefined &&

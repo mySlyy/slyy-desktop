@@ -1,6 +1,5 @@
 /**
- * What a plugin put in the draft (`docs/plugin-plan/render/draft/`,
- * `docs/plugin-plan/render/attachments/`):
+ * What a plugin put in the draft (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2):
  * - `mark`: a chip showing the reference's `name` that sends `send`;
  * - `fold`: the one chip holding the marks past the per-draft limit, sending
  *   their `send` texts joined by spaces; `pluginId` is the first one's;

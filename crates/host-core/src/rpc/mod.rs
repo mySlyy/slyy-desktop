@@ -7932,12 +7932,12 @@ mod tests {
 
     #[cfg(windows)]
     fn output_bash_command() -> &'static str {
-        "[Console]::Out.Write('out-π'); [Console]::Error.Write('err-π')"
+        "[Console]::Out.Write('out-\u{3C0}'); [Console]::Error.Write('err-\u{3C0}')"
     }
 
     #[cfg(not(windows))]
     fn output_bash_command() -> &'static str {
-        "printf 'out-π'; printf 'err-π' >&2"
+        "printf 'out-\u{3C0}'; printf 'err-\u{3C0}' >&2"
     }
 
     async fn wait_for_bash_registration(
@@ -9775,11 +9775,11 @@ mod tests {
         assert!(result["content"]["stdout"]
             .as_str()
             .unwrap()
-            .contains("out-π"));
+            .contains("out-\u{3C0}"));
         assert!(result["content"]["stderr"]
             .as_str()
             .unwrap()
-            .contains("err-π"));
+            .contains("err-\u{3C0}"));
 
         let mut streams = Vec::new();
         while let Ok(raw) = rx.try_recv() {

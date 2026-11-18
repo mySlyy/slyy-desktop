@@ -2368,7 +2368,8 @@ window; opening a normal panel afterward must still work.
   `pi_project_open` with the fixture project. 4) Call `pi_session_create`,
   `pi_session_get`, and `pi_agent_status`. 5) Call `pi_agent_prompt` and
   observe the existing desktop session-change event select the target session.
-  6) Call `pi_desktop_invoke` for a reviewed read operation. 7) Attempt
+  6) Call `slyy_invoke` for a reviewed read operation, then the same call as
+  `pi_desktop_invoke` and with an `X-Slyy-Token` header. 7) Attempt
   `pi_session_delete` and `pi_session_configure` without confirmation, then
   repeat with `confirm: true`. 8) Stop the app and inspect the manifest.
 - **Expected**: An unauthenticated request receives 401; `initialize` with an
@@ -2381,7 +2382,10 @@ window; opening a normal panel afterward must still work.
   native-picker channels are absent from `pi_control_describe`; secret-shaped
   fields are stripped; the endpoint binds loopback only; disallowed Origins and
   unsupported protocol version headers are rejected; and the manifest changes
-  to `active: false` on shutdown.
+  to `active: false` on shutdown. The manifest names server `slyy`;
+  `tools/list` lists `slyy_invoke` only, while the `pi_desktop_invoke` alias
+  and the `X-Slyy-Token` / `X-Pi-Desktop-Token` headers authenticate and
+  behave identically.
 - **Specs linked**: `02-architecture/01-architecture.md`,
   `03-runtime/01-ipc-protocol.md`, `05-security/01-security.md`, ADR 0203,
   D370, D372

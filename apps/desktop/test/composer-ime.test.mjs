@@ -64,28 +64,6 @@ test("model menu keydown ignores IME composition keystrokes", () => {
   );
 });
 
-test("an ideographic comma opens the slash menu from an empty draft (D405)", () => {
-  const handler = draftSource.slice(
-    draftSource.indexOf("const handleInput ="),
-    draftSource.indexOf("removeChipByTokenRef", draftSource.indexOf("const handleInput =")),
-  );
-  assert.match(
-    handler,
-    /rewriteIdeographicCommaTrigger\(/,
-    "the editable must route a committed 、 through the shared rewrite",
-  );
-  assert.match(
-    handler,
-    /valueRef\.current === ""/,
-    "only a draft with nothing in it may be rewritten",
-  );
-  assert.match(
-    handler,
-    /pendingEditorCaretRef\.current = caret/,
-    "the caret must land after the substituted slash",
-  );
-});
-
 test("a dropped compositionend cannot leave the composer composing forever (#929)", () => {
   // A Windows Chinese IME can drop compositionend when the composing text is
   // deleted. The draft's `composing` flag is component state, so without a

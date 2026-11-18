@@ -21,6 +21,12 @@ import {
 } from "../src/lib/chat-links.ts";
 
 const ROOT = "/Users/dev/project";
+// Non-ASCII path segments keep generic Unicode coverage; they are written as
+// escapes so the source stays ASCII.
+const REPORT = "\u62A5\u544A";
+const SPEC_DIR = "\u89C4\u8303";
+const ARCH = "\u67B6\u6784";
+const OUT_DIR = "\u8F93\u51FA\u76EE\u5F55";
 
 function renderSanitizedMarkdown(source, root = "D:\\person") {
   return renderToStaticMarkup(
@@ -55,8 +61,8 @@ test("Windows Markdown file links survive parsing and sanitization without chang
   const paths = [
     String.raw`D:\person\test.js`,
     "D:/person/test.js",
-    String.raw`D:\person\dir name\报告 2026.js`,
-    "D:/person/dir name/报告 2026.js",
+    `D:\\person\\dir name\\${REPORT} 2026.js`,
+    `D:/person/dir name/${REPORT} 2026.js`,
   ];
 
   for (const path of paths) {
@@ -73,7 +79,7 @@ test("Windows Markdown file links survive parsing and sanitization without chang
   assert.match(plainMarkup, /<a href="D%3A%5Cperson%5Ctest\.js">test\.js<\/a>/);
   assertMarkdownLinkClick(plainMarkup, String.raw`D:\person\test.js`);
 
-  const referencePath = String.raw`D:\person\dir name\报告 2026.js`;
+  const referencePath = `D:\\person\\dir name\\${REPORT} 2026.js`;
   const referenceMarkup = renderSanitizedMarkdown(
     `[file][local]\n\n[local]: <${referencePath}>`,
   );
@@ -86,36 +92,36 @@ test("Windows Markdown file links survive parsing and sanitization without chang
   const encodedMarkup = renderSanitizedMarkdown(`[file](${encodedPath})`);
   const encodedHref = encodedMarkup.match(/<a href="([^"]+)"/)?.[1];
   assert.ok(encodedHref, `encoded path link lost href: ${encodedMarkup}`);
-  assert.equal(decodeURIComponent(encodedHref), String.raw`D:\person\dir name\报告.js`);
+  assert.equal(decodeURIComponent(encodedHref), `D:\\person\\dir name\\${REPORT}.js`);
   assert.equal(encodedHref, encodedPath, "normalization must not double-encode an existing URI path");
-  assertMarkdownLinkClick(encodedMarkup, String.raw`D:\person\dir name\报告.js`);
+  assertMarkdownLinkClick(encodedMarkup, `D:\\person\\dir name\\${REPORT}.js`);
 
   const encodedSlashPath = "D%3A%2Fperson%2Fdir%20name%2F%E6%8A%A5%E5%91%8A.js";
   const encodedSlashMarkup = renderSanitizedMarkdown(`[file](${encodedSlashPath})`);
   const encodedSlashHref = encodedSlashMarkup.match(/<a href="([^"]+)"/)?.[1];
   assert.ok(encodedSlashHref, `encoded forward-slash link lost href: ${encodedSlashMarkup}`);
-  assert.equal(decodeURIComponent(encodedSlashHref), "D:/person/dir name/报告.js");
+  assert.equal(decodeURIComponent(encodedSlashHref), `D:/person/dir name/${REPORT}.js`);
   assert.equal(encodedSlashHref, encodedSlashPath);
-  assertMarkdownLinkClick(encodedSlashMarkup, "D:/person/dir name/报告.js");
+  assertMarkdownLinkClick(encodedSlashMarkup, `D:/person/dir name/${REPORT}.js`);
 });
 
 test("explicit Markdown destinations keep their href without a file extension (issue #2113)", () => {
   // A link destination is a deliberate reference: a drive-anchored directory
   // (or extension-less file) keeps its href instead of being sanitized away
   // as an unknown `c:` scheme, and the click routes through the file opener.
-  for (const destination of [String.raw`C:\link-demo\输出目录`, "C:/link-demo/输出目录"]) {
-    const markup = renderSanitizedMarkdown(`[目录](<${destination}>)`);
+  for (const destination of [`C:\\link-demo\\${OUT_DIR}`, `C:/link-demo/${OUT_DIR}`]) {
+    const markup = renderSanitizedMarkdown(`[folder](<${destination}>)`);
     assertMarkdownLinkClick(markup, destination);
   }
 
-  const plainMarkup = renderSanitizedMarkdown(String.raw`[目录](C:\link-demo\输出目录)`);
-  assertMarkdownLinkClick(plainMarkup, String.raw`C:\link-demo\输出目录`);
+  const plainMarkup = renderSanitizedMarkdown(`[folder](C:\\link-demo\\${OUT_DIR})`);
+  assertMarkdownLinkClick(plainMarkup, `C:\\link-demo\\${OUT_DIR}`);
 
   assertMarkdownLinkClick(renderSanitizedMarkdown("[build](<C:/repo/Makefile>)"), "C:/repo/Makefile");
 
   // A relative directory destination keeps its href and routes through the
   // opener against the workspace root.
-  const relMarkup = renderSanitizedMarkdown("[相对目录](examples/)");
+  const relMarkup = renderSanitizedMarkdown("[relative folder](examples/)");
   const relHref = relMarkup.match(/<a href="([^"]+)"/)?.[1];
   assert.ok(relHref, relMarkup);
   const calls = [];
@@ -125,7 +131,7 @@ test("explicit Markdown destinations keep their href without a file extension (i
 
   // A trailing separator keeps today's inert rendering: the click path's own
   // acceptance still rejects it, so normalization stays in parity.
-  const trailingMarkup = renderSanitizedMarkdown(String.raw`[目录](<C:\link-demo\输出目录\>)`);
+  const trailingMarkup = renderSanitizedMarkdown(`[folder](<C:\\link-demo\\${OUT_DIR}\\>)`);
   assert.ok(!/<a href=/i.test(trailingMarkup), trailingMarkup);
 });
 
@@ -151,7 +157,7 @@ test("file URL links survive sanitization only as references for main-process re
   for (const [url, path] of [
     ["file:///C:/scratch/animation.html", "C:/scratch/animation.html"],
     ["file:///tmp/my%20animation.html", "/tmp/my animation.html"],
-    ["file:///C:/scratch/%E9%B9%88%E9%B9%95.html", "C:/scratch/鹈鹕.html"],
+    ["file:///C:/scratch/%E9%B9%88%E9%B9%95.html", "C:/scratch/\u9E48\u9E55.html"],
   ]) {
     const markup = renderSanitizedMarkdown("[Open animation](<" + url + ">)");
     assertMarkdownLinkClick(markup, path);
@@ -209,7 +215,7 @@ test("parseFileRef accepts bare names only with known extensions", () => {
   assert.equal(parseFileRef("report.md@draft"), "report.md@draft");
   assert.equal(parseFileRef("report.md-v2"), "report.md-v2");
   assert.equal(parseFileRef("docs/report.md+long-version"), "docs/report.md+long-version");
-  assert.equal(parseFileRef("docs/报告.中文"), "docs/报告.中文");
+  assert.equal(parseFileRef(`docs/${REPORT}.\u4E2D\u6587`), `docs/${REPORT}.\u4E2D\u6587`);
   // dotted identifiers in prose stay plain
   assert.equal(parseFileRef("store.messages"), null);
   assert.equal(parseFileRef("store.messages+copy"), null);
@@ -282,9 +288,9 @@ test("resolvePreviewTarget classifies urls and workspace files", () => {
     kind: "file",
     path: "docs/README.md",
   });
-  assert.deepEqual(resolvePreviewTarget("核查报告.md", ROOT), {
+  assert.deepEqual(resolvePreviewTarget(`${REPORT}.md`, ROOT), {
     kind: "file",
-    path: "核查报告.md",
+    path: `${REPORT}.md`,
   });
   assert.deepEqual(resolvePreviewTarget(`${ROOT}/src/a.ts`, ROOT), {
     kind: "file",
@@ -408,7 +414,7 @@ test("suffix characters after extensions stay in path links", () => {
 test("dotted directories do not split absolute file paths", () => {
   for (const path of [
     "/tmp/archive.md/report.md",
-    "/tmp/archive.md备份/report.md",
+    "/tmp/archive.md\u5907\u4EFD/report.md",
     "/tmp/archive.md+copy/report.md",
     "C:/repo.v1/docs/page.md",
     "C:\\repo.v1\\docs\\page.md",
@@ -459,8 +465,6 @@ test("prose between separate paths stays outside both links", () => {
     ["Open docs/a.md then docs/b.md", ["docs/a.md", "docs/b.md"]],
     ["Open docs/a.md against docs/b.md", ["docs/a.md", "docs/b.md"]],
     ["Open /tmp/a.md, then docs/b.md", ["/tmp/a.md", "docs/b.md"]],
-    ["打开 /tmp/first.md 与 docs/second.md", ["/tmp/first.md", "docs/second.md"]],
-    ["打开 /tmp/App.tsx文件 docs/second.md", ["/tmp/App.tsx", "docs/second.md"]],
   ]) {
     const targets = splitChatText(source, ROOT)
       .filter((segment) => segment.kind === "target")
@@ -519,9 +523,6 @@ test("unmarked first-segment spaces stay plain; explicit refs stay whole", () =>
       ["docs/page.md"],
     );
   }
-  assert.deepEqual(splitChatText("打开 my project/page.md", ROOT), [
-    { kind: "text", text: "打开 my project/page.md" },
-  ]);
   assert.deepEqual(
     splitChatText("Open docs/a.md and my project/page.md", ROOT)
       .filter((segment) => segment.kind === "target")
@@ -603,7 +604,7 @@ test("ambiguous bare names stay plain while prose still links single tokens", ()
 
 test("splitChatText linkifies embedded refs and keeps literals", () => {
   const segments = splitChatText(
-    "看看 apps/desktop/src/App.tsx 和 https://example.com 吧",
+    "see apps/desktop/src/App.tsx and https://example.com now",
     ROOT,
   );
   assert.deepEqual(
@@ -620,8 +621,8 @@ test("splitChatText linkifies embedded refs and keeps literals", () => {
     url: "https://example.com",
   });
   // text with no refs comes back as one literal run
-  assert.deepEqual(splitChatText("普通文本，没有链接。", ROOT), [
-    { kind: "text", text: "普通文本，没有链接。" },
+  assert.deepEqual(splitChatText("Plain text, no links.", ROOT), [
+    { kind: "text", text: "Plain text, no links." },
   ]);
 });
 
@@ -739,29 +740,29 @@ test("remarkChatFileLinks is a unified attacher, not a transformer", () => {
 });
 
 test("parseFileRef accepts unicode filenames and home paths", () => {
-  assert.equal(parseFileRef("报告.pdf"), "报告.pdf");
-  assert.equal(parseFileRef("docs/规范/架构.md"), "docs/规范/架构.md");
-  assert.equal(parseFileRef("src/报告.ts:42"), "src/报告.ts");
+  assert.equal(parseFileRef(`${REPORT}.pdf`), `${REPORT}.pdf`);
+  assert.equal(parseFileRef(`docs/${SPEC_DIR}/${ARCH}.md`), `docs/${SPEC_DIR}/${ARCH}.md`);
+  assert.equal(parseFileRef(`src/${REPORT}.ts:42`), `src/${REPORT}.ts`);
   assert.equal(parseFileRef("~/Downloads/x.png"), "~/Downloads/x.png");
 });
 
 test("splitChatText linkifies workspace unicode filenames", () => {
-  const segments = splitChatText("先看 报告.pdf，再看 docs/规范/架构.md", ROOT);
+  const segments = splitChatText(`see ${REPORT}.pdf, then docs/${SPEC_DIR}/${ARCH}.md`, ROOT);
   assert.deepEqual(
     segments
       .filter((s) => s.kind === "target" && s.target.kind === "file")
       .map((s) => s.target.path),
-    ["报告.pdf", "docs/规范/架构.md"],
+    [`${REPORT}.pdf`, `docs/${SPEC_DIR}/${ARCH}.md`],
   );
 });
 
 test("splitChatText resolves a unicode absolute path under the root", () => {
-  const segments = splitChatText(`see ${ROOT}/src/报告.md please`, ROOT);
+  const segments = splitChatText(`see ${ROOT}/src/${REPORT}.md please`, ROOT);
   assert.deepEqual(
     segments
       .filter((s) => s.kind === "target" && s.target.kind === "file")
       .map((s) => s.target.path),
-    [`${ROOT}/src/报告.md`],
+    [`${ROOT}/src/${REPORT}.md`],
   );
 });
 
@@ -813,26 +814,17 @@ test("markdown linkification encodes a Windows file path without losing its sour
 });
 
 test("a relative Unicode Markdown anchor reaches the local file opener", () => {
-  const markup = renderSanitizedMarkdown("[核查报告.md](核查报告.md)");
-  assert.match(markup, /<a href="[^"]+">核查报告\.md<\/a>/);
-  assertMarkdownLinkClick(markup, "核查报告.md");
+  const markup = renderSanitizedMarkdown(`[${REPORT}.md](${REPORT}.md)`);
+  assert.match(markup, new RegExp(`<a href="[^"]+">${REPORT}\\.md</a>`));
+  assertMarkdownLinkClick(markup, `${REPORT}.md`);
 });
 
 test("splitChatText keeps unknown extensions literal", () => {
-  assert.deepEqual(splitChatText("安装包.dmg 在下载目录", ROOT), [
-    { kind: "text", text: "安装包.dmg 在下载目录" },
+  assert.deepEqual(splitChatText("installer.dmg is in Downloads", ROOT), [
+    { kind: "text", text: "installer.dmg is in Downloads" },
   ]);
 });
 
-test("an ascii filename followed by cjk prose still linkifies", () => {
-  const segments = splitChatText("打开 App.tsx文件 看看", ROOT);
-  assert.deepEqual(
-    segments
-      .filter((s) => s.kind === "target" && s.target.kind === "file")
-      .map((s) => s.target.path),
-    ["App.tsx"],
-  );
-});
 
 
 test("splitChatText preserves parentheses inside HTTP URLs", () => {
@@ -889,7 +881,7 @@ test("sentence punctuation after URLs stays outside the link", () => {
     "https://en.wikipedia.org/wiki/React_(software)",
     "https://example.com/report_(draft).html?q=(one)#part(2)",
   ]) {
-    for (const suffix of [".", ",", "!", "?", ";", ":", "。", "，", "！", "？", "..."]) {
+    for (const suffix of [".", ",", "!", "?", ";", ":", "..."]) {
       const source = `See ${url}${suffix}`;
       const segments = splitChatText(source, ROOT);
       assert.equal(segments.find(s => s.kind === "target").target.url, url);
@@ -922,6 +914,8 @@ test("parseFileRefPosition handles line, column, range, and GitHub anchors", () 
   assert.deepEqual(parseFileRefPosition("src/main.rs#L42-L44"), { line: 42 });
   assert.deepEqual(parseFileRefPosition("src/main.rs:42."), { line: 42 });
   assert.deepEqual(parseFileRefPosition("src/main.rs:42:7,"), { line: 42, column: 7 });
+  // Only ASCII sentence punctuation is trimmed; a fullwidth comma is not.
+  assert.equal(parseFileRefPosition("src/main.rs:42\uFF0C"), null);
   assert.equal(parseFileRefPosition("src/main.rs"), null);
   assert.equal(parseFileRefPosition("src/main.rs:0"), null);
   assert.equal(parseFileRefPosition("src/main.rs:42-41"), null);

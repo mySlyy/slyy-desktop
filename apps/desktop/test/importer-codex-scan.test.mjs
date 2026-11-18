@@ -67,8 +67,8 @@ test("small archives keep the exact full-parse semantics", async () => {
         [
           metaLine("abc-1", "/repo/ink", "2026-01-01T00:00:00Z"),
           responseItem("user", "# AGENTS.md\nrules", "2026-01-01T00:00:01Z"),
-          responseItem("user", "画一只虾", "2026-01-01T00:00:02Z"),
-          responseItem("assistant", "好的", "2026-01-01T00:00:03Z"),
+          responseItem("user", "Draw a shrimp", "2026-01-01T00:00:02Z"),
+          responseItem("assistant", "Sure", "2026-01-01T00:00:03Z"),
           "not json at all\n",
           "\n",
         ].join("\n"),
@@ -80,7 +80,7 @@ test("small archives keep the exact full-parse semantics", async () => {
       const s = summaries[0];
       assert.equal(s.source, "codex");
       assert.equal(s.externalId, "abc-1");
-      assert.equal(s.title, "画一只虾");
+      assert.equal(s.title, "Draw a shrimp");
       assert.equal(s.projectPath, "/repo/ink");
       assert.equal(s.createdAt, iso("2026-01-01T00:00:00Z"));
       assert.equal(s.updatedAt, iso("2026-01-01T00:00:03Z"));
@@ -126,7 +126,7 @@ test("old-format headers and item counts are preserved", async () => {
           JSON.stringify({
             type: "message",
             role: "user",
-            content: [{ type: "input_text", text: "题款位置怎么定" }],
+            content: [{ type: "input_text", text: "Where should the inscription go" }],
             timestamp: "2026-02-01T00:00:05Z",
           }),
           JSON.stringify({
@@ -142,7 +142,7 @@ test("old-format headers and item counts are preserved", async () => {
     async (dir) => {
       const [s] = await scanCodexSessions(dir);
       assert.equal(s.externalId, "old-1");
-      assert.equal(s.title, "题款位置怎么定");
+      assert.equal(s.title, "Where should the inscription go");
       assert.equal(s.messageCount, 2);
       assert.equal(s.updatedAt, iso("2026-02-01T00:00:06Z"));
     },
@@ -175,7 +175,7 @@ test("large files are sampled: messageCount is null, title and timestamps surviv
         "big.jsonl",
         [
           metaLine("big-1", "/repo/big", "2026-03-01T00:00:00Z"),
-          responseItem("user", "从这张图开始", "2026-03-01T00:00:01Z"),
+          responseItem("user", "Start from this image", "2026-03-01T00:00:01Z"),
           // Padding pushes the file over the full-parse threshold; the last
           // timestamp lives in the tail the same way real archives end.
           fillBytes(
@@ -196,7 +196,7 @@ test("large files are sampled: messageCount is null, title and timestamps surviv
     async (dir) => {
       const [s] = await scanCodexSessions(dir);
       assert.equal(s.externalId, "big-1");
-      assert.equal(s.title, "从这张图开始");
+      assert.equal(s.title, "Start from this image");
       assert.equal(s.createdAt, iso("2026-03-01T00:00:00Z"));
       assert.equal(s.updatedAt, iso("2026-03-01T00:01:00Z"));
       assert.equal(s.messageCount, null);
@@ -216,14 +216,14 @@ test("a large file whose real user message sits beyond the head is still found",
             CODEX_SCAN_FULL_PARSE_MAX_BYTES,
             responseItem("assistant", "padding", "2026-04-01T00:00:30Z"),
           ),
-          responseItem("user", "深处的真实消息", "2026-04-01T00:01:00Z"),
+          responseItem("user", "The real message deep inside", "2026-04-01T00:01:00Z"),
         ].join("\n"),
       ],
     ],
     async (dir) => {
       const [s] = await scanCodexSessions(dir);
       assert.equal(s.externalId, "deep-1");
-      assert.equal(s.title, "深处的真实消息");
+      assert.equal(s.title, "The real message deep inside");
       assert.equal(s.updatedAt, iso("2026-04-01T00:01:00Z"));
     },
   );
@@ -245,7 +245,7 @@ test("a large file with an oversized first line still yields its real title", as
             },
             padding: "x".repeat(1_048_576),
           }),
-          responseItem("user", "首行很长但标题仍应保留", "2026-05-01T00:00:01Z"),
+          responseItem("user", "The first line is long but the title must stay", "2026-05-01T00:00:01Z"),
           fillBytes(
             CODEX_SCAN_FULL_PARSE_MAX_BYTES + 512 * 1024,
             JSON.stringify({
@@ -259,7 +259,7 @@ test("a large file with an oversized first line still yields its real title", as
     async (dir) => {
       const [s] = await scanCodexSessions(dir);
       assert.equal(s.externalId, "oversized-1");
-      assert.equal(s.title, "首行很长但标题仍应保留");
+      assert.equal(s.title, "The first line is long but the title must stay");
       assert.equal(s.createdAt, iso("2026-05-01T00:00:00Z"));
     },
   );
@@ -272,7 +272,7 @@ test("sampled updatedAt uses top-level timestamps only", async () => {
         "nested-timestamp.jsonl",
         [
           metaLine("nested-1", "/repo/nested", "2026-06-01T00:00:00Z"),
-          responseItem("user", "只应使用顶层时间戳", "2026-06-01T00:00:01Z"),
+          responseItem("user", "Only the top-level timestamp counts", "2026-06-01T00:00:01Z"),
           fillBytes(
             CODEX_SCAN_FULL_PARSE_MAX_BYTES + 512 * 1024,
             JSON.stringify({
@@ -318,13 +318,13 @@ test("newer IDE-context synthetic prefixes fall through to the first real user m
           [
             metaLine(`ide-${index}`, "/repo/ide", "2026-05-01T00:00:00Z"),
             responseItem("user", prefix, "2026-05-01T00:00:01Z"),
-            responseItem("user", "帮我看看这个报错", "2026-05-01T00:00:02Z"),
+            responseItem("user", "Take a look at this error for me", "2026-05-01T00:00:02Z"),
           ].join("\n"),
         ],
       ],
       async (dir) => {
         const [s] = await scanCodexSessions(dir);
-        assert.equal(s.title, "帮我看看这个报错", `prefix: ${prefix}`);
+        assert.equal(s.title, "Take a look at this error for me", `prefix: ${prefix}`);
       },
     );
   }
@@ -338,13 +338,13 @@ test("real markdown first messages survive even when they start with #", async (
         "role.jsonl",
         [
           metaLine("role-1", "/repo/role", "2026-05-02T00:00:00Z"),
-          responseItem("user", "# Role: 资深 Java 后端开发工程师\n\n## Profile", "2026-05-02T00:00:01Z"),
+          responseItem("user", "# Role: Senior Java backend engineer\n\n## Profile", "2026-05-02T00:00:01Z"),
         ].join("\n"),
       ],
     ],
     async (dir) => {
       const [s] = await scanCodexSessions(dir);
-      assert.match(s.title, /^# Role: 资深 Java 后端开发工程师/);
+      assert.match(s.title, /^# Role: Senior Java backend engineer/);
     },
   );
 });
@@ -356,7 +356,7 @@ test("corrupt stored timestamps fall back to the file mtime, not the import time
         "corrupt.jsonl",
         [
           metaLine("corrupt-1", "/repo/corrupt", "1e309"),
-          responseItem("user", "时间戳坏掉的会话", "not-a-date"),
+          responseItem("user", "Session with a broken timestamp", "not-a-date"),
         ].join("\n"),
       ],
     ],
@@ -379,7 +379,7 @@ test("the sampled path also falls back to the file mtime", async () => {
         "big-corrupt.jsonl",
         [
           metaLine("big-corrupt-1", "/repo/big-corrupt", "not-a-date"),
-          responseItem("user", "大文件坏时间戳", "1e309"),
+          responseItem("user", "Large file with a broken timestamp", "1e309"),
           fillBytes(
             CODEX_SCAN_FULL_PARSE_MAX_BYTES + 512 * 1024,
             JSON.stringify({
@@ -409,14 +409,14 @@ test("scans newest sessions first and bounds total files to limit", async () => 
         "2026/01/01/old.jsonl",
         [
           metaLine("old-1", "/repo", "2026-01-01T00:00:00Z"),
-          responseItem("user", "很早以前的消息", "2026-01-01T00:00:01Z"),
+          responseItem("user", "A message from long ago", "2026-01-01T00:00:01Z"),
         ].join("\n"),
       ],
       [
         "2026/09/18/new.jsonl",
         [
           metaLine("new-1", "/repo", "2026-09-18T00:00:00Z"),
-          responseItem("user", "今天的最新消息", "2026-09-18T00:00:01Z"),
+          responseItem("user", "Today's latest message", "2026-09-18T00:00:01Z"),
         ].join("\n"),
       ],
     ],
@@ -424,7 +424,7 @@ test("scans newest sessions first and bounds total files to limit", async () => 
       const summaries = await scanCodexSessions(dir, 1);
       assert.equal(summaries.length, 1);
       assert.equal(summaries[0].externalId, "new-1");
-      assert.equal(summaries[0].title, "今天的最新消息");
+      assert.equal(summaries[0].title, "Today's latest message");
       const detailed = await scanCodexSessionsResult(dir, 1);
       assert.equal(detailed.truncated, true);
       assert.equal(detailed.sessions[0].externalId, "new-1");
@@ -451,7 +451,7 @@ test("the default 250-file cap keeps the newest path-dated sessions", async () =
     "2026/01/01/old.jsonl",
     [
       metaLine("old-1", "/repo", "2026-01-01T00:00:00Z"),
-      responseItem("user", "很早以前的消息", "2026-01-01T00:00:01Z"),
+      responseItem("user", "A message from long ago", "2026-01-01T00:00:01Z"),
     ].join("\n"),
   ]);
   await withArchive(cases, async (dir) => {

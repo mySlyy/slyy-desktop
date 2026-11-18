@@ -37,12 +37,13 @@ function anchored(
   };
 }
 
-/** One CJK paragraph, so the character count is real text and not a constant. */
-const CJK_PARAGRAPH =
-  "上下文估计的关键在于尾部：估算器只对最后一条用量之后的消息按字符数除以四来猜，" +
-  "而中文正文的真实开销接近每字一个词元。连续低报时不能把估计值一路压到危险区间，" +
-  "否则压缩会被推迟，请求就会在临界点上失败。无锚点时必须把系统提示与工具结构的固定开销" +
-  "和按比例的中文字符偏差分开处理，跨量级的样本不能当作比例系数直接套用。";
+/**
+ * A CJK tail of 155 distinct Han ideographs (U+4E00 onward), the length of
+ * a typical prose paragraph, so the character count is real text and not a constant.
+ */
+const CJK_PARAGRAPH = Array.from({ length: 155 }, (_, index) =>
+  String.fromCodePoint(0x4e00 + index),
+).join("");
 
 describe("ContextEstimateCalibration", () => {
   it("returns the raw estimate until a series has enough observations", () => {

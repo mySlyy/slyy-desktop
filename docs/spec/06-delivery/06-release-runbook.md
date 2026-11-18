@@ -289,13 +289,12 @@ The Linux updater feeds carry the architecture they were built for:
 channel files `electron-updater` requests on the matching architecture, so a
 lane fails before upload if its own feed is missing.
 
-### 4.4 CNB mirror trigger (upstream only)
+### 4.4 CNB mirror (removed)
 
 Upstream PI-Desktop mirrors each GitHub Release to a CNB (cnb.cool) pipeline
-through `.github/workflows/mirror-to-cnb.yml`. That job is guarded to the
-upstream repository, so it never runs for Slyy: GitHub Releases on
-`mySlyy/slyy-desktop` are the only artifact source and the only
-electron-updater feed.
+through `.github/workflows/mirror-to-cnb.yml`. Slyy removed that workflow:
+GitHub Releases on `mySlyy/slyy-desktop` are the only artifact source and the
+only electron-updater feed.
 
 ### 4.5 GitHub Actions secrets for macOS signing
 

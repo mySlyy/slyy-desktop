@@ -171,10 +171,6 @@ test("provider headings establish a stronger type level than model rows", () => 
     stylesSource,
     /\.composer-model-group \.composer-model-option\s*\{[^}]*font-size:\s*var\(--text-sm\)[^}]*font-weight:\s*var\(--font-weight-normal\)/,
   );
-  assert.match(
-    stylesSource,
-    /:lang\(zh-CN\) \.composer-model-group-label\s*\{[\s\S]*?text-transform:\s*none/,
-  );
 });
 
 test("Composer preserves aliases but never shows a catalog friendly name for an unaliased model", async () => {

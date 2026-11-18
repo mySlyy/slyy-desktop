@@ -3,8 +3,8 @@ import { firstHeaderValueFault, foldFullwidthHeaderValue, inspectHeaderValue } f
 
 describe("foldFullwidthHeaderValue", () => {
   it("folds the fullwidth block onto ASCII", () => {
-    // The reported failure shape: `０` is U+FF10, which lands on index 7 of
-    // `1234567０` and made undici throw a ByteString TypeError.
+    // The reported failure shape: fullwidth zero U+FF10 lands on index 7 of
+    // "1234567" + U+FF10 and made undici throw a ByteString TypeError.
     expect(foldFullwidthHeaderValue("1234567\uFF10")).toBe("12345670");
     expect(foldFullwidthHeaderValue("\uFF10\uFF11\uFF41\uFF0D")).toBe("01a-");
     expect(foldFullwidthHeaderValue("\uFF08\uFF09\uFF0C")).toBe("(),");
@@ -20,7 +20,7 @@ describe("foldFullwidthHeaderValue", () => {
   });
 
   it("keeps characters that have no ASCII counterpart", () => {
-    expect(foldFullwidthHeaderValue("星\u201C")).toBe("星\u201C");
+    expect(foldFullwidthHeaderValue("\u661f\u201C")).toBe("\u661f\u201C");
   });
 
   it("returns the input when nothing folds", () => {
@@ -42,7 +42,7 @@ describe("firstHeaderValueFault", () => {
       index: 7,
       codePoint: 0xff10,
     });
-    expect(firstHeaderValueFault("abc星")).toEqual({ index: 3, codePoint: 0x661f });
+    expect(firstHeaderValueFault("abc\u661f")).toEqual({ index: 3, codePoint: 0x661f });
     expect(firstHeaderValueFault("ab\u0000cd")).toEqual({ index: 2, codePoint: 0 });
     expect(firstHeaderValueFault("a\r\nb")).toEqual({ index: 1, codePoint: 0x0d });
     expect(firstHeaderValueFault("trailing\u007F")).toEqual({
@@ -54,8 +54,8 @@ describe("firstHeaderValueFault", () => {
 
 describe("inspectHeaderValue", () => {
   it("reports the folded value a request should carry", () => {
-    expect(inspectHeaderValue("  \uFF10  7星  ")).toEqual({
-      value: "0  7星",
+    expect(inspectHeaderValue("  \uFF10  7\u661f  ")).toEqual({
+      value: "0  7\u661f",
       folded: true,
       fault: { index: 4, codePoint: 0x661f },
     });
@@ -79,8 +79,8 @@ describe("inspectHeaderValue", () => {
 
   it("reports the folded value's fault, not the raw input's", () => {
     // U+FF10 folds to `0`, so the remaining fault is the Han character.
-    expect(inspectHeaderValue("\uFF10星")).toEqual({
-      value: "0星",
+    expect(inspectHeaderValue("\uFF10\u661f")).toEqual({
+      value: "0\u661f",
       folded: true,
       fault: { index: 1, codePoint: 0x661f },
     });

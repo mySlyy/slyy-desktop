@@ -9,7 +9,7 @@ export function searchMatchRanges(text: string, query: string): [number, number]
   const needle = foldSearchText(query.trim());
   if (!needle) return [];
   const folded = foldSearchText(text);
-  // Lowercase can expand one character (İ -> i + combining dot). Map only
+  // Lowercase can expand one character (U+0130 -> i + combining dot). Map only
   // when needed, so ordinary ASCII/CJK highlighting has no allocation per char.
   const starts: number[] = [];
   const ends: number[] = [];

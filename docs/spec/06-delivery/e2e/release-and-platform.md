@@ -324,9 +324,9 @@
   uploaded artifacts.
 - **Steps**: 1) Publish or edit that GitHub Release. 2) Inspect the Actions
   run list for `mirror-to-cnb.yml`.
-- **Expected**: The upstream-only CNB (cnb.cool) mirror job is skipped, because
-  it is guarded to the upstream PI-Desktop repository. GitHub Release artifacts
-  and updater feeds on `mySlyy/slyy-desktop` are unchanged.
+- **Expected**: No CNB (cnb.cool) mirror run exists: Slyy removed
+  `mirror-to-cnb.yml`. GitHub Release artifacts and updater feeds on
+  `mySlyy/slyy-desktop` are unchanged.
 - **Specs linked**: `06-delivery/06-release-runbook.md` §4.4
 - **Acceptance**: Quality (release mirroring)
 - **Milestone**: M6+

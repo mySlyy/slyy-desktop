@@ -25,7 +25,7 @@ export async function seedReviewHistory(host, directory) {
   };
   const original = Array.from({ length: 3100 }, (_, i) => `const line_${String(i + 1).padStart(3, "0")} = ${i + 1};`).join("\n") + "\n";
   await writeFile(join(root, "long.ts"), original);
-  const firstTurn = await begin("round-one", "完善轮次审阅并统一子代理修改");
+  const firstTurn = await begin("round-one", "Polish the round review and unify subagent edits");
   await append({ id: "task-row", role: "tool", content: "", createdAt: new Date().toISOString(), toolName: "Task", toolCallId: "review-task", toolStatus: "success" }, firstTurn);
   const changed = original.replace("line_030 = 30", "line_030 = 300").replace("line_080 = 80", "line_080 = 800");
   const first = await mutate(firstTurn, "long.ts", changed);
@@ -36,9 +36,9 @@ export async function seedReviewHistory(host, directory) {
   const zero = (await mutate(firstTurn, "zero-preview.txt", "x".repeat(600000))).toolResult.details.review;
   if (!zero.truncated || zero.additions !== 0 || zero.deletions !== 0) throw new Error("Expected native preview-limited zero counters");
   await end(firstTurn);
-  const second = await begin("round-two", "新增最近修改的测试文件");
+  const second = await begin("round-two", "Add the recently modified test file");
   await mutate(second, "latest.txt", "Latest modified round\n"); await end(second);
-  const third = await begin("round-no-edit", "只讨论方案，不修改文件"); await end(third);
+  const third = await begin("round-no-edit", "Only discuss the approach, do not modify files"); await end(third);
   // A second populated session exposes stale focus requests that an empty session would hide.
   const populated = (await host.call("session.create", { title: "Other modified session", projectPath: root, mode: "agent" })).session;
   await host.call("session.configure", { id: populated.id, mode: "agent", permissionMode: "auto" });
@@ -58,7 +58,7 @@ export async function seedReviewHistory(host, directory) {
     session, other, populated, round: "round-one", latest: "round-two", firstSnapshot: first.toolResult.details.review.snapshotId,
     lateMessage: { ...first, id: "late-refresh" },
     async appendLate() { return mutate(firstTurn, "late.txt", "Late old delegate\n", "review-task"); },
-    startRunning: () => begin("round-running", "运行中首次修改测试"),
+    startRunning: () => begin("round-running", "First edit test while running"),
     writeRunning: turnId => mutate(turnId, "running.txt", "First modification in the running round\n"),
     endRunning: end,
     readCurrent: () => readFile(join(root, "long.ts"), "utf8"),

@@ -14,9 +14,9 @@ const { electronBinary } = resolveElectronBinary(root);
 const temp = await mkdtemp(join(process.env.PI_SCRATCH_DIR || tmpdir(), "pi-launcher-overflow-"));
 const scenarios = [
   { count: 40, width: 244, height: 260, explicitTab: false, theme: "light", language: "en" },
-  { count: 40, width: 360, height: 320, explicitTab: true, theme: "dark", language: "zh-CN" },
+  { count: 40, width: 360, height: 320, explicitTab: true, theme: "dark", language: "de" },
   { count: 40, width: 720, height: 600, explicitTab: true, theme: "light", language: "en" },
-  { count: 3, width: 244, height: 520, explicitTab: false, theme: "dark", language: "zh-CN" },
+  { count: 3, width: 244, height: 520, explicitTab: false, theme: "dark", language: "de" },
   { count: 0, width: 360, height: 260, explicitTab: true, theme: "light", language: "en" },
 ];
 try {

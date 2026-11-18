@@ -19,23 +19,23 @@ test("bundled file manager creates, renames and moves real entries with valid na
     assert.equal(file.ok, true, JSON.stringify(file));
     assert.equal(file.entry.path, "new-file.txt");
     assert.equal(await readFile(join(root, "new-file.txt"), "utf8"), "");
-    const folder = await plugin.onPanelInvoke("fm.create", { name: "新文件夹", isDirectory: true });
+    const folder = await plugin.onPanelInvoke("fm.create", { name: "\u65b0\u6587\u4ef6\u5939", isDirectory: true });
     assert.equal(folder.ok, true, JSON.stringify(folder));
     assert.equal(folder.entry.isDirectory, true);
     const renamed = await plugin.onPanelInvoke("fm.rename", { path: "new-file.txt", newName: "renamed.txt" });
     assert.equal(renamed.ok, true, JSON.stringify(renamed));
-    const moved = await plugin.onPanelInvoke("fm.move", { from: "renamed.txt", toDir: "新文件夹" });
+    const moved = await plugin.onPanelInvoke("fm.move", { from: "renamed.txt", toDir: "\u65b0\u6587\u4ef6\u5939" });
     assert.equal(moved.ok, true, JSON.stringify(moved));
-    assert.equal(moved.entry.path, "新文件夹/renamed.txt");
-    assert.equal((await stat(join(root, "新文件夹/renamed.txt"))).isFile(), true);
+    assert.equal(moved.entry.path, "\u65b0\u6587\u4ef6\u5939/renamed.txt");
+    assert.equal((await stat(join(root, "\u65b0\u6587\u4ef6\u5939/renamed.txt"))).isFile(), true);
     for (const name of ["", ".", "..", "../escape", "a/b", "a\\b", "bad\0name", "bad:name", "CON", "nul.txt", "trailing."]) {
       const rejected = await plugin.onPanelInvoke("fm.create", { name });
       assert.equal(rejected.ok, false, name);
       assert.equal(rejected.code, "INVALID_NAME", JSON.stringify(rejected));
-      const renameRejected = await plugin.onPanelInvoke("fm.rename", { path: "新文件夹/renamed.txt", newName: name });
+      const renameRejected = await plugin.onPanelInvoke("fm.rename", { path: "\u65b0\u6587\u4ef6\u5939/renamed.txt", newName: name });
       assert.equal(renameRejected.code, "INVALID_NAME", JSON.stringify(renameRejected));
     }
-    const duplicate = await plugin.onPanelInvoke("fm.create", { name: "新文件夹", isDirectory: true });
+    const duplicate = await plugin.onPanelInvoke("fm.create", { name: "\u65b0\u6587\u4ef6\u5939", isDirectory: true });
     assert.equal(duplicate.code, "EXISTS");
   } finally {
     await plugin.onUnload();

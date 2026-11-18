@@ -44,8 +44,8 @@ index 6627d80..46b008b 100644
  
    const loadDirectory = useCallback(
 -    async (path: string, force = false) => {
-+    // 返回这次看到的目录条目（缓存命中返回缓存里的），调用方要拿它做判定时
-+    // 不必回头读 directories 状态——那条路要等一次渲染，异步链里是旧的。
++    // Returns the directory entries seen this time (cached ones on a cache hit), so callers deciding on them
++    // need not read the directories state back: that path waits for a render and is stale inside an async chain.
 +    async (path: string, force = false): Promise<FileEntry[] | undefined> => {
        const revision = revisionRef.current;
        const existing = dirsRef.current.get(path);
@@ -84,13 +84,13 @@ index 6627d80..46b008b 100644
              await loadDirectory(parent);
            }
            if (revision !== revisionRef.current) return;
-+          // 目录 location（0.9.2）：宿主引用的目录不进文件读取（fm.read 对
-+          // 目录一律 INVALID_PATH）。展开它自己并加载列表——树就是目录的
-+          // 「内容」，所以也不能收起左侧列表：收起了就没有东西可看。
-+          // 判定用 loadDirectory 的**返回值**：directories 状态要等一次渲染
-+          // 才落进 dirsRef，异步链里读 ref 是旧的（首帧上根列表经常刚好没
-+          // 落地，判成 unknown 又退回文件路径，正好复现这次要修的失败）。
-+          // loadDirectory 幂等，已加载的目录不产生额外通道调用。
++          // Directory location (0.9.2): a directory referenced by the host never goes to a file read (fm.read
++          // refuses directories with INVALID_PATH). Expand it and load its listing: the tree is the directory's
++          // "content", so the left list must not collapse either; collapsed, there would be nothing to see.
++          // Decide with the **return value** of loadDirectory: the directories state only reaches dirsRef after
++          // a render, so reading the ref inside the async chain is stale (on the first frame the root listing often
++          // has not landed yet, gets judged unknown and falls back to the file path, reproducing the failure fixed here).
++          // loadDirectory is idempotent; already loaded directories cause no extra channel calls.
 +          const parentPath = parents.length > 0 ? parents[parents.length - 1] : "";
 +          if (revision !== revisionRef.current) return;
 +          const parentEntries = await loadDirectory(parentPath);
@@ -121,7 +121,7 @@ index 02e9279..d157a69 100644
      errExists: "同名条目已存在。",
      errName: "该名称不被允许。",
      errNotFound: "该路径已不存在。",
-+    errIsDirectory: "该路径是一个目录；文件夹在目录树里浏览，且只能在项目内。",
++    errIsDirectory: "That path is a directory; folders are browsed in the tree, and only inside the project.",
      errUnsupported: "当前宿主不支持该操作。",
      errNoBridge: "本页面需要在 PI-Desktop 中打开。",
      changes: "变更",
@@ -134,11 +134,11 @@ index 95ac38a..a412a57 100644
  }
  
 +/**
-+ * 宿主打开目标在树里的身份（0.9.2 目录 location）。宿主引用的目录本就存在，
-+ * 打开它意味着展开并列出内容，而不是把目录塞给文件读取（fm.read 对目录一律
-+ * 报 INVALID_PATH）。判定只信**已经加载**的父目录列表：按 path 精确匹配条目。
-+ * 列表缺席（还没列完 / 刚被外部改动）返回 "unknown"，调用方按文件处理——读
-+ * 失败的报告本来就是准确的，宁可保守也不猜。
++ * Identity of a host open target in the tree (0.9.2 directory location). A directory the host references exists,
++ * and opening it means expanding and listing its content, not passing the directory to a file read (fm.read
++ * reports INVALID_PATH for directories). Only an **already loaded** parent listing is trusted: exact match by path.
++ * Without a listing (not listed yet / just changed externally) it returns "unknown" and the caller treats it as a file;
++ * the read failure report is accurate anyway, so stay conservative rather than guess.
 + */
 +export type HostOpenTargetKind = "file" | "directory" | "unknown";
 +
@@ -163,8 +163,8 @@ index 52af46b..c2f5155 100644
      case "GIT_UNAVAILABLE":
        return t("gitUnavailable");
 +    case "INVALID_PATH":
-+      // 目录不进文件读取（fm.read / fm.write 的统一拒绝）。宿主打开目录
-+      // location 时这条失败是正常路径，翻成人话而不是裸的英文 message。
++      // Directories never go to a file read (the shared refusal of fm.read / fm.write). When the host opens a directory
++      // location this failure is the normal path; translate it into plain language instead of the bare English message.
 +      if (failure.message === "path is a directory") return t("errIsDirectory");
 +      return failure.message || failure.code;
      default:
@@ -177,16 +177,16 @@ index 0000000..dd5ef64
 +++ b/views-src/verify-host-open.mjs
 @@ -0,0 +1,114 @@
 +/**
-+ * 宿主打开目录 location（0.9.2）的离线校验。
++ * Offline check for host-opened directory locations (0.9.2).
 + *
-+ * 宿主（Desktop 的 chat 面板）引用的目录以前也被塞给 fm.read，主进程一律回
-+ * INVALID_PATH "path is a directory"，视图只能显示一句裸英文——目录引用等于
-+ * 一个必然失败的操作。修好之后视图在父目录列表里判定身份：目录 → 展开并列出
-+ * 内容；文件 → 照旧预览；列表缺席 → 按文件保守处理。这里断言 lib/hostOpen.ts
-+ * 的纯判定与 lib/rpc.ts 对该失败的翻译，不需要 DOM（与 verify-roots.mjs 同样
-+ * 的做法）。
++ * Directories referenced by the host (Desktop's chat panel) used to be passed to fm.read too; the main process always
++ * answered INVALID_PATH "path is a directory", and the view could only show a bare English sentence: a directory
++ * reference was an operation bound to fail. After the fix the view classifies the target from the parent listing:
++ * directory → expand and list its content; file → preview as before; no listing → treat as a file conservatively.
++ * This asserts the pure classification in lib/hostOpen.ts and the translation of that failure in lib/rpc.ts,
++ * without a DOM (the same approach as verify-roots.mjs).
 + *
-+ * 用法：pnpm verify:host-open
++ * Usage: pnpm verify:host-open
 + */
 +
 +import { build } from "esbuild";
@@ -240,27 +240,27 @@ index 0000000..dd5ef64
 +  { path: "src/dir/openimage.js", isDirectory: false },
 +];
 +
-+console.log("1. classifyHostOpenTarget（父目录列表已加载）");
++console.log("1. classifyHostOpenTarget (parent listing loaded)");
 +check(
-+  "目录条目判定为 directory",
++  "directory entry classified as directory",
 +  hostOpen.classifyHostOpenTarget("examples", LISTING) === "directory",
 +);
 +check(
-+  "文件条目判定为 file",
++  "file entry classified as file",
 +  hostOpen.classifyHostOpenTarget("test.ts", LISTING) === "file",
 +);
 +check(
-+  "多段路径按完整相对路径精确匹配，不做后缀猜测",
++  "multi-segment paths match the full relative path exactly, no suffix guessing",
 +  hostOpen.classifyHostOpenTarget("src/dir/openimage.js", LISTING) === "file" &&
 +    hostOpen.classifyHostOpenTarget("dir/openimage.js", LISTING) === "unknown",
 +);
 +check(
-+  "列表缺席（未加载 / 已失效）按 unknown 保守处理",
++  "no listing (not loaded / invalidated) is treated conservatively as unknown",
 +  hostOpen.classifyHostOpenTarget("examples", undefined) === "unknown" &&
 +    hostOpen.classifyHostOpenTarget("examples", []) === "unknown",
 +);
 +
-+console.log("2. failureMessage 把目录读取失败翻成人话");
++console.log("2. failureMessage turns the directory read failure into plain language");
 +const t = (key) => {
 +  const table = {
 +    errIsDirectory: "That path is a directory; folders are browsed in the tree, and only inside the project.",
@@ -268,19 +268,19 @@ index 0000000..dd5ef64
 +  return table[key] ?? key;
 +};
 +check(
-+  'fm.read 的 INVALID_PATH "path is a directory" 得到专门文案',
++  'fm.read INVALID_PATH "path is a directory" gets its dedicated message',
 +  rpc.failureMessage({ ok: false, code: "INVALID_PATH", message: "path is a directory" }, t) ===
 +    t("errIsDirectory"),
 +);
 +check(
-+  "其他 INVALID_PATH 仍返回主进程自己的 message",
++  "other INVALID_PATH failures still return the main process's own message",
 +  rpc.failureMessage({ ok: false, code: "INVALID_PATH", message: "path must be a string" }, t) ===
 +    "path must be a string",
 +);
 +
-+console.log("3. 中英文案键一一对齐（errIsDirectory 两边都有）");
++console.log("3. en and zh copy keys stay aligned (errIsDirectory in both)");
 +check(
-+  "en 与 zh 都有 errIsDirectory",
++  "en and zh both have errIsDirectory",
 +  typeof i18n.COPY_TABLES.en.errIsDirectory === "string" &&
 +    typeof i18n.COPY_TABLES.zh.errIsDirectory === "string",
 +);

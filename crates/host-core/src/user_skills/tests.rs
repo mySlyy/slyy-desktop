@@ -181,7 +181,7 @@ fn import_uses_parent_directory_when_name_is_not_ascii() {
     let source = source_dir.join("SKILL.md");
     fs::write(
         &source,
-        "---\nname: 代码审查\ndescription: >\n  Review diffs before merge.\n---\n\nCheck the patch.\n",
+        "---\nname: \u{4EE3}\u{7801}\u{5BA1}\u{67E5}\ndescription: >\n  Review diffs before merge.\n---\n\nCheck the patch.\n",
     )
     .unwrap();
     let mut registry = UserSkillRegistry::new(app.path());
@@ -192,7 +192,7 @@ fn import_uses_parent_directory_when_name_is_not_ascii() {
         )
         .unwrap();
     assert_eq!(record.id, "code-review");
-    assert_eq!(record.name, "代码审查");
+    assert_eq!(record.name, "\u{4EE3}\u{7801}\u{5BA1}\u{67E5}");
     assert_eq!(
         record.description.as_deref(),
         Some("Review diffs before merge.")
@@ -202,7 +202,7 @@ fn import_uses_parent_directory_when_name_is_not_ascii() {
         .unwrap();
     assert_eq!(listed.len(), 1);
     assert_eq!(listed[0].id, "code-review");
-    assert_eq!(listed[0].name, "代码审查");
+    assert_eq!(listed[0].name, "\u{4EE3}\u{7801}\u{5BA1}\u{67E5}");
 }
 
 #[test]
@@ -508,11 +508,11 @@ fn a_skill_without_frontmatter_gains_a_name_when_it_has_to_rename() {
 #[test]
 fn placement_uses_the_id_the_scan_will_derive_from_the_name() {
     let directory = tempdir().unwrap();
-    let source = record("code-review", "代码审查");
-    let existing = vec![record("code-review", "代码审查")];
+    let source = record("code-review", "\u{4EE3}\u{7801}\u{5BA1}\u{67E5}");
+    let existing = vec![record("code-review", "\u{4EE3}\u{7801}\u{5BA1}\u{67E5}")];
 
     let placement = plan_skill_placement(&source, directory.path(), true, &existing).unwrap();
-    assert_eq!(placement.name, "代码审查 (2)");
+    assert_eq!(placement.name, "\u{4EE3}\u{7801}\u{5BA1}\u{67E5} (2)");
     // The rename's slug is `2`, not the file stem the move started from, so
     // that is what both the directory and the next scan will call it.
     assert_eq!(placement.stem, "2");
@@ -559,16 +559,16 @@ fn a_chinese_named_skill_moves_without_hiding_the_other_levels_copy() {
         skill_home(home.path());
         fs::create_dir_all(project.path().join(".agents/skills")).unwrap();
         // Both names slug to nothing, so each document's id comes from its
-        // file stem — while the renamed candidate `代码审查 (2)` slugs to
+        // file stem — while the renamed candidate `<CJK name> (2)` slugs to
         // `2`, which is nothing like the stem the old move would have used.
         fs::write(
             home.path().join("skills/code-review.md"),
-            "---\nname: 代码审查\n---\n\nGlobal copy.\n",
+            "---\nname: \u{4EE3}\u{7801}\u{5BA1}\u{67E5}\n---\n\nGlobal copy.\n",
         )
         .unwrap();
         fs::write(
             project.path().join(".agents/skills/code-review.md"),
-            "---\nname: 代码审查\n---\n\nProject copy.\n",
+            "---\nname: \u{4EE3}\u{7801}\u{5BA1}\u{67E5}\n---\n\nProject copy.\n",
         )
         .unwrap();
         let mut registry = UserSkillRegistry::new(app.path());
@@ -582,25 +582,29 @@ fn a_chinese_named_skill_moves_without_hiding_the_other_levels_copy() {
             .unwrap();
 
         assert_eq!(moved.id, "2");
-        assert_eq!(moved.name, "代码审查 (2)");
+        assert_eq!(moved.name, "\u{4EE3}\u{7801}\u{5BA1}\u{67E5} (2)");
         assert!(!home.path().join("skills/code-review.md").exists());
         assert_eq!(
             fs::read_to_string(project.path().join(".agents/skills/2.md")).unwrap(),
-            "---\nname: 代码审查 (2)\n---\n\nGlobal copy.\n"
+            "---\nname: \u{4EE3}\u{7801}\u{5BA1}\u{67E5} (2)\n---\n\nGlobal copy.\n"
         );
         // The project's own copy is untouched and both documents are listed
         // under distinct ids and names.
         assert_eq!(
             fs::read_to_string(project.path().join(".agents/skills/code-review.md")).unwrap(),
-            "---\nname: 代码审查\n---\n\nProject copy.\n"
+            "---\nname: \u{4EE3}\u{7801}\u{5BA1}\u{67E5}\n---\n\nProject copy.\n"
         );
         let listed = registry
             .list(CapabilityLevel::Project, Some(&project_path))
             .unwrap();
         assert_eq!(listed.len(), 2);
         assert_unique_records(&listed);
-        assert!(listed.iter().any(|record| record.name == "代码审查"));
-        assert!(listed.iter().any(|record| record.name == "代码审查 (2)"));
+        assert!(listed
+            .iter()
+            .any(|record| record.name == "\u{4EE3}\u{7801}\u{5BA1}\u{67E5}"));
+        assert!(listed
+            .iter()
+            .any(|record| record.name == "\u{4EE3}\u{7801}\u{5BA1}\u{67E5} (2)"));
 
         // The same document moves back to the global level under its new
         // name, keeping the id the scan gave it.
@@ -612,7 +616,7 @@ fn a_chinese_named_skill_moves_without_hiding_the_other_levels_copy() {
             )
             .unwrap();
         assert_eq!(back.id, "2");
-        assert_eq!(back.name, "代码审查 (2)");
+        assert_eq!(back.name, "\u{4EE3}\u{7801}\u{5BA1}\u{67E5} (2)");
         assert!(home.path().join("skills/2.md").is_file());
         assert_unique_records(
             &registry
@@ -633,16 +637,16 @@ fn a_names_slug_is_not_used_when_that_id_belongs_to_another_document() {
         fs::create_dir_all(project.path().join(".agents/skills")).unwrap();
         fs::write(
             home.path().join("skills/code-review.md"),
-            "---\nname: 代码审查\n---\n\nGlobal copy.\n",
+            "---\nname: \u{4EE3}\u{7801}\u{5BA1}\u{67E5}\n---\n\nGlobal copy.\n",
         )
         .unwrap();
         fs::write(
             project.path().join(".agents/skills/code-review.md"),
-            "---\nname: 代码审查\n---\n\nProject copy.\n",
+            "---\nname: \u{4EE3}\u{7801}\u{5BA1}\u{67E5}\n---\n\nProject copy.\n",
         )
         .unwrap();
         // This document's id is exactly the slug the renamed candidate
-        // `代码审查 (2)` would produce, so that candidate cannot be used.
+        // `<CJK name> (2)` would produce, so that candidate cannot be used.
         fs::write(
             project.path().join(".agents/skills/2.md"),
             "---\nname: 2\n---\n\nTakes the id 2.\n",
@@ -658,7 +662,7 @@ fn a_names_slug_is_not_used_when_that_id_belongs_to_another_document() {
             )
             .unwrap();
 
-        assert_eq!(moved.name, "代码审查 (3)");
+        assert_eq!(moved.name, "\u{4EE3}\u{7801}\u{5BA1}\u{67E5} (3)");
         assert_eq!(moved.id, "3");
         assert!(project.path().join(".agents/skills/3.md").is_file());
         assert_eq!(

@@ -1367,8 +1367,8 @@ export async function createWindow({
                 (() => {
                   const items = [...document.querySelectorAll('.thread-item .thread-item-main, .thread-item-main, .thread-item')];
                   const prefer =
-                    items.find((el) => /同步代码/.test(el.textContent || '')) ||
-                    items.find((el) => !/新\s*建\s*任\s*务|New task|未命名/i.test(el.textContent || ''));
+                    items.find((el) => /Sync code/.test(el.textContent || '')) ||
+                    items.find((el) => !/New task|Neue Aufgabe|Untitled|Unbenannt/i.test(el.textContent || ''));
                   if (prefer) prefer.dispatchEvent(new MouseEvent('click', { bubbles: true }));
                 })()
               `);
@@ -2197,11 +2197,11 @@ export async function createWindow({
             await openSearch();
             await new Promise((r) => setTimeout(r, 450));
             await shot("pi-search");
-            await typeSearch("设计");
+            await typeSearch("design");
             await new Promise((r) => setTimeout(r, 350));
             await shot("pi-search-query");
-            // Settings hits: "主题" resolves to 通用 tab's theme row.
-            await typeSearch("主题");
+            // Settings hits: "theme" resolves to the theme row of the General tab.
+            await typeSearch("theme");
             await new Promise((r) => setTimeout(r, 350));
             await shot("pi-search-settings");
             await setTheme("dark");
@@ -2209,13 +2209,13 @@ export async function createWindow({
             await shot("pi-search-dark");
             await setTheme("light");
             await new Promise((r) => setTimeout(r, 250));
-            // Page hits: "插件" surfaces the plugins page entry.
-            await typeSearch("插件");
+            // Page hits: "extensions" surfaces the plugins page entry.
+            await typeSearch("extensions");
             await new Promise((r) => setTimeout(r, 350));
             await shot("pi-search-pages");
-            // Anchor flash: Enter on the 主题 settings hit lands on 基础 and
-            // flashes the theme row.
-            await typeSearch("主题");
+            // Anchor flash: Enter on the "theme" settings hit lands on the Basics
+            // tab and flashes the theme row.
+            await typeSearch("theme");
             await new Promise((r) => setTimeout(r, 350));
             await searchKey("ArrowDown");
             await searchKey("Enter");

@@ -75,7 +75,7 @@ fn cold_layout_preserves_unicode_after_a_growing_rewrite() {
         message("m3", "last"),
     ];
     seed_cache(dir.path(), &messages);
-    messages[1] = message("m2", &"xx中文".repeat(3000));
+    messages[1] = message("m2", &"xx\u{4E2D}\u{6587}".repeat(3000));
     write_transcript(dir.path(), "layout-regression", CREATED_AT, &messages).unwrap();
     for _ in 0..3 {
         assert_messages(&cold_read(dir.path()), &messages);
@@ -88,13 +88,13 @@ fn cold_layout_preserves_all_messages_after_a_same_length_rewrite() {
     let mut messages = vec![
         message("m1", &"x".repeat(LAYOUT_CACHE_MIN_LEN as usize)),
         message("m2", "a"),
-        message("m3", "x中文中文"),
+        message("m3", "x\u{4E2D}\u{6587}\u{4E2D}\u{6587}"),
     ];
     seed_cache(dir.path(), &messages);
     let path = transcript_path(dir.path(), "layout-regression").unwrap();
     let previous_len = fs::metadata(&path).unwrap().len();
-    messages[1] = message("m2", "a中文");
-    messages[2] = message("m3", "x中文");
+    messages[1] = message("m2", "a\u{4E2D}\u{6587}");
+    messages[2] = message("m3", "x\u{4E2D}\u{6587}");
     write_transcript(dir.path(), "layout-regression", CREATED_AT, &messages).unwrap();
     assert_eq!(fs::metadata(&path).unwrap().len(), previous_len);
     assert_messages(&cold_read(dir.path()), &messages);
@@ -106,7 +106,7 @@ fn cold_layout_ignores_a_previous_zero_identity_cache() {
     let mut messages = vec![
         message("m1", &"x".repeat(LAYOUT_CACHE_MIN_LEN as usize)),
         message("m2", "a"),
-        message("m3", "x中文中文"),
+        message("m3", "x\u{4E2D}\u{6587}\u{4E2D}\u{6587}"),
     ];
     seed_cache(dir.path(), &messages);
     let layout =
@@ -129,8 +129,8 @@ fn cold_layout_ignores_a_previous_zero_identity_cache() {
         ),
     )
     .unwrap();
-    messages[1] = message("m2", "a中文");
-    messages[2] = message("m3", "x中文");
+    messages[1] = message("m2", "a\u{4E2D}\u{6587}");
+    messages[2] = message("m3", "x\u{4E2D}\u{6587}");
     write_transcript(dir.path(), "layout-regression", CREATED_AT, &messages).unwrap();
     assert_messages(&cold_read(dir.path()), &messages);
 }
@@ -140,7 +140,7 @@ fn cold_layout_keeps_append_only_history() {
     let dir = tempdir().unwrap();
     let mut messages = vec![message("m1", &"x".repeat(LAYOUT_CACHE_MIN_LEN as usize))];
     seed_cache(dir.path(), &messages);
-    messages.push(message("m2", "中文😀 appended"));
+    messages.push(message("m2", "\u{4E2D}\u{6587}😀 appended"));
     append_message(dir.path(), "layout-regression", CREATED_AT, &messages[1]).unwrap();
     assert_messages(&cold_read(dir.path()), &messages);
 }
@@ -149,8 +149,11 @@ fn cold_layout_keeps_append_only_history() {
 fn a_damaged_disk_cache_is_rebuilt_without_skipping_messages() {
     let dir = tempdir().unwrap();
     let messages: Vec<MessageRecord> = (0..300)
-        .map(|index| message(&format!("m{index}"), &format!("内容🙂{index}")))
-        .chain(std::iter::once(message("large", &"大🙂".repeat(400_000))))
+        .map(|index| message(&format!("m{index}"), &format!("\u{5185}\u{5BB9}🙂{index}")))
+        .chain(std::iter::once(message(
+            "large",
+            &"\u{5927}🙂".repeat(400_000),
+        )))
         .collect();
     seed_cache(dir.path(), &messages);
     let cache = layout_cache_path(dir.path(), "layout-regression").unwrap();
@@ -188,7 +191,7 @@ fn cold_layout_after_updating_an_earlier_message_preserves_the_tail() {
         message("m3", "last"),
     ];
     seed_cache(dir.path(), &messages);
-    messages[1] = message("m2", &"xx中文".repeat(3000));
+    messages[1] = message("m2", &"xx\u{4E2D}\u{6587}".repeat(3000));
     assert!(update_message(dir.path(), "layout-regression", &messages[1]).unwrap());
     assert_messages(&cold_read(dir.path()), &messages);
 }
@@ -196,7 +199,7 @@ fn cold_layout_after_updating_an_earlier_message_preserves_the_tail() {
 #[test]
 fn a_growing_middle_rewrite_does_not_reuse_stale_in_memory_offsets() {
     let dir = tempdir().unwrap();
-    let body = "中文🙂".repeat(800);
+    let body = "\u{4E2D}\u{6587}🙂".repeat(800);
     let mut messages: Vec<MessageRecord> = (0..300)
         .map(|index| {
             if index == 150 {
@@ -224,7 +227,10 @@ fn a_growing_middle_rewrite_does_not_reuse_stale_in_memory_offsets() {
     // Grow a row in the middle. The resulting file remains longer than the
     // cache's scanned prefix, which used to make refresh_layout scan only the
     // new tail while keeping every offset after this row stale.
-    messages[150] = task_message("completed", &format!("{}{}", body, "状态🙂".repeat(80)));
+    messages[150] = task_message(
+        "completed",
+        &format!("{}{}", body, "\u{72B6}\u{6001}🙂".repeat(80)),
+    );
     assert!(update_message(dir.path(), "layout-regression", &messages[150]).unwrap());
     assert!(fs::metadata(&path).unwrap().len() > cached.file_len);
 
@@ -245,7 +251,7 @@ fn a_growing_middle_rewrite_does_not_reuse_stale_in_memory_offsets() {
 #[test]
 fn layout_recovery_rebuilds_once_and_recomputes_the_window() {
     let dir = tempdir().unwrap();
-    let body = "中文🙂".repeat(800);
+    let body = "\u{4E2D}\u{6587}🙂".repeat(800);
     let messages: Vec<MessageRecord> = (0..300)
         .map(|index| message(&format!("m{index}"), &body))
         .collect();
@@ -390,7 +396,10 @@ fn a_reliable_identity_persists_a_layout() {
 #[test]
 fn unavailable_file_identity_disables_disk_cache_but_keeps_reads_available() {
     let dir = tempdir().unwrap();
-    let first = message("m1", &"可读🙂".repeat(LAYOUT_CACHE_MIN_LEN as usize / 6));
+    let first = message(
+        "m1",
+        &"\u{53EF}\u{8BFB}🙂".repeat(LAYOUT_CACHE_MIN_LEN as usize / 6),
+    );
     write_transcript(
         dir.path(),
         "layout-regression",
@@ -414,7 +423,7 @@ fn unavailable_file_identity_disables_disk_cache_but_keeps_reads_available() {
         .unwrap()
         .exists());
 
-    let second = message("m2", "仍可读取🙂");
+    let second = message("m2", "\u{4ECD}\u{53EF}\u{8BFB}\u{53D6}🙂");
     append_message(dir.path(), "layout-regression", CREATED_AT, &second).unwrap();
     let next_length = fs::metadata(transcript_path(dir.path(), "layout-regression").unwrap())
         .unwrap()
@@ -435,7 +444,7 @@ fn an_unwritable_layout_cache_does_not_block_transcript_reads() {
     let dir = tempdir().unwrap();
     let messages = vec![message(
         "large",
-        &"可读🙂".repeat(LAYOUT_CACHE_MIN_LEN as usize / 6),
+        &"\u{53EF}\u{8BFB}🙂".repeat(LAYOUT_CACHE_MIN_LEN as usize / 6),
     )];
     write_transcript(dir.path(), "layout-regression", CREATED_AT, &messages).unwrap();
     let cache = layout_cache_path(dir.path(), "layout-regression").unwrap();

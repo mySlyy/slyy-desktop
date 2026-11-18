@@ -104,8 +104,14 @@ mod tests {
 
     #[test]
     fn tail_preserves_unicode_and_exact_budget() {
-        assert_eq!(tail("ab中文".into(), 4), ("文".into(), true));
-        assert_eq!(tail("中文".into(), 6), ("中文".into(), false));
+        assert_eq!(
+            tail("ab\u{4E2D}\u{6587}".into(), 4),
+            ("\u{6587}".into(), true)
+        );
+        assert_eq!(
+            tail("\u{4E2D}\u{6587}".into(), 6),
+            ("\u{4E2D}\u{6587}".into(), false)
+        );
     }
 
     #[tokio::test]
@@ -115,7 +121,11 @@ mod tests {
             ("fixture".into(), "fixture".into(), false),
             ("x".repeat(1024), "x".repeat(1024), false),
             ("x".repeat(1025), "x".repeat(1024), true),
-            (format!("{}中", "x".repeat(1023)), "x".repeat(1023), true),
+            (
+                format!("{}\u{4E2D}", "x".repeat(1023)),
+                "x".repeat(1023),
+                true,
+            ),
         ] {
             task.command = command;
             for output in [false, true] {
@@ -145,7 +155,7 @@ mod tests {
             let mut shared = task.shared.lock().await;
             shared.state = BackgroundTaskState::Failed;
             shared.exit_code = Some(1);
-            shared.push_stdout(&"中".repeat(10000));
+            shared.push_stdout(&"\u{4E2D}".repeat(10000));
             shared.push_stderr("final assertion error");
         }
         task.settled.send_replace(Some(task.started_at.elapsed()));

@@ -71,8 +71,8 @@ allowlist. Agent-runtime injects OpenCode routing headers on every LLM
 request (session turns, subagents, context-compaction summaries, prompt
 enhancement, and plugin one-shots): `x-opencode-session` is the durable
 conversation id (or a per-call UUID when the caller has no session),
-`x-opencode-client` is `pi-desktop`, and `User-Agent` is
-`pi-desktop/<APP_VERSION>` unless the row sets `headers["User-Agent"]`. A custom OpenAI-compatible row whose base URL
+`x-opencode-client` is `slyy`, and `User-Agent` is
+`slyy/<APP_VERSION>` unless the row sets `headers["User-Agent"]`. A custom OpenAI-compatible row whose base URL
 host is `opencode.ai` receives the same headers. pi-ai is not relied on to
 emit `x-opencode-session`. Each provider row (AI service or OAuth account)
 may set optional `headers`; empty keeps adapter defaults. A fetch wrapper is

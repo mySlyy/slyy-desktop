@@ -106,7 +106,7 @@ describe("selectRecentTail", () => {
     // 600 Han characters are ~172 tokens at 3.5 chars/token, under a 200
     // budget, but ~600 under the output-cap estimate. The tail must still cut.
     const budget = 200;
-    const tail = selectRecentTail([user("中".repeat(600))], budget);
+    const tail = selectRecentTail([user("\u4e2d".repeat(600))], budget);
 
     expect(tail).toHaveLength(1);
     const text = (tail[0] as { content: Array<{ text: string }> }).content[0]!.text;
@@ -287,12 +287,12 @@ describe("truncateMessageToTail", () => {
 
   it("shrinks a long CJK tail until the output-cap estimate fits", () => {
     const budget = 200;
-    const truncated = truncateMessageToTail(user("中".repeat(1_600)), budget) as {
+    const truncated = truncateMessageToTail(user("\u4e2d".repeat(1_600)), budget) as {
       content: Array<{ text: string }>;
     };
     const text = truncated.content[0]!.text;
 
-    expect(text).toContain("中");
+    expect(text).toContain("\u4e2d");
     expect(text).toContain(CHECKPOINT_TRUNCATION_MARKER.trim());
     expect(outputCapTokens(text)).toBeLessThanOrEqual(budget);
     expect(text.length).toBeLessThan(

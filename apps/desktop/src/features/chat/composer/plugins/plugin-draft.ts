@@ -1,6 +1,6 @@
 /**
  * The composer draft as plugins see and write it
- * (`docs/plugin-plan/render/draft/`). Pure, so the bridge and logic tests
+ * (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2). Pure, so the bridge and logic tests
  * share it.
  *
  * A plugin's view is the draft's text with every chip replaced by one

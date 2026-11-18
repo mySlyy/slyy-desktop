@@ -184,14 +184,6 @@
   white-space: nowrap;
 }
 
-:lang(zh-CN) .projects-group-label,
-:lang(zh-TW) .projects-group-label,
-:lang(zh-CN) .projects-detail-label,
-:lang(zh-TW) .projects-detail-label {
-  letter-spacing: var(--tracking-normal);
-  text-transform: none;
-}
-
 .projects-group-count {
   flex: 0 0 auto;
   border-radius: var(--radius-full);

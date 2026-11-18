@@ -1667,7 +1667,7 @@ near-zero duration. A folded group keeps its rows mounted, `aria-hidden`, and
   session path opens `<data_dir>/scratch/<sessionId>/` in the system file
   manager, creating the directory if it does not exist yet. Both actions
   appear only while developer mode is on.
-- Copy conversation link writes the `pi-desktop://session/<id>` reference to
+- Copy conversation link writes the `slyy://session/<id>` reference to
   the clipboard without developer mode. Pasting it into another conversation's
   Composer draft sends a bounded excerpt of that conversation with the turn,
   and the user message then shows it as a chip (§20B).
@@ -3779,7 +3779,8 @@ Anatomy:
   main selects image blocks or path fallbacks from the exact model capability.
   Reference-only drafts are sendable. Builtin/plugin dispatch still bypasses
   the model-ready gate when no prompt text or file reference is sent.
-- A `pi-desktop://session/<id>` link in the draft is the reference itself: no
+- A `slyy://session/<id>` link (legacy `pi-desktop://session/<id>` still
+  parsed) in the draft is the reference itself: no
   new trigger symbol joins `@` files and `/` commands, and the link stays
   visible plaintext while the draft is unsent. Immediately before dispatch,
   main resolves each link to another conversation in the same project into a
@@ -4634,7 +4635,7 @@ TASKS (2)                     │ Nightly dependency check   [Enabled] [Run now]
 ### 20B.1 Purpose
 
 Carry another conversation into a turn without retyping it. The
-`pi-desktop://session/<id>` link is the whole interaction: a reader copies it
+`slyy://session/<id>` link is the whole interaction: a reader copies it
 from the conversation overflow menu and pastes it into a Composer draft (issue
 #1324, option B). Copy conversation ID stays the developer-mode identifier.
 
@@ -4667,8 +4668,11 @@ Conversation overflow                    Composer draft (unsent)
 
 ### 20B.4 Interaction
 
-- Copy conversation link writes `pi-desktop://session/<sessionId>` from the
-  conversation overflow menu. The durable id is the reference; Copy
+- Copy conversation link writes `slyy://session/<sessionId>` from the
+  conversation overflow menu. Links in the pre-rebrand
+  `pi-desktop://session/<sessionId>` form are still parsed everywhere a
+  `slyy://` link is (draft, sent message, chip), so existing messages keep
+  their references. The durable id is the reference; Copy
   conversation ID still exposes the bare id in developer mode.
 - Sending a turn whose draft holds the link attaches a bounded excerpt of the
   referenced conversation: the 40 newest messages, 8 KB per field, 16 KB for
@@ -4705,9 +4709,10 @@ Conversation overflow                    Composer draft (unsent)
 - The chip carries the button role with a catalog-built accessible name and a
   tooltip naming the conversation it opens; it is keyboard-activatable and leaves
   the surrounding selectable message text intact.
-- `pi-desktop://` is not yet an operating-system protocol handler; opening a
-  link from outside the app is a separate change (issue #1324, option A). This
-  section covers the in-app reference.
+- Neither `slyy://` nor `pi-desktop://` is registered as an operating-system
+  protocol handler, so a separately installed PI-Desktop is never hijacked;
+  opening a link from outside the app is a separate change (issue #1324,
+  option A). This section covers the in-app reference.
 ## 21. Acceptance criteria (all components)
 
 1. All components use semantic color tokens from [07-ui-design-system.md](07-ui-design-system.md) — no raw hex

@@ -241,8 +241,7 @@
 /*
  * A cluster heading, not a destination: it drops to the smallest legible step
  * and spaces its letters, so the eye separates the four clusters before it
- * reads any single row (D684). Latin labels read as small caps; CJK labels are
- * unaffected by the transform.
+ * reads any single row (D684). Labels read as small caps.
  */
 .settings-nav-group-label {
   padding: 0 10px 6px;

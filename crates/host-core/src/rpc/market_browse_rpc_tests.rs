@@ -138,7 +138,7 @@ fn remote_page() -> Value {
         "pageCount": 15,
         "categories": [{ "id": "developer-tools", "count": 30 }],
         "categoryLabels": {
-            "developer-tools": { "en": "Developer Tools", "zh-CN": "开发工具" }
+            "developer-tools": { "en": "Developer Tools", "zh-CN": "\u{5F00}\u{53D1}\u{5DE5}\u{5177}" }
         },
         "artifactBaseUrl": null,
         "plugins": [

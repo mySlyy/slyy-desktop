@@ -30,7 +30,7 @@ test("native URI file lists preserve order and decode spaces/unicode without rea
   assert.deepEqual(await nativeClipboardPaths(clipboard({
     "text/uri-list": "# comment\r\nfile:///tmp/one%20folder\r\nfile:///tmp/%E4%B8%AD%E6%96%87\r\nhttps://example.com/ignored",
     "text/plain": "unrelated clipboard text",
-  }), "linux"), ["/tmp/one folder", "/tmp/中文"]);
+  }), "linux"), ["/tmp/one folder", "/tmp/\u4e2d\u6587"]);
   assert.deepEqual(await nativeClipboardPaths(clipboard({ "x-special/gnome-copied-files": "copy\nfile:///tmp/a\nfile:///tmp/a" }), "linux"), ["/tmp/a"]);
 });
 
@@ -41,7 +41,7 @@ test("native file lists enforce metadata and selection bounds", async () => {
 });
 
 test("Windows uses the complete native FileDropList instead of custom CF_HDROP or one FileNameW", async () => {
-  const paths = ["C:\\first folder", "C:\\notes.txt", "D:\\中文"];
+  const paths = ["C:\\first folder", "C:\\notes.txt", "D:\\\u4e2d\u6587"];
   assert.deepEqual(await nativeClipboardPaths(silentWindowsClipboard(), "win32", () => paths), paths);
   await assert.rejects(() => nativeClipboardPaths(clipboard({}), "win32", () => ["relative"]), /invalid clipboard file path/);
 });
@@ -103,7 +103,7 @@ test("macOS Finder metadata is piped to plutil asynchronously", async () => {
 });
 
 test("Windows PowerShell clipboard adapter reads stdout asynchronously with process bounds", async () => {
-  const paths = ["C:\\first folder", "D:\\中文"];
+  const paths = ["C:\\first folder", "D:\\\u4e2d\u6587"];
   const calls = [];
   let eventLoopTicks = 0;
   const { nativeClipboardPaths: readPaths } = loadWithExecFile((command, args, options) => {
@@ -191,14 +191,14 @@ test("a Windows clipboard probe failure rejects without blocking the main proces
 test("directory metadata never copies a tree and mixed files use the existing import capability", async t => {
   const root = await mkdtemp(join(tmpdir(), "composer-folders-"));
   t.after(() => rm(root, { recursive: true, force: true }));
-  const folder = join(root, "folder & 中文"), file = join(root, "notes.txt");
+  const folder = join(root, "folder & \u4e2d\u6587"), file = join(root, "notes.txt");
   await mkdir(folder);
   await writeFile(join(folder, "keep.txt"), "original");
   await writeFile(file, "notes");
   let captured;
   const result = await readComposerClipboardDirectories(clipboard({}), paths => { captured = paths; return "selection"; }, () => [folder, file]);
   assert.deepEqual(result.items.map(item => item.kind), ["directory", "file"]);
-  assert.equal(result.items[0].name, "folder & 中文");
+  assert.equal(result.items[0].name, "folder & \u4e2d\u6587");
   assert.equal(result.token, "selection");
   assert.equal(captured.length, 1);
   assert.equal(result.items[1].path, undefined, "regular source paths stay in main");

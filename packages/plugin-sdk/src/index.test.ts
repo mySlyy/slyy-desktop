@@ -23,18 +23,18 @@ describe("validateManifest", () => {
   it("accepts and resolves English/Chinese panel titles", () => {
     const result = validateManifest({
       ...base,
-      ui: { panel: "renderer/index.html", title: { en: "Hello", "zh-CN": "你好" } },
+      ui: { panel: "renderer/index.html", title: { en: "Hello", "zh-CN": "Hello (zh-CN)" } },
     });
     expect(result.ok).toBe(true);
     expect(resolvePluginLocalizedString(result.manifest?.ui?.title, "en-US")).toBe("Hello");
-    expect(resolvePluginLocalizedString(result.manifest?.ui?.title, "zh-CN")).toBe("你好");
+    expect(resolvePluginLocalizedString(result.manifest?.ui?.title, "zh-CN")).toBe("Hello (zh-CN)");
   });
 
   it("falls back to English for shell locales without a plugin translation", () => {
-    const value = { en: "History", "zh-CN": "历史" };
+    const value = { en: "History", "zh-CN": "History (zh-CN)" };
     expect(resolvePluginLocalizedString(value, "zh-TW")).toBe("History");
     expect(resolvePluginLocalizedString(value, "zh-Hant")).toBe("History");
-    expect(resolvePluginLocalizedString(value, "zh-CN")).toBe("历史");
+    expect(resolvePluginLocalizedString(value, "zh-CN")).toBe("History (zh-CN)");
   });
 
   it("requires both supported locales for localized panel titles", () => {
@@ -79,14 +79,14 @@ describe("validateManifest", () => {
         mcpServers: [{ id: "files", transport: "stdio", command: "mcp-files" }],
         services: [{ id: "watcher", autoRestart: true }],
         bus: { publish: ["notes.created"], subscribe: ["notes.**"] },
-        sessionSources: [{ id: "legacy", label: { en: "Legacy", "zh-CN": "旧会话" } }],
+        sessionSources: [{ id: "legacy", label: { en: "Legacy", "zh-CN": "Legacy (zh-CN)" } }],
       },
     });
     expect(result.ok).toBe(true);
   });
 
   it("rejects ids that would share another plugin's directory or partition", () => {
-    for (const id of ["foo!bar", "foo/bar", "foo bar", "插件", ".", ".."]) {
+    for (const id of ["foo!bar", "foo/bar", "foo bar", "\u63d2\u4ef6", ".", ".."]) {
       expect(validateManifest({ ...base, id })).toEqual({
         ok: false,
         error: "manifest.id may only contain letters, digits, '.', '-' and '_'",
@@ -233,13 +233,13 @@ describe("validateManifest", () => {
         }],
         scenicThemes: {
           id: "scenic-themes",
-          label: { en: "Scenic themes", "zh-CN": "风景主题" },
-          description: { en: "Scenic cards", "zh-CN": "风景卡片" },
+          label: { en: "Scenic themes", "zh-CN": "Scenic themes (zh-CN)" },
+          description: { en: "Scenic cards", "zh-CN": "Scenic cards (zh-CN)" },
           icon: "palette",
           themes: [{
             themeId: "scenic",
-            label: { en: "Scenic", "zh-CN": "风景" },
-            description: { en: "Scenic card", "zh-CN": "风景卡片" },
+            label: { en: "Scenic", "zh-CN": "Scenic (zh-CN)" },
+            description: { en: "Scenic card", "zh-CN": "Scenic card (zh-CN)" },
             previewAsset: "assets/scenic.png",
           }],
         },
@@ -255,13 +255,13 @@ describe("validateManifest", () => {
   it("validates host-rendered scenic Settings contributions", () => {
     const scenicThemes = {
       id: "nexus-scenic-themes",
-      label: { en: "Nexus Scenic Themes", "zh-CN": "Nexus 风景主题" },
-      description: { en: "Four scenic themes", "zh-CN": "四款风景主题" },
+      label: { en: "Nexus Scenic Themes", "zh-CN": "Nexus Scenic Themes (zh-CN)" },
+      description: { en: "Four scenic themes", "zh-CN": "Four scenic themes (zh-CN)" },
       icon: "palette" as const,
       themes: [{
         themeId: "twilight-mountains",
-        label: { en: "Twilight Mountains", "zh-CN": "暮光山脉" },
-        description: { en: "Twilight glass", "zh-CN": "暮光玻璃" },
+        label: { en: "Twilight Mountains", "zh-CN": "Twilight Mountains (zh-CN)" },
+        description: { en: "Twilight glass", "zh-CN": "Twilight glass (zh-CN)" },
         previewAsset: "assets/twilight-mountains.png",
       }],
     };
@@ -313,8 +313,8 @@ describe("validateContributions", () => {
   it("validates Composer transform declarations and their permission", () => {
     const transform = {
       id: "enhance",
-      title: { en: "Enhance prompt", "zh-CN": "增强提示词" },
-      undoTitle: { en: "Undo enhancement", "zh-CN": "撤销增强" },
+      title: { en: "Enhance prompt", "zh-CN": "Enhance prompt (zh-CN)" },
+      undoTitle: { en: "Undo enhancement", "zh-CN": "Undo enhancement (zh-CN)" },
     };
     expect(validateContributions({ composerTransforms: [transform] })).toBeUndefined();
     expect(
@@ -391,7 +391,7 @@ describe("contributes.views", () => {
           view,
           {
             id: "history",
-            title: { en: "History", "zh-CN": "历史" },
+            title: { en: "History", "zh-CN": "History (zh-CN)" },
             icon: "clock",
             entry: "views/history.html",
             order: 10,
@@ -683,7 +683,7 @@ describe("contributes.launcherTriggers", () => {
         {
           id: "calculator",
           pattern: "^[0-9+\\-*/(). ]+$",
-          title: { en: "Calculator", "zh-CN": "计算器" },
+          title: { en: "Calculator", "zh-CN": "Calculator (zh-CN)" },
         },
         { id: "kilometres", pattern: "^\\d+\\s*km$", flags: "iu", title: "Kilometres" },
       ],
@@ -872,7 +872,7 @@ describe("contributes.providers", () => {
         contributes: {
           providers: [{
             ...provider,
-            category: { en: "Community", "zh-CN": "公益站" },
+            category: { en: "Community", "zh-CN": "Community (zh-CN)" },
           }],
         },
       }).ok,
@@ -895,7 +895,7 @@ describe("contributes.providers", () => {
         contributes: {
           providers: [{
             ...provider,
-            category: { en: "", "zh-CN": "公益站" },
+            category: { en: "", "zh-CN": "Community (zh-CN)" },
           }],
         },
       }).error,
@@ -912,7 +912,7 @@ describe("contributes.providers", () => {
         contributes: {
           providers: [{
             ...provider,
-            category: { en: "Community", "zh-CN": "公".repeat(129) },
+            category: { en: "Community", "zh-CN": "z".repeat(129) },
           }],
         },
       }).error,
@@ -922,7 +922,7 @@ describe("contributes.providers", () => {
   it("accepts a short localized introduction and rejects malformed or oversized copy", () => {
     expect(validateContributions({ providers: [{
       ...provider,
-      description: { en: "A community API.", "zh-CN": "社区公益 API 服务。" },
+      description: { en: "A community API.", "zh-CN": "A community API. (zh-CN)" },
     }] })).toBeUndefined();
     expect(validateContributions({ providers: [{
       ...provider,
@@ -1062,26 +1062,26 @@ describe("manifest i18n", () => {
   it("keeps a per-locale display block on the manifest", () => {
     const result = validateManifest({
       ...base,
-      description: "小清新待办",
+      description: "A calm todo list",
       i18n: {
         en: { name: "Todo List", description: "A calm todo list" },
         "zh-CN": {
-          name: "小清新待办",
-          description: "轻盈的待办清单",
-          safetyNotes: "只读写自己的数据",
+          name: "Todo List (zh-CN)",
+          description: "A light todo list (zh-CN)",
+          safetyNotes: "Reads and writes only its own data (zh-CN)",
         },
       },
     });
     expect(result.ok).toBe(true);
     expect(result.manifest?.i18n?.en.name).toBe("Todo List");
-    expect(result.manifest?.i18n?.["zh-CN"].name).toBe("小清新待办");
+    expect(result.manifest?.i18n?.["zh-CN"].name).toBe("Todo List (zh-CN)");
   });
 
   it("accepts a partial block, which falls back per field", () => {
     expect(validateManifest({ ...base, i18n: { en: { name: "Hello" } } }).ok).toBe(true);
     // A locale the shell does not read, and an unknown display field, are the
     // author's business rather than a load failure.
-    expect(validateManifest({ ...base, i18n: { ja: { name: "ハロー" } } }).ok).toBe(true);
+    expect(validateManifest({ ...base, i18n: { ja: { name: "Hello (ja)" } } }).ok).toBe(true);
     expect(
       validateManifest({ ...base, i18n: { en: { name: "Hello", tagline: "x" } } as never }).ok,
     ).toBe(true);
@@ -1091,7 +1091,7 @@ describe("manifest i18n", () => {
     expect(validateManifest({ ...base, i18n: [] as never }).error).toMatch(
       /manifest\.i18n must be an object/,
     );
-    expect(validateManifest({ ...base, i18n: { "zh-CN": "小清新待办" } as never }).error).toMatch(
+    expect(validateManifest({ ...base, i18n: { "zh-CN": "Todo List (zh-CN)" } as never }).error).toMatch(
       /manifest\.i18n\.zh-CN must be an object/,
     );
     expect(validateManifest({ ...base, i18n: { en: { name: 7 } } as never }).error).toMatch(

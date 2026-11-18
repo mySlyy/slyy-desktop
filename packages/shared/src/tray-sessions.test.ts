@@ -191,7 +191,7 @@ describe("traySessionTitle", () => {
     expect(traySessionTitle(["line", "one"].join("\n"), "fallback")).toBe("line one");
     expect(traySessionTitle("   ", "fallback")).toBe("fallback");
     expect(traySessionTitle("a".repeat(32), "fallback")).toBe("a".repeat(32));
-    expect(traySessionTitle("中".repeat(16), "fallback")).toBe("中".repeat(16));
+    expect(traySessionTitle("\u4e2d".repeat(16), "fallback")).toBe("\u4e2d".repeat(16));
   });
 
   it("cuts a Latin title to 31 columns plus an ellipsis", () => {
@@ -203,8 +203,8 @@ describe("traySessionTitle", () => {
   });
 
   it("counts a CJK character as two columns, so half as many fit", () => {
-    expect(traySessionTitle("中".repeat(20), "fallback")).toBe(`${"中".repeat(15)}…`);
-    expect(traySessionTitle(`a${"中".repeat(20)}`, "fallback")).toBe(`a${"中".repeat(15)}…`);
+    expect(traySessionTitle("\u4e2d".repeat(20), "fallback")).toBe(`${"\u4e2d".repeat(15)}\u2026`);
+    expect(traySessionTitle(`a${"\u4e2d".repeat(20)}`, "fallback")).toBe(`a${"\u4e2d".repeat(15)}\u2026`);
   });
 
   it("counts an emoji as two columns, with or without the variation selector", () => {

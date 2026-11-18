@@ -10,7 +10,8 @@ intentionally targets a path outside the session workspace.
 
 1. **Security denylist** (always on, not user-disable in MVP)
 2. **App defaults** (shipped)
-3. **Workspace rules** (`.pi-desktopignore` at the workspace root)
+3. **Workspace rules** (`.slyyignore` at the workspace root; the legacy
+   `.pi-desktopignore` is still read, and both apply when present)
 4. **User global ignore** (`<data_dir>/ignore`, i.e. `~/.slyy-gen2/ignore`
    by default)
 5. Explicit tool path still subject to the security denylist and the
@@ -72,10 +73,12 @@ coverage/
 Support:
 
 ```text
-.pi-desktopignore
+.slyyignore
+.pi-desktopignore   (legacy, still read)
 ```
 
-Syntax: gitignore-compatible subset.
+Syntax: gitignore-compatible subset. When both files exist, the rules of both
+apply.
 
 ## 6. Tool behavior
 

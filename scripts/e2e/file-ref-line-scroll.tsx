@@ -35,7 +35,7 @@ window.piDesktop = {
     if (channel === IPC.invoke.fsResolveRef) {
       const ref = String(input?.ref ?? "");
       resolveRefs.push(ref);
-      const relativePath = ref === "核查报告.md" ? ref : targetPath;
+      const relativePath = ref === "\u6838\u67e5\u62a5\u544a.md" ? ref : targetPath;
       return {
         ok: true,
         data: {
@@ -113,7 +113,7 @@ void i18n
             <LinkifiedText text={`Review ${targetPath}:${targetLine}-70.`} />
           </div>
           <div className="fixture-markdown">
-            <Markdown source="[核查报告.md](核查报告.md)" renderDiagrams={false} />
+            <Markdown source={"[\u6838\u67e5\u62a5\u544a.md](\u6838\u67e5\u62a5\u544a.md)"} renderDiagrams={false} />
           </div>
           <FilesTab />
         </I18nextProvider>,

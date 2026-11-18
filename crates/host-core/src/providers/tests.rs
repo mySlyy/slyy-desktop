@@ -519,10 +519,10 @@ fn alias_length_is_limited_to_sixty_characters() {
     assert!(error.contains("MODEL_ALIAS_TOO_LONG"), "{error}");
 
     // Multi-byte aliases are counted in characters, not bytes.
-    let multi_byte = binding_with_alias("model", Some(&"あ".repeat(MAX_MODEL_ALIAS_CHARS)));
+    let multi_byte = binding_with_alias("model", Some(&"\u{3042}".repeat(MAX_MODEL_ALIAS_CHARS)));
     assert!(validate_model_aliases(&[multi_byte]).is_ok());
     let multi_byte_over =
-        binding_with_alias("model", Some(&"あ".repeat(MAX_MODEL_ALIAS_CHARS + 1)));
+        binding_with_alias("model", Some(&"\u{3042}".repeat(MAX_MODEL_ALIAS_CHARS + 1)));
     let error = validate_model_aliases(&[multi_byte_over])
         .unwrap_err()
         .to_string();
@@ -1973,7 +1973,7 @@ fn header_values_fold_fullwidth_and_reject_non_latin1() {
         .execute(
             "UPDATE providers SET config_json = ?1 WHERE id = ?2",
             params![
-                json!({ "headers": { "x-legacy": "\u{FF11}\u{FF12}\u{FF13}", "x-cjk": "星" } })
+                json!({ "headers": { "x-legacy": "\u{FF11}\u{FF12}\u{FF13}", "x-cjk": "\u{661F}" } })
                     .to_string(),
                 provider.id
             ],
@@ -2057,7 +2057,7 @@ fn sync_payloads_keep_only_storable_headers() {
         "headers": {
             "X-Title": "PI\u{3000}Desktop",
             "X-Key": "1234567\u{FF10}",
-            "X-CJK": "星",
+            "X-CJK": "\u{661F}",
             "Authorization": "Bearer secret"
         }
     });
@@ -2072,7 +2072,7 @@ fn sync_payloads_keep_only_storable_headers() {
     assert!(normalize_headers_input(&headers).is_ok());
 
     // Every row unusable: the key goes away instead of storing an empty map.
-    let mut payload = json!({ "headers": { "X-CJK": "星" } });
+    let mut payload = json!({ "headers": { "X-CJK": "\u{661F}" } });
     retain_storable_headers(&mut payload);
     assert!(payload.get("headers").is_none());
 
@@ -2086,7 +2086,7 @@ fn sync_payloads_keep_only_storable_headers() {
 
     // A row dropped here is also invisible to the read path, so a local store
     // holding it behaves the same before and after this runs.
-    let raw = BTreeMap::from([("x-cjk".to_string(), "星".to_string())]);
+    let raw = BTreeMap::from([("x-cjk".to_string(), "\u{661F}".to_string())]);
     assert!(storable_headers(&raw).is_empty());
 }
 

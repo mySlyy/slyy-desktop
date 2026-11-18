@@ -15,8 +15,8 @@ const scratch = await mkdtemp(join(artifacts, "run-"));
 const workspace = join(scratch, "workspace");
 await mkdir(workspace);
 await writeFile(join(workspace, "failure.cjs"), `
-process.stdout.write('中文'.repeat(100000) + '\\nstdout-final\\n');
-process.stderr.write('错误'.repeat(100000) + '\\nassertion-failed-final\\n');
+process.stdout.write('\\u4e2d\\u6587'.repeat(100000) + '\\nstdout-final\\n');
+process.stderr.write('\\u9519\\u8bef'.repeat(100000) + '\\nassertion-failed-final\\n');
 process.exitCode = 1;
 `);
 await writeFile(join(workspace, "service.cjs"), `

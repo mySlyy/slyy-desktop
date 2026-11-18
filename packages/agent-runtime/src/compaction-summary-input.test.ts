@@ -127,7 +127,7 @@ describe("estimateSummaryPromptTokens", () => {
   // baseline bills it 1/3.5, so a CJK prompt that "fits" is sent whole and
   // rejected as a context overflow. The estimate must carry the correction.
   it("does not treat 1600 CJK characters as a few hundred tokens", () => {
-    const cjk = input([user("中".repeat(1_600))]);
+    const cjk = input([user("\u4e2d".repeat(1_600))]);
     const ascii = input([user("a".repeat(1_600))]);
     const cjkTokens = estimateSummaryPromptTokens(cjk);
     const asciiTokens = estimateSummaryPromptTokens(ascii);
@@ -140,12 +140,12 @@ describe("estimateSummaryPromptTokens", () => {
 
   it("sizes a CJK history over the summary input limit the guard rejects", () => {
     // A limit of 800 must not wave the 1600-character CJK prompt through.
-    const cjk = input([user("中".repeat(1_600))]);
+    const cjk = input([user("\u4e2d".repeat(1_600))]);
     expect(estimateSummaryPromptTokens(cjk)).toBeGreaterThan(800);
   });
 
   it("carries the CJK correction for a CJK previous summary", () => {
-    const base = input([user("ask")], { previousSummary: "摘".repeat(3_500) });
+    const base = input([user("ask")], { previousSummary: "\u6458".repeat(3_500) });
     const tokens = estimateSummaryPromptTokens(base);
     expect(tokens).toBeGreaterThan(3_500);
     expect(tokens).toBeLessThan(4_000);
@@ -295,7 +295,7 @@ describe("planSummaryChunks", () => {
   it("splits a CJK range the chars-per-token estimate would send whole", () => {
     // budget = floor(800*0.9) = 720 tokens; a 400-CJK-char message costs ~415,
     // so two per chunk would exceed it — while chars/3.5 sees only ~115.
-    const messages = Array.from({ length: 4 }, () => user("中".repeat(400)));
+    const messages = Array.from({ length: 4 }, () => user("\u4e2d".repeat(400)));
     const chunks = planSummaryChunks(input(messages), {
       summaryInputLimit: 800,
       reserveTokens: 0,
@@ -306,7 +306,7 @@ describe("planSummaryChunks", () => {
   });
 
   it("truncates an oversized CJK message inside the chunk's token budget", () => {
-    const chunks = planSummaryChunks(input([user("中".repeat(5_000))]), {
+    const chunks = planSummaryChunks(input([user("\u4e2d".repeat(5_000))]), {
       summaryInputLimit: 800,
       reserveTokens: 0,
     });

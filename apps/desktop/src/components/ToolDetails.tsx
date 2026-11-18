@@ -38,7 +38,7 @@ function blockCopyText(block: ToolBlock): string {
   switch (block.kind) {
     case "asktool":
       return block.questions
-        .map(({ question, answers }) => `${question}：${answers?.join("、") ?? ""}`)
+        .map(({ question, answers }) => `${question}: ${answers?.join(", ") ?? ""}`)
         .join("\n---\n");
     case "code":
       return block.text;

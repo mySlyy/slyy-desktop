@@ -201,10 +201,12 @@ function estimateMessageTokens(
       // would charge the character twice.
       cjkChars += countCjkChars(b.name) + countCjkChars(payload);
     } else if (b.type === "hostedSearch") {
-      // 与适配器共用回放投影；搜索结果不是图片，也不是普通工具参数。
-      // 投影会校验结构，失败必须保留为本地错误，不能按零成本继续请求。
-      // 只有目标模型不会回放的条目（跨模型的 Responses 搜索）才计零成本，
-      // 判据来自适配器本身，不是这里的猜测。
+      // Shares the replay projection with the adapter; search results are
+      // neither images nor ordinary tool arguments. The projection validates
+      // the structure, and a failure must stay a local error rather than let
+      // the request continue at zero cost. Only entries the target model
+      // will not replay (cross-model Responses searches) count as zero cost,
+      // and that criterion comes from the adapter itself, not a guess here.
       const replay = hostedSearchReplayProjection(b, replayOptions);
       const payload = JSON.stringify(replay);
       if (payload !== undefined) {

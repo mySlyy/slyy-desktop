@@ -54,7 +54,7 @@ function textMessage(index) {
   return {
     id: `message-${String(index).padStart(3, "0")}`,
     role: "user",
-    content: `合成会话 ${index} 🙂 `.repeat(800),
+    content: `\u5408\u6210\u4f1a\u8bdd ${index} \u{1F642} `.repeat(800),
     createdAt,
     status: "complete",
   };
@@ -109,7 +109,7 @@ try {
       await append(sessionId, {
         id: "nested-child",
         role: "assistant",
-        content: "子任务结果 🙂",
+        content: "\u5b50\u4efb\u52a1\u7ed3\u679c \u{1F642}",
         createdAt,
         parentToolCallId: "task-middle-call",
       });
@@ -144,9 +144,9 @@ try {
     details: {
       delegationId: "delegate-middle",
       status: "completed",
-      result: "最终结果 中文🙂 ".repeat(600),
+      result: "\u6700\u7ec8\u7ed3\u679c \u4e2d\u6587\u{1F642} ".repeat(600),
     },
-  }, "终态回写 中文🙂 ".repeat(600));
+  }, "\u7ec8\u6001\u56de\u5199 \u4e2d\u6587\u{1F642} ".repeat(600));
   await host.call("session.appendMessage", { sessionId, message: terminalTask });
   messages[150] = terminalTask;
   const rewrittenSize = (await stat(transcriptPath)).size;

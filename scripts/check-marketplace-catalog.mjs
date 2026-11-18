@@ -17,7 +17,7 @@ const DEFAULT_URL =
  * but names a host the client refuses would be a release nobody can install, so
  * the gate is checked here rather than discovered by the first user.
  */
-const PACKAGE_HOST_ALLOWLIST = ["github.com", "githubusercontent.com", "cnb.cool"];
+const PACKAGE_HOST_ALLOWLIST = ["github.com", "githubusercontent.com"];
 
 function usage() {
   console.error(

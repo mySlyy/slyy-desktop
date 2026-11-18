@@ -51,7 +51,7 @@ const SAVE = "Assets/_Game/Scripts/Systems/Save/SaveSlots.cs";
 const STALE = "Assets/Stale/SaveFeature.cs";
 // Short enough to rank inside the bare @ menu if a searched row leaked into it.
 const SHORT = "a.cs";
-const UNICODE = "src/café-竞赛-🚀.ts";
+const UNICODE = "src/caf\u00e9-\u7ade\u8d5b-\u{1f680}.ts";
 // The shallowest 8000 entries of a large tree; the deep scripts are not among them.
 const shallow = Array.from({ length: 8000 }, (_, index) => ({
   path: "Assets/Art/Group" + Math.floor(index / 300) + "/asset_" + index + ".png",
@@ -177,7 +177,7 @@ window.deepFileSearchProbe = async () => {
   fileIndex = { entries: ["README.md", UNICODE].map((path) => ({ path, kind: "file" })), truncated: false };
   useAppStore.setState({ workspace: { path: "/small", name: "small" } });
   await type("");
-  await type("@竞赛");
+  await type("@\u7ade\u8d5b");
   await until(() => rows().includes(UNICODE), "the Unicode file name was not preserved in the menu");
   editor().dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
   await settle();

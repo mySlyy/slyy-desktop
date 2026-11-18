@@ -55,7 +55,7 @@ class FakeNdjsonInput {
   }
 }
 
-const payload = { id: "rpc", result: { content: "A\u2028中文🙂\u2029B\r\nC" } };
+const payload = { id: "rpc", result: { content: "A\u2028\u4e2d\u6587\u{1f642}\u2029B\r\nC" } };
 const wire = new TextEncoder().encode(`${JSON.stringify(payload)}\n`);
 
 describe("readNdjsonLines", () => {

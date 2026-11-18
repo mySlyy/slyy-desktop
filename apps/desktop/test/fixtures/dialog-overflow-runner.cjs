@@ -53,7 +53,7 @@ app.whenReady().then(async () => {
   check('typing and submit preserve the input answer', await evaluate('window.dialogFixture.responses[0]?.value === "Ann"'));
   for (const theme of ['light','dark']) for (const request of ['input','confirm','select']) {
     win.setContentSize(520, 480);
-    await evaluate('window.dialogFixture.show("extension", ' + JSON.stringify({ theme, request, longTitle: true, locale: 'zh-CN' }) + ')');
+    await evaluate('window.dialogFixture.show("extension", ' + JSON.stringify({ theme, request, longTitle: true, locale: 'de' }) + ')');
     const m = await measure();
     check(theme + ' ' + request + ' wraps long content within the viewport', m.contained && m.overflow <= 1 && m.closeContained && m.sourceWrapped, m);
     if (request === 'select') {
@@ -83,7 +83,7 @@ app.whenReady().then(async () => {
     }
   }
   win.setContentSize(1254, 772);
-  await evaluate('window.dialogFixture.show("models", { theme: "dark", locale: "zh-CN" })');
+  await evaluate('window.dialogFixture.show("models", { theme: "dark", locale: "de" })');
   const modelRows = await evaluate(`(() => {
     const panes = document.querySelector('.provider-setup-panes');
     const paneBounds = [...panes.children].map(pane => pane.getBoundingClientRect());
@@ -109,7 +109,7 @@ app.whenReady().then(async () => {
   check('Advanced still expands one selected model on demand',
     await evaluate(`document.querySelectorAll('.provider-chosen-row-body:not([hidden])').length === 1 && document.querySelector('.provider-chosen-advanced-toggle').getAttribute('aria-expanded') === 'true'`));
   win.setContentSize(520, 480);
-  await evaluate('window.dialogFixture.show("models", { theme: "dark", locale: "zh-CN" })');
+  await evaluate('window.dialogFixture.show("models", { theme: "dark", locale: "de" })');
   const narrowModelPanes = await evaluate(`(() => {
     const panes = document.querySelector('.provider-setup-panes');
     const surface = document.querySelector('.dialog-fixture-models');

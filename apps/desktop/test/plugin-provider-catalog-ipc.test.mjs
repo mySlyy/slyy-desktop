@@ -61,7 +61,7 @@ test("the plugin Add Service IPC returns declared categories through the Host ha
           name: "Primary",
           baseUrl: "https://api.example/v1",
           category,
-          description: { en: "A short English introduction.", "zh-CN": "一句话中文简介。" },
+          description: { en: "A short English introduction.", "zh-CN": "A short English introduction. (zh-CN)" },
           models: [{ id: "model-1" }],
         }],
       },
@@ -74,7 +74,7 @@ test("the plugin Add Service IPC returns declared categories through the Host ha
       listLoaded: () => [
         plugin("community.sites", "Community Sites", ["provider.register"], {
           en: "Community API Sites",
-          "zh-CN": "公益站",
+          "zh-CN": "Community API Sites (zh-CN)",
         }),
         plugin("unapproved.sites", "Unapproved", [], "Hidden"),
       ],
@@ -94,8 +94,8 @@ test("the plugin Add Service IPC returns declared categories through the Host ha
     pluginId: "community.sites",
     providerId: "plugin:community.sites:primary",
     pluginName: "Community Sites",
-    category: "公益站",
-    description: "一句话中文简介。",
+    category: "Community API Sites (zh-CN)",
+    description: "A short English introduction. (zh-CN)",
   }]);
 });
 

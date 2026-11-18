@@ -79,12 +79,12 @@ describe("loadProjectInstructions", () => {
 
   it("caps the project chain at 32 KiB without splitting UTF-8 characters and marks the cut", async () => {
     root = await mkdtemp(join(tmpdir(), "pi-desktop-instructions-"));
-    await writeFile(join(root, "AGENTS.md"), "中".repeat(20_000));
+    await writeFile(join(root, "AGENTS.md"), "\u4e2d".repeat(20_000));
 
     const loaded = await loadProjectInstructions(root);
     const [content, notice] = loaded!.entries[0].content.split("\n\n");
     expect(Buffer.byteLength(content, "utf8")).toBeLessThanOrEqual(32 * 1024);
-    expect(content.endsWith("中")).toBe(true);
+    expect(content.endsWith("\u4e2d")).toBe(true);
     expect(notice).toBe(
       "[Slyy truncated AGENTS.md: loaded the first 32766 of 60000 bytes; the rest of this file is not in context.]",
     );

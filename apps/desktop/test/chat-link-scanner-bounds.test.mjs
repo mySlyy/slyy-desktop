@@ -64,8 +64,8 @@ test("Markdown text nodes in one tree share scan work while later trees get fres
 });
 
 test("CRLF and Unicode source survive bounded linkification unchanged", () => {
-  const source = "查看 报告.pdf\r\n😀 and docs/规范/架构.md";
+  const source = "see \u62a5\u544a.pdf\r\n\u{1f600} and docs/\u89c4\u8303/\u67b6\u6784.md";
   const linked = splitChatText(source, ROOT);
-  assert.deepEqual(targets(linked).map((segment) => segment.text), ["报告.pdf", "docs/规范/架构.md"]);
+  assert.deepEqual(targets(linked).map((segment) => segment.text), ["\u62a5\u544a.pdf", "docs/\u89c4\u8303/\u67b6\u6784.md"]);
   assert.equal(linked.map((segment) => segment.text).join(""), source);
 });

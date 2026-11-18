@@ -1,6 +1,5 @@
 /**
- * Plugin marks in the composer draft (`docs/plugin-plan/ui/composer/`,
- * `docs/plugin-plan/render/draft/`).
+ * Plugin marks in the composer draft (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2).
  *
  * A mark is an atomic chip backed by a composer file reference with a
  * `plugin` part: it shows its label and sends its `send` text in its place.

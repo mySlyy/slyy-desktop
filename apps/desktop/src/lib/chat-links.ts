@@ -60,7 +60,7 @@ function stripLineRef(path: string): string {
 export function parseFileRefPosition(
   text: string,
 ): { line: number; column?: number } | null {
-  const token = text.trim().replace(/[.,!?;:，。！？；：]+$/u, "");
+  const token = text.trim().replace(/[.,!?;:]+$/u, "");
   const match = token.match(/(?::(\d+)(?::(\d+)|-(\d+))?|#L(\d+)(?:-L?(\d+))?)$/iu);
   if (!match) return null;
   const line = Number(match[1] ?? match[4]);
@@ -271,7 +271,7 @@ export function resolvePreviewTarget(
   if (isHttpUrl(trimmed)) return { kind: "url", url: trimmed };
   const position = parseFileRefPosition(trimmed);
   const pathText = position
-    ? trimmed.replace(/[.,!?;:，。！？；：]+$/u, "")
+    ? trimmed.replace(/[.,!?;:]+$/u, "")
     : trimmed;
   const at = unwrapAtFileRef(pathText);
   if (at) {
@@ -380,8 +380,7 @@ const PROSE_INTRODUCERS = new Set([
   "see", "open", "read", "view", "check", "show", "find", "edit",
   "update", "fix", "inspect", "compare", "review", "use", "add", "remove",
   "write", "create", "created", "delete", "rename", "move", "copy",
-  "change", "saved", "generated", "和", "与", "再看", "然后", "接着",
-  "打开", "请看", "先看", "查看", "读取", "编辑",
+  "change", "saved", "generated",
 ]);
 function spacedRefDisposition(
   raw: string,
@@ -397,7 +396,7 @@ function spacedRefDisposition(
       if (!spendChatLinkScanWork(budget, stats, 1)) return "exhausted";
       let previousStart = start - 1;
       let inspected = 0;
-      const separator = /[\s(),!?;:，。！？；：()[\]{}<>"']/u;
+      const separator = /[\s(),!?;:[\]{}<>"']/u;
       while (previousStart > 0 && inspected < CHAT_LINK_SCAN_LIMITS.maxFileCandidateCodeUnits) {
         if (!spendChatLinkScanWork(budget, stats, 1)) return "exhausted";
         inspected += 1;
@@ -408,8 +407,7 @@ function spacedRefDisposition(
       }
       const previousWord = source.slice(previousStart, start - 1).toLowerCase();
       const previousLooksLikeFile = /[./\\]/u.test(previousWord) ||
-        /\.[A-Za-z0-9]{1,8}(?:[+@-][\p{L}\p{N}_@+-]*)?$/u.test(previousWord) ||
-        /\p{Script=Han}/u.test(previousWord);
+        /\.[A-Za-z0-9]{1,8}(?:[+@-][\p{L}\p{N}_@+-]*)?$/u.test(previousWord);
       if (
         previousWord &&
         inspected < CHAT_LINK_SCAN_LIMITS.maxFileCandidateCodeUnits &&

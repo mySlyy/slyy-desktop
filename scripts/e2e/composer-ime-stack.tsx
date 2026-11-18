@@ -189,8 +189,8 @@ globalThis.composerImeStackProbe = async () => {
 
   // --- The ordinary path must keep working -------------------------------
   snap("mounted");
-  await type("/、", { composing: true });
-  snap("IME /、");
+  await type("/n", { composing: true });
+  snap("IME /n");
   await type("", { composing: true });
   snap("deleted (composing)");
   await type("", { composing: false });
@@ -201,12 +201,12 @@ globalThis.composerImeStackProbe = async () => {
   const normalQuery = snap("typed /re");
 
   // --- A compositionend that never arrives -------------------------------
-  // A Windows Chinese IME can drop compositionend when the composing text is
+  // A Windows IME can drop compositionend when the composing text is
   // deleted. `composing` is component state in useComposerDraft, so a flag
   // stuck true freezes the trigger and only an unmount clears it — which is
   // the "a new conversation is the only escape" half of the report.
   await type("", { composing: false });
-  await type("/、", { composing: true, endComposition: false });
+  await type("/n", { composing: true, endComposition: false });
   snap("compositionend dropped");
   // The browser's own composition is over, so what follows is ordinary input
   // with isComposing false even though the app never heard about it.

@@ -32,7 +32,6 @@ LIFT = (52, 52, 52, 255)
 RING = (255, 255, 255, 42)
 INK = (255, 255, 255, 255)
 MUTED = (180, 180, 180, 255)
-FAINT = (120, 120, 120, 255)
 ARROW = (232, 232, 232, 255)
 
 
@@ -132,7 +131,6 @@ def _wordmark(base: Image.Image) -> None:
 
     title_font = _font("/System/Library/Fonts/HelveticaNeue.ttc", 21, index=10)
     caption_font = _font("/System/Library/Fonts/HelveticaNeue.ttc", 13, index=0)
-    zh_font = _font("/System/Library/Fonts/Hiragino Sans GB.ttc", 12, index=0)
 
     draw = ImageDraw.Draw(base)
     title = "Slyy"
@@ -149,7 +147,6 @@ def _wordmark(base: Image.Image) -> None:
         fill=INK,
     )
     _center_text(draw, "Drag to Applications to install", 328, caption_font, MUTED)
-    _center_text(draw, "拖到「应用程序」完成安装", 352, zh_font, FAINT)
 
 
 def render() -> Image.Image:

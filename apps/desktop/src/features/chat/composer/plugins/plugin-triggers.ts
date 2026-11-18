@@ -1,5 +1,5 @@
 /**
- * Plugin-owned composer triggers (`docs/plugin-plan/ui/composer/`): where a
+ * Plugin-owned composer triggers (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2): where a
  * trigger is active in the draft, and what of a plugin's answer the host
  * keeps. Pure, so the completion hook and logic tests share it.
  */

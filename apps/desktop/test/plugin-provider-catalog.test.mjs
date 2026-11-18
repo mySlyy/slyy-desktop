@@ -16,8 +16,8 @@ test("the provider catalog is permission-filtered, API-key-only, localized and s
         id: "second",
         name: "Second",
         baseUrl: "https://second.example/v1",
-        category: { en: "Community", "zh-CN": "公益站" },
-        description: { en: "A community API with check-in credits.", "zh-CN": "通过签到获取额度的公益 API 服务。" },
+        category: { en: "Community", "zh-CN": "Community (zh-CN)" },
+        description: { en: "A community API with check-in credits.", "zh-CN": "A community API with check-in credits. (zh-CN)" },
         models: [{ id: "second-model" }],
       },
       {
@@ -45,7 +45,7 @@ test("the provider catalog is permission-filtered, API-key-only, localized and s
         id: "first",
         name: "First",
         baseUrl: "https://first.example/v1",
-        category: "公益站",
+        category: "Community (zh-CN)",
         models: [{ id: "first-model" }],
       },
     ]),
@@ -64,14 +64,14 @@ test("the provider catalog is permission-filtered, API-key-only, localized and s
       pluginId: "community.sites",
       providerId: "plugin:community.sites:second",
       pluginName: "Community Sites",
-      category: "公益站",
-      description: "通过签到获取额度的公益 API 服务。",
+      category: "Community (zh-CN)",
+      description: "A community API with check-in credits. (zh-CN)",
     },
     {
       pluginId: "community.first",
       providerId: "plugin:community.first:first",
       pluginName: "First Plugin",
-      category: "公益站",
+      category: "Community (zh-CN)",
     },
   ]);
 });
@@ -94,12 +94,12 @@ test("a localized provider category follows the active app locale", () => {
     id: "demo",
     name: "Demo",
     baseUrl: "https://demo.example/v1",
-    category: { en: "Community", "zh-CN": "公益站" },
+    category: { en: "Community", "zh-CN": "Community (zh-CN)" },
     models: [{ id: "demo-model" }],
   }])];
 
   assert.equal(pluginProviderCatalogEntries(sources, "en")[0]?.category, "Community");
-  assert.equal(pluginProviderCatalogEntries(sources, "zh-CN")[0]?.category, "公益站");
+  assert.equal(pluginProviderCatalogEntries(sources, "zh-CN")[0]?.category, "Community (zh-CN)");
 });
 
 test("the provider catalog resolves a localized one-sentence introduction", () => {
@@ -107,10 +107,10 @@ test("the provider catalog resolves a localized one-sentence introduction", () =
     id: "demo",
     name: "Demo",
     baseUrl: "https://demo.example/v1",
-    description: { en: "A short introduction.", "zh-CN": "一句话简介。" },
+    description: { en: "A short introduction.", "zh-CN": "A short introduction. (zh-CN)" },
     models: [{ id: "demo-model" }],
   }])];
 
   assert.equal(pluginProviderCatalogEntries(sources, "en")[0]?.description, "A short introduction.");
-  assert.equal(pluginProviderCatalogEntries(sources, "zh-CN")[0]?.description, "一句话简介。");
+  assert.equal(pluginProviderCatalogEntries(sources, "zh-CN")[0]?.description, "A short introduction. (zh-CN)");
 });

@@ -1033,7 +1033,7 @@ export const enEntries: ChangelogEntry[] = [
       "Chat and Agent modes with streaming, thinking levels, and model management.",
       "Workspace tools with permission gating, terminal, browser, and git review.",
       "Rust host core for storage, secrets, sessions, and notifications.",
-      "Plugin foundation plus dual English / 简体中文 UI.",
+      "Plugin foundation plus dual English / Simplified Chinese UI.",
       "Update checks against GitHub Releases (in-app where supported).",
     ],
   },
