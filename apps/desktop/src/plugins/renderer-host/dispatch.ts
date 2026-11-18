@@ -1,6 +1,6 @@
 /**
  * The outbound gate of plugin renderer code (`slot-contract.html` §3,
- * `docs/plugin-plan/render/plugin-call/`).
+ * `docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2).
  *
  * Every load of a plugin gets its own channel, bound to the plugin's id and
  * to its `manifest.rendererActions`, so a component can only ever act as its

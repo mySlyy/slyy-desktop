@@ -100,7 +100,7 @@ folder/mixed-selection behavior. No system clipboard contents are changed.
   Electron preload bridge. Native OS clipboard and file-manager display are
   manual scenarios.
 
-> Scope: MVP acceptance scenarios plus current shipped product increments for PI-Desktop
+> Scope: MVP acceptance scenarios plus current shipped product increments for Slyy
 > Status: Accepted (protocol/Electron automation is active; full desktop Playwright remains planned)
 > Cross-references: [acceptance-criteria](../02-acceptance-criteria.md) · [milestones](../01-mvp-milestones.md) · [ai-development-workflow](../03-ai-development-workflow.md) · [change-checklist](../05-change-checklist.md)
 
@@ -271,7 +271,7 @@ folder/mixed-selection behavior. No system clipboard contents are changed.
 
 ## E2E-IMAGES-provider-save-feedback
 
-- **Preconditions:** Image configuration UI fixture; English and Chinese.
+- **Preconditions:** Image configuration UI fixture; English and German.
 - **Steps:** Mark image models and save the provider; choose a different image
   default from its summary; pick a candidate the stored list no longer offers;
   then unmark the sole image model and save.
@@ -296,7 +296,7 @@ folder/mixed-selection behavior. No system clipboard contents are changed.
   An unaffected chat default stays unchanged; a removed chat default still falls
   back to the first configured model. Reload preserves results.
 - **Specs:** 03-runtime/21-image-generation. **Acceptance:** B.
-- **Milestone:** Maintenance. **Status:** Automated in English and Chinese by
+- **Milestone:** Maintenance. **Status:** Automated by
   `scripts/e2e-image-generation-ui.mjs`.
 
 ## E2E-IMAGES-desktop-conversation
@@ -323,7 +323,7 @@ folder/mixed-selection behavior. No system clipboard contents are changed.
   for images, uncheck it in the provider editor. Cancel must preserve the image
   default; Save must clear both its candidate and default binding. Reopen settings
   and the editor: the image row stays hidden, the checkbox stays unchecked, and
-  the model can be selected as the chat default. Covered in English and Chinese
+  the model can be selected as the chat default. Covered
   by `scripts/e2e-image-generation-ui.mjs` with an API-boundary fixture.
 - **Conversation selection:** Every marked image provider/model is absent from
   default and Composer candidates. Other providers retain same-ID models. An
@@ -500,9 +500,10 @@ folder/mixed-selection behavior. No system clipboard contents are changed.
   forms render with KaTeX, with `\[…\]` using display layout. The renderer does
   not start a second animation-frame typewriter loop, raise React error 185, or
   reject Vite-inlined KaTeX fonts under CSP.
-- **CJK emphasis regression**: Stream and reload `这是**“重点内容”**，请查看。`,
-  `这是**重点。**后续内容。` and `这是**（重点）**后续内容。`; each marked
-  phrase is bold without visible markers. Inline/fenced code and escaped
+- **CJK emphasis regression**: Stream and reload Markdown in which a `**…**`
+  span sits directly against full-width CJK punctuation (full-width quotes,
+  a full-width full stop inside the span, full-width parentheses) with no
+  surrounding spaces; each marked phrase is bold without visible markers. Inline/fenced code and escaped
   asterisks remain literal, English emphasis remains intact, and source-copy
   bytes/selection anchors remain unchanged. React/Vite SSR and every-prefix
   grammar tests cover this boundary; native E2E remains unexecuted.
@@ -928,7 +929,8 @@ folder/mixed-selection behavior. No system clipboard contents are changed.
   draft, send it, and inspect the user message. 3) Ask a follow-up in B without
   repeating the link. 4) Paste C's link into B and send. 5) In A, send A's own
   link. 6) Rename A from its conversation overflow menu, then return to B.
-- **Expected**: The clipboard holds `pi-desktop://session/<A's id>`. B's user
+  7) In B, send A's link rewritten as `pi-desktop://session/<A's id>`.
+- **Expected**: The clipboard holds `slyy://session/<A's id>`. B's user
   message keeps the link text visible and shows a chat-icon chip labelled with
   the catalog's reference label and A's title; activating the chip opens A. The
   answer uses A's content, and the follow-up still reads the same reference
@@ -938,7 +940,8 @@ folder/mixed-selection behavior. No system clipboard contents are changed.
   discards an excerpt whose conversation belongs to another project.
   Renaming A afterwards renames the chip in B, which names the conversation from
   its current title; the excerpt the model already read keeps the name recorded
-  when the reference was made.
+  when the reference was made. The legacy `pi-desktop://` link resolves to the
+  same chip and excerpt.
 - **Specs linked**: `04-ux/08-component-spec.md` §20B,
   `03-runtime/04-data-storage.md`, `03-runtime/02-agent-runtime.md`
 - **Acceptance criterion**: C — Conversation & stream
@@ -1344,8 +1347,8 @@ folder/mixed-selection behavior. No system clipboard contents are changed.
   until the destination commits, the only wait affordance is the thin progress
   track, nothing is dimmed, and prompt submission stays inert until the visible
   pane is the active session, so a prompt cannot reach the session being left.
-  In zh-CN/zh-TW, the Composer permission menu renders the Accept edits option
-  as `允许编辑` / `允許編輯` and keeps it on one line.
+  In German, the Composer permission menu renders the Accept edits option as
+  `Änderungen akzeptieren` and keeps it on one line.
 - **Specs linked**: `04-ux/08-component-spec.md` (§11),
   `04-ux/09-interaction-patterns.md` (§5A), ADR 0137
 - **Acceptance**: C (new project/session composer)
@@ -1354,7 +1357,7 @@ folder/mixed-selection behavior. No system clipboard contents are changed.
 
 ## E2E-088b: Composer placeholder guidance follows page and session context
 
-- **Preconditions**: English and zh-CN locales are available; a provider is
+- **Preconditions**: English and German locales are available; a provider is
   configured; at least one Skill is active; both an empty home and two
   conversations can be opened.
 - **Steps**: 1) On empty home, record the welcome placeholder and wait longer
@@ -1366,7 +1369,7 @@ folder/mixed-selection behavior. No system clipboard contents are changed.
   slash menu. Include Skills with long English/CJK descriptions, short/no
   descriptions, a separate title/argument hint, and an exceptionally long slash
   name; also inspect a long filename in `@` mode. Repeat at 800px and 1680px
-  viewport widths with 320px and 640px composer widths. 6) Switch to zh-CN and
+  viewport widths with 320px and 640px composer widths. 6) Switch to German and
   repeat the context-switch checks.
 - **Expected**: The initially rendered context starts with its welcome copy and stays stable until
   the page/session context changes. Each context switch advances to the next
@@ -1378,8 +1381,8 @@ folder/mixed-selection behavior. No system clipboard contents are changed.
   it keeps the typed command chip visible and the model calls `Skill` with the
   original ID before answering. Verify builtin, plugin, and user Skill prefixes,
   multiple inline references, and a prompt template sharing the unprefixed
-  Skill name; inactive and unknown Skills must not resolve. zh-CN shows the
-  matching localized copy, including
+  Skill name; inactive and unknown Skills must not resolve. German shows the
+  matching localized copy of the keyboard hint
   `Shift+Enter for newline · Use Send to submit`.
   Long descriptions use only the space remaining after command names and
   hints, so short names stay fully visible. Descriptions and oversized names
@@ -1695,7 +1698,7 @@ folder/mixed-selection behavior. No system clipboard contents are changed.
   14. Restore the archived project, then activate it.
   15. Archive one project session, open it from Projects, and return to Projects.
   16. Return to the app shell and open Plugins.
-- **Expected**: The rail contains exactly Appearance, Conversation, Shortcuts, Voice, Behavior, Models, Instructions, Skills, MCP, Subagents, Projects, System, Cloud sync, Remote Hosts, and Info in that order, each with its semantic Lucide icon (Palette / MessageSquare / Keyboard / Mic / Sliders / Bot / FileText / BookOpen / Server / Sparkles / Archive / Monitor / CloudDownload / Globe / Info), and no two destinations share a glyph. The flat directory is visually grouped under four muted, non-interactive headings — Preferences / 偏好 for Appearance, Conversation, Shortcuts, and Voice; Agent / 智能体 for Behavior, Models, Instructions, Skills, MCP, and Subagents; Workspace / 工作区 for Projects; System / 系统 for System, Cloud sync, Remote Hosts, and Info — with whitespace and no divider lines between groups; searching keeps the destination results flat and hides empty groups together with their headings. The selected row carries an accent-tinted pill and an accent glyph, and the content pane opens with that same glyph at page scale beside the title. There is no General and no AI destination (D684): theme and type are Appearance, the transcript and composer rows are Conversation, network/storage/power are System, and the permission mode, default mode and Command shell row are Behavior → Session defaults; an available selected shell is represented by the selector without a duplicate Configured status, while default, fallback, and no-effective-shell states remain explicit; Context management has no settings card; Keyboard shortcuts and global instructions have their own destinations; Developer lives under Info; Projects shows active, closed, and archived durable rows without a visibility toggle, grouping them under the always-visible Pinned / All projects / Archived strips (D168/D267/D455) with per-section counts in a one-column workbench. The destination renders no hero block and no page-level counter run: the intro is one quiet description line, and each group strip's count agrees with its rendered rows; a click selects a row without leaving Settings; sorting by Name reorders rows inside every section without hiding any; search matches project fields and session titles and reports a match count, a session-title result selects its owning project, lists sessions in the inspector by latest activity with relative update times, and reveals history in batches of eight; clearing the search restores the complete index. The inspector menu closes on Escape and on an outside press. Bootstrap completion and background refreshes do not return Settings or Extensions to the chat home; the destination changes only after an explicit navigation action. Restore keeps the archive open and activation returns to chat with the restored project retained in the sidebar. Opening an archived session succeeds before clearing its archived state, returns to chat with that session selected, and makes it visible in the project sidebar; returning to Project archive no longer shows that session as archived. The home sidebar and global page results have no standalone Projects destination; Settings search finds Projects; Plugins remains an independent app-shell destination.
+- **Expected**: The rail contains exactly Appearance, Conversation, Shortcuts, Voice, Behavior, Models, Instructions, Skills, MCP, Subagents, Projects, System, Cloud sync, Remote Hosts, and Info in that order, each with its semantic Lucide icon (Palette / MessageSquare / Keyboard / Mic / Sliders / Bot / FileText / BookOpen / Server / Sparkles / Archive / Monitor / CloudDownload / Globe / Info), and no two destinations share a glyph. The flat directory is visually grouped under four muted, non-interactive headings — Preferences (German: Einstellungen) for Appearance, Conversation, Shortcuts, and Voice; Agent for Behavior, Models, Instructions, Skills, MCP, and Subagents; Workspace (Arbeitsbereich) for Projects; System for System, Cloud sync, Remote Hosts, and Info — with whitespace and no divider lines between groups; searching keeps the destination results flat and hides empty groups together with their headings. The selected row carries an accent-tinted pill and an accent glyph, and the content pane opens with that same glyph at page scale beside the title. There is no General and no AI destination (D684): theme and type are Appearance, the transcript and composer rows are Conversation, network/storage/power are System, and the permission mode, default mode and Command shell row are Behavior → Session defaults; an available selected shell is represented by the selector without a duplicate Configured status, while default, fallback, and no-effective-shell states remain explicit; Context management has no settings card; Keyboard shortcuts and global instructions have their own destinations; Developer lives under Info; Projects shows active, closed, and archived durable rows without a visibility toggle, grouping them under the always-visible Pinned / All projects / Archived strips (D168/D267/D455) with per-section counts in a one-column workbench. The destination renders no hero block and no page-level counter run: the intro is one quiet description line, and each group strip's count agrees with its rendered rows; a click selects a row without leaving Settings; sorting by Name reorders rows inside every section without hiding any; search matches project fields and session titles and reports a match count, a session-title result selects its owning project, lists sessions in the inspector by latest activity with relative update times, and reveals history in batches of eight; clearing the search restores the complete index. The inspector menu closes on Escape and on an outside press. Bootstrap completion and background refreshes do not return Settings or Extensions to the chat home; the destination changes only after an explicit navigation action. Restore keeps the archive open and activation returns to chat with the restored project retained in the sidebar. Opening an archived session succeeds before clearing its archived state, returns to chat with that session selected, and makes it visible in the project sidebar; returning to Project archive no longer shows that session as archived. The home sidebar and global page results have no standalone Projects destination; Settings search finds Projects; Plugins remains an independent app-shell destination.
   Cloud sync and Remote Hosts appear in packaged Settings with Experimental
   badges on their navigation rows and page titles; see `04-ux/06-settings-ia.md`.
 - **Specs linked**: `04-ux/06-settings-ia.md`, `04-ux/01-ui-ia.md`, `03-runtime/11-provider-model-system.md`
@@ -1713,8 +1716,7 @@ process restart and listener removal. Host/plugin-registry edges are synthetic;
 this does not claim an installed full-app settings journey.
 
 - **Preconditions**: App running on macOS; the harness can exercise English,
-  Simplified Chinese, Traditional Chinese, Turkish, German, Spanish, French,
-  Korean, and Brazilian Portuguese system locales.
+  German, and at least one unshipped (for example French) system locale.
 - **Steps**:
   1) Open Settings → Appearance.
   2) In the Appearance card, open the Theme picker. Confirm System, Light, and
@@ -1726,17 +1728,13 @@ this does not claim an installed full-app settings journey.
      settings write or restart. Repeat with explicit Light and Dark: OS changes
      must not override the selected app palette.
   4) In the Language row, open the searchable picker. Confirm Auto is pinned
-     at the top with the detected native name and that English, 简体中文,
-     繁體中文, Türkçe, Deutsch, Español, Français, 한국어, and Português (Brasil)
-     are listed by native name. With Simplified Chinese selected as the OS
-     locale, selecting Auto applies Simplified Chinese; with Traditional Chinese
-     selected, Auto applies Traditional Chinese; with Brazilian Portuguese
-     selected, Auto applies pt-BR.
-  5) Select English, 简体中文, 繁體中文, Türkçe, Deutsch, Español, Français,
-     한국어, and Português (Brasil) in turn and confirm shell chrome switches
-     to each locale without a reload. Confirm `zh-Hant` and `zh-HK` resolve to
-     繁體中文, `de-DE` to Deutsch, `es-MX` to Español, `fr-CA` to Français,
-     `ko-KR` to 한국어, and `pt`, `pt-BR`, `pt_BR`, and `pt-PT` to pt-BR.
+     at the top with the detected native name and that English and Deutsch
+     are listed by native name. With German selected as the OS locale,
+     selecting Auto applies German; with an unshipped OS locale (for example
+     French), Auto falls back to English.
+  5) Select English and Deutsch in turn and confirm shell chrome switches to
+     each locale without a reload. Confirm `de`, `de-DE`, `de-AT`, and `de-CH`
+     resolve to Deutsch and every other OS locale resolves to English.
   6) Type a native name or English name into the language search and confirm
      unmatched locales disappear. Type a theme name into the theme search and
      confirm unmatched options disappear.
@@ -1746,13 +1744,14 @@ this does not claim an installed full-app settings journey.
   then any plugin themes after a divider. Auto resolves the OS locale through
   the main process (`app.getLocale()`), passes it safely through the sandboxed
   preload bridge, and reflects the detected native name inline in the menu;
-  zh-TW, Turkish, German, Spanish, French, Korean, and Brazilian Portuguese
-  are complete shell catalogs, including release-note copy; switching options
+  German is a complete shell catalog, including release-note copy; a stored
+  language that no longer ships (for example an upstream `zh-CN` choice) falls
+  back to Auto; switching options
   updates the live UI without a reload.
 - **Specs linked**: `04-ux/06-settings-ia.md`, `04-ux/02-i18n-english-first.md`
 - **Acceptance**: A (core shell), H (localization)
 - **Milestone**: M4
-- **Status**: Partially automated in `scripts/e2e-settings-scroll.mjs` for pt-BR picker selection and live copy; the full locale list and OS Auto-resolution matrix remain documented.
+- **Status**: Partially automated in `scripts/e2e-settings-scroll.mjs` for picker selection and live copy (switching to German); the OS Auto-resolution matrix remains documented.
 
 ## E2E-091a: Theme changes keep the Windows frameless background aligned
 
@@ -1921,23 +1920,21 @@ this does not claim an installed full-app settings journey.
 - **Status**: Documented; source-contract covered
   (`session-project-move.test.mjs`); automation pending
 
-## E2E-046: PI-Desktop renderer branding and composer icon boundary
+## E2E-046: Slyy renderer branding and composer icon boundary
 
-- **Preconditions**: App running in both English and zh-CN locales, with an
+- **Preconditions**: App running in both English and German locales, with an
   empty home and a docked transcript available.
 - **Steps**: 1) Inspect the expanded and collapsed sidebar. 2) Inspect the
-  empty-home hero and docked composer. 3) Observe the eight-frame mascot GIF
-  looping in place, move the pointer over it, and confirm its cadence and
-  geometry do not change. Enable reduced motion and confirm the still first
-  frame is shown. 4) Focus the footer Settings and Plugins icons, then each
+  empty-home hero and docked composer. 3) Confirm the empty-home hero shows
+  the static Slyy dot mark, in both themes and with reduced motion. 4) Focus the footer Settings and Plugins icons, then each
   project/Temporary session create control. 5) Open Settings and the composer
   input.
-- **Expected**: Visible shell identity reads `PI-Desktop`; the empty-home hero
-  renders the theme-matching 100px `HomeMascotLogo` GIF with a short idle hold
-  and a looping wave. Pointer hover does not alter the cadence or geometry,
-  and reduced motion shows the matching still first frame.
+- **Expected**: Visible shell identity reads `Slyy`; the empty-home hero
+  (`HomeMascotLogo`) renders the static Slyy dot mark
+  (`src/assets/brand/slyy-mark.svg`), identical in light and dark, with no
+  animation (it replaced the upstream eight-frame mascot GIF of ADR 0152).
   The expanded/collapsed
-  sidebar renders the derived `src/assets/brand/logo-*.png` asset through `BrandLogo`
+  sidebar renders the same `slyy-mark.svg` through `BrandLogo`
   and the docked composer prompt row has no leading
   brand icon or reserved icon slot and its text aligns directly with the input
   gutter. The right Composer toolbar shows a Bot model × reasoning chip and
@@ -2722,7 +2719,7 @@ must keep splitting are covered by `markdown-blocks.test.mjs`.
 
 ## E2E-CHAT-content-width-handles: Dual edge handles resize the centered chat band
 
-- **Preconditions**: PI-Desktop is open on chat (empty home or a transcript)
+- **Preconditions**: Slyy is open on chat (empty home or a transcript)
   at a viewport wider than 760px. Reduced motion off.
 - **Steps**: 1) Confirm no divider is visible at rest. 2) Hover the left
   content edge and confirm a short faint capsule, then the right edge. 3) Drag
@@ -3325,7 +3322,7 @@ must keep splitting are covered by `markdown-blocks.test.mjs`.
   Reopen the menu, press Delete twice, and verify the session is removed. Repeat
   the arm/cancel/confirm sequence for the running session after it becomes idle.
 - **Expected**: the first press removes nothing and relabels the item to
-  `nav.deleteTaskConfirm` ("Delete?" / "确认删除？") with `data-armed="true"`;
+  `nav.deleteTaskConfirm` ("Delete?" / German "Löschen?") with `data-armed="true"`;
   the menu stays open, and an outside press, Escape, or expiry clears the arm
   without removing anything. Only the second press removes a session and its
   transcript. Project deletion instead requires its explicit confirmation
@@ -4101,7 +4098,7 @@ command, a delegate, and an explicit Stop. Accepted input is delivered once.
   3. Finish the current response/tool batch and inspect the next model input,
      transcript and durable turn id. Let the turn finish and observe follow-up.
   4. Repeat with Enter-to-send off, an open autocomplete menu, Shift+Enter,
-     Alt+Shift+Enter and a Chinese IME candidate confirmation. Inspect the Send
+     Alt+Shift+Enter and an IME candidate confirmation. Inspect the Send
      tooltip on macOS (`⌥+Enter`) and Windows/Linux (`Alt+Enter`).
   5. Race steering against turn completion, Stop, and a pending plan approval;
      switch sessions while a rejected request is pending.
@@ -4147,7 +4144,7 @@ command, a delegate, and an explicit Stop. Accepted input is delivered once.
   Include a nested assistant answer whose Task is outside its 60-line page, a
   later terminal copy of that Task, collapsed activity, hidden Markdown link
   destinations, emphasis delimiters, and file-chip directories.
-  Add short matching sentences surrounded by unrelated Chinese/English
+  Add short matching sentences surrounded by unrelated English
   sentences, multiple short lines before a match, a quoted sentence, a file
   path containing periods, and a matching sentence longer than 180 characters.
 - **Steps**: Search body-only user and assistant terms, then rename the owning
@@ -4162,7 +4159,7 @@ command, a delegate, and an explicit Stop. Accepted input is delivered once.
   Use the latest-message control to resume the live transcript. Scroll within
   the active conversation, reopen search, and select its own result; locate the
   target inside the same pane. Edit, retry, branch, and delete an old message. Reopen search and check the retained query.
-  Repeat with CJK and symbols. Verify that a contiguous Chinese phrase matches,
+  Repeat with CJK and symbols. Verify that a contiguous CJK phrase matches,
   while inserting a space between its words only matches text with that space.
   Change queries rapidly while delayed first-page
   and later-page requests resolve out of order. Close/reopen during loading.
@@ -4182,7 +4179,10 @@ command, a delegate, and an explicit Stop. Accepted input is delivered once.
   result shows that sentence with a background highlight on the literal match.
   Repeat after multiple line breaks and at narrow window widths in light and
   dark themes. Long-sentence truncation must keep the whole matching query
-  visible; short previews must omit unrelated adjacent sentences.
+  visible; short previews must omit unrelated adjacent sentences. Excerpt
+  sentence boundaries are Latin punctuation only: Slyy removed the CJK
+  sentence-boundary handling (2026-11-18), so a CJK-only excerpt is cut by
+  length rather than at a CJK full stop.
 - **Expected**: Every matching visible session is reachable; counts cover all
   125 messages, with no duplicate session rows. Archived visibility follows
   the existing explicit-search rule and deleted sessions never appear. Each
@@ -4260,7 +4260,7 @@ command, a delegate, and an explicit Stop. Accepted input is delivered once.
   `session_start`, contributes a skill through `resources_discover`, and uses
   the 0.87 `turn_end` boundary to propose a `context_edit` for the settled
   assistant entry.
-- **Steps:** Start PI-Desktop with fixture-only agent/session directories;
+- **Steps:** Start Slyy with fixture-only agent/session directories;
   refresh sessions; open the native row beside a Desktop row; submit one text
   prompt; stop or let the faux response settle; send the same text again with
   a retryable response before success; reselect/refresh repeatedly; reopen through
@@ -4317,7 +4317,7 @@ command, a delegate, and an explicit Stop. Accepted input is delivered once.
 - **Preconditions:** An isolated Pi agent directory contains a valid native v3
   session and a copied JSONL file under a nested directory with the same
   `header.id`.
-- **Steps:** Start PI-Desktop with the fixture-only agent directory, refresh the
+- **Steps:** Start Slyy with the fixture-only agent directory, refresh the
   session list, open the listed native session, and search its transcript.
 - **Expected:** The list contains one row for that native id. Detail and search
   resolve through the selected file; duplicate files remain byte-identical and
@@ -4402,7 +4402,7 @@ command, a delegate, and an explicit Stop. Accepted input is delivered once.
   (and any error or pending-action surface) remains. Reopen it and confirm a
   every settled group folded and every finished reasoning row folded, and that
   each group header names the actions it contains plus the call count
-  (`搜索并读取文件 · 12 次操作`). Confirm tool and search payloads stay closed.
+  (`Searched and read files · 12 actions`). Confirm tool and search payloads stay closed.
   Turn `Auto-fold finished groups` off and confirm every settled group opens
   whatever its size, then turn it back on; turn `Auto-fold finished thinking`
   off and confirm every reasoning row opens, then turn it back on. On a second
@@ -4437,7 +4437,7 @@ command, a delegate, and an explicit Stop. Accepted input is delivered once.
   singleton segment, literal-final-item leaf selection, failure/denial/recovery,
   retained-pane remounts, run rows keeping their details closed until opened, and
   a legacy search reveal.
-  In AI settings, check the display selector in English and Simplified Chinese
+  In AI settings, check the display selector in English and German
   at 800px, 1000px, and 1440px window widths with 100% and 150% font scales.
   Select all three values and verify each remains visibly selected and saved.
 - **Expected:** A turn renders exactly one process disclosure containing every
@@ -4500,7 +4500,7 @@ command, a delegate, and an explicit Stop. Accepted input is delivered once.
   fully-folded layouts, active-to-completed process disclosure behavior, the
   automatic folding and reading-hold transitions, and the activity issue
   counter's inline layout at 320/800px and 100%/150% zoom in English and
-  Simplified Chinese; `pnpm test:e2e:transcript-disclosure` verifies manual-open
+  German; `pnpm test:e2e:transcript-disclosure` verifies manual-open
   retention and viewport anchoring; `apps/desktop/test/turn-process.test.mjs`
   covers mode segmentation, `apps/desktop/test/activity-group-folding.test.mjs`
   covers the settled group defaults and the issue-counter contract,
@@ -4659,7 +4659,7 @@ command, a delegate, and an explicit Stop. Accepted input is delivered once.
 
 ## E2E-CHAT-user-link-selection: URLs in user messages are selectable text
 
-- **Steps**: Send `介绍一下这个项目：https://github.com/vastsa/PI-Desktop` in a user message. Drag from the start of the message past the end of the URL, then copy. Click the URL once afterwards.
+- **Steps**: Send `Describe this project: https://github.com/mySlyy/slyy-desktop` in a user message. Drag from the start of the message past the end of the URL, then copy. Click the URL once afterwards.
 - **Expected**: The selection highlights the prose and the URL together, and the copied text is the whole message including the URL. A plain click on the URL still opens it through the Link open destination.
 - **Coverage**: `transcript-style.test.mjs` asserts `.chat-text-link` opts back into text selection over the unselectable `button` baseline; drag-and-copy checked in Chromium against the full renderer stylesheet (issue #1243).
 - **Specs linked**: `04-ux/08-component-spec.md` §8.3.
@@ -4683,11 +4683,12 @@ command, a delegate, and an explicit Stop. Accepted input is delivered once.
 ## E2E-MARKDOWN-table-actions
 
 - **Setup**: Render a conversation containing two Markdown tables, including
-  aligned columns, formatted text, Chinese text, commas, quotes, and `<br>` cells.
+  aligned columns, formatted text, non-Latin (for example CJK) text, commas,
+  quotes, and `<br>` cells.
 - **Steps**: Copy the first table; download its CSV; expand it; use copy inside
   the modal; close with Escape and with Close. Append a streamed row while the
   preview is open. Repeat the preview at a narrow width in light/dark themes
-  and English/Chinese. Deny clipboard writes at the browser boundary.
+  and English/German. Deny clipboard writes at the browser boundary.
 - **Expected**: Actions operate only on their own table. Markdown retains inline
   syntax and alignment. CSV decodes as UTF-8 and preserves fields and line breaks.
   The modal fits the viewport, traps focus, updates streamed rows, blocks native

@@ -8,15 +8,15 @@
  * Two different inputs get fixed differently:
  *
  * - The fullwidth block (U+FF01–U+FF5E) and the ideographic space (U+3000)
- *   are what a Chinese/Japanese IME or a fullwidth-formatted page produces for
- *   plain ASCII. `０` is U+FF10, so it folds back to `0`, which is what the
+ *   are what a CJK IME or a fullwidth-formatted page produces for plain
+ *   ASCII. The fullwidth digit zero U+FF10 folds back to `0`, which is what the
  *   user meant. This is the compatibility case.
  * - Everything else above U+00FF (Han, emoji, curly quotes) has no wire
  *   representation in a header value; percent- or base64-encoding would send
  *   the server bytes it never decodes. Those are rejected by the callers.
  *
  * Only the fullwidth block is folded. A full NFKC pass is deliberately not
- * used: NFKC would also rewrite halfwidth katakana `ｱ` into U+30A2 and emit
+ * used: NFKC would also rewrite halfwidth katakana U+FF71 into U+30A2 and emit
  * combining marks, swapping one unusable value for another.
  */
 

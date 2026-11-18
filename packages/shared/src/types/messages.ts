@@ -79,7 +79,7 @@ export type MessageAttachment = {
   size?: number;
   /**
    * Bounded excerpt of a referenced conversation, written by Electron main when
-   * the prompt carries a `pi-desktop://session/<id>` link. The model reads it
+   * the prompt carries a `slyy://session/<id>` link. The model reads it
    * with the user's message; other attachment kinds never carry it.
    */
   text?: string;

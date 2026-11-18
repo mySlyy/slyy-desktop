@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Real React/Chromium regressions: native composition must produce "/", not
- * "/、", and deleting text after a missing compositionend must reopen the menu.
+ * Real React/Chromium regressions: native composition must commit the composed
+ * text, and deleting text after a missing compositionend must reopen the menu.
  *
  * Mount production input, draft and completion wiring; drive native Chromium
  * composition through CDP as well as the lost-end event sequence from #929.
@@ -93,30 +93,25 @@ app.whenReady().then(async () => {
       assert.equal(settled.composing, false);
       return settled;
     };
-    const slash = await composed("", "、", "、", "/");
-    assert.equal(slash.open, true, "committed comma must open the slash menu");
-    await composed("", "ni", "你", "你");
-    await composed("你好", "、", "、", "你好、");
-    await composed("、原文", "ni", "你", "、原文你");
+    await composed("", "ni", "\u4f60", "\u4f60");
+    await composed("draft ", "ni", "\u4f60", "draft \u4f60");
     await reset();
-    await input("imeSetComposition", { text: "、", selectionStart: 1, selectionEnd: 1 });
+    await input("imeSetComposition", { text: "\u4f60", selectionStart: 1, selectionEnd: 1 });
     await state();
     await input("imeSetComposition", { text: "", selectionStart: 0, selectionEnd: 0 });
     const cancelled = await state();
     assert.equal(cancelled.dom, "", "cancelled composition must leave no visible text");
     assert.equal(cancelled.value.trim(), "", "cancelled composition must leave a blank draft");
     assert.equal(cancelled.composing, false);
-    for (const text of ["/", "、"]) {
-      await reset();
-      await input("insertText", { text });
-      expectText(await state(), "/", "direct trigger " + text);
-    }
+    await reset();
+    await input("insertText", { text: "/" });
+    expectText(await state(), "/", "direct trigger /");
     await reset();
     await input("imeSetComposition", { text: "n", selectionStart: 1, selectionEnd: 1 });
     await state();
-    await reset("、保留");
-    await input("insertText", { text: "你" });
-    expectText(await state(), "、保留你", "a draft replacement must release the old composition origin");
+    await reset("keep");
+    await input("insertText", { text: "\u4f60" });
+    expectText(await state(), "keep\u4f60", "a draft replacement must release the old composition origin");
     result.nativeComposition = true;
     console.log("COMPOSER_IME_STACK_PROBE " + JSON.stringify(result));
     app.exit(result && result.ok ? 0 : 1);

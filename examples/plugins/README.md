@@ -28,7 +28,7 @@ Related specs:
 
 Panel chrome contract:
 
-- PI-Desktop owns exactly a transparent 46px drag band and the minimal
+- Slyy owns exactly a transparent 46px drag band and the minimal
   top-right three-button window-control capsule on every platform.
 - Normal-flow panel content is offset below that band automatically. Do not
   add another 46px top padding.
@@ -73,12 +73,10 @@ inventory are in the [development guide](../../docs/plugin-development.md).
 
 ## Distribution
 
-The official catalog is the plugin center's
-[`catalog.json`](https://plugins.aiuo.net/catalog.json). Plugin sources remain
-in publisher-owned repositories. The
-[GitHub distribution mirror](https://github.com/AIUO-Net/pi-desktop-plugins)
-contains distribution artifacts/catalog data, not the source warehouse or a
-mandatory plugin template. `pi-plugin publish` prepares local submission files;
+The official catalog is the Slyy hub's
+[`catalog.json`](https://hub.slyy.ai/catalog.json). Plugin sources remain
+in publisher-owned repositories; the hub serves catalog data and package
+resolution, not a source warehouse or a mandatory plugin template. `pi-plugin publish` prepares local submission files;
 it does not upload. See the guide's release workflow before publishing.
 
 ## Fetch redirect probe

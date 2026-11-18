@@ -203,7 +203,7 @@ pub struct MessageAttachment {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub size: Option<i64>,
     /// Bounded excerpt of a referenced conversation (`kind: "session"`), written
-    /// by Electron main when the prompt carried a `pi-desktop://session/<id>`
+    /// by Electron main when the prompt carried a `slyy://session/<id>`
     /// link. Travels with the user message so the model keeps reading it.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub text: Option<String>,
@@ -399,31 +399,12 @@ pub struct SearchHit {
 /// it decides whether a title may still be replaced. Every entry is stored
 /// lowercased and compared through `to_lowercase`, because both localized
 /// keys the renderer writes — `chat.untitledTask` and `nav.newChat` — have
-/// their own label per locale, and a non-ASCII uppercase letter (a future
-/// "Ñö..." entry) would slip past ASCII-case-insensitive matching (#1755).
-/// Keep this in sync with `LEGACY_DEFAULT_TITLES` in
+/// their own label per locale, and a non-ASCII uppercase letter would slip
+/// past ASCII-case-insensitive matching (#1755). Only the shipped English and
+/// German labels are listed; titles from removed upstream locales are ordinary
+/// titles. Keep this in sync with `LEGACY_DEFAULT_TITLES` in
 /// `apps/desktop/src/lib/session-title-utils.ts`.
-const PLACEHOLDER_TITLES: [&str; 19] = [
-    "",
-    "new task",
-    "new chat",
-    "新建任务",
-    "新对话",
-    "新建任務",
-    "新對話",
-    "새 작업",
-    "새 채팅",
-    "tarefa sem título",
-    "nova conversa",
-    "yeni görev",
-    "yeni sohbet",
-    "neue aufgabe",
-    "nouvelle tâche",
-    "nueva tarea",
-    "neuer chat",
-    "nuevo chat",
-    "nouvelle discussion",
-];
+const PLACEHOLDER_TITLES: [&str; 5] = ["", "new task", "new chat", "neue aufgabe", "neuer chat"];
 
 fn is_default_title(title: &str) -> bool {
     let t = title.trim().to_lowercase();
@@ -4617,15 +4598,13 @@ mod tests {
     use super::*;
 
     #[test]
-    fn default_title_matches_the_german_french_and_spanish_placeholders() {
+    fn default_title_matches_the_english_and_german_placeholders() {
         // The renderer lowercases `chat.untitledTask` before persisting (#1755);
         // the nav.newChat labels resolve through the same to_lowercase path.
+        assert!(is_default_title("New task"));
         assert!(is_default_title("neue aufgabe"));
-        assert!(is_default_title("Nouvelle tâche"));
-        assert!(is_default_title("nueva tarea"));
         assert!(is_default_title("Neuer Chat"));
-        assert!(is_default_title("nuevo chat"));
-        assert!(is_default_title("Nouvelle discussion"));
+        assert!(!is_default_title("nueva tarea"));
         assert!(!is_default_title("real session name"));
     }
     use crate::workspace::simple_canonicalize;
@@ -5257,7 +5236,12 @@ mod tests {
             .unwrap();
         assert_eq!(after, before);
 
-        assert!(rename_session(&db, &session.id, &"界".repeat(MAX_SESSION_TITLE_CHARS),).is_ok());
+        assert!(rename_session(
+            &db,
+            &session.id,
+            &"\u{754C}".repeat(MAX_SESSION_TITLE_CHARS),
+        )
+        .is_ok());
         assert!(rename_session(&db, &session.id, "   ").is_err());
         assert!(
             rename_session(&db, &session.id, &"x".repeat(MAX_SESSION_TITLE_CHARS + 1),).is_err()
@@ -5356,17 +5340,11 @@ mod tests {
     fn localized_placeholder_titles_accept_the_first_prompt_fallback() {
         let db = test_db();
         for placeholder in [
-            "새 작업",
-            "新建任務",
-            "Tarefa sem título",
-            "Yeni görev",
             "New chat",
             "new task",
             "new chat",
-            "tarefa sem título",
-            "nova conversa",
-            "yeni görev",
-            "yeni sohbet",
+            "Neue Aufgabe",
+            "NEUER CHAT",
         ] {
             let session =
                 create_session(&db, Some(placeholder.into()), None, None, None, None).unwrap();
@@ -5382,6 +5360,10 @@ mod tests {
                     .title,
                 "Derived label"
             );
+        }
+        // Labels of removed upstream locales are ordinary titles.
+        for title in ["Nueva tarea", "\u{65B0}\u{5EFA}\u{4EFB}\u{52A1}"] {
+            assert!(!is_default_title(title), "{title} is not a placeholder");
         }
     }
 
@@ -5622,7 +5604,11 @@ mod tests {
         append_message(
             &db,
             &session.id,
-            &user_msg("m1", "写一个文件", "2025-05-01T00:00:00Z"),
+            &user_msg(
+                "m1",
+                "\u{5199}\u{4E00}\u{4E2A}\u{6587}\u{4EF6}",
+                "2025-05-01T00:00:00Z",
+            ),
             None,
         )
         .unwrap();
@@ -5704,7 +5690,11 @@ mod tests {
             &db,
             &session.id,
             &[
-                user_msg("m1", "写一个文件", "2025-05-01T00:00:00Z"),
+                user_msg(
+                    "m1",
+                    "\u{5199}\u{4E00}\u{4E2A}\u{6587}\u{4EF6}",
+                    "2025-05-01T00:00:00Z",
+                ),
                 review_tool,
             ],
         )
@@ -5712,7 +5702,7 @@ mod tests {
         append_message(
             &db,
             &session.id,
-            &user_msg("m3", "继续", "2025-05-01T00:00:04Z"),
+            &user_msg("m3", "\u{7EE7}\u{7EED}", "2025-05-01T00:00:04Z"),
             None,
         )
         .unwrap();
@@ -6068,7 +6058,11 @@ mod tests {
     fn user_attachments_roundtrip_as_canonical_blocks() {
         let db = test_db();
         let session = create_session(&db, None, None, None, None, None).unwrap();
-        let mut user = user_msg("image-1", "这是什么", "2025-05-01T00:00:00Z");
+        let mut user = user_msg(
+            "image-1",
+            "\u{8FD9}\u{662F}\u{4EC0}\u{4E48}",
+            "2025-05-01T00:00:00Z",
+        );
         user.attachments = Some(vec![MessageAttachment {
             local_reference: None,
             kind: "image".into(),
@@ -6084,7 +6078,10 @@ mod tests {
 
         let detail = get_session(&db, &session.id).unwrap().unwrap();
         assert_eq!(detail.messages[0].attachments, user.attachments);
-        assert_eq!(detail.messages[0].content, "这是什么");
+        assert_eq!(
+            detail.messages[0].content,
+            "\u{8FD9}\u{662F}\u{4EC0}\u{4E48}"
+        );
 
         let record = transcripts::read_transcript(db.data_dir(), &session.id)
             .unwrap()
@@ -7617,23 +7614,30 @@ mod tests {
     #[test]
     fn search_finds_cjk_and_short_queries() {
         let db = test_db();
-        let session = create_session(&db, Some("重构".into()), None, None, None, None).unwrap();
+        let session =
+            create_session(&db, Some("\u{91CD}\u{6784}".into()), None, None, None, None).unwrap();
         append_message(
             &db,
             &session.id,
-            &user_msg("m1", "帮我重构数据库结构", "2025-05-01T00:00:00Z"),
+            &user_msg(
+                "m1",
+                "\u{5E2E}\u{6211}\u{91CD}\u{6784}\u{6570}\u{636E}\u{5E93}\u{7ED3}\u{6784}",
+                "2025-05-01T00:00:00Z",
+            ),
             None,
         )
         .unwrap();
-        let hits = search_messages(&db, "数据库", 10).unwrap();
+        let hits = search_messages(&db, "\u{6570}\u{636E}\u{5E93}", 10).unwrap();
         assert_eq!(hits.len(), 1);
         assert_eq!(hits[0].session_id, session.id);
         // 2-char query falls back to LIKE.
-        let hits = search_messages(&db, "重构", 10).unwrap();
+        let hits = search_messages(&db, "\u{91CD}\u{6784}", 10).unwrap();
         assert_eq!(hits.len(), 1);
         // Deleting the session clears the index (cascade + FTS trigger).
         delete_session(&db, &session.id).unwrap();
-        assert!(search_messages(&db, "数据库", 10).unwrap().is_empty());
+        assert!(search_messages(&db, "\u{6570}\u{636E}\u{5E93}", 10)
+            .unwrap()
+            .is_empty());
     }
 
     /// The search snippets must show the window around the match. FTS5's

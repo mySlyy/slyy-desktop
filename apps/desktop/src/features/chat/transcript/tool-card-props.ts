@@ -1,6 +1,6 @@
 /**
  * Props projection and push cadence for the `toolCard` slot
- * (`docs/plugin-plan/ui/tool-card/`).
+ * (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2).
  *
  * The contract fixes the fields (toolName / toolCallId / toolArgs? /
  * toolStatus / toolResult? / toolError? / durationMs? + ids) and

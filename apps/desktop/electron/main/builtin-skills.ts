@@ -8,7 +8,7 @@ import { getModuleDirectory } from "./module-path";
 import { pluginWorkspaceContains } from "./plugin-workspace-contains";
 
 /**
- * Skills PI-Desktop ships itself.
+ * Skills Slyy ships itself.
  *
  * These ride the same catalog-plus-`Skill`-tool path as plugin-contributed
  * skills (D174), so a first-party skill and a third-party one are

@@ -226,7 +226,7 @@ fn click_uid(uid: &str) -> Action {
 #[test]
 fn our_own_windows_are_never_targetable() {
     let desktop = FakeDesktop::new(vec![
-        target(OWN_PID, "com.pi-desktop", "PI-Desktop", "self-window"),
+        target(OWN_PID, "ai.slyy.desktop.gen2", "Slyy", "self-window"),
         target(99, "com.example.app", "Example", "other-window"),
     ]);
     let listed = policy::list_targets(&desktop, &Denylist::default()).expect("targets");
@@ -669,7 +669,7 @@ fn labels_from_a_window_are_bounded() {
         super::MAX_LABEL_CHARS
     );
     // A multi-byte label must not be cut mid-character.
-    let wide = "字".repeat(super::MAX_LABEL_CHARS + 10);
+    let wide = "\u{5B57}".repeat(super::MAX_LABEL_CHARS + 10);
     assert_eq!(
         super::truncate_label(&wide).chars().count(),
         super::MAX_LABEL_CHARS
@@ -696,7 +696,7 @@ fn a_desktop_grant_binds_the_frontmost_usable_window() {
     // Our own window is in front, which is exactly the case the automatic
     // grant must not take: "the whole desktop" never includes us.
     let desktop = FakeDesktop::new(vec![
-        target(OWN_PID, "com.pi-desktop", "PI-Desktop", "self-window"),
+        target(OWN_PID, "ai.slyy.desktop.gen2", "Slyy", "self-window"),
         target(99, "com.example.app", "Example", "front"),
         target(98, "com.other.app", "Other", "back"),
     ]);
@@ -775,7 +775,7 @@ fn an_automatic_grant_skips_a_window_whose_tree_cannot_be_opened() {
 #[test]
 fn a_desktop_grant_refuses_when_every_window_is_refused() {
     let desktop = FakeDesktop::new(vec![
-        target(OWN_PID, "com.pi-desktop", "PI-Desktop", "self-window"),
+        target(OWN_PID, "ai.slyy.desktop.gen2", "Slyy", "self-window"),
         target(31, "com.apple.keychainaccess", "Keychain Access", "kc"),
     ]);
     let error = policy::create_grant(
@@ -876,7 +876,7 @@ fn a_window_that_cannot_be_read_does_not_become_the_bound_one() {
 fn a_rebind_re_applies_every_refusal() {
     let desktop = FakeDesktop::new(vec![
         target(5, "com.example.app", "Example", "w1"),
-        target(OWN_PID, "com.pi-desktop", "PI-Desktop", "self-window"),
+        target(OWN_PID, "ai.slyy.desktop.gen2", "Slyy", "self-window"),
         target(31, "com.apple.keychainaccess", "Keychain Access", "kc"),
         target(7, "com.secret.notes", "Secret Notes", "notes"),
     ]);

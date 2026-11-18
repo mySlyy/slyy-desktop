@@ -47,7 +47,7 @@ plugin (or its panel) can mirror the app's language and color mode exactly:
 type PluginAppearance = {
   theme: string        // raw preference: "light" | "dark" | "system" | "plugin:<pluginId>:<themeId>"
   base: "light" | "dark" | "system"  // palette the preference resolves to
-  locale: string       // active language tag (e.g. "en", "zh-CN")
+  locale: string       // active language tag (e.g. "en", "de")
   pluginTheme: { id: string; base: "light" | "dark"; css: string } | null
 }
 ```
@@ -113,7 +113,7 @@ settings surface uses its own panel/view and reads `pi.app.getLocale`.
 The data-only `scenicThemes` contribution has a host-rendered Settings surface;
 `settingsDestinations` is not an implemented public contribution (ADR 0287).
 Shortcut settings are plugin-local: they invoke the declared
-`command` only while the PI-Desktop app window is focused and while the plugin's
+`command` only while the Slyy app window is focused and while the plugin's
 activation scope matches the current project. They are never registered as
 OS-global shortcuts in this release. The host emits `plugin:settingsChanged`
 after a user edit so a plugin can refresh in-memory configuration.
@@ -178,8 +178,8 @@ separately declares the permissions required by that API, such as
     "composerTransforms": [
       {
         "id": "enhance",
-        "title": { "en": "Enhance prompt", "zh-CN": "增强提示词" },
-        "undoTitle": { "en": "Undo", "zh-CN": "撤销" }
+        "title": "Enhance prompt",
+        "undoTitle": "Undo"
       }
     ]
   }
@@ -1320,7 +1320,7 @@ with the opt-in local MCP control plane (ADR 0203 / D370). The two catalogs
 differ only for operations marked plugin-only: the six
 `session/collaboration/*` operations are callable through this gateway but are
 deliberately absent from the MCP-visible catalog (`tools/list`,
-`pi_control_describe`, and the `pi_desktop_invoke` enum), because they require
+`pi_control_describe`, and the `slyy_invoke` enum), because they require
 an authenticated plugin invocation context and no renderer mutation channel
 exists for them. The returned catalog omits Electron channel names and the
 plugin never receives the MCP bearer token. Invocation reuses the controller,
@@ -1441,7 +1441,7 @@ command belonging to that plugin.
 
 `command` must already be registered by the calling plugin; anything else fails
 `INVALID_ARGUMENT`. An accelerator reserved by the operating system, one
-PI-Desktop itself currently spends (by default `Alt+Space` opens the plugin
+Slyy itself currently spends (by default `Alt+Space` opens the plugin
 launcher and `Alt+Shift+W` shows or hides the window; once the user rebinds one of
 them, the freed accelerator is available again), or one held by another plugin
 is refused rather than taken over, and a refused re-registration leaves the

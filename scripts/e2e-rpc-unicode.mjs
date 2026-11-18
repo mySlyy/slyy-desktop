@@ -17,7 +17,7 @@ let host;
 let sidecar;
 let server;
 const requests = [];
-const text = "before\u2028中🙂\u2029after\r\nend";
+const text = "before\u2028\u4e2d\u{1F642}\u2029after\r\nend";
 async function deadline(promise) {
   let timer;
   try {

@@ -41,7 +41,7 @@ globalThis.providerOrderProbe = async (restart = false) => {
   const root = createRoot(host, { onUncaughtError: (error) => errors.push(error) });
   const i18n = createInstance();
   await i18n.init({ lng: "en", fallbackLng: "en", resources: {
-    en: { translation: catalogs.en }, "zh-CN": { translation: catalogs["zh-CN"] },
+    en: { translation: catalogs.en }, de: { translation: catalogs.de },
   }, interpolation: { escapeValue: false } });
   const rows = () => Array.from(host.querySelectorAll<HTMLElement>(".model-provider-row"));
   const names = () => rows().map((row) => row.querySelector(".model-provider-row-name")?.textContent).join(",");
@@ -207,8 +207,8 @@ globalThis.providerOrderProbe = async (restart = false) => {
     assert(useAppStore.getState().settings?.defaultModelId === "deepseek-chat",
       "removing the selected default must fall back to the first remaining model");
 
-    await i18n.changeLanguage("zh-CN");
-    await until(() => !!row("B").getAttribute("aria-label")?.includes("拖动"), "card reorder instruction must follow the interface language");
+    await i18n.changeLanguage("de");
+    await until(() => !!row("B").getAttribute("aria-label")?.includes("Ziehen"), "card reorder instruction must follow the interface language");
     flushSync(() => host.querySelector<HTMLButtonElement>(".composer-model-thinking-chip")!.click());
     flushSync(() => document.querySelector<HTMLButtonElement>(".composer-menu-entry")!.click());
     await until(() => document.querySelectorAll(".composer-model-group").length === 3, "model menu groups missing");

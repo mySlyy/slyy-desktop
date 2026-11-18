@@ -51,9 +51,21 @@ fn title_slug_and_filename_are_descriptive_and_local_minute_shaped() {
     assert!(filename.ends_with(".md"));
     assert!(filename.is_ascii());
     assert_eq!(filename.len(), "build-api-v2-YYYYMMDD-HHmm.md".len());
-    assert_eq!(title_slug("中文 / ???", KIND_PLAN), "中文");
-    assert_eq!(title_slug("中文 / ???", KIND_GOAL), "中文");
-    assert!(plan_filename(KIND_PLAN, "中文审批卡片", now, 1).starts_with("中文审批卡片-"));
+    assert_eq!(
+        title_slug("\u{4E2D}\u{6587} / ???", KIND_PLAN),
+        "\u{4E2D}\u{6587}"
+    );
+    assert_eq!(
+        title_slug("\u{4E2D}\u{6587} / ???", KIND_GOAL),
+        "\u{4E2D}\u{6587}"
+    );
+    assert!(plan_filename(
+        KIND_PLAN,
+        "\u{4E2D}\u{6587}\u{5BA1}\u{6279}\u{5361}\u{7247}",
+        now,
+        1
+    )
+    .starts_with("\u{4E2D}\u{6587}\u{5BA1}\u{6279}\u{5361}\u{7247}-"));
 }
 
 #[test]

@@ -137,7 +137,7 @@ test("the monogram is the first letter or digit of the name", () => {
   assert.equal(monogramLetter("openai"), "O");
   assert.equal(monogramLetter("  (beta) gateway"), "B");
   assert.equal(monogramLetter("01.AI"), "0");
-  assert.equal(monogramLetter("月之暗面"), "月");
+  assert.equal(monogramLetter("\u6708\u4e4b\u6697\u9762"), "\u6708");
   assert.equal(monogramLetter("—"), "");
 });
 

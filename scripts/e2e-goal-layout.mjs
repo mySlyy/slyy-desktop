@@ -91,7 +91,7 @@ app.whenReady().then(async () => {
     window.webContents.sendInputEvent({ type: "mouseUp", button: "left", clickCount: 1, ...point });
     if (action) await call("after", key);
   }
-  for (const language of ["en", "zh-CN"]) for (const width of [320, 480, 720, 1120]) {
+  for (const language of ["en", "de"]) for (const width of [320, 480, 720, 1120]) {
     const entry = { language, width };
     try {
       window.setContentSize(width, 1000);

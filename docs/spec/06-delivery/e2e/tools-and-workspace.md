@@ -104,10 +104,13 @@ journeys cover successful reads, saves and directory browsing.
   into the first session without touching the project. Writing
   subagents edit in separate worktrees and completed runs merge back into the
   session. Delete warns about unmerged work and removes the worktree folder
-  and `pi-desktop/<id>` branch without touching files linked from it. After
+  and `slyy/<id>` branch without touching files linked from it. After
   restart the session reopens in its worktree; a manually removed worktree
   shows `Folder missing` and never falls back to the project. In the non-git
-  project **New isolated session** is disabled with the reason under it.
+  project **New isolated session** is disabled with the reason under it. A
+  project with a local `slyy` branch disables it with the branch-taken
+  reason; a local `pi-desktop` branch does not. A session created before the
+  rebrand on `pi-desktop/<id>` still resumes, merges, and deletes cleanly.
 - **Windows checks:** a worktree containing a directory junction is deleted
   without following the junction; a deep path beyond 260 characters is
   created and removed; deleting while a file in the worktree is locked fails
@@ -436,7 +439,7 @@ journeys cover successful reads, saves and directory browsing.
 ## E2E-034: NDJSON log files are written and redacted
 
 - **Preconditions**: Fresh profile; provider configured; one chat turn completed.
-- **Steps**: 1) Run a prompt with a tool call. 2) Open `~/.pi-desktop/logs/`. 3) Inspect the categorized files under `app/`, `host/`, and `agent/`.
+- **Steps**: 1) Run a prompt with a tool call. 2) Open `~/.slyy-gen2/logs/`. 3) Inspect the categorized files under `app/`, `host/`, and `agent/`.
 - **Expected**: NDJSON records exist with `ts/level/channel/category/event/message`; a normal tool call produces one completion or failure record carrying `sessionId`/`toolCallId`, safe tool metadata, and bounded result/duration information; an interrupted tool remains traceable by the same id; no API key, authorization value, raw command output, or local absolute path appears; each category file rotates at 5 MB; lifecycle, permission, tool, provider, plugin, persistence, updater, and error records remain available without creating dedicated timing category files.
 - **Specs linked**: `03-runtime/09-logging-and-observability.md`
 - **Acceptance**: H (diagnostics)
@@ -1642,7 +1645,7 @@ journeys cover successful reads, saves and directory browsing.
      overwritten. Click the binary file and confirm it reports as unsupported
      rather than printing replacement characters; open the image, the CSV, and
      the Markdown file and confirm each gets its own viewer. Switch the app to
-     Simplified Chinese and confirm the tree, viewer, and context menu are
+     German and confirm the tree, viewer, and context menu are
      localized. Switch projects and confirm the tree updates without waiting on
      a poll.
   6. Click a project file path in the conversation. Confirm it opens in this
@@ -1785,9 +1788,10 @@ journeys cover successful reads, saves and directory browsing.
   header actions stay outside that scroller. The question body is keyboard
   focusable with a visible focus ring. Next, Skip, and the step indicators open
   each question at the top of that body. The tool output is
-  ordered as `question：answer`, uses `、` between multiple answers and `\n---\n`
-  between questions, and
-  keeps `question：` for the skipped question. Markdown renders as rich text
+  ordered as the question, `: `, then the answer; it
+  uses `, ` between multiple answers and `\n---\n`
+  between questions, and keeps the question plus `: ` for the
+  skipped question (`formatAskToolOutput` in `packages/shared`). Markdown renders as rich text
   without activating embedded links or loading images. Selecting a formatted
   option returns its original Markdown source label. Decline all produces empty placeholders for every
   question and still completes the tool call. The completed row shows the
@@ -1964,7 +1968,7 @@ journeys cover successful reads, saves and directory browsing.
 
 ## E2E-158: Temporary sessions use isolated scratch workspaces
 
-- **Preconditions**: PI-Desktop has a project open, a temporary session can be
+- **Preconditions**: Slyy has a project open, a temporary session can be
   created, and the host data directory is known. The temporary session starts
   with an empty transcript.
 - **Steps**:
@@ -2090,17 +2094,17 @@ are withdrawn with ADR 0165.
 
 - **Preconditions**: An Agent session in a workspace that contains
   `apps/desktop/src/App.tsx`, `docs/adr/0163-transcript-file-reference-chips.md`,
-  `docs/spec/00-baseline.md`, `核查报告.md`, and a Unicode-named file such as
-  `报告.pdf`.
+  `docs/spec/00-baseline.md`, `Prüfbericht.md`, and a Unicode-named file such
+  as `Übersicht.pdf`.
 - **Steps**: 1) Open an existing session whose transcript already contains
   assistant markdown. 2) Prompt a turn whose assistant reply mentions
   `apps/desktop/src/App.tsx` as a bare path, as inline code, a Unicode path such
-  as `报告.pdf`, and as a markdown link; also include
-  `[核查报告.md](核查报告.md)`. 3) Click each. 4) Open the ADR markdown file
+  as `Übersicht.pdf`, and as a markdown link; also include
+  `[Prüfbericht.md](Prüfbericht.md)`. 3) Click each. 4) Open the ADR markdown file
   in the work-panel files viewer and click a `../spec/00-baseline.md` link.
   5) Include an absolute path under the workspace, an outside absolute path,
   and a `~/` path in chat; confirm only the under-root path becomes a target.
-  6) Send a user message `使用llama.cpp，给我迁移步骤，只读。`, then a user
+  6) Send a user message `Use llama.cpp, give me the migration steps, read only.`, then a user
   message that names the real `apps/desktop/src/App.tsx` as a bare path and as
   `@apps/desktop/src/App.tsx`. 7) Add a workspace directory link to an
   outside `page.md`, a second in-root `page.md`, and a link to an in-root file;
@@ -2111,7 +2115,7 @@ are withdrawn with ADR 0165.
   - Each chat path opens `apps/desktop/src/App.tsx` in the File Manager
     work-panel view — the file view a chat click prefers — not a host `file:`
     tab.
-  - Clicking `[核查报告.md](核查报告.md)` in the assistant reply opens that
+  - Clicking `[Prüfbericht.md](Prüfbericht.md)` in the assistant reply opens that
     project Markdown file in the File Manager work-panel view.
   - Unicode filenames and multi-segment paths inside the workspace become
     targets, while an outside absolute path and a `~/` path stay plain text.
@@ -2120,8 +2124,10 @@ are withdrawn with ADR 0165.
   - The markdown-file `../` link opens `docs/spec/00-baseline.md`, not a
     workspace-root `spec/00-baseline.md`.
   - A `../../../outside.ts` link from `docs/adr` stays inert.
-  - The user sentence containing `使用llama.cpp` stays exact original text, not
-    a file chip, when that path does not exist.
+  - The user sentence containing `llama.cpp` stays exact original text, not
+    a file chip, when that path does not exist. (The upstream CJK-punctuation
+    path boundary for chat links and mentions was removed in Slyy on
+    2026-11-18; only ASCII punctuation and whitespace bound a path.)
   - A user-message bare path becomes a chip only after `fs/resolveRef` confirms
     a real file; an explicit `@path` chips immediately.
   - Escaping and dangling exact links do not become file targets or redirect to
@@ -2140,8 +2146,8 @@ are withdrawn with ADR 0165.
 
 - **Preconditions**: A project containing `.env`, `.env.example`,
   `server.pem`, `keys/id_rsa`, `notes.txt`, `node_modules/pkg/index.js`,
-  `generated/out.txt`, `debug.log`, and a root `.pi-desktopignore` with
-  `generated/`. Every file contains the word `needle`. The session is Agent
+  `generated/out.txt`, `old/out.txt`, `debug.log`, a root `.slyyignore`
+  with `generated/`, and a legacy root `.pi-desktopignore` with `old/`. Every file contains the word `needle`. The session is Agent
   in `auto` permission mode.
 - **Steps**: 1) Ask for `Read` of `.env`, then of `.env.example`. 2) Ask for
   `Write` to `keys/id_rsa`. 3) Run an unscoped `Grep` and `Glob` for `needle`.
@@ -2151,7 +2157,7 @@ are withdrawn with ADR 0165.
 - **Expected**: Steps 1 and 2 fail with `WORKSPACE_PATH_DENIED`, the
   `.env.example` read succeeds, and no `keys/id_rsa` file is created. The
   unscoped search lists `notes.txt` and `.env.example` only: `.env`,
-  `server.pem`, `node_modules`, `generated`, and `debug.log` are absent. The
+  `server.pem`, `node_modules`, `generated`, `old`, and `debug.log` are absent. The
   explicit-path searches return one hit each. The in-process walker and the
   `rg` fast path produce the same file set.
 - **Specs linked**: `03-runtime/15-workspace-ignore-rules.md`,
@@ -2332,7 +2338,7 @@ are withdrawn with ADR 0165.
   Only the preload IPC boundary is replaced with deterministic host replies.
 - **Steps:** Open an extension input prompt with a long Windows source path;
   type, submit, reopen and dismiss. Repeat long title/message/option prompts in
-  light/dark themes and Chinese at 520×480. Inspect long project/plugin names in
+  light/dark themes and German at 520×480. Inspect long project/plugin names in
   rename, instructions, memory, delete, install, settings, permission-review and
   OAuth dialogs; exercise dismissal controls.
 - **Expected:** Full source paths and other long text wrap without clipping; horizontal
@@ -2424,7 +2430,7 @@ are withdrawn with ADR 0165.
 - Create a UTF-16LE PowerShell build log with a BOM and CRLF, then ask the agent
   to Read it. The tool and the next model request contain readable log lines.
 - Edit a displayed line. The original BOM, endian and CRLF bytes are preserved.
-- Repeat with UTF-16BE Chinese text. Ordinary binary files remain rejected.
+- Repeat with UTF-16BE CJK text. Ordinary binary files remain rejected.
 - Automated coverage: `read_powershell_utf16le_log`,
   `read_and_edit_utf16be_chinese_text`, and the existing binary/CRLF tool tests.
 
@@ -2549,7 +2555,7 @@ permission-request UI below has isolated fixture automation.
 
 - **Preconditions**: Isolated desktop profile, computer use enabled with a model
   bound, OS permissions granted on the platform under test, two fixture target
-  applications, one PI-Desktop window in front, no provider account needed.
+  applications, one Slyy window in front, no provider account needed.
 - **Steps**: Ask the agent to operate an application with no grant in existence.
   Watch the indicator, run `inspect` and one `act`. Press Stop mid-task and have
   the agent immediately call `Computer` again. Wait out the cooldown and call
@@ -2557,7 +2563,7 @@ permission-request UI below has isolated fixture automation.
   idle past its expiry, and exhaust an action budget. Restart the app.
 - **Expected**: No picker appears and the user is never asked which window: the
   first call mints a desktop grant bound to the frontmost window that is not
-  PI-Desktop's, with no OS prompt and no capture under `a11y-only`. The
+  Slyy's, with no OS prompt and no capture under `a11y-only`. The
   indicator names that window, shows budget and capture mode, follows every
   rebind, and stays visible while the app is backgrounded. Stop revokes the
   grant, aborts the owning turn, and the immediate re-call fails
@@ -2587,10 +2593,10 @@ permission-request UI below has isolated fixture automation.
 ## E2E-COMPUTER-USE-window-switching-stays-inside-the-refusals
 
 - **Preconditions**: Isolated desktop profile with an active desktop grant, two
-  fixture applications, a PI-Desktop window, a window from the built-in
+  fixture applications, a Slyy window, a window from the built-in
   credential denylist, and one fixture window that can be closed on demand.
 - **Steps**: Have the agent read the window list, switch to the second fixture
-  application, inspect it, and act. Attempt a switch to the PI-Desktop window,
+  application, inspect it, and act. Attempt a switch to the Slyy window,
   to the denylisted window, and to an id that no longer exists. Act using a
   `uid` read before the switch. Close the bound window mid-task and act.
 - **Expected**: The observation lists the windows the host enumerated with
@@ -2623,16 +2629,16 @@ permission-request UI below has isolated fixture automation.
 
 ## E2E-COMPUTER-USE-self-target-and-secure-input-refused
 
-- **Preconditions**: Isolated desktop profile with an active grant, a PI-Desktop
+- **Preconditions**: Isolated desktop profile with an active grant, a Slyy
   window with a pending approval card, and a fixture window containing a
   password field.
-- **Steps**: Attempt to inspect, capture, and act on a PI-Desktop window,
+- **Steps**: Attempt to inspect, capture, and act on a Slyy window,
   including its approval card and the Live Voice widget, under every permission
   mode including `auto` and under an `autonomous-in-scope` grant. Focus the
   password field and attempt `inspect`, `screenshot`, and `set_value`. Attempt a
   target on the built-in credential denylist and try to remove that entry.
 - **Expected**: Every self-target attempt fails `COMPUTER_SELF_TARGET_REFUSED`;
-  no synthetic event reaches any PI-Desktop window and no approval card is
+  no synthetic event reaches any Slyy window and no approval card is
   dismissed. Secure input refuses capture and synthesis with
   `COMPUTER_SECURE_INPUT_REFUSED`, and no field content appears in a snapshot,
   image, tool result, or log. The built-in denylist entry cannot be removed.
@@ -2643,7 +2649,7 @@ permission-request UI below has isolated fixture automation.
   `built_in_credential_surfaces_cannot_be_allowlisted`, and
   `secure_input_refuses_both_inspection_and_action` in host-core. Device:
   `scripts/e2e-computer-use-device.mjs`.
-- **Status**: PARTIAL — on device, a PI-Desktop window sat in front of every
+- **Status**: PARTIAL — on device, a Slyy window sat in front of every
   other window and was refused `COMPUTER_SELF_TARGET_REFUSED` both as the
   automatic grant's choice and as an explicit bind, and a denylisted window was
   refused `COMPUTER_TARGET_DENYLISTED`. The approval card specifically, and the

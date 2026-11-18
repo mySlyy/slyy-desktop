@@ -1,7 +1,7 @@
 /**
  * The composer's completion list: the host's own `/` commands and `@` files
  * (`useComposerAutocomplete`) followed by the group of the plugin owning the
- * typed symbol (`composerTrigger`, `docs/plugin-plan/ui/composer/`), and
+ * typed symbol (`composerTrigger`, `docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2), and
  * what accepting a row does to the draft.
  *
  * A plugin trigger only answers the user's typing: it is off while an IME
@@ -83,7 +83,7 @@ export function useComposerCompletions({
   referenceSessionId: string;
   fileReferencesRef: RefObject<ComposerFileReference[]>;
   applyEditorDraft: (text: string, references: ComposerFileReference[], caret: number) => void;
-  handleInput: (source: string, caret: number, composing?: boolean) => string;
+  handleInput: (source: string, caret: number) => string;
   invalidateComposerTransforms: () => void;
 }) {
   const host = useComposerAutocomplete({ value, cursor, composing, enabled, agentsEnabled });
@@ -246,8 +246,8 @@ export function useComposerCompletions({
   };
 
   /** The draft's input handler, noting what the user typed. */
-  const handleTypedInput = (source: string, caret: number, composing = false) => {
-    setTypedValue(handleInput(source, caret, composing));
+  const handleTypedInput = (source: string, caret: number) => {
+    setTypedValue(handleInput(source, caret));
   };
 
   return { ac, acceptCompletion, handleInput: handleTypedInput };

@@ -74,7 +74,7 @@ try {
   await sourceHost.call("session.queuePush", { id: randomUUID(), sessionId: session.id, principal: "user",
     inputHash: "fixture-queued-input", content: "Queued request", permissionMode: "ask",
     attachments: [{ kind: "file", name: "input.txt", ref: pasted }] });
-  await sourceHost.call("settings.set", { language: "zh-CN", theme: "light", enterToSend: false });
+  await sourceHost.call("settings.set", { language: "de", theme: "light", enterToSend: false });
   await sourceHost.call("secrets.set", { secretRef: "secret:e2e-storage-fixture", value: "temporary-fixture-credential" });
   await put(join(pluginSource, "manifest.json"), JSON.stringify({ schemaVersion: 1, id: "storage-e2e", name: "Storage fixture", version: "1.0.0", main: "main.js", permissions: [] }));
   await put(join(pluginSource, "main.js"), "module.exports = {};");
@@ -125,7 +125,7 @@ try {
   const { memory } = await destinationHost.call("project.memory.get", { path: join(next.data, "projects/local-project") });
   assert.equal(memory.content, "Durable project memory");
   const settings = await destinationHost.call("settings.get");
-  assert.equal(settings.language, "zh-CN"); assert.equal(settings.theme, "light"); assert.equal(settings.enterToSend, false);
+  assert.equal(settings.language, "de"); assert.equal(settings.theme, "light"); assert.equal(settings.enterToSend, false);
   const { value: credential } = await destinationHost.call("secrets.getForRuntime", { secretRef: "secret:e2e-storage-fixture" });
   assert.equal(credential, "temporary-fixture-credential");
   const { plugins } = await destinationHost.call("plugins.list");

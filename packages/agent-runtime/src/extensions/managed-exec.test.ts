@@ -37,10 +37,10 @@ it("never starts an already-cancelled exec and keeps normal command output", asy
 
 it("decodes a multi-byte character split across output chunks", async () => {
   const owner = new AbortController();
-  // "中" is three UTF-8 bytes; write them as two separate chunks.
-  const source = "const b=Buffer.from('中文');process.stdout.write(b.subarray(0,1));setTimeout(()=>process.stdout.write(b.subarray(1)),50);";
+  // U+4E2D is three UTF-8 bytes; write them as two separate chunks.
+  const source = "const b=Buffer.from('\u4e2d\u6587');process.stdout.write(b.subarray(0,1));setTimeout(()=>process.stdout.write(b.subarray(1)),50);";
   expect(await managedExec(process.execPath, ["-e", source], tmpdir(), owner.signal))
-    .toMatchObject({ stdout: "中文", code: 0, killed: false, truncated: false });
+    .toMatchObject({ stdout: "\u4e2d\u6587", code: 0, killed: false, truncated: false });
 });
 
 it("terminates a command whose combined output exceeds maxBuffer and reports truncation", async () => {
@@ -55,7 +55,7 @@ it("terminates a command whose combined output exceeds maxBuffer and reports tru
 
 it("drops an incomplete UTF-8 suffix at the truncation boundary", async () => {
   const owner = new AbortController();
-  const source = "process.stdout.write(Buffer.from('aé'));setInterval(()=>{},1000);";
+  const source = "process.stdout.write(Buffer.from('a\u00e9'));setInterval(()=>{},1000);";
   const result = await managedExec(process.execPath, ["-e", source], tmpdir(), owner.signal, { maxBuffer: 2 });
   expect(result).toMatchObject({ stdout: "a", truncated: true });
 });

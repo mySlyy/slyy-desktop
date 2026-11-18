@@ -39,9 +39,10 @@ function render(locale) {
   return { element, callbacks, calls };
 }
 
+// The view ships English copy only, whatever the app locale.
 for (const [locale, expected] of [
   ["en", "Only existing local files can be opened."],
-  ["zh-CN", "只能打开已存在的本地文件。"],
+  ["de-DE", "Only existing local files can be opened."],
 ]) {
   for (const url of ["file:///tmp/demo.html", "/tmp/demo.html"]) {
     test(`address bar explains ${url} in ${locale}`, async () => {

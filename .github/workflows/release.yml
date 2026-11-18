@@ -12,8 +12,21 @@
 # with its native pi-desktop-host-core Rust sidecar. The Linux app.asar is also
 # exported as a system-Electron repackaging asset, and all outputs — with their
 # electron-updater latest*.yml feeds — are published to the GitHub Release
-# (D126/D285/D364/D603). macOS tag artifacts are Developer ID-signed, notarized, and
-# stapled before upload (D450 / ADR 0289).
+# (D126/D285/D364/D603).
+#
+# Releases go to the PUBLIC repository mySlyy/releases, not to this (private)
+# source repository: users, electron-updater and the remote pi-host bootstrap
+# cannot read releases from a private repo (ADR slyy-downstream-branding). The
+# publish job therefore authenticates with the SLYY_RELEASES_TOKEN secret, a
+# fine-grained PAT with Contents read/write on mySlyy/releases only; the
+# default GITHUB_TOKEN cannot write to another repository.
+#
+# macOS signing on tag pushes follows the SLYY_MAC_SIGNING_ENABLED repository
+# variable. Set to 'true', tag artifacts are Developer ID-signed, notarized,
+# and stapled before upload (D450 / ADR 0289) and missing Apple secrets fail
+# the run. Unset (no Apple secrets exist yet), the macOS lanes package
+# unsigned, and the release is published as a GitHub pre-release whose notes
+# state that macOS and Windows builds are unsigned.
 #
 # It also builds the headless `pi-host` bundle for both Linux architectures the
 # desktop publishes and publishes each as
@@ -30,14 +43,23 @@ on:
   workflow_dispatch:
     inputs:
       sign_macos:
-        description: 'Sign and notarize macOS artifacts (default true; set false only for unsigned debug artifacts)'
+        description: 'Sign and notarize macOS artifacts (default true; false packages unsigned macOS artifacts)'
         required: false
         default: true
         type: boolean
 
-# Least privilege by default; only the publish job needs to write the release.
+# Least privilege by default. No job writes to this repository: the publish job
+# writes to mySlyy/releases with SLYY_RELEASES_TOKEN.
 permissions:
   contents: read
+
+env:
+  # One switch for the build and publish jobs. Tag pushes sign only when the
+  # SLYY_MAC_SIGNING_ENABLED repository variable is 'true'; workflow_dispatch
+  # follows its sign_macos input (default true).
+  MACOS_SIGN_RELEASE: ${{ (github.event_name == 'workflow_dispatch' && inputs.sign_macos) || (github.event_name != 'workflow_dispatch' && vars.SLYY_MAC_SIGNING_ENABLED == 'true') }}
+  # Public repository that receives every release (see header).
+  RELEASES_REPOSITORY: mySlyy/releases
 
 concurrency:
   group: release-${{ github.ref }}
@@ -51,6 +73,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+      - name: Require the releases-repository token on tag builds
+        # Fail before an hour of platform builds, not in the publish job.
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          SLYY_RELEASES_TOKEN: ${{ secrets.SLYY_RELEASES_TOKEN }}
+        run: |
+          if [ -z "${SLYY_RELEASES_TOKEN}" ]; then
+            echo "::error::Missing GitHub Actions secret SLYY_RELEASES_TOKEN (fine-grained PAT, Contents read/write on ${RELEASES_REPOSITORY}). See docs/spec/06-delivery/06-release-runbook.md section 4.5."
+            exit 1
+          fi
+
       - uses: actions/checkout@v7
 
       - uses: pnpm/action-setup@v6
@@ -85,9 +118,6 @@ jobs:
   build:
     name: Build ${{ matrix.name }}
     needs: verify
-    env:
-      # Tag pushes always sign. workflow_dispatch signs unless explicitly disabled.
-      MACOS_SIGN_RELEASE: ${{ github.event_name != 'workflow_dispatch' || inputs.sign_macos == true }}
     strategy:
       fail-fast: false
       matrix:
@@ -218,7 +248,8 @@ jobs:
       - name: Package unsigned macOS installer
         if: matrix.platform == 'macos' && env.MACOS_SIGN_RELEASE != 'true'
         env:
-          # Debug-only lane: workflow_dispatch with sign_macos=false.
+          # Tag push without SLYY_MAC_SIGNING_ENABLED, or workflow_dispatch
+          # with sign_macos=false.
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
         run: |
           set -euo pipefail
@@ -516,14 +547,25 @@ jobs:
             apps/pi-host/dist-bundle/pi-host-*-linux-${{ matrix.arch }}.tar.gz.sha256
 
   publish:
-    name: Publish GitHub Release
+    name: Publish GitHub Release (mySlyy/releases)
     if: startsWith(github.ref, 'refs/tags/v')
     needs: [build, pi-host-bundle]
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # Nothing is written to this repository; the release is created in
+    # RELEASES_REPOSITORY with SLYY_RELEASES_TOKEN.
     permissions:
-      contents: write
+      contents: read
     steps:
+      - name: Require the releases-repository token
+        env:
+          SLYY_RELEASES_TOKEN: ${{ secrets.SLYY_RELEASES_TOKEN }}
+        run: |
+          if [ -z "${SLYY_RELEASES_TOKEN}" ]; then
+            echo "::error::Missing GitHub Actions secret SLYY_RELEASES_TOKEN (fine-grained PAT, Contents read/write on ${RELEASES_REPOSITORY})."
+            exit 1
+          fi
+
       - uses: actions/download-artifact@v8
         with:
           path: dist
@@ -564,15 +606,74 @@ jobs:
           RUBY
           rm latest-mac-arm64.yml latest-mac-x64.yml
 
+      - name: Verify pi-host bundles for the remote bootstrap
+        # apps/desktop/electron/main/remote/pi-host-release.ts downloads
+        # https://github.com/<RELEASES_REPOSITORY>/releases/download/v<version>/pi-host-<version>-linux-<arch>.tar.gz
+        # plus its .sha256 at the desktop's own version.
+        working-directory: dist
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          for arch in x64 arm64; do
+            for file in "pi-host-${version}-linux-${arch}.tar.gz" "pi-host-${version}-linux-${arch}.tar.gz.sha256"; do
+              if [ ! -f "$file" ]; then
+                echo "::error::Missing remote bootstrap asset $file"
+                exit 1
+              fi
+            done
+          done
+
+      - name: Write release notes
+        # Release notes are written here, not generated: GitHub would build
+        # them from the commit history of the releases repository, which holds
+        # no source. The in-app notes come from packages/shared/src/changelog*.ts.
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          {
+            echo "Slyy ${version}"
+            echo
+            if [ "${MACOS_SIGN_RELEASE}" != "true" ]; then
+              echo "> [!WARNING]"
+              echo "> **Unsigned pre-release.** The macOS builds are not signed or notarized by Apple:"
+              echo "> Gatekeeper blocks the first launch. Allow it once under"
+              echo "> System Settings > Privacy & Security > Open Anyway. If macOS reports the app as damaged, run"
+              echo "> \`xattr -dr com.apple.quarantine \"/Applications/Slyy Gen2.app\"\`."
+              echo "> macOS in-app updates do not work for unsigned builds: install each new version manually from this page."
+              echo
+            fi
+            echo "> [!NOTE]"
+            echo "> The Windows builds are unsigned: SmartScreen may warn on first launch (More info > Run anyway)."
+            echo
+            echo "| Platform | Download |"
+            echo "| --- | --- |"
+            echo "| macOS Apple silicon | \`Slyy-${version}-arm64.dmg\` |"
+            echo "| macOS Intel | \`Slyy-${version}-x64.dmg\` |"
+            echo "| Windows x64 | \`Slyy-Setup-${version}.exe\` (portable: \`Slyy-Portable-${version}.zip\`) |"
+            echo "| Linux x64 / arm64 | AppImage, deb, rpm |"
+            echo
+            echo "\`pi-host-${version}-linux-<arch>.tar.gz\` (+ \`.sha256\`) is the remote host bundle Slyy installs over SSH."
+          } > release-notes.md
+          cat release-notes.md
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
           # D126/D285/D364/D603: all desktop platforms and both native macOS
           # architectures ship from tag builds — installers, the Windows
-          # portable ZIP, the Linux ASAR, blockmaps, and the latest*.yml
-          # feeds that drive electron-updater on each platform (in-app for
-          # Windows NSIS and Linux AppImage; macOS and Windows ZIP remain
-          # manual-delivery by product policy).
+          # portable ZIP, the Linux ASAR, blockmaps, the pi-host bundles, and
+          # the latest*.yml feeds that drive electron-updater on each platform
+          # (in-app for Windows NSIS and Linux AppImage; macOS and Windows ZIP
+          # remain manual-delivery by product policy).
+          repository: ${{ env.RELEASES_REPOSITORY }}
+          token: ${{ secrets.SLYY_RELEASES_TOKEN }}
+          # Same tag name as this repository's tag; GitHub creates it in the
+          # releases repository on its default branch (no source is shared).
+          tag_name: ${{ github.ref_name }}
+          name: Slyy ${{ github.ref_name }}
+          body_path: release-notes.md
           files: dist/*
-          generate_release_notes: true
-          prerelease: ${{ contains(github.ref_name, '-') }}
+          generate_release_notes: false
+          # Version prereleases (x.y.z-beta.N) and every unsigned macOS build
+          # are pre-releases, so they never become "latest".
+          prerelease: ${{ contains(github.ref_name, '-') || env.MACOS_SIGN_RELEASE != 'true' }}

@@ -48,8 +48,8 @@ mod tests {
     fn accepts_omitted_and_localized_catalog_fields() {
         validate(json!({})).expect("catalog metadata is optional");
         validate(json!({
-            "category": { "en": "Community API Sites", "zh-CN": "公益站" },
-            "description": { "en": "A community API service.", "zh-CN": "社区 API 服务。" }
+            "category": { "en": "Community API Sites", "zh-CN": "\u{516C}\u{76CA}\u{7AD9}" },
+            "description": { "en": "A community API service.", "zh-CN": "\u{793E}\u{533A} API \u{670D}\u{52A1}\u{3002}" }
         }))
         .expect("localized catalog metadata should be accepted");
     }
@@ -67,8 +67,8 @@ mod tests {
 
     #[test]
     fn enforces_utf16_character_limits() {
-        assert!(validate(json!({ "category": "界".repeat(128) })).is_ok());
-        assert!(validate(json!({ "category": "界".repeat(129) })).is_err());
+        assert!(validate(json!({ "category": "\u{754C}".repeat(128) })).is_ok());
+        assert!(validate(json!({ "category": "\u{754C}".repeat(129) })).is_err());
         assert!(validate(json!({ "description": "😀".repeat(140) })).is_ok());
         assert!(validate(json!({ "description": "😀".repeat(141) })).is_err());
     }

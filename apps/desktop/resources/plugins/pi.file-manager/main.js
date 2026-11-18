@@ -1,48 +1,54 @@
 "use strict";
 
 /**
- * 文件管理器 — PI-Desktop 插件主进程
+ * File Manager — Slyy plugin main process
  *
- * 插件 id: pi.file-manager
- * 视图:    contributes.views[0] → views/index.html（右侧工作面板）
+ * Plugin id: pi.file-manager
+ * View:      contributes.views[0] → views/index.html (right work panel)
  *
- * 为什么用原生 node:fs：
- *   宿主的 pi.fs.* 网关做不到本插件的核心诉求——manifest.fs 的 write/delete
- *   在语法上就禁止整树通配（plugin-sdk fs-policy.ts isWholeTreePattern），任何
- *   一个能通过校验的窄 scope 都会让「保存」变成每次都弹权限确认；而 fs.list /
- *   fs.glob 还有条数上限、跳过 node_modules、屏蔽凭据路径，并且没有创建 /
- *   重命名 / 移动。官方文档也承认这个边界：brokered gate「约束不了插件进程里
- *   的直接 Node 访问」（docs/spec/05-security/01-security.md）。
+ * Why raw node:fs:
+ *   The host's pi.fs.* gateway cannot meet this plugin's core need: manifest.fs
+ *   write/delete syntactically forbid whole-tree globs (plugin-sdk fs-policy.ts
+ *   isWholeTreePattern), so any narrow scope that passes validation would turn
+ *   every "save" into a permission prompt; fs.list /
+ *   fs.glob also have entry limits, skip node_modules, hide credential paths, and
+ *   offer no create /
+ *   rename / move. The official docs acknowledge this boundary: the brokered gate
+ *   "cannot constrain direct Node access inside the plugin process"
+ *   (docs/spec/05-security/01-security.md).
  *
- * 因此本插件自己承担全部安全责任：
- *   ① 路径包含：规范化 + realpath 双重校验，拒绝 .. 与符号链接 / junction 逃逸
- *   ② 敏感路径黑名单：.env* / .ssh / *.pem / .git/** 等读写全拒
- *   ③ 原子写：临时文件 → fsync → chmod → rename，中断不留半写文件
- *   ④ 冲突检测：mtimeMs + size 作为乐观锁，外部改动过的文件不静默覆盖
- *   ⑤ 写入审计：追加到插件数据目录 write-audit.jsonl（宿主审计不到这条路径）
- *   ⑥ 上限：文本预览 2 MiB / 图片 8 MiB / 音视频与 PDF 24 MiB / 写入 8 MiB /
- *      单目录 3000 条 / 搜索分页（二进制预览走 base64，所以单独设限）
- *   ⑦ 宿主请求打开：宿主可以要求视图打开项目之外的文件（会话临时目录 / 附件，
- *      路径由宿主自己选定）。视图带 external: true 时才放行绝对路径，这条路径
- *      不做根内包含校验（它本来就在根外），黑名单与 realpath 检查照旧全量生效。
- *   ⑧ 项目组（0.5.0）：宿主可以把一个项目注册成多个本地文件夹（roots）。本插件
- *      同一时刻**只认一个** root 作为包含基点——当前选中的那个（记忆在
- *      prefs.projectRoots，按 projectId 记忆、缺 projectId 时按主根路径）。基点
- *      绝不放大成「整个组的并集」：换基点只是换一扇门，门后的规则一条不变。
- *   ⑨ git 联动（0.7.0）：状态与差异来自工作区里真实存在的 git（只读子命令
- *      status / diff / rev-parse，见下面「git 状态」一节），不是自己解析 .git/**。
- *      git 缺失 / 非仓库 / 超时都只是「没有状态」，绝不牵连列目录与读写。
+ * So this plugin carries all security responsibility itself:
+ *   (1) Path containment: normalisation + realpath, refusing .. and symlink / junction escapes
+ *   (2) Sensitive path deny list: .env* / .ssh / *.pem / .git/** etc. refused for read and write
+ *   (3) Atomic writes: temp file → fsync → chmod → rename; an interruption leaves no half-written file
+ *   (4) Conflict detection: mtimeMs + size as an optimistic lock; externally changed files are never overwritten silently
+ *   (5) Write audit: appended to write-audit.jsonl in the plugin data directory (the host cannot audit this path)
+ *   (6) Limits: text preview 2 MiB / images 8 MiB / audio, video and PDF 24 MiB / writes 8 MiB /
+ *      3000 entries per directory / paged search (binary previews travel as base64, hence separate limits)
+ *   (7) Host open requests: the host can ask the view to open files outside the project (session scratch
+ *      directory / attachments,
+ *      paths chosen by the host itself). Absolute paths are accepted only when the view sets external: true;
+ *      such a path skips root containment (it is outside the root by definition), while the deny list and
+ *      realpath checks stay fully enforced.
+ *   (8) Project groups (0.5.0): the host can register one project as several local folders (roots). This plugin
+ *      accepts **exactly one** root as the containment base at a time, the selected one (remembered in
+ *      prefs.projectRoots, keyed by projectId, or by the primary root path without a projectId). The base
+ *      is never widened to "the union of the group": switching the base only switches the door; the rules
+ *      behind it stay the same.
+ *   (9) Git integration (0.7.0): status and diffs come from the real git in the working copy (read-only subcommands
+ *      status / diff / rev-parse, see the "git status" section below), never from parsing .git/** ourselves.
+ *      Missing git / not a repository / timeout all just mean "no status" and never affect listing or reads/writes.
  *
- * 通道：视图 window.pluginBridge.invoke("fm.*", payload) → onPanelInvoke。
- *   宿主对自定义通道的转发超时是 30s（plugin-runtime.ts PLUGIN_PANEL_TIMEOUT_MS），
- *   所以任何遍历类操作都必须分页，绝不整树递归返回。
+ * Channels: view window.pluginBridge.invoke("fm.*", payload) → onPanelInvoke.
+ *   The host times out forwarded custom channels after 30s (plugin-runtime.ts PLUGIN_PANEL_TIMEOUT_MS),
+ *   so every traversal must be paged and never return a whole tree recursively.
  */
 
 const fs = require("node:fs/promises");
 const path = require("node:path");
 const { isRemoteWorkspace, invokeRemote } = require("./remote-workspace.js");
 
-// ── 上限 ────────────────────────────────────────────────────────────────────
+// ── Limits ─────────────────────────────────────────────────────────────────
 
 const MAX_READ_BYTES = 2 * 1024 * 1024;
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
@@ -50,7 +56,7 @@ const MAX_MEDIA_BYTES = 24 * 1024 * 1024;
 const MAX_PDF_BYTES = 24 * 1024 * 1024;
 const MAX_WRITE_BYTES = 8 * 1024 * 1024;
 const MAX_LIST_ENTRIES = 3000;
-/** prefs.projectRoots 最多记多少个项目；超出按最久没用过的淘汰。 */
+/** Max number of projects remembered in prefs.projectRoots; beyond that the least recently used is evicted. */
 const MAX_PROJECT_ROOTS = 20;
 const MAX_SEARCH_MATCHES = 60;
 const MAX_SEARCH_SCANNED = 200000;
@@ -59,13 +65,14 @@ const MAX_SEARCH_SESSIONS = 4;
 const AUDIT_MAX_BYTES = 1024 * 1024;
 
 /**
- * 图片 / 音视频走 data URI 交给视图：面板是 file:// 的沙箱页，没有文件系统，
- * 相对路径只会指向视图自身，所以字节必须随响应带过去（base64 会膨胀约 1/3，
- * 这也是这两类各有独立上限的原因）。
+ * Images / audio / video go to the view as data URIs: the panel is a file:// sandbox page without a filesystem,
+ * and relative paths only point at the view itself, so the bytes must travel with the response (base64 adds about 1/3,
+ * which is also why these two kinds have their own limits).
  *
- * 只列 Chromium 真能解码的格式。TIFF 故意不在列——浏览器放不出来，硬认成
- * 图片只会得到一张破图，让它落到二进制分支、明确说「不支持预览」更诚实。
- * SVG 走 <img>，脚本不会执行（图片上下文是只读渲染，不是文档上下文）。
+ * Only formats Chromium can really decode. TIFF is deliberately absent: the browser cannot show it, and claiming
+ * it as an image would only produce a broken picture; falling through to the binary branch and saying "preview
+ * not supported" is more honest.
+ * SVG goes through <img>, so scripts never run (an image context is read-only rendering, not a document context).
  */
 const IMAGE_MIME = new Map([
   [".png", "image/png"],
@@ -97,7 +104,7 @@ const MEDIA_MIME = new Map([
   [".weba", "audio/webm"],
 ]);
 
-// ── 敏感路径黑名单（读与写都拒绝） ──────────────────────────────────────────
+// ── Sensitive path deny list (refused for read and write) ─────────────────
 
 const DENY_SEGMENTS = new Set([
   ".git",
@@ -114,28 +121,28 @@ const DENY_EXACT_NAMES = new Set([".env"]);
 const DENY_NAME_PREFIXES = [".env.", "id_rsa", "id_dsa", "id_ecdsa", "id_ed25519"];
 const DENY_EXTENSIONS = new Set([".pem", ".key", ".p12", ".pfx", ".keystore", ".jks"]);
 
-/** 写入额外拒绝：依赖目录体量巨大且几乎不可能手改。 */
+/** Extra write refusal: dependency folders are huge and almost never edited by hand. */
 const WRITE_DENY_SEGMENTS = new Set(["node_modules"]);
 
-/** 忽略规则文件名；项目里一个都没有时不过滤任何条目。 */
+/** Ignore rule file names; with none in the project, no entry is filtered. */
 const IGNORE_FILE_NAMES = [".gitignore", ".ignore"];
 
-// ── 模块状态 ────────────────────────────────────────────────────────────────
+// ── Module state ───────────────────────────────────────────────────────────
 
 /**
- * mdPreview / csvTable / jsonTree 的默认值不同，是刻意的：
- * CSV 基本是纯数据，打开就想看表格；JSON 多半是 package.json / tsconfig.json
- * 这类配置，打开就想改文本。两边都只需点一下切换器换到另一侧。
+ * The different defaults of mdPreview / csvTable / jsonTree are deliberate:
+ * CSV is mostly plain data and you want the table on open; JSON is mostly config such as package.json /
+ * tsconfig.json, where you want to edit the text. Either way the switcher flips to the other side in one click.
  */
 let dataPath = null;
 let prefs = {
   splitRatio: 0.32,
-  /** 左侧文件列表是否收起；宿主请求打开文件时视图会强制收起并持久化。 */
+  /** Whether the left file list is collapsed; a host open request forces it collapsed and persists that. */
   treeCollapsed: false,
   showIgnored: false,
   /**
-   * 监听外部改动并自动刷新（0.8.0）。默认开；用户可以随时关掉回到「只手动刷新」。
-   * 主进程那边的 fs.watch 与视图的轮询都跟着这个偏好走。
+   * Watch external changes and refresh automatically (0.8.0). On by default; the user can switch back to "manual refresh only" at any time.
+   * Both the main-process fs.watch and the view's polling follow this preference.
    */
   watchFiles: true,
   mdPreview: false,
@@ -143,16 +150,16 @@ let prefs = {
   jsonTree: false,
   tablePageSize: 1000,
   /**
-   * 项目组里「当前在看哪个 folder root」的记忆：projectKey → 绝对路径。
-   * projectKey = `p:<projectId>`（宿主给了 projectId）或 `r:<主根路径>`；
-   * 值必须命中宿主当前给的 roots 才被信任（否则退回主根），最多
-   * MAX_PROJECT_ROOTS 条，按最近写入做 LRU 淘汰。见下面「项目组与基点」。
+   * Memory of "which folder root is shown" in a project group: projectKey → absolute path.
+   * projectKey = `p:<projectId>` (when the host gives a projectId) or `r:<primary root path>`;
+   * a value is trusted only if it matches a root the host currently gives (otherwise the primary root), at most
+   * MAX_PROJECT_ROOTS entries, LRU-evicted by most recent write. See "Project groups and base" below.
    */
   projectRoots: {},
 };
 const searchSessions = new Map();
 
-// ── 错误 ────────────────────────────────────────────────────────────────────
+// ── Errors ─────────────────────────────────────────────────────────────────
 
 function fail(code, message) {
   const error = new Error(message || code);
@@ -168,11 +175,11 @@ function toFailure(error) {
   };
 }
 
-// ── 路径安全 ────────────────────────────────────────────────────────────────
+// ── Path safety ────────────────────────────────────────────────────────────
 
 /**
- * child 是否严格位于 parent 之内（child === parent 返回 false）。
- * Windows 下 path.relative 已按大小写不敏感比较公共前缀。
+ * Whether child lies strictly inside parent (child === parent returns false).
+ * On Windows path.relative already compares the common prefix case-insensitively.
  */
 function isInside(parent, child) {
   const rel = path.relative(parent, child);
@@ -209,12 +216,12 @@ async function exists(target) {
 }
 
 /**
- * 当前基点：宿主给的组里**被选中**的那个 folder root。所有按相对路径解析的通道
- * （列表 / 读 / 写 / 新建 / 重命名 / 移动 / 搜索 / sqlite）都以它为包含基点。
+ * Current base: the **selected** folder root of the host's group. Every channel resolving relative paths
+ * (list / read / write / create / rename / move / search / sqlite) uses it as the containment base.
  *
- * path / name 在 0.5.0 之前就是 workspace.path/name——那时只有一个根，也就是
- * 主根；现在多根时它是「当前选中的那个」。视图需要的组身份不在这里，见下面
- * projectGroup()：两者刻意分开，免得视图把「基点」当成「组的身份」来记忆。
+ * Before 0.5.0 path / name were workspace.path/name; there was only one root, the
+ * primary root. With several roots it is now "the selected one". The group identity the view needs is not here, see
+ * projectGroup() below: the two are deliberately separate so the view never remembers "the base" as "the group identity".
  */
 async function currentRoot() {
   const workspace = await pi.workspace.get();
@@ -224,9 +231,9 @@ async function currentRoot() {
 }
 
 /**
- * 组形状：path / name 是组的**主根**（与 pi.workspace.get 完全一致），projectId
- * 与 roots 原样透传给视图（宿主没给就一个都不带）。视图只从这里认「这是哪个组、
- * 一共有哪些 folder」，当前看的是哪个由 prefs.projectRoots 推导。
+ * Group shape: path / name are the group's **primary root** (identical to pi.workspace.get); projectId
+ * and roots pass through to the view unchanged (none when the host gives none). The view learns "which group,
+ * which folders" only from here; which one is shown is derived from prefs.projectRoots.
  */
 async function projectGroup() {
   const workspace = await pi.workspace.get();
@@ -234,7 +241,7 @@ async function projectGroup() {
   return rootPayload(workspace, primaryRootOf(rootsOf(workspace)));
 }
 
-/** 把一个 root 包成发给视图的形状（基点路径 + 名字 + 组信息）。 */
+/** Wrap one root in the shape sent to the view (base path + name + group info). */
 function rootPayload(workspace, root) {
   const group = groupRoots(workspace);
   return {
@@ -248,7 +255,7 @@ function rootPayload(workspace, root) {
   };
 }
 
-/** 把相对根目录的正斜杠路径规范化；拒绝绝对路径与 `..` 段。 */
+/** Normalise a forward-slash path relative to the root; refuse absolute paths and `..` segments. */
 function normalizeRelative(relPath) {
   if (typeof relPath !== "string") throw fail("INVALID_PATH", "path must be a string");
   if (path.isAbsolute(relPath)) throw fail("ABSOLUTE_PATH", "absolute paths are not accepted");
@@ -260,7 +267,7 @@ function normalizeRelative(relPath) {
 }
 
 /**
- * 所有通道的唯一入口守卫。返回 { root, rootPath, abs, rel, isRoot }。
+ * The single entry guard for every channel. Returns { root, rootPath, abs, rel, isRoot }.
  */
 async function resolveInsideRoot(relPath, { mode = "read", allowRoot = false } = {}) {
   const root = await currentRoot();
@@ -285,7 +292,7 @@ async function resolveInsideRoot(relPath, { mode = "read", allowRoot = false } =
     realRoot = rootPath;
   }
 
-  // 父目录必须真实存在且落在根内：这是符号链接 / junction 逃逸的主闸门。
+  // The parent directory must really exist and lie inside the root: this is the main gate against symlink / junction escapes.
   let realParent;
   try {
     realParent = await fs.realpath(path.dirname(abs));
@@ -311,23 +318,23 @@ async function resolveInsideRoot(relPath, { mode = "read", allowRoot = false } =
   return { root, rootPath, abs, rel, isRoot: false };
 }
 
-/** 绝对路径判定：POSIX 根、Windows 盘符、UNC（`\\server\share`）。 */
+/** Absolute path test: POSIX root, Windows drive letter, UNC (`\\server\share`). */
 function isAbsolutePath(target) {
   return /^\//.test(target) || /^[A-Za-z]:[\\/]/.test(target) || target.startsWith("\\\\");
 }
 
-/** 黑名单按 POSIX 段切分，所以外部路径里的 `\` 先统一成 `/`。 */
+/** The deny list splits on POSIX segments, so `\` in external paths is first turned into `/`. */
 function denyPathOf(target) {
   return String(target).replace(/\\/g, "/");
 }
 
 /**
- * 项目之外的绝对路径——宿主请求视图打开的文件（会话临时目录 / 附件），路径由
- * 宿主自己选定，本来就在项目根外。
+ * An absolute path outside the project: a file the host asks the view to open (session scratch directory / attachment),
+ * chosen by the host itself and outside the project root by definition.
  *
- * 与 resolveInsideRoot 的唯一区别是不做根内包含校验：对这条路径做包含校验没有
- * 意义。黑名单照旧全量生效，而且「原始字符串 / 规范化后 / realpath 之后」各查
- * 一遍，免得 `..` 折叠或符号链接把 .ssh 这类段藏起来。
+ * The only difference from resolveInsideRoot is the missing root containment check: containment makes no
+ * sense for this path. The deny list stays fully enforced, checked on the raw string / normalised form / realpath
+ * each, so `..` folding or symlinks cannot hide segments such as .ssh.
  */
 async function resolveExternal(rawPath, mode) {
   if (typeof rawPath !== "string" || !rawPath.trim()) {
@@ -342,7 +349,7 @@ async function resolveExternal(rawPath, mode) {
     throw fail("DENIED_PATH", `refused path: ${abs}`);
   }
 
-  // 父目录必须真实存在（写新文件也一样），且真实路径不在黑名单里。
+  // The parent directory must really exist (also when writing a new file), and the real path must not be denied.
   let realParent;
   try {
     realParent = await fs.realpath(path.dirname(abs));
@@ -365,16 +372,16 @@ async function resolveExternal(rawPath, mode) {
     }
   }
 
-  // rel 直接取绝对路径：外部路径没有「相对根」的形态，响应里的 path 就是它，
-  // 视图把这个字符串原样带回来读写。
+  // rel is the absolute path itself: external paths have no root-relative form; the path in the response is it,
+  // and the view brings that string back unchanged for reads and writes.
   return { abs, rel: abs };
 }
 
 /**
- * 读 / 写共用的目标解析。三种形态：
- *   payload 带 `external: true` → 项目外绝对路径（宿主请求打开它自己选定的文件）
- *   绝对路径                    → 组内某个 root 下的绝对路径（0.5.0，可跨 folder）
- *   其余                        → 相对「当前选中的 root」的路径
+ * Target resolution shared by read / write. Three forms:
+ *   payload with `external: true` → absolute path outside the project (a file the host picked itself)
+ *   absolute path                 → absolute path under some root of the group (0.5.0, may cross folders)
+ *   anything else                 → path relative to "the selected root"
  */
 async function resolveTarget(payload, mode) {
   const rawPath = payload?.path ?? "";
@@ -384,12 +391,14 @@ async function resolveTarget(payload, mode) {
 }
 
 /**
- * 绝对路径的「组内」形态：宿主给的绝对路径可能落在同一个项目的另一个 folder
- * root 里。找到包含它的 root 就切过去，再按「相对那个 root」的路径走原有守卫——
- * 绝对路径本身绝不当基点用，包含基仍然是单独一个 root。
+ * The in-group form of absolute paths: an absolute path from the host may lie in another folder
+ * root of the same project. Find the containing root, switch to it, then run the usual guard on the path relative
+ * to that root;
+ * the absolute path itself is never used as a base, and the containment base is still a single root.
  *
- * 落在组外的一律拒绝。组外只有一条合法入口：视图显式带 `external: true` 的
- * 项目外路径，那条路仍归 resolveExternal 管。
+ * Anything outside the group is refused. The only legitimate entry outside the group is a path outside the project
+ * that the view marks with `external: true`,
+ * which is still handled by resolveExternal.
  */
 async function resolveGroupAbsolute(rawPath, mode) {
   const workspace = await pi.workspace.get();
@@ -408,37 +417,37 @@ async function resolveGroupAbsolute(rawPath, mode) {
   return resolveInsideRoot(relativeToRoot(hit.path, abs), { mode });
 }
 
-// ── 项目组与基点（0.5.0） ────────────────────────────────────────────────────
+// ── Project groups and base (0.5.0) ────────────────────────────────────────
 //
-// 宿主可以把一个项目注册成多个本地文件夹（roots）。本插件同一时刻只以「当前
-// 选中的那个 root」为包含基点：.. / 符号链接 / 凭据黑名单这些规则一条都没放松，
-// 只是换了扇门（绝不放大成「整个组的并集」）。
+// The host can register one project as several local folders (roots). This plugin uses only "the
+// selected root" as the containment base at a time: none of the .. / symlink / credential deny list rules are relaxed,
+// only the door changes (never widened to "the union of the group").
 //
-// 选中的是哪个：prefs.projectRoots 是**唯一**真相 —— projectKey → 绝对路径。
-// projectKey 是 `p:<projectId>`（宿主给了 projectId 时）或 `r:<主根路径>`。视图
-// 与主进程都按它推导基点，所以切基点必须先把这份记忆落盘，再发下一个通道请求。
+// Which one is selected: prefs.projectRoots is the **single** source of truth: projectKey → absolute path.
+// projectKey is `p:<projectId>` (when the host gives a projectId) or `r:<primary root path>`. The view
+// and the main process both derive the base from it, so switching the base must persist this memory before the next channel request.
 //
 /**
- * 去尾部分隔符、把反斜杠统一成正斜杠后的比较形态。
+ * Comparison form after stripping trailing separators and turning backslashes into forward slashes.
  *
- * 宿主给的目录是正斜杠（`C:/Users/me/Docs`），而这里（`sanitizePrefs`）会用 Node 的
- * `path.resolve()` 把记忆里的值写成反斜杠（`C:\Users\me\Docs`）。同一个目录的这两种
- * 写法必须算同一个目录，否则「切到 B 之后记住」在写盘那一刻就自己失效了：视图用原样
- * 字符串还能匹配（头部名字会换），这里匹配不上就退回主目录（列表不换）。
+ * The host reports directories with forward slashes (`C:/Users/me/Docs`), while here (`sanitizePrefs`) Node's
+ * `path.resolve()` writes remembered values with backslashes (`C:\Users\me\Docs`). Both spellings of the same
+ * directory must count as the same directory, otherwise "remember B after switching" breaks the moment it is written: the view
+ * still matches with its raw string (the header name changes), while here nothing matches and we fall back to the primary folder (the list does not change).
  */
 function canonicalPath(target) {
   const trimmed = String(target).replace(/[\\/]+$/, "");
   return (trimmed || String(target)).replace(/\\/g, "/");
 }
 
-/** 同一个目录的两种写法（Windows 盘符 / 路径大小写、末尾斜杠）。 */
+/** Two spellings of the same directory (Windows drive letter / path case, trailing slash). */
 function samePath(left, right) {
   const a = canonicalPath(left);
   const b = canonicalPath(right);
   return a === b || a.toLowerCase() === b.toLowerCase();
 }
 
-/** roots 里按路径命中一个 root：先精确比，再忽略大小写比一次。 */
+/** Match a root in roots by path: exact first, then once more case-insensitively. */
 function matchRoot(roots, target) {
   return (
     roots.find((entry) => entry.path === target) ??
@@ -447,14 +456,14 @@ function matchRoot(roots, target) {
   );
 }
 
-/** 相对某个 root 的 POSIX 相对路径（调用前必须已确认落在该 root 内）。 */
+/** POSIX path relative to a root (the caller must already have confirmed it lies inside that root). */
 function relativeToRoot(rootPath, abs) {
   return path.relative(rootPath, abs).split(path.sep).join("/");
 }
 
 /**
- * 宿主给的 roots 规整结果；宿主没送（或送来的全是垃圾）时返回 null —— 绝不自己
- * 造一个假的 roots 去骗视图。名字缺失时退回目录名。
+ * Normalised roots from the host; null when the host sent none (or only garbage). Never
+ * invent fake roots to fool the view. A missing name falls back to the directory name.
  */
 function groupRoots(workspace) {
   const raw = workspace?.roots;
@@ -474,7 +483,7 @@ function groupRoots(workspace) {
   return roots.length > 0 ? roots : null;
 }
 
-/** 内部的 root 列表：宿主没给 roots 时退化成一个根（主根 = workspace.path）。 */
+/** Internal root list: without roots from the host it degrades to a single root (primary root = workspace.path). */
 function rootsOf(workspace) {
   const roots = groupRoots(workspace);
   if (roots) return roots;
@@ -494,7 +503,7 @@ function primaryRootOf(roots) {
   return roots.find((entry) => entry.primary === true) ?? roots[0];
 }
 
-/** 记忆键：优先 projectId；宿主没给就退回主根路径（前缀让两种键不会互相撞上）。 */
+/** Memory key: projectId first; without one, the primary root path (the prefixes keep the two key kinds from colliding). */
 function projectKeyOf(workspace) {
   return typeof workspace.projectId === "string" && workspace.projectId
     ? `p:${workspace.projectId}`
@@ -502,9 +511,9 @@ function projectKeyOf(workspace) {
 }
 
 /**
- * 记忆一条「这个项目在看哪个 root」：重写一次就把这条挪到末尾，超过
- * MAX_PROJECT_ROOTS 条时丢最旧的。JS 对象保持字符串键的插入顺序，所以插入顺序
- * 本身就是最近使用顺序。
+ * Remember "which root this project shows": each rewrite moves the entry to the end, and beyond
+ * MAX_PROJECT_ROOTS entries the oldest is dropped. JS objects keep string keys in insertion order, so insertion order
+ * itself is the most-recently-used order.
  */
 function rememberProjectRoot(map, key, value) {
   const next = {};
@@ -523,7 +532,7 @@ function rememberProjectRoot(map, key, value) {
   return bounded;
 }
 
-/** 记忆里的 root 必须命中宿主当前给的 roots 才被信任，否则退回主根。 */
+/** A remembered root is trusted only if it matches a root the host currently gives, otherwise the primary root is used. */
 function selectedRootOf(workspace) {
   const roots = rootsOf(workspace);
   const remembered = (prefs.projectRoots ?? {})[projectKeyOf(workspace)];
@@ -533,8 +542,8 @@ function selectedRootOf(workspace) {
 }
 
 /**
- * 换基点（绝对路径落在组里另一个 root 时用）。落盘是必须的：视图那边也按这份
- * 记忆推导基点，不写就会各说各话。返回基点是否真的变了。
+ * Switch the base (used when an absolute path lies in another root of the group). Persisting is required: the view also
+ * derives the base from this memory, and without writing it the two would disagree. Returns whether the base really changed.
  */
 async function selectRoot(workspace, rootPath) {
   const key = projectKeyOf(workspace);
@@ -544,25 +553,25 @@ async function selectRoot(workspace, rootPath) {
   try {
     await pi.plugin.setSettings({ fmPrefs: prefs });
   } catch {
-    /* 设置写不进去不影响本次请求：内存里的基点已经换了 */
+    /* A failed settings write does not affect this request: the in-memory base has already switched */
   }
   return changed;
 }
 
 /**
- * 换基点后必须丢掉的两样按「相对路径」缓存的东西：SQLite 句柄与搜索会话——
- * 两个 root 下的同名相对路径根本不是同一个文件。
+ * Two things cached by relative path must be dropped after switching the base: SQLite handles and search sessions;
+ * the same relative path under two roots is not the same file.
  */
 function dropRootScopedCaches() {
   searchSessions.clear();
   for (const key of [...sqliteHandles.keys()]) closeSqliteHandle(key);
 }
 
-// ── 忽略规则（.gitignore / .ignore 语义子集） ────────────────────────────────
+// ── Ignore rules (subset of .gitignore / .ignore semantics) ────────────────
 //
-// 项目里存在忽略规则文件就按规则隐藏，一个都没有就全部展示。
-// 子集支持：空行、# 注释、! 取反、末尾 / 仅目录、前导 / 锚定、* ? ** 通配、
-// 无斜杠模式匹配任意层级。不支持 \ 转义与 [a-z] 字符类。
+// If the project has ignore rule files their rules hide entries; with none, everything is shown.
+// Supported subset: blank lines, # comments, ! negation, trailing / for directories only, leading / anchoring, * ? ** globs,
+// slash-free patterns matching at any depth. No \ escapes and no [a-z] character classes.
 
 function compileIgnoreLine(rawLine, base) {
   let line = String(rawLine).replace(/\r$/, "");
@@ -630,7 +639,7 @@ async function readIgnoreFile(rootPath, relDir) {
   return rules;
 }
 
-/** 根 → 目标目录这一链上的全部规则（浅的在前，深的在后，深层优先）。 */
+/** All rules along the root → target directory chain (shallow first, deep last; deeper wins). */
 async function rulesForDirectory(rootPath, relDir) {
   const parts = segmentsOf(relDir);
   const chain = [""];
@@ -645,8 +654,8 @@ async function rulesForDirectory(rootPath, relDir) {
 }
 
 /**
- * 命中判定。祖先目录被忽略则整体忽略（与 git 一致，取反无法把文件从
- * 被排除的目录里救回来）；否则由最后一条匹配的规则决定。
+ * Match decision. An ignored ancestor ignores everything below it (as in git, negation cannot rescue a file
+ * from an excluded directory); otherwise the last matching rule decides.
  */
 function matchesRules(relPath, isDirectory, rules) {
   const parts = segmentsOf(relPath);
@@ -673,7 +682,7 @@ function matchesRules(relPath, isDirectory, rules) {
   return false;
 }
 
-// ── 审计 ────────────────────────────────────────────────────────────────────
+// ── Audit ──────────────────────────────────────────────────────────────────
 
 async function audit(entry) {
   if (!dataPath) return;
@@ -684,44 +693,44 @@ async function audit(entry) {
     if (stat && stat.size > AUDIT_MAX_BYTES) await fs.writeFile(file, line, "utf8");
     else await fs.appendFile(file, line, "utf8");
   } catch {
-    /* 审计失败不应影响主流程 */
+    /* An audit failure must not affect the main flow */
   }
 }
 
-// ── git 状态（0.7.0） ───────────────────────────────────────────────────────
+// ── Git status (0.7.0) ─────────────────────────────────────────────────────
 //
-// 文件列表里的「已修改 / 新增」标记，以及单个文件到底改了什么。
+// The "modified / added" marks in the file list, and what exactly changed in a single file.
 //
-// 状态**不是自己解析 .git/** 得来的，而是跑工作区里真实存在的 git（只读子命令
-// status / diff / rev-parse）。两条理由：
-//   ① 索引格式（v2/v3/v4、扩展块、稀疏索引）、工作树状态、rename 检测、
-//      .gitattributes 的 filters 与换行归一化，都要复刻一遍。自己算出来的状态
-//      迟早和 git 对不上——而「和 git 对不上」正是这个功能的全部价值所在。
-//   ② 插件进程跑在宿主给的最小环境里（child-process-env.ts 只放行 PATH 等少量
-//      变量），git 就在 PATH 上，spawn 得到；状态也因此跟着用户的 git 版本走。
+// Status does **not** come from parsing .git/** ourselves but from running the real git in the working copy (read-only
+// subcommands status / diff / rev-parse). Two reasons:
+//   (1) Index formats (v2/v3/v4, extensions, sparse index), working tree state, rename detection,
+//      .gitattributes filters and line-ending normalisation would all have to be reimplemented. A home-grown status
+//      will sooner or later disagree with git, and "agreeing with git" is the entire value of this feature.
+//   (2) The plugin process runs in the minimal environment the host gives it (child-process-env.ts only passes PATH and a
+//      few other variables); git is on PATH and can be spawned, so status also follows the user's git version.
 //
-// 边界：
-//   · 只跑只读子命令，从不传会写索引 / 联网的开关。GIT_OPTIONAL_LOCKS=0 让
-//     status 不为了刷新索引去抢 .git/index.lock；GIT_TERMINAL_PROMPT=0 保证任何
-//     意外的交互都变成一次立即失败，而不是把面板挂住。
-//   · 每个子命令都有超时（5s）与输出上限，超了直接 kill。面板通道的总预算是 30s，
-//     一次列表最多再叠一层 2s 的结果缓存。
-//   · 路径仍然先过 resolveInsideRoot（根内包含 + 凭据黑名单）；传给 git 的是
-//     **根相对**路径，并配 GIT_LITERAL_PATHSPECS=1——文件名里带 ":(top)" 之类
-//     也不会被当成 pathspec 魔法。git 在这里只是被问了一句「这些文件怎么样」。
-//   · git 缺失 / 当前文件夹不是仓库 / 超时 / 任何意外，都只是「没有状态」：
-//     全部降级成 null，绝不影响列目录与读写。
-//   · 子模块只看指针本身变没变（--ignore-submodules=none），不递归进子模块工作区。
+// Boundaries:
+//   · Only read-only subcommands, never a switch that writes the index or touches the network. GIT_OPTIONAL_LOCKS=0 keeps
+//     status from grabbing .git/index.lock to refresh the index; GIT_TERMINAL_PROMPT=0 turns any
+//     unexpected interaction into an immediate failure instead of hanging the panel.
+//   · Every subcommand has a timeout (5s) and an output cap and is killed when exceeded. The panel channel budget is 30s,
+//     and a listing adds at most one more 2s result cache layer.
+//   · Paths still pass resolveInsideRoot first (root containment + credential deny list); git receives
+//     **root-relative** paths with GIT_LITERAL_PATHSPECS=1, so file names containing ":(top)" and the like
+//     are never treated as pathspec magic. git is merely asked "how are these files doing".
+//   · Missing git / folder is not a repository / timeout / anything unexpected just means "no status":
+//     everything degrades to null and never affects listing or reads/writes.
+//   · Submodules only report whether the pointer changed (--ignore-submodules=none), never recursing into their working trees.
 
 const GIT_TIMEOUT_MS = 5000;
-/** 同一 root 的结果缓存：一次展开目录往往连带好几次列表调用。 */
+/** Result cache per root: expanding one folder often triggers several list calls. */
 const GIT_SNAPSHOT_TTL_MS = 2000;
 const MAX_STATUS_BYTES = 8 * 1024 * 1024;
 const MAX_DIFF_BYTES = 1024 * 1024;
-/** 未跟踪文件的「全文都是新增」是自己读出来的，单独一个更紧的上限。 */
+/** The "everything added" view of untracked files is read by us, with its own tighter limit. */
 const MAX_UNTRACKED_DIFF_BYTES = 256 * 1024;
 const MAX_DIFF_LINES = 20000;
-/** PATH 里没有 git 时的兜底（Windows 上 git 常不在 PATH 的前半段）。 */
+/** Fallbacks when git is not on PATH (on Windows git is often not early on PATH). */
 const GIT_FALLBACK_BINARIES = [
   "/usr/bin/git",
   "/usr/local/bin/git",
@@ -731,7 +740,7 @@ const GIT_FALLBACK_BINARIES = [
   "C:\\Program Files\\Git\\bin\\git.exe",
 ];
 
-/** 状态严重度：目录汇总时取子树里最值得注意的那个（冲突 > 新增 > 删除 > …）。 */
+/** Status severity: a folder rollup takes the most notable status in its subtree (conflict > added > deleted > …). */
 const GIT_STATUS_RANK = {
   typechange: 1,
   modified: 2,
@@ -743,9 +752,9 @@ const GIT_STATUS_RANK = {
 
 let childSpawn = null;
 /**
- * 惰性拿 child_process.spawn：万一这个运行时不给（非 Node 宿主、被裁剪的构建），
- * 用到它的功能各自静默降级（git 变「没有状态」、编辑器探测变「没有候选」），
- * 列目录、读写、保存一律照旧。
+ * Lazily obtain child_process.spawn: if this runtime does not provide it (non-Node host, stripped build),
+ * each feature using it degrades silently (git becomes "no status", editor detection "no candidates"),
+ * while listing, reading, writing and saving keep working.
  */
 function childSpawnFn() {
   if (childSpawn === null) {
@@ -758,7 +767,7 @@ function childSpawnFn() {
   return childSpawn || null;
 }
 
-/** 探测成功的 git 可执行文件；null = 还没试过。 */
+/** The git executable that was found; null = not tried yet. */
 let gitBinary = null;
 
 function runGit(rootPath, binary, args, { maxBytes, timeoutMs = GIT_TIMEOUT_MS } = {}) {
@@ -773,11 +782,11 @@ function runGit(rootPath, binary, args, { maxBytes, timeoutMs = GIT_TIMEOUT_MS }
         stdio: ["ignore", "pipe", "pipe"],
         env: {
           ...process.env,
-          // 只读三件套：别抢索引锁、别开分页器、别弹交互提示。
+          // Read-only trio: do not grab the index lock, do not start a pager, do not prompt.
           GIT_OPTIONAL_LOCKS: "0",
           GIT_PAGER: "cat",
           GIT_TERMINAL_PROMPT: "0",
-          // 文件名里的 pathspec 魔法一律当普通字符。
+          // Treat pathspec magic in file names as plain characters.
           GIT_LITERAL_PATHSPECS: "1",
           LC_ALL: "C",
         },
@@ -803,7 +812,7 @@ function runGit(rootPath, binary, args, { maxBytes, timeoutMs = GIT_TIMEOUT_MS }
 
     const timer = setTimeout(() => {
       timedOut = true;
-      // close 可能被后代进程继承的管道拖住；截止时间必须直接结束等待。
+      // close can be held up by pipes inherited by descendants; the deadline must end the wait directly.
       finish(reject, fail("GIT_TIMEOUT", "git command timed out"));
       child.kill("SIGKILL");
       child.stdout?.destroy?.();
@@ -813,7 +822,7 @@ function runGit(rootPath, binary, args, { maxBytes, timeoutMs = GIT_TIMEOUT_MS }
     child.stdout?.on("data", (chunk) => {
       size += chunk.length;
       if (size > maxBytes) {
-        // 超量就掐掉：面板里没人看得完 8 MiB 的状态，掐掉还少占内存。
+        // Cut it off when over the cap: nobody in the panel reads 8 MiB of status, and cutting saves memory.
         truncated = true;
         child.kill("SIGKILL");
         return;
@@ -837,8 +846,8 @@ function runGit(rootPath, binary, args, { maxBytes, timeoutMs = GIT_TIMEOUT_MS }
 }
 
 /**
- * 跑一条 git 命令。第一次用 PATH 里的 `git`；ENOENT 就按常见安装位置挨个试，
- * 找到就记住（每个插件进程一次）。
+ * Run one git command. First try `git` on PATH; on ENOENT try the usual install locations one by one,
+ * and remember the hit (once per plugin process).
  */
 async function runGitCommand(rootPath, args, options = {}) {
   const candidates = gitBinary ? [gitBinary] : ["git", ...GIT_FALLBACK_BINARIES];
@@ -857,15 +866,15 @@ async function runGitCommand(rootPath, args, options = {}) {
 }
 
 /**
- * `git status --porcelain=v1 -z` 的解析。两列状态 + 一个路径，NUL 分隔；重命名 /
- * 复制是**两条**记录：先「新路径」（带 XY 两列），紧跟一条只有原路径的裸记录。
+ * Parses `git status --porcelain=v1 -z`. Two status columns + a path, NUL-separated; a rename /
+ * copy is **two** records: first the "new path" (with the XY columns), followed by a bare record with only the original path.
  */
 function parsePorcelainV1(stdout) {
   const records = [];
   const fields = stdout.toString("utf8").split("\0");
   for (let index = 0; index < fields.length; index += 1) {
     const field = fields[index];
-    // 空字段是结尾的 NUL；长度不足或第三位不是空格的都是裸路径（重命名的原路径）。
+    // An empty field is the trailing NUL; too short or no space at index 2 means a bare path (the original path of a rename).
     if (!field || field.length < 4 || field[2] !== " ") continue;
     const x = field[0];
     const y = field[1];
@@ -877,7 +886,7 @@ function parsePorcelainV1(stdout) {
   return records;
 }
 
-/** 两列状态 → 一个用来显示的状态 + 「暂存区里也有没有」+「是不是全新文件」。 */
+/** Two status columns → one display status + "also in the index" + "brand-new file". */
 function classifyRecord(record) {
   const { x, y } = record;
   if (x === "?" || y === "?") return { status: "added", staged: false, untracked: true };
@@ -894,8 +903,8 @@ function classifyRecord(record) {
 }
 
 /**
- * `git diff --numstat -z` 的解析：每条 `+行数\t-行数\t路径`，二进制是 `-\t-`。
- * 重命名在 -z 下是 `+行\t-行\t`（路径留空）后面跟两条裸路径，原路径在前、新路径在后。
+ * Parses `git diff --numstat -z`: each record is `+lines\t-lines\tpath`, binary is `-\t-`.
+ * Under -z a rename is `+lines\t-lines\t` (empty path) followed by two bare paths, original first, new second.
  */
 function parseNumstat(stdout) {
   const stats = new Map();
@@ -910,7 +919,7 @@ function parseNumstat(stdout) {
     const deleted = field.slice(first + 1, second);
     let filePath = field.slice(second + 1);
     if (!filePath) {
-      // 重命名：紧跟的两条裸路径是 (原, 新)，统计挂在新路径上。
+      // Rename: the next two bare paths are (original, new); the counts belong to the new path.
       filePath = fields[index + 2] ?? "";
       index += 2;
       if (!filePath) continue;
@@ -925,9 +934,9 @@ function parseNumstat(stdout) {
 }
 
 /**
- * HEAD → 工作区的增删行数。一次 diff 就覆盖了「已暂存 + 未暂存」两层。
- * 仓库还没有任何提交（unborn HEAD）时 HEAD 不存在，退回「暂存区」与「工作区」
- * 两份再合并。
+ * Added/removed lines from HEAD → working tree. One diff covers both "staged + unstaged" layers.
+ * Before any commit (unborn HEAD) HEAD does not exist; fall back to the "index" and "working tree"
+ * diffs and merge them.
  */
 async function gitNumstat(rootPath) {
   const options = { maxBytes: MAX_STATUS_BYTES };
@@ -946,11 +955,11 @@ async function gitNumstat(rootPath) {
 }
 
 /**
- * 一次快照：这个工作区相对当前基点 root 的状态。
+ * One snapshot: the status of this working copy relative to the current base root.
  *
- * files 的键是**根相对**路径（git 报的路径相对仓库根，而当前基点可能在仓库的
- * 子目录里，所以先减掉 `rev-parse --show-prefix` 给的前缀）；值是这一行要显示的
- * 状态与增删行数。快照为 null = 这里没有可用的状态（非仓库 / 没有 git / 出错）。
+ * Keys of files are **root-relative** paths (git reports paths relative to the repository root, and the current base may
+ * be a subdirectory of the repository, so the prefix from `rev-parse --show-prefix` is removed first); values are the
+ * status and line counts to show for that row. A null snapshot = no usable status here (not a repository / no git / error).
  */
 async function buildGitSnapshot(rootPath) {
   const probe = await runGitCommand(rootPath, ["rev-parse", "--show-toplevel", "--show-prefix"], {
@@ -992,7 +1001,7 @@ async function buildGitSnapshot(rootPath) {
       ...classified,
       added: stat?.added ?? 0,
       deleted: stat?.deleted ?? 0,
-      // 未跟踪的文件没有 numstat（git 不知道它以前长什么样），行数留给差异视图去数。
+      // Untracked files have no numstat (git does not know what they used to look like); the diff view counts their lines.
       binary: Boolean(stat?.binary),
     });
   }
@@ -1001,15 +1010,15 @@ async function buildGitSnapshot(rootPath) {
     rootPath,
     files,
     truncated: status.truncated,
-    // unborn 仓库与游离 HEAD 都报 "HEAD"，那不是分支名。
+    // Unborn repositories and detached HEAD both report "HEAD", which is not a branch name.
     branch: branchResult?.code === 0 ? branchResult.stdout.toString("utf8").trim() : null,
   };
 }
 
-/** rootPath → { at, snapshot }；同一个 root 的并发请求共用一次 git。 */
+/** rootPath → { at, snapshot }; concurrent requests for the same root share one git run. */
 let gitCache = new Map();
 
-/** 本插件自己改过文件之后立刻作废缓存：状态必须跟着这次保存走。 */
+/** Invalidate the cache right after this plugin changes files: status must follow this save. */
 function invalidateGitSnapshots() {
   gitCache = new Map();
 }
@@ -1020,7 +1029,7 @@ async function gitSnapshotFor(rootPath) {
   if (cached && Date.now() - cached.at < GIT_SNAPSHOT_TTL_MS) return cached.snapshot;
 
   const pending = buildGitSnapshot(rootPath)
-    // 快照失败只等于「没有状态」：绝不让它把列目录 / 打开文件带崩。
+    // A failed snapshot only means "no status": it must never bring down listing / opening files.
     .catch(() => null)
     .then((snapshot) => {
       gitCache.set(rootPath, { at: Date.now(), snapshot });
@@ -1031,9 +1040,9 @@ async function gitSnapshotFor(rootPath) {
 }
 
 /**
- * 把子树里的变化汇总到直接子目录上：列目录时每个子目录要一个徽标，不能对每个
- * 目录都重扫一遍全部变化（3000 个条目 × 几万条变化会卡住面板）。这里只把每条
- * 变化归到它**第一段**路径上，一次遍历就够。
+ * Roll changes in the subtree up onto the direct child directories: listing needs one badge per child directory, and
+ * rescanning all changes per directory would freeze the panel (3000 entries × tens of thousands of changes). Each
+ * change is assigned only to its **first** path segment, so one pass is enough.
  */
 function rollupByChildDirectory(snapshot, rel) {
   const prefix = rel ? `${rel}/` : "";
@@ -1042,7 +1051,7 @@ function rollupByChildDirectory(snapshot, rel) {
     if (prefix && !filePath.startsWith(prefix)) continue;
     const rest = filePath.slice(prefix.length);
     const slash = rest.indexOf("/");
-    if (slash < 0) continue; // 直接子文件：它自己那行有状态
+    if (slash < 0) continue; // direct child file: its own row carries the status
     const name = rest.slice(0, slash);
     const current = groups.get(name);
     if (!current) {
@@ -1058,12 +1067,12 @@ function rollupByChildDirectory(snapshot, rel) {
       current.status = info.status;
     }
   }
-  // 目录的徽标只显示状态与合计行数，binary 是单文件才有的细节。
+  // A folder badge only shows status and total line counts; binary is a single-file detail.
   for (const group of groups.values()) delete group.binary;
   return groups;
 }
 
-/** 列表响应里那一句「多少处改动」：只算当前基点这个 root 里的变化。 */
+/** The "how many changes" line in the list response: counts only changes inside the current base root. */
 function summarizeGit(snapshot) {
   const counts = { modified: 0, added: 0, deleted: 0, renamed: 0, conflicted: 0 };
   let total = 0;
@@ -1080,19 +1089,19 @@ function summarizeGit(snapshot) {
   };
 }
 
-/** 打开一个文件时问一句「它有没有改动」：列表收起时右侧也要有「变更」可看。 */
+/** Ask "does it have changes" when opening a file: with the list collapsed the right side still needs "Changes". */
 async function gitInfoFor(abs, rel) {
   if (!rel) return null;
   const root = await currentRoot();
-  // 项目外（宿主自选的会话临时文件 / 附件）没有根内基点，与 git 无关。
+  // Outside the project (session scratch files / attachments picked by the host) there is no root base and no git.
   if (!root || !isInside(root.path, abs)) return null;
   const snapshot = await gitSnapshotFor(root.path);
   return snapshot?.files.get(rel) ?? null;
 }
 
 /**
- * unified diff → 可直接渲染的段落。返回行类型（add/del/ctx）而不是原始文本，
- * 视图不必再解析一遍，也就能在这里单测。
+ * unified diff → directly renderable sections. Returns line kinds (add/del/ctx) instead of raw text,
+ * so the view does not parse it again and it can be unit-tested here.
  */
 function parseUnifiedDiff(text) {
   const meta = [];
@@ -1103,8 +1112,8 @@ function parseUnifiedDiff(text) {
   let newLine = 0;
 
   const rawLines = text.split("\n");
-  // git 的输出以换行收尾：split 出来的最后一个空串不是一行内容，丢掉它，
-  // 否则每个文件末尾都会多出一行「空白的上下文」。
+  // git output ends with a newline: the last empty string from split is not a line of content; drop it,
+  // otherwise every file would end with an extra "blank context" line.
   if (rawLines.length > 0 && rawLines[rawLines.length - 1] === "") rawLines.pop();
   for (const line of rawLines) {
     if (line.startsWith("@@")) {
@@ -1126,7 +1135,7 @@ function parseUnifiedDiff(text) {
       continue;
     }
     if (!hunk) {
-      // hunk 之前是文件头：diff --git / index / 模式变化 / 二进制提示。
+      // Before the first hunk is the file header: diff --git / index / mode changes / binary notice.
       if (line.startsWith("Binary files") || line.startsWith("GIT binary patch")) binary = true;
       else if (line) meta.push(line);
       continue;
@@ -1149,8 +1158,8 @@ function parseUnifiedDiff(text) {
 }
 
 /**
- * 未跟踪文件的内容全是新增，git 自己不给差异（`--no-index` 还得造一个 /dev/null，
- * 跨平台不牢靠）。这里直接读文件、每行加前缀，语义与 git 的「新文件」一致。
+ * An untracked file's content is all added, and git gives no diff for it (`--no-index` would need a fake /dev/null,
+ * which is not reliable across platforms). Read the file directly and prefix each line, matching git's "new file" semantics.
  */
 function untrackedDiff(text, truncated) {
   const lines = text.split("\n");
@@ -1177,11 +1186,11 @@ function untrackedDiff(text, truncated) {
 }
 
 /**
- * 一个文件到底改了什么。已跟踪文件同时看「暂存区 → 工作区」与「HEAD → 暂存区」
- * 两段：只有一段有内容就只给这一段，两段都有就都列出来（标题写清楚哪来的）。
+ * What exactly changed in a file. For tracked files look at both "index → working tree" and "HEAD → index":
+ * if only one has content give only that one, if both do list both (with headings saying where each comes from).
  */
 async function handleGitDiff(payload) {
-  // 一次解析就够：包含校验、凭据黑名单、基点都在 resolveInsideRoot 里。
+  // One resolution is enough: containment, the credential deny list and the base are all in resolveInsideRoot.
   const { rootPath, abs, rel } = await resolveInsideRoot(payload?.path ?? "");
   if (!rel) throw fail("INVALID_PATH", "the project root has no changes to show");
   const snapshot = await gitSnapshotFor(rootPath);
@@ -1207,7 +1216,7 @@ async function handleGitDiff(payload) {
       };
     }
     const buffer = await fs.readFile(abs);
-    // 含 NUL 字节 = 二进制：逐行加前缀毫无意义，直接说清楚。
+    // Contains NUL bytes = binary: prefixing each line is meaningless, say so directly.
     if (buffer.subarray(0, 4096).includes(0)) {
       return {
         ok: true,
@@ -1249,8 +1258,8 @@ async function handleGitDiff(payload) {
   const sections = [];
   let addedLines = 0;
   let deletedLines = 0;
-  // 整个响应的行数预算：超了就把后面的 hunk 丢掉并说清楚「已截断」——界面上那句
-  // 「输出已截断」必须名副其实，否则用户会以为差异就这么多。
+  // Line budget for the whole response: beyond it drop the remaining hunks and say "truncated"; the UI's
+  // "output truncated" must be accurate, otherwise users would think that is the whole diff.
   let budget = MAX_DIFF_LINES;
   let truncated = false;
 
@@ -1309,51 +1318,51 @@ async function handleGitDiff(payload) {
   };
 }
 
-// ── 文件监听（0.8.0） ───────────────────────────────────────────────────────
+// ── File watching (0.8.0) ──────────────────────────────────────────────────
 //
-// 「文件在编辑器之外被改了」这条链路以前只能靠用户点刷新。现在主进程用 Node 的
-// fs.watch 盯着**当前基点 root**（递归），把变化去抖成一串根相对路径，视图低频
-// 轮询取走。为什么是「主进程 watch + 视图轮询」而不是别的形状：
-//   · 宿主没有给插件「向视图推送」的通道（pi 上只有 ui.showToast / notify 这类
-//     单向通知），视图只能自己来取；那就让主进程做监听、视图只取游标增量，
-//     免得视图每秒在整棵树上 stat 一遍。
-//   · fs.watch 是操作系统的原生通知（macOS FSEvents / Windows
-//     ReadDirectoryChangesW / Linux inotify），比轮询便宜得多，也不占通道预算。
+// "A file changed outside the editor" used to rely on the user pressing refresh. Now the main process uses Node's
+// fs.watch on the **current base root** (recursive), debounces changes into a list of root-relative paths, and the view
+// polls them at a low rate. Why "main-process watch + view polling" and not another shape:
+//   · The host gives plugins no channel to push to a view (pi only has one-way notifications such as ui.showToast /
+//     notify), so the view has to fetch; the main process watches and the view only fetches cursor deltas,
+//     instead of the view stat-ing the whole tree every second.
+//   · fs.watch is the OS's native notification (macOS FSEvents / Windows
+//     ReadDirectoryChangesW / Linux inotify), much cheaper than polling and outside the channel budget.
 //
-// 三件必须做对的事：
-//   ① **不把自己的写当成外部改动**：保存走的是「临时文件 + rename」，监听一定会
-//     报。照单全收的话，用户每按一次 Ctrl+S 就会把自己的文档重新装载一遍（光标
-//     与滚动位置一起丢）。所以本插件每次写盘 / 新建 / 改名 / 移动 / 删除都先记一笔
-//     （noteSelfWrite），这一笔在 SELF_WRITE_SUPPRESS_MS 内到达的事件被丢掉。
-//   ② **不盯噪声**：.git/ 与 node_modules/ 的变化量极大且与本视图无关；凭据类路径
-//     （.env* / .ssh / *.pem…）照旧不报——监听不是绕过黑名单的后门。
-//   ③ **不丢事件、也不无限增长**：去抖窗口内的事件合并成一次；增量历史有界，
-//     视图拿着很旧的游标回来时只可能拿到「最近这些」，它据此做的是保守刷新，
-//     不会因为少看到一次就出错。
+// Three things that must be right:
+//   (1) **Never treat our own writes as external changes**: saving is "temp file + rename", which the watcher always
+//     reports. Taking that at face value would reload the user's document on every Ctrl+S (losing cursor
+//     and scroll position). So every write / create / rename / move / delete by this plugin is noted first
+//     (noteSelfWrite), and events arriving within SELF_WRITE_SUPPRESS_MS of that note are dropped.
+//   (2) **Ignore noise**: .git/ and node_modules/ change a lot and do not concern this view; credential paths
+//     (.env* / .ssh / *.pem…) are still never reported: watching is not a back door around the deny list.
+//   (3) **Lose no events, grow without bound never**: events within the debounce window merge into one; the delta history is bounded,
+//     and a view returning with a very old cursor only gets "the recent ones" and refreshes conservatively,
+//     so missing one round never causes an error.
 
 const WATCH_DEBOUNCE_MS = 250;
 const WATCH_HISTORY_LIMIT = 400;
-/** 本插件自己的写在这段时间内到达的同名事件被忽略。 */
+/** Same-path events arriving within this time after our own write are ignored. */
 const SELF_WRITE_SUPPRESS_MS = 1500;
 const WATCH_SELF_WRITE_CACHE_LIMIT = 200;
-/** 一次轮询最多报多少条变化（再多，视图「刷新所在目录」已经覆盖到了）。 */
+/** Max changes reported per poll (beyond that, the view's "refresh the containing folder" already covers it). */
 const WATCH_MAX_CHANGED = 200;
 
 let watchSupported = true;
 let watcher = null;
 let watchRevision = 0;
-/** 增量历史：{ revision, path }，超过上限丢最旧的。 */
+/** Delta history: { revision, path }; the oldest are dropped beyond the limit. */
 let watchHistory = [];
-/** 去抖窗口里收到的事件（路径去重）。 */
+/** Events received within the debounce window (paths de-duplicated). */
 let watchPending = new Set();
 let watchTimer = null;
-/** 根相对路径 → 本插件自己写它的时间戳。 */
+/** Root-relative path → timestamp of this plugin's own write to it. */
 const selfWrites = new Map();
 
 let fsWatch = null;
 /**
- * 惰性拿 fs.watch：万一这个运行时不给（非 Node 宿主、被裁剪的构建），功能静默
- * 降级成「只有手动刷新」，与 git 缺失是同一种降级方式。
+ * Lazily obtain fs.watch: if this runtime does not provide it (non-Node host, stripped build), the feature silently
+ * degrades to "manual refresh only", the same kind of degradation as missing git.
  */
 function fsWatchFn() {
   if (fsWatch === null) {
@@ -1366,17 +1375,17 @@ function fsWatchFn() {
   return fsWatch || null;
 }
 
-/** 噪声与不该看的东西：.git / node_modules / 凭据路径 / 本插件的临时文件。 */
+/** Noise and things we must not watch: .git / node_modules / credential paths / this plugin's temp files. */
 function isWatchIgnored(rel) {
   if (!rel) return false;
-  // 任意一层出现 .git / node_modules 都跳（只看第一段会漏掉嵌套的依赖目录）。
+  // Skip .git / node_modules at any depth (checking only the first segment would miss nested dependency folders).
   if (rel.split("/").some((segment) => segment === ".git" || segment === "node_modules")) return true;
-  // 原子写的临时文件：`.README.md.1730abcd.ef12.tmp`（见 atomicWrite）。
+  // Atomic-write temp files: `.README.md.1730abcd.ef12.tmp` (see atomicWrite).
   if (/^\..+\.[a-z0-9]+\.[a-z0-9]+\.tmp$/i.test(rel.split("/").pop() ?? "")) return true;
   return isDenied(rel, "read");
 }
 
-/** 本插件自己写下的这个路径刚被监听到了？ */
+/** Was this path just written by this plugin itself? */
 function isSelfWrite(rel) {
   const at = selfWrites.get(rel);
   if (at === undefined) return false;
@@ -1388,14 +1397,14 @@ function isSelfWrite(rel) {
 }
 
 /**
- * 本插件自己动了这个路径：接下来这一小段时间里它引起的事件不算「外部改动」。
+ * This plugin touched this path: events it causes during the next short period are not "external changes".
  *
- * 除了这个路径，还要把它**每一层祖先目录**一起记上：Windows 的递归监听在我们写一个
- * 文件时，会额外给「它所在的每一层目录」各报一次 `change <目录>`——文件名是给了的，
- * 只是名字是目录而不是文件（实测：写 `src/deep/x.ts` 会报 `change src/deep` 与
- * `change src`）。这几笔不记下来，自己按一次 Ctrl+S 就会被这些多余的目录事件判成
- * 「外部改动」，刚保存的文档被重装一遍——正是这一节要防的事。根目录自身不发这种
- * 目录事件（实测），所以只记到最外层目录为止。
+ * Besides the path itself, record **every ancestor directory** too: when we write a file, the recursive watcher on
+ * Windows additionally reports `change <dir>` once for "every directory level containing it"; a file name is given,
+ * it is just a directory instead of the file (tested: writing `src/deep/x.ts` reports `change src/deep` and
+ * `change src`). Without recording those, a single Ctrl+S would have these extra directory events judged
+ * "external changes" and the just-saved document reloaded, exactly what this section prevents. The root itself
+ * emits no such directory event (tested), so recording stops at the outermost directory.
  */
 function noteSelfWrite(rel) {
   if (!rel) return;
@@ -1428,7 +1437,7 @@ function flushWatchChanges() {
   if (watchHistory.length > WATCH_HISTORY_LIMIT) {
     watchHistory = watchHistory.slice(-WATCH_HISTORY_LIMIT);
   }
-  // 磁盘变了，git 状态与增删行数也就变了：快照当场作废，下一次列表 / 差异现算。
+  // The disk changed, so git status and line counts changed too: invalidate the snapshot now; the next list / diff recomputes.
   invalidateGitSnapshots();
 }
 
@@ -1448,13 +1457,13 @@ function stopWatching() {
     try {
       watcher.close();
     } catch {
-      /* 已经关掉了 */
+      /* Already closed */
     }
     watcher = null;
   }
 }
 
-/** 对着基点 root 开一只递归监听。同一时刻只有一只——换基点就是换监听对象。 */
+/** Open one recursive watcher on the base root. Only one at a time: switching the base switches what is watched. */
 function startWatching(rootPath) {
   if (watcher?.rootPath === rootPath) return true;
   stopWatching();
@@ -1466,11 +1475,11 @@ function startWatching(rootPath) {
   try {
     const handle = watch(
       rootPath,
-      // persistent: false —— 监听不该让插件进程一直活着；没有变化时它可以自然退出。
+      // persistent: false: watching must not keep the plugin process alive; without changes it may exit naturally.
       { recursive: true, persistent: false },
       (_eventType, filename) => {
-        // 有些平台不提供文件名：那就只知道「根底下有东西变了」，把根本身报出去，
-        // 视图据此刷新当前目录——宁可多刷一次，也不要漏掉一次。
+        // Some platforms give no file name: then we only know "something under the root changed", so report the root itself
+        // and let the view refresh the current folder; better one refresh too many than one missed.
         if (!filename) {
           noteWatchChange("");
           return;
@@ -1481,24 +1490,24 @@ function startWatching(rootPath) {
       },
     );
     handle.on("error", () => {
-      // 监听器自己出错了（例如根目录被删了）：退回手动刷新，不把错误抛给任何通道。
+      // The watcher itself failed (e.g. the root was deleted): fall back to manual refresh and throw to no channel.
       stopWatching();
       watchSupported = false;
     });
     watcher = { rootPath, close: () => handle.close() };
     return true;
   } catch {
-    // 老平台不支持 recursive watch：不假装能用，让视图把自动刷新关掉。
+    // Old platforms without recursive watch: do not pretend it works; let the view switch auto-refresh off.
     watchSupported = false;
     return false;
   }
 }
 
 /**
- * 视图的轮询：拿「上次游标之后变了哪些路径」。
+ * The view's poll: fetch "which paths changed since the last cursor".
  *
- * 顺带做两件事——基点换了就换监听；去抖窗口快到点时把这一批现在就发出去（否则用户
- * 会多等一个去抖周期才看到刷新）。
+ * Also does two things: switch the watcher when the base changed, and flush the batch now when the debounce window is
+ * about to expire (otherwise the user would wait one more debounce period for the refresh).
  */
 async function handleWatch(payload) {
   const root = await currentRoot();
@@ -1517,37 +1526,37 @@ async function handleWatch(payload) {
     available: watchSupported && watcher !== null,
     revision: watchRevision,
     changed: changed.slice(0, WATCH_MAX_CHANGED),
-    // 游标已经落到有界历史之外：视图据此也按「可能还有别的变化」做一次保守刷新。
+    // The cursor has fallen outside the bounded history: the view should also refresh conservatively, "there may be other changes".
     stale: since > 0 && watchHistory.length > 0 && since < watchHistory[0].revision,
   };
 }
 
-// ── 编辑器探测与「通过…打开」（0.9.0） ─────────────────────────────────────
+// ── Editor detection and "Open with…" (0.9.0) ───────────────────────────────
 //
-// 树里的右键菜单要列出这台机器上**真实存在**的编辑器。探测刻意不遍历目录：
-//   ① 注册表 App Paths（HKLM / WOW6432Node / HKCU）——安装器几乎都会在这里留一条
-//      `<name>.exe` → 绝对路径，一次 reg query 就能批量读出来；
-//   ② 注册表 StartMenuInternet 的 `shell\open\command`——浏览器（Chrome / Edge /
-//      Firefox / Zen 这类）只在这里注册，而且这里给的是完整可执行文件；
-//   ③ PATH 上按候选命令名找可执行文件（VS Code / Zed 会装 bin 目录）；
-//   ④ 少量由用户主目录推导出来的固定安装位置，各一次 stat。
-// 四者都是 O(候选数)，没有任何递归列目录——「遍历整个磁盘找软件」是这个功能最
-// 容易写出来的那个错误版本，也是最慢的一个。
+// The tree's context menu must list editors that **really exist** on this machine. Detection deliberately never walks directories:
+//   (1) Registry App Paths (HKLM / WOW6432Node / HKCU): installers almost always leave a
+//      `<name>.exe` → absolute path entry there, readable in bulk with one reg query;
+//   (2) Registry StartMenuInternet `shell\open\command`: browsers (Chrome / Edge /
+//      Firefox / Zen and the like) register only there, and it gives the full executable;
+//   (3) Executables on PATH by candidate command name (VS Code / Zed install a bin directory);
+//   (4) A few fixed install locations derived from the user's home directory, one stat each.
+// All four are O(candidates), with no recursive directory listing: "walk the whole disk to find software" is the
+// easiest wrong version of this feature to write, and also the slowest.
 //
-// 结果按**日期**缓存一天，写进插件数据目录（editors.json）：多个 PI-Desktop 实例
-// 共享同一次探测，同一天里再打开菜单不会重复跑注册表。写盘失败只是退回「本进程内
-// 缓存」，功能不受影响；探测不到时菜单里就只剩「默认应用」一项——绝不摆一个点了
-// 没反应的编辑器上去。
+// Results are cached by **date** for one day in the plugin data directory (editors.json): several Slyy instances
+// share one probe, and reopening the menu on the same day does not query the registry again. A failed write only falls back to the
+// in-process cache, without affecting the feature; with nothing detected the menu keeps only "Default app"; never
+// list an editor that does nothing when clicked.
 //
-// 只跑得到 .exe 的才算数（Windows）：.cmd / .bat 这类 shim 需要经 cmd.exe 执行，
-// 而把用户项目里的路径拼进命令行是多余的注入面。App Paths 与 PATH 上的编辑器
-// 几乎总能给出真正的 .exe，所以这条限制不会漏掉它们。
+// Only real .exe files count (Windows): .cmd / .bat shims need cmd.exe to run,
+// and splicing user project paths into a command line is an unnecessary injection surface. Editors in App Paths and on PATH
+// almost always provide a real .exe, so this limit does not miss them.
 
 const EDITOR_CACHE_FILE = "editors.json";
 const EDITOR_PROBE_TIMEOUT_MS = 4000;
 const EDITOR_PROBE_MAX_BYTES = 512 * 1024;
 
-/** 缓存按「日期」判定（本地时区），不是时间戳：一天只探测一次。 */
+/** The cache is keyed by "date" (local time zone), not a timestamp: probe once a day. */
 function todayStamp() {
   const now = new Date();
   const month = `${now.getMonth() + 1}`.padStart(2, "0");
@@ -1555,7 +1564,7 @@ function todayStamp() {
   return `${now.getFullYear()}-${month}-${day}`;
 }
 
-/** 惰性拿同步 fs（探测里只做几次 stat，异步反而更啰嗦）。 */
+/** Lazily obtain synchronous fs (detection only does a few stats; async would just be more verbose). */
 let fsSync = null;
 function fsSyncFn() {
   if (fsSync === null) {
@@ -1579,8 +1588,8 @@ function isFileSync(target) {
 }
 
 /**
- * PATH 上查一个命令时尝试的文件名，按优先级排列（纯函数，verify-editors 直接断言）。
- * 只有 .exe 会被采纳：见文件头关于 shim 的说明。
+ * File names tried when looking up a command on PATH, in priority order (pure function, asserted by verify-editors).
+ * Only .exe is accepted: see the file header on shims.
  */
 function pathLookupOrder(name, platform, pathext) {
   if (platform !== "win32") return [name];
@@ -1593,7 +1602,7 @@ function pathLookupOrder(name, platform, pathext) {
   return ordered.map((extension) => `${name}${extension}`);
 }
 
-/** PATH 目录列表 + 候选文件名 → 第一个真实存在的文件（不遍历目录，只 stat 候选）。 */
+/** PATH directories + candidate file names → first file that really exists (no directory walk, only stats of candidates). */
 function findOnPath(name) {
   const dirs = String(process.env.PATH || "")
     .split(PLATFORM === "win32" ? ";" : ":")
@@ -1612,9 +1621,9 @@ function findOnPath(name) {
 const PLATFORM = process.platform;
 
 /**
- * 常见编辑器与浏览器。`appPaths` 是注册表里的键名（小写比较），`commands` 是 PATH
- * 上的命令名，`fixed` 是由用户主目录推导出来的固定安装位置。三者按顺序取第一个命中，
- * 命中后再 stat 一次确认文件真的还在（注册表常留下已经卸载的条目）。
+ * Common editors and browsers. `appPaths` are registry key names (compared lowercase), `commands` are command names
+ * on PATH, `fixed` are fixed install locations derived from the user's home directory. The first hit in that order wins,
+ * then one more stat confirms the file still exists (the registry often keeps entries of uninstalled software).
  */
 function editorCandidates() {
   if (PLATFORM === "darwin") return macEditorCandidates();
@@ -1869,7 +1878,7 @@ function linuxEditorCandidates() {
   ];
 }
 
-/** 注册表 App Paths 的 `reg query /s` 输出 → `<name>.exe`（小写）→ 绝对路径。 */
+/** `reg query /s` output of registry App Paths → `<name>.exe` (lowercase) → absolute path. */
 function parseAppPathsRegistry(text) {
   const found = new Map();
   let current = null;
@@ -1888,8 +1897,8 @@ function parseAppPathsRegistry(text) {
 }
 
 /**
- * StartMenuInternet 的 `reg query /s` 输出 → 子键名（小写）→ 可执行文件路径。
- * 只认 `shell\open\command` 那一条，值形如 `"C:\…\chrome.exe" -- "%1"`。
+ * `reg query /s` output of StartMenuInternet → subkey name (lowercase) → executable path.
+ * Only the `shell\open\command` entry counts, with values like `"C:\…\chrome.exe" -- "%1"`.
  */
 function parseStartMenuRegistry(text) {
   const found = new Map();
@@ -1913,7 +1922,7 @@ function parseStartMenuRegistry(text) {
   return found;
 }
 
-/** 从 shell 命令行里剥出可执行文件：`"C:\a b\x.exe" -- "%1"` → `C:\a b\x.exe`。 */
+/** Strip the executable from a shell command line: `"C:\a b\x.exe" -- "%1"` → `C:\a b\x.exe`. */
 function executableFromCommand(command) {
   const trimmed = String(command).trim();
   if (!trimmed) return null;
@@ -1926,7 +1935,7 @@ function executableFromCommand(command) {
   return null;
 }
 
-/** 起一个只读子进程并收它的 stdout；拿不到任何东西就返回空串（探测静默降级）。 */
+/** Start a read-only child process and collect its stdout; return an empty string when nothing comes (detection degrades silently). */
 function runCapture(command, args, timeoutMs = EDITOR_PROBE_TIMEOUT_MS) {
   const spawn = childSpawnFn();
   if (!spawn) return Promise.resolve("");
@@ -1951,7 +1960,7 @@ function runCapture(command, args, timeoutMs = EDITOR_PROBE_TIMEOUT_MS) {
       try {
         child.kill();
       } catch {
-        /* 已经退出了 */
+        /* Already exited */
       }
       finish("");
     }, timeoutMs);
@@ -1963,7 +1972,7 @@ function runCapture(command, args, timeoutMs = EDITOR_PROBE_TIMEOUT_MS) {
         try {
           child.kill();
         } catch {
-          /* 已经退出了 */
+          /* Already exited */
         }
         finish(out.slice(0, EDITOR_PROBE_MAX_BYTES));
       }
@@ -1973,7 +1982,7 @@ function runCapture(command, args, timeoutMs = EDITOR_PROBE_TIMEOUT_MS) {
   });
 }
 
-/** reg.exe 的绝对路径（插件进程的 PATH 里通常没有 System32）。 */
+/** Absolute path of reg.exe (System32 is usually not on the plugin process PATH). */
 function regExePath() {
   const systemRoot = process.env.SystemRoot || process.env.windir || "C:\\Windows";
   const native = path.join(systemRoot, "System32", "reg.exe");
@@ -1993,9 +2002,9 @@ const REG_START_MENU_KEYS = [
 ];
 
 /**
- * 注册表两处 + PATH 的探测结果。注册表查询并行发起：6 次 reg.exe 一起跑，
- * 总耗时是一次进程启动的量级（实测 100ms 上下），而不是它们的和。
- * 非 Windows、没有 reg.exe、注册表读不到——一律返回空表，探测退化成 PATH + 固定路径。
+ * Detection results from the two registry locations + PATH. Registry queries run in parallel: 6 reg.exe runs together
+ * take about one process start in total (about 100ms measured), not their sum.
+ * Non-Windows, no reg.exe, unreadable registry: all return empty tables, and detection degrades to PATH + fixed paths.
  */
 async function editorSources() {
   const empty = { appPaths: new Map(), menus: new Map() };
@@ -2025,12 +2034,12 @@ async function editorSources() {
 }
 
 /**
- * 一个候选的命中位置：注册表 App Paths → StartMenuInternet → PATH → 固定路径。
+ * Where a candidate is found: registry App Paths → StartMenuInternet → PATH → fixed paths.
  *
- * 注册表两种键名都要试**前缀**：StartMenuInternet 下的浏览器子键常带客户端哈希后缀
- * （Firefox 是 `FIREFOX.EXE-308046b0af4a39cb`、Chromium 系是 `Chrome.HTM…`），
- * 精确匹配会一个都命中不了。前缀匹配只在没有精确命中时兜底，且取最短的那个键
- * （`chrome` 优先于 `chromehtml`），避免误配到同前缀的另一款软件。
+ * Both registry key name kinds must also be tried as a **prefix**: browser subkeys under StartMenuInternet often carry a client hash suffix
+ * (Firefox is `FIREFOX.EXE-308046b0af4a39cb`, Chromium-based ones `Chrome.HTM…`),
+ * so exact matching would find nothing. Prefix matching is only a fallback without an exact hit, and takes the shortest key
+ * (`chrome` over `chromehtml`) to avoid matching another program with the same prefix.
  */
 function lookupRegistryKey(map, key) {
   const wanted = String(key).toLowerCase();
@@ -2067,18 +2076,18 @@ function locateEditor(candidate, sources) {
   return null;
 }
 
-/** PATH 命中必须是 .exe（Windows）；其它平台命令本身就是可执行文件。 */
+/** A PATH hit must be an .exe (Windows); on other platforms the command itself is the executable. */
 function isOnlyExtension(target, extension) {
   if (PLATFORM !== "win32") return true;
   return target.toLowerCase().endsWith(extension);
 }
 
 /**
- * 全量探测一次；候选按表里的顺序，去重后返回 { id, label, kind, command }。
+ * Full detection once; candidates in table order, de-duplicated, returned as { id, label, kind, command }.
  *
- * kind 是「这是什么程序」（editor / browser），不是「能不能打开这个文件」——
- * 后者取决于被点的文件，由视图按扩展名判定（lib/editors.ts）。放在这里是因为
- * 只有探测侧知道 Chrome 是浏览器：一旦写成视图里的 id 名单，加一款浏览器就要改两处。
+ * kind is "what kind of program this is" (editor / browser), not "can it open this file";
+ * the latter depends on the clicked file and is decided by the view by extension (lib/editors.ts). It lives here because
+ * only the detection side knows Chrome is a browser: as an id list in the view, adding a browser would need two changes.
  */
 async function probeEditors() {
   const sources = await editorSources();
@@ -2100,7 +2109,7 @@ async function probeEditors() {
   return found;
 }
 
-/** 缓存文件形状：{ stamp, platform, editors }。任何形状不对都当没有缓存。 */
+/** Cache file shape: { stamp, platform, editors }. Any wrong shape counts as no cache. */
 async function readEditorCacheFile(stamp) {
   if (!dataPath) return null;
   try {
@@ -2116,8 +2125,8 @@ async function readEditorCacheFile(stamp) {
           typeof entry.label === "string" &&
           typeof entry.command === "string",
       )
-      // 老缓存（0.9.0 之前的版本没写 kind）当作编辑器：宁可少一项「用浏览器打开」，
-      // 也不把编辑器误判成浏览器而从普通文件上删掉。
+      // Old caches (versions before 0.9.0 wrote no kind) count as editors: better one "open in browser" item fewer
+      // than misjudging an editor as a browser and dropping it from ordinary files.
       .map((entry) => ({
         id: entry.id,
         label: entry.label,
@@ -2139,11 +2148,11 @@ async function writeEditorCacheFile(value) {
       "utf8",
     );
   } catch {
-    /* 写不进去只是下次重新探测 */
+    /* A failed write only means detecting again next time */
   }
 }
 
-/** 本进程内缓存 + 同一天的落盘缓存；并发调用共用同一次探测。 */
+/** In-process cache + same-day on-disk cache; concurrent calls share one probe. */
 let editorCache = null;
 let editorProbe = null;
 
@@ -2171,10 +2180,10 @@ async function detectEditors() {
 }
 
 /**
- * 交给外部编辑器的环境变量。插件进程跑在宿主给的最小环境里（只有 PATH / SystemRoot /
- * USERPROFILE 等十来个变量），而编辑器启动时通常要读 APPDATA / LOCALAPPDATA 找自己的
- * 配置与扩展。这两个变量的位置在 Windows 上是固定的，直接从主目录推出来补上；
- * 其余保持沿袭，不伪造。
+ * Environment for external editors. The plugin process runs in the minimal environment the host gives it (only PATH / SystemRoot /
+ * USERPROFILE and about ten other variables), while editors usually read APPDATA / LOCALAPPDATA at startup to find their
+ * configuration and extensions. On Windows these two locations are fixed, so derive them from the home directory;
+ * everything else is inherited as is, nothing is faked.
  */
 function editorEnv() {
   const env = { ...process.env };
@@ -2187,11 +2196,11 @@ function editorEnv() {
 }
 
 /**
- * 用指定编辑器打开一个绝对路径。
+ * Open an absolute path with the given editor.
  *
- * 走的是 spawn 而不是 shell：编辑器是可执行文件、参数是一个绝对路径，两者之间不需要
- * 命令行这一层（有 shell 就有注入面）。detached + stdio ignore + unref，编辑器是用户
- * 的窗口，不该随面板关闭而消失，也不该把插件进程拖住。
+ * Uses spawn, not a shell: the editor is an executable and the argument one absolute path, with no need for
+ * a command-line layer in between (a shell means an injection surface). detached + stdio ignore + unref: the editor is the user's
+ * window and must neither disappear when the panel closes nor hold the plugin process.
  */
 function launchEditor(command, target) {
   const spawn = childSpawnFn();
@@ -2209,7 +2218,7 @@ function launchEditor(command, target) {
     throw fail("EDITOR_UNAVAILABLE", String(error?.message ?? error));
   }
   child.on("error", () => {
-    /* 编辑器起不来只是没反应，面板不该因此报错 */
+    /* An editor that fails to start just does nothing; the panel must not report an error for it */
   });
   child.unref();
 }
@@ -2220,15 +2229,15 @@ async function handleEditors() {
     ok: true,
     platform: PLATFORM,
     stamp: cache.stamp,
-    // kind 一并给视图：它据此决定「这个程序要不要出现在这个文件上」（见 lib/editors.ts）。
+    // Give kind to the view as well: it decides from it whether "this program appears for this file" (see lib/editors.ts).
     editors: cache.editors.map((entry) => ({ id: entry.id, label: entry.label, kind: entry.kind })),
   };
 }
 
 async function handleOpenWith(payload) {
   if (payload?.external === true) {
-    // 编辑器 command 绝不由视图指定，只认 id；external 是「宿主自己选定的项目外路径」
-    // 那条通道的标记，这里不该出现——与其放行，不如明确拒绝。
+    // The editor command is never chosen by the view, only the id; external marks the "path outside the project picked by the host"
+    // channel and does not belong here; refuse it explicitly rather than let it through.
     throw fail("INVALID_PATH", "external paths are not accepted here");
   }
   const target = await resolveTarget(payload, "read");
@@ -2241,7 +2250,7 @@ async function handleOpenWith(payload) {
   return { ok: true, editor: { id: editor.id, label: editor.label, kind: editor.kind } };
 }
 
-// ── 读 ──────────────────────────────────────────────────────────────────────
+// ── Read ───────────────────────────────────────────────────────────────────
 
 async function handleList(payload) {
   const { rootPath, abs, rel } = await resolveInsideRoot(payload?.path ?? "", {
@@ -2316,8 +2325,8 @@ async function handleList(payload) {
     return left.name.localeCompare(right.name, undefined, { numeric: true, sensitivity: "base" });
   });
 
-  // git 状态：整个工作区一次算完（2s 缓存），文件各取各的，目录取子树的汇总。
-  // 非仓库 / 没有 git 时 snapshot 为 null，整列就是 null——树照旧，只是没有徽标。
+  // git status: the whole working copy is computed once (2s cache); files take their own entry, folders their subtree rollup.
+  // Not a repository / no git: snapshot is null and the whole column is null; the tree stays, just without badges.
   const snapshot = await gitSnapshotFor(rootPath);
   const gitGroups = snapshot ? rollupByChildDirectory(snapshot, rel) : new Map();
   for (const entry of entries) {
@@ -2338,7 +2347,7 @@ async function handleList(payload) {
   };
 }
 
-/** base64 拼成 data URI——视图只能拿到字符串，不能拿到路径。 */
+/** base64 joined into a data URI: the view only ever gets a string, never a path. */
 function asDataUri(mime, buffer) {
   return `data:${mime};base64,${buffer.toString("base64")}`;
 }
@@ -2349,8 +2358,8 @@ async function handleRead(payload) {
   const stat = await fs.stat(abs).catch(() => null);
   if (!stat) throw fail("NOT_FOUND", "file not found");
   if (stat.isDirectory()) throw fail("INVALID_PATH", "path is a directory");
-  // 打开文件时也问一句 git：这个文件有没有改动。左侧列表收起时（宿主请求打开就会
-  // 收起）树里没有这一行，右侧的「变更」入口不能跟着一起消失。
+  // Ask git when opening a file as well: does this file have changes. With the left list collapsed (a host open request
+  // collapses it) this row is not in the tree, and the "Changes" entry on the right must not disappear with it.
   const base = {
     path: rel,
     size: stat.size,
@@ -2359,9 +2368,9 @@ async function handleRead(payload) {
   };
   const extension = path.extname(rel).toLowerCase();
 
-  // 数据库：只读 100 字节的头部就能认出它，所以这一支**不做体积限制**——
-  // 几百 MB 的 .db 也会在这里秒开（真正的取数走 fm.sqlite.*，一次只拿一页）。
-  // 扩展名像但魔数不对的（比如 Windows 的 thumbs.db 其实是 OLE 文件）继续按普通文件走。
+  // Database: the 100-byte header is enough to recognise it, so this branch has **no size limit**:
+  // even a .db of hundreds of MB opens instantly here (real fetching goes through fm.sqlite.*, one page at a time).
+  // A matching extension with a wrong magic number (e.g. Windows thumbs.db is really an OLE file) continues as an ordinary file.
   if (SQLITE_EXT.test(extension)) {
     const head = await readHead(abs, 100);
     if (isSqliteFile(head)) {
@@ -2375,8 +2384,8 @@ async function handleRead(payload) {
     }
   }
 
-  // PDF 独立于文本 / 二进制判定；损坏或加密文档由 PDF.js 给出明确提示。
-  // 沿用 resolveTarget 的根包含、凭据黑名单和宿主指定外部文件的检查。
+  // PDF is decided independently of text / binary; PDF.js reports corrupt or encrypted documents clearly.
+  // Reuses resolveTarget's root containment, credential deny list and checks for host-designated external files.
   if (extension === ".pdf") {
     if (stat.size > MAX_PDF_BYTES) {
       return { ok: true, kind: "tooLarge", limit: MAX_PDF_BYTES, ...base };
@@ -2388,8 +2397,8 @@ async function handleRead(payload) {
     return { ok: true, kind: "pdf", mime: "application/pdf", dataUri: asDataUri("application/pdf", buffer), ...base };
   }
 
-  // 图片与音视频返回 data URI：视图在 file:// 下拿不到项目里的文件，
-  // 只能把字节随响应带过去。两类各自先做体积检查，避免读进内存再拒绝。
+  // Images and audio/video return data URIs: under file:// the view cannot reach project files,
+  // so the bytes must travel with the response. Each kind checks its size first, to avoid reading into memory and then refusing.
   const imageMime = IMAGE_MIME.get(extension);
   if (imageMime) {
     if (stat.size > MAX_IMAGE_BYTES) {
@@ -2408,8 +2417,8 @@ async function handleRead(payload) {
     return { ok: true, kind: "media", mime: mediaMime, dataUri: asDataUri(mediaMime, buffer), ...base };
   }
 
-  // 其余扩展名一律按内容判断：超过上限 → tooLarge，含 NUL 字节 → binary。
-  // zip / apk / exe 这类二进制会落到这里，视图只提示「不支持预览」。
+  // Every other extension is judged by content: over the limit → tooLarge, contains NUL bytes → binary.
+  // Binaries such as zip / apk / exe land here, and the view only says "preview not supported".
   if (stat.size > MAX_READ_BYTES) {
     return { ok: true, kind: "tooLarge", limit: MAX_READ_BYTES, ...base };
   }
@@ -2431,7 +2440,7 @@ async function handleRead(payload) {
   };
 }
 
-// ── 写 ──────────────────────────────────────────────────────────────────────
+// ── Write ──────────────────────────────────────────────────────────────────
 
 async function atomicWrite(abs, serialized, mode) {
   const dir = path.dirname(abs);
@@ -2446,10 +2455,10 @@ async function atomicWrite(abs, serialized, mode) {
     await handle.close();
     handle = null;
 
-    // rename 会替换 inode，先把原文件权限位搬到临时文件上。
+    // rename replaces the inode, so copy the original permission bits to the temp file first.
     if (mode != null) await fs.chmod(tmp, mode).catch(() => {});
 
-    // Windows 上防病毒 / 索引器可能造成瞬态 EPERM / EBUSY。
+    // On Windows antivirus / indexers can cause transient EPERM / EBUSY.
     for (let attempt = 0; ; attempt += 1) {
       try {
         await fs.rename(tmp, abs);
@@ -2479,7 +2488,7 @@ async function handleWrite(payload) {
   const stat = await fs.stat(abs).catch(() => null);
   if (stat?.isDirectory()) throw fail("INVALID_PATH", "path is a directory");
 
-  // 乐观锁：编辑器之外的改动绝不静默覆盖。
+  // Optimistic lock: changes made outside the editor are never overwritten silently.
   if (stat && typeof payload?.expectedMtimeMs === "number") {
     const mtimeChanged = Math.abs(stat.mtimeMs - payload.expectedMtimeMs) > 0.5;
     const sizeChanged =
@@ -2508,17 +2517,17 @@ async function handleWrite(payload) {
     bytes: Buffer.byteLength(serialized, "utf8"),
     result: "ok",
   });
-  // 刚落盘的内容就是「工作区相对 HEAD 的改动」：状态缓存必须立刻作废，
-  // 否则树里的徽标与右侧的差异要等 2s 之后才跟上。
+  // What was just written is "the working tree's change against HEAD": the status cache must be invalidated now,
+  // otherwise the tree badges and the diff on the right would lag by 2s.
   invalidateGitSnapshots();
-  // 监听（0.8.0）会把「临时文件 + rename」报成一次外部改动；记一笔，视图就不会
-  // 因为用户自己按的 Ctrl+S 而把文档重新装载一遍（那会丢光标与滚动位置）。
+  // The watcher (0.8.0) reports "temp file + rename" as an external change; note it, so the view does not
+  // reload the document because of the user's own Ctrl+S (which would lose cursor and scroll position).
   noteSelfWrite(rel);
 
   return { ok: true, mtimeMs: next.mtimeMs, size: next.size };
 }
 
-// ── 新建 / 重命名 / 移动 / 删除 ────────────────────────────────────────────
+// ── Create / rename / move / delete ────────────────────────────────────────
 
 const WINDOWS_RESERVED = /^(?:con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\..*)?$/i;
 
@@ -2541,7 +2550,7 @@ function entryFromStat(name, rel, stat) {
     ignored: false,
     isSymlink: false,
     outside: false,
-    // 新建 / 改名 / 移动之后这一行是全新的：状态由下一次列表调用现算。
+    // After create / rename / move this row is brand new: its status is computed by the next list call.
     git: null,
   };
 }
@@ -2560,8 +2569,8 @@ async function handleCreate(payload) {
   else await fs.writeFile(childAbs, "", { flag: "wx" });
 
   await audit({ api: "fm.create", path: childRel, result: "ok" });
-  invalidateGitSnapshots(); // 新文件立刻就该有「新增」徽标。
-  noteSelfWrite(childRel); // 监听别把这当成「外部新建」。
+  invalidateGitSnapshots(); // A new file should get its "added" badge right away.
+  noteSelfWrite(childRel); // Keep the watcher from treating this as an "external create".
   return { ok: true, entry: entryFromStat(name, childRel, await fs.stat(childAbs)) };
 }
 
@@ -2593,7 +2602,7 @@ async function handleMove(payload) {
   if (!targetStat?.isDirectory()) throw fail("INVALID_PATH", "the destination is not a directory");
   if (source.abs === target.abs) return { ok: true, entry: null };
 
-  // 不能把目录移进它自己的子孙。
+  // A directory cannot be moved into its own descendants.
   if (isInside(source.abs, target.abs)) {
     throw fail("INVALID_PATH", "cannot move a directory into itself");
   }
@@ -2609,7 +2618,7 @@ async function handleMove(payload) {
     await fs.rename(source.abs, nextAbs);
   } catch (error) {
     if (error?.code !== "EXDEV") throw error;
-    // 跨卷：复制 + 删除。
+    // Across volumes: copy + delete.
     await fs.cp(source.abs, nextAbs, { recursive: true, errorOnExist: true });
     await fs.rm(source.abs, { recursive: true });
   }
@@ -2622,16 +2631,16 @@ async function handleMove(payload) {
 }
 
 /**
- * 删除文件或目录。目录整体递归删除，删之前由视图弹确认框。
+ * Delete a file or directory. Directories are removed recursively as a whole; the view asks for confirmation first.
  *
- * 路径限制与写 / 新建 / 重命名 / 移动完全一致：resolveTarget(payload, "write")
- * 覆盖了项目内相对路径、组内绝对路径与 external 项目外路径三种形态，凭据黑名单
- * 与 node_modules 拒绝都在里面。根目录本身绝不能删——右键空白处的菜单也能走到
- * 这里，rel 为空就是根。
+ * Path limits are identical to write / create / rename / move: resolveTarget(payload, "write")
+ * covers the project-relative path, in-group absolute path and external out-of-project path forms, including the credential deny list
+ * and the node_modules refusal. The root itself must never be deleted: the context menu on empty space can also reach
+ * this point, and an empty rel is the root.
  */
 async function handleDelete(payload) {
   const target = await resolveTarget(payload, "write");
-  // 根目录本身绝不能删：右键空白处的菜单也能走到这里。
+  // The root itself must never be deleted: the context menu on empty space can also reach this point.
   if (!target.rel) throw fail("INVALID_PATH", "refusing to delete the project root");
 
   let stat;
@@ -2649,7 +2658,7 @@ async function handleDelete(payload) {
   return { ok: true };
 }
 
-// ── 搜索（分页 + 会话游标） ─────────────────────────────────────────────────
+// ── Search (paged + session cursor) ────────────────────────────────────────
 
 function pruneSessions() {
   while (searchSessions.size > MAX_SEARCH_SESSIONS) {
@@ -2674,8 +2683,8 @@ async function handleSearch(payload) {
 
   let session = cursor ? searchSessions.get(cursor) : null;
   if (!session) {
-    // 栈里是「目录帧」而不是目录路径：帧被完整扫完才出栈，否则命中上限时
-    // 该目录剩余条目会被永久丢掉（分页会漏结果）。
+    // The stack holds "directory frames", not directory paths: a frame is popped only when fully scanned, otherwise when the limit
+    // is hit the directory's remaining entries would be lost forever (paging would miss results).
     session = {
       id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
       createdAt: Date.now(),
@@ -2709,8 +2718,8 @@ async function handleSearch(payload) {
       frame.index = 0;
     }
 
-    // 子目录先收集，等本帧处理完再入栈：直接在循环里 push 会让后面的
-    // `pop()` 把刚压入的子帧弹掉，父帧则被反复重扫（死循环）。
+    // Collect subdirectories first and push them after this frame is done: pushing inside the loop would let the later
+    // `pop()` take the just-pushed child frame, rescanning the parent frame again and again (infinite loop).
     const children = [];
     while (frame.index < frame.entries.length) {
       if (outOfBudget()) break;
@@ -2737,7 +2746,7 @@ async function handleSearch(payload) {
       }
     }
 
-    // 未扫完则原样回栈，下次续扫；扫完才释放目录列表。
+    // Push back unchanged if not fully scanned, to continue next time; release the directory listing only when done.
     if (frame.index < frame.entries.length) session.stack.push(frame);
     else frame.entries = null;
 
@@ -2756,21 +2765,21 @@ async function handleSearch(payload) {
   };
 }
 
-// ── SQLite（只读浏览 + 查询） ───────────────────────────────────────────────
+// ── SQLite (read-only browsing + queries) ──────────────────────────────────
 //
-// 用 Node 内置的 node:sqlite。宿主是 Electron 43 / Node 24，模块存在（实测），
-// 零依赖规则不破——和用 node:fs 同级。
+// Uses Node's built-in node:sqlite. The host is Electron 43 / Node 24, where the module exists (tested),
+// so the zero-dependency rule holds, on par with using node:fs.
 //
-// 为什么不像图片那样把字节搬给视图：.db 动辄几十上百 MB，只能留在主进程里查，
-// 每次只把一页行发给视图。这是本插件唯一能打开「大文件」的预览类型。
+// Why not hand the bytes to the view like images: a .db is easily tens or hundreds of MB and can only be queried in the main process,
+// sending one page of rows to the view at a time. This is the only preview type in this plugin that opens "large files".
 //
-// 只读是三层钉住的：
-//   ① 打开时 { readOnly: true }
-//   ② 打开后立刻 PRAGMA query_only = 1（实测：DROP / INSERT 都被 SQLite 拒绝，
-//      报 "attempt to write a readonly database"）
-//   ③ 语句白名单：只放行 SELECT / WITH / VALUES / EXPLAIN 与只读 PRAGMA，且必须是
-//      单条语句——node:sqlite 的 prepare 对多语句是**放行**的（实测 "select 1; select 2"
-//      只执行第一条、不报错），所以多语句必须自己拦。
+// Read-only is pinned in three layers:
+//   (1) opened with { readOnly: true }
+//   (2) PRAGMA query_only = 1 right after opening (tested: SQLite refuses both DROP / INSERT,
+//      reporting "attempt to write a readonly database")
+//   (3) statement allowlist: only SELECT / WITH / VALUES / EXPLAIN and read-only PRAGMA, and only
+//      single statements: node:sqlite prepare **accepts** multiple statements (tested: "select 1; select 2"
+//      runs only the first without error), so multiple statements must be blocked by us.
 
 const SQLITE_EXT = /\.(?:db|db3|sqlite|sqlite3)$/i;
 const SQLITE_MAGIC = "SQLite format 3\u0000";
@@ -2782,7 +2791,7 @@ const SQLITE_HANDLE_LIMIT = 2;
 const SQLITE_IDLE_MS = 60000;
 const ROWID = "rowid";
 
-/** 只放行这些只读 PRAGMA；写性的（journal_mode 带值、writable_schema 等）不进白名单。 */
+/** Only these read-only PRAGMAs pass; writing ones (journal_mode with a value, writable_schema etc.) are not allowlisted. */
 const READ_ONLY_PRAGMAS = new Set([
   "table_info",
   "table_xinfo",
@@ -2802,8 +2811,8 @@ const READ_ONLY_PRAGMAS = new Set([
   "collation_list",
 ]);
 
-/** 这些词在 SQLite 里都是保留字，只能以关键字出现（列名同名必须加引号，而引号段会被跳过），
- *  所以扫到就是真的写语句，不会误伤。 */
+/** These words are all reserved in SQLite and can only appear as keywords (a column with the same name must be quoted, and quoted segments are skipped),
+ *  so finding one means a real write statement, with no false positives. */
 const WRITE_VERBS = new Set([
   "insert",
   "update",
@@ -2825,8 +2834,8 @@ const WRITE_VERBS = new Set([
 ]);
 
 /**
- * 拆出语句结构：首个关键字、出现的全部关键字、以及是不是多语句。
- * 引号段（'…' / "…" / `…` / […]）与注释整段跳过——不然 SQL 里的分号和关键字会把判定带偏。
+ * Extract the statement structure: first keyword, all keywords present, and whether it is multiple statements.
+ * Quoted segments ('…' / "…" / `…` / […]) and comments are skipped whole, otherwise semicolons and keywords inside SQL would skew the decision.
  */
 function analyzeSql(sql) {
   const keywords = [];
@@ -2870,7 +2879,7 @@ function analyzeSql(sql) {
     }
     if (char === ";") {
       index += 1;
-      // 分号后面还有非空白内容 → 多语句
+      // Non-blank content after a semicolon → multiple statements
       if (sql.slice(index).replace(/[\s;]/g, "").length > 0) multiple = true;
       continue;
     }
@@ -2898,7 +2907,7 @@ function assertReadOnlySql(sql) {
   if (head === "select" || head === "values" || head === "explain") return;
 
   if (head === "with") {
-    // WITH 可以给 INSERT/UPDATE/DELETE 当前缀，得再看一遍整句有没有写动词
+    // WITH can prefix INSERT/UPDATE/DELETE, so check the whole statement again for write verbs
     if (keywords.some((word) => WRITE_VERBS.has(word))) {
       throw fail("SQLITE_SQL_NOT_READ_ONLY", "only read-only statements are allowed");
     }
@@ -2916,7 +2925,7 @@ function assertReadOnlySql(sql) {
   throw fail("SQLITE_SQL_NOT_READ_ONLY", "only select / with / values / explain are allowed");
 }
 
-/** 标识符加引号。名字一律来自我们自己读出的 schema，仍然转义一次——不给自己留例外。 */
+/** Quote an identifier. Names always come from the schema we read ourselves, but are still escaped once; no exceptions for ourselves. */
 function quoteIdent(name) {
   return `"${String(name).split('"').join('""')}"`;
 }
@@ -2932,7 +2941,7 @@ function loadSqlite() {
   return sqliteModule;
 }
 
-/** rel 路径 → { db, mtimeMs, size, usedAt }；按 mtime + 体积判断句柄是否还新鲜。 */
+/** rel path → { db, mtimeMs, size, usedAt }; mtime + size decide whether a handle is still fresh. */
 const sqliteHandles = new Map();
 
 function closeSqliteHandle(rel) {
@@ -2942,7 +2951,7 @@ function closeSqliteHandle(rel) {
   try {
     entry.db.close();
   } catch {
-    /* 关不上就算了，进程退出时会一并释放 */
+    /* If it cannot be closed, so be it; it is released when the process exits */
   }
 }
 
@@ -2956,7 +2965,7 @@ function pruneSqliteHandles() {
   }
 }
 
-/** 读文件头（默认 100 字节）——只读这么点，所以 .db 再大也能秒开。 */
+/** Read the file header (100 bytes by default); reading only that much is why even a large .db opens instantly. */
 async function readHead(abs, bytes = 100) {
   let handle = null;
   try {
@@ -2974,7 +2983,7 @@ async function readHead(abs, bytes = 100) {
 const isSqliteFile = (head) =>
   head.length >= 16 && head.subarray(0, 16).toString("latin1") === SQLITE_MAGIC;
 
-/** 100 字节头部 → 概览。页大小在偏移 16（大端 u16，值 1 表示 65536）。 */
+/** 100-byte header → overview. Page size is at offset 16 (big-endian u16, value 1 means 65536). */
 function sqliteInfo(head, size, hasWal, hasJournal) {
   const u16 = (offset) => head.readUInt16BE(offset);
   const u32 = (offset) => head.readUInt32BE(offset);
@@ -3001,7 +3010,7 @@ async function sqliteFileInfo(abs, rel, stat) {
   return sqliteInfo(head, stat.size, hasWal, hasJournal);
 }
 
-/** 拿到（必要时打开）一个只读句柄。文件在外部被改过就重开，免得看到旧结构。 */
+/** Get (opening if needed) a read-only handle. Reopen if the file changed externally, so we never see a stale schema. */
 async function sqliteHandle(relPath) {
   const { abs, rel } = await resolveInsideRoot(relPath, { mode: "read" });
 
@@ -3015,7 +3024,7 @@ async function sqliteHandle(relPath) {
   const sqlite = loadSqlite();
   if (!sqlite) throw fail("SQLITE_UNAVAILABLE", "this runtime does not provide node:sqlite");
 
-  // 闲置太久就松手：插件进程不该一直攥着别的程序的数据库文件
+  // Let go after idling too long: the plugin process should not keep holding another program's database file
   const now = Date.now();
   for (const [key, entry] of [...sqliteHandles.entries()]) {
     if (now - entry.usedAt > SQLITE_IDLE_MS) closeSqliteHandle(key);
@@ -3031,14 +3040,14 @@ async function sqliteHandle(relPath) {
   const db = new sqlite.DatabaseSync(abs, { readOnly: true });
   try {
     db.exec("pragma query_only = 1");
-    // SQLite 是懒打开：文件头合法但内容损坏时，直到第一次查询才报错。
-    // 这里先踹一脚，让失败在 open 阶段就暴露出来。
+    // SQLite opens lazily: a valid header with corrupt content only fails on the first query.
+    // Kick it here, so the failure surfaces at open time.
     db.prepare("select count(*) as n from sqlite_master").get();
   } catch (error) {
     try {
       db.close();
     } catch {
-      /* 打不开的句柄只能丢弃 */
+      /* A handle that cannot be opened can only be discarded */
     }
     if (error?.code === "ERR_SQLITE_ERROR") {
       throw fail("SQLITE_BROKEN", `SQLite could not read this file: ${error.message}`);
@@ -3067,7 +3076,7 @@ function sqliteColumns(db, objectName) {
   }));
 }
 
-/** 客户端取到的一律是字符串或 null（null 才是 SQL 的 NULL，空字符串是真的空串）。 */
+/** The client always gets strings or null (null is SQL NULL; an empty string is a real empty string). */
 function formatCell(value) {
   if (value === null || value === undefined) return null;
   if (typeof value === "string") {
@@ -3078,7 +3087,7 @@ function formatCell(value) {
   return String(value);
 }
 
-/** 用 iterate 只取需要的行——同步 API 没有中断接口，唯一能做的就是把取的行数掐死。 */
+/** Use iterate to fetch only the needed rows: the synchronous API has no interrupt, so the only option is to cap the row count. */
 function takeRows(statement, limit) {
   const rows = [];
   let truncated = false;
@@ -3146,7 +3155,7 @@ async function handleSqliteRows(payload) {
   const objects = db
     .prepare("select type, name from sqlite_master where type in ('table','view')")
     .all();
-  // 对象名绝不直接进 SQL：先在 schema 清单里核对，再拼引号
+  // Object names never go into SQL directly: check them against the schema list first, then quote
   const target = objects.find((row) => String(row.name) === requested);
   if (!target) throw fail("SQLITE_NO_SUCH_OBJECT", `no such table or view: ${requested}`);
 
@@ -3168,7 +3177,7 @@ async function handleSqliteRows(payload) {
   const order = orderBy
     ? ` ORDER BY (${quoteIdent(orderBy)} IS NULL), ${quoteIdent(orderBy)} ${direction}`
     : "";
-  const limit = pageSize + 1; // 多取一行，用来判断还有没有下一页
+  const limit = pageSize + 1; // fetch one extra row to tell whether there is a next page
 
   let statement;
   let withRowid = true;
@@ -3177,7 +3186,7 @@ async function handleSqliteRows(payload) {
       `SELECT ${ROWID}, * FROM ${quoteIdent(name)}${order} LIMIT ${limit} OFFSET ${offset}`,
     );
   } catch {
-    // 视图或 WITHOUT ROWID 表没有 rowid，退回普通取数
+    // Views and WITHOUT ROWID tables have no rowid; fall back to plain fetching
     withRowid = false;
     statement = db.prepare(`SELECT * FROM ${quoteIdent(name)}${order} LIMIT ${limit} OFFSET ${offset}`);
   }
@@ -3252,7 +3261,7 @@ async function handleSqliteQuery(payload) {
   };
 }
 
-// ── 偏好 ────────────────────────────────────────────────────────────────────
+// ── Preferences ────────────────────────────────────────────────────────────
 
 function sanitizePrefs(partial) {
   const next = { ...prefs };
@@ -3266,16 +3275,16 @@ function sanitizePrefs(partial) {
     if (typeof partial.mdPreview === "boolean") next.mdPreview = partial.mdPreview;
     if (typeof partial.csvTable === "boolean") next.csvTable = partial.csvTable;
     if (typeof partial.jsonTree === "boolean") next.jsonTree = partial.jsonTree;
-    // 表格每页行数：夹到 100–5000 并对齐到 100。视图的下拉框只提供几档固定值，
-    // 这里不跟着枚举走（main.js 不该知道视图的选项表），夹紧就够了。
+    // Table rows per page: clamped to 100–5000 and aligned to 100. The view's dropdown only offers a few fixed values;
+    // this does not follow that enumeration (main.js should not know the view's option table), clamping is enough.
     if (typeof partial.tablePageSize === "number" && Number.isFinite(partial.tablePageSize)) {
       const rounded = Math.round(partial.tablePageSize / 100) * 100;
       next.tablePageSize = Math.min(Math.max(rounded, 100), 5000);
     }
-    // 项目组里「当前在看哪个 folder root」的记忆：projectKey → 绝对路径。
-    // 只收字符串值（不做真值转换）、只收绝对路径，并保持有界（LRU，见上）。
-    // 值是不是「宿主当前给的某个 root」不在这里判——那是推导基点时的事
-    // （selectedRootOf），这里只保证形状。
+    // Memory of "which folder root is shown" in a project group: projectKey → absolute path.
+    // Only string values (no truthiness coercion), only absolute paths, kept bounded (LRU, see above).
+    // Whether a value is "a root the host currently gives" is not decided here; that happens when deriving the base
+    // (selectedRootOf); here only the shape is guaranteed.
     if (
       partial.projectRoots &&
       typeof partial.projectRoots === "object" &&
@@ -3292,8 +3301,8 @@ function sanitizePrefs(partial) {
 
 async function handlePrefsSet(payload) {
   const partial = payload?.partial;
-  // 只有动了 root 记忆才需要知道当前项目是谁（并顺手丢掉按相对路径缓存的
-  // 搜索会话与 SQLite 句柄——两个 root 下的同名相对路径不是同一个文件）。
+  // Only touching the root memory requires knowing the current project (and dropping the search sessions and
+  // SQLite handles cached by relative path along the way: the same relative path under two roots is not the same file).
   const touchesRoots = Boolean(partial && typeof partial === "object" && "projectRoots" in partial);
   let key = null;
   let previous;
@@ -3312,9 +3321,9 @@ async function handlePrefsSet(payload) {
 }
 
 async function handleHello() {
-  // 组形状（主根）+ 偏好。这里**不是**当前基点：视图按 workspace.get 的同一形状
-  // 认这个字段，基点由 prefs.projectRoots 推导（两条投递路径形状一致，
-  // 「r:<主根路径>」这个记忆键才是稳的）。
+  // Group shape (primary root) + preferences. This is **not** the current base: the view reads this field in the same shape
+  // as workspace.get, and the base is derived from prefs.projectRoots (both delivery paths have the same shape,
+  // which keeps the "r:<primary root path>" memory key stable).
   const root = await projectGroup();
   return {
     ok: true,
@@ -3325,8 +3334,8 @@ async function handleHello() {
       maxListEntries: MAX_LIST_ENTRIES,
     },
     ignoreFiles: IGNORE_FILE_NAMES,
-    // 这个运行时能不能监听：不能的话视图把「自动刷新」开关显示成不可用，
-    // 而不是让用户开了却永远没反应。
+    // Whether this runtime can watch: if not, the view shows the "Auto-refresh" switch as unavailable
+    // instead of letting the user turn it on with nothing ever happening.
     watch: { available: !isRemoteWorkspace(root) && watchSupported && fsWatchFn() !== null },
     // Older hosts may load this plugin before the built-in Browser action API exists.
     capabilities: { openHtmlInBrowser: !isRemoteWorkspace(root) && typeof pi.fs.openInBrowser === "function" },
@@ -3334,7 +3343,7 @@ async function handleHello() {
   };
 }
 
-// ── 通道路由 ────────────────────────────────────────────────────────────────
+// ── Channel routing ────────────────────────────────────────────────────────
 
 const CHANNELS = {
   "fm.hello": handleHello,
@@ -3353,8 +3362,8 @@ const CHANNELS = {
   "fm.sqlite.query": handleSqliteQuery,
   "fm.git.diff": handleGitDiff,
   "fm.watch": handleWatch,
-  // 编辑器探测与「通过…打开」（0.9.0）。前者一天只真的探一次（落盘缓存，多开共享），
-  // 后者只认探测结果里的 id，视图指定不了可执行文件。
+  // Editor detection and "Open with…" (0.9.0). The former really probes once a day (on-disk cache shared across instances),
+  // the latter only accepts ids from the detection results; the view cannot choose an executable.
   "fm.editors": handleEditors,
   "fm.openWith": handleOpenWith,
 };
@@ -3376,7 +3385,7 @@ async function onPanelInvoke(channel, payload) {
   }
 }
 
-// ── 生命周期 ────────────────────────────────────────────────────────────────
+// ── Lifecycle ──────────────────────────────────────────────────────────────
 
 async function onLoad() {
   try {
@@ -3388,7 +3397,7 @@ async function onLoad() {
     const settings = await pi.plugin.getSettings();
     prefs = sanitizePrefs(settings?.fmPrefs ?? {});
   } catch {
-    /* 保持默认 */
+    /* Keep the defaults */
   }
 }
 
@@ -3396,9 +3405,9 @@ async function onUnload() {
   searchSessions.clear();
   for (const key of [...sqliteHandles.keys()]) closeSqliteHandle(key);
   invalidateGitSnapshots();
-  // 监听必须随插件一起走：漏关就是一只挂在别人项目上的眼睛（而且是 persistent 的）。
+  // The watcher must go with the plugin: leaking it leaves an eye on someone else's project (and a persistent one at that).
   stopWatching();
-  // 编辑器探测的内存缓存跟着插件走；落盘的 editors.json 留着（今天之内别的实例还能用）。
+  // The in-memory editor detection cache goes with the plugin; the on-disk editors.json stays (other instances can use it today).
   editorCache = null;
   editorProbe = null;
 }
@@ -3407,8 +3416,8 @@ module.exports = {
   onLoad,
   onUnload,
   onPanelInvoke,
-  // 纯解析函数：verify-git.mjs 直接拿它们单测（porcelain / numstat / unified
-  // diff 的形态很容易在 git 升级时悄悄变一次，解析必须能被断言）。
+  // Pure parsing functions: verify-git.mjs unit-tests them directly (the porcelain / numstat / unified
+  // diff forms can quietly change with a git upgrade, so parsing must be assertable).
   internals: {
     parsePorcelainV1,
     classifyRecord,
@@ -3421,16 +3430,16 @@ module.exports = {
     GIT_SNAPSHOT_TTL_MS,
     MAX_DIFF_LINES,
     MAX_UNTRACKED_DIFF_BYTES,
-    // 监听（0.8.0）的纯判定：噪声过滤与自己写入的抑制，verify-watch.mjs 直接断言。
+    // Pure watch decisions (0.8.0): noise filtering and own-write suppression, asserted directly by verify-watch.mjs.
     isWatchIgnored,
     isSelfWrite,
     noteSelfWrite,
     WATCH_DEBOUNCE_MS,
     SELF_WRITE_SUPPRESS_MS,
     WATCH_HISTORY_LIMIT,
-    // 编辑器探测（0.9.0）：输出形态与缓存判定都是纯函数，verify-editors.mjs 直接断言
-    // （注册表 / shell 命令行 / PATH 候选名这几种文本解析错了，菜单里就会多出一个
-    // 点了没反应的编辑器，甚至漏掉机器上真实存在的那个）。
+    // Editor detection (0.9.0): output shapes and cache decisions are pure functions, asserted directly by verify-editors.mjs
+    // (if parsing of the registry / shell command line / PATH candidate names went wrong, the menu would gain an
+    // editor that does nothing when clicked, or miss one that really exists on the machine).
     parseAppPathsRegistry,
     parseStartMenuRegistry,
     executableFromCommand,

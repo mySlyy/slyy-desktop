@@ -33,12 +33,12 @@ pub(crate) fn valid_header_key(key: &str) -> bool {
 }
 
 /// Fold the fullwidth block (U+FF01–U+FF5E) and the ideographic space (U+3000)
-/// onto ASCII. This is what a Chinese/Japanese IME or a fullwidth-formatted
-/// page produces for plain ASCII — `０` is U+FF10 — so folding it back is the
-/// user's intent, not a rewrite of it.
+/// onto ASCII. This is what a CJK IME or a fullwidth-formatted page produces
+/// for plain ASCII (the fullwidth digit zero is U+FF10), so folding it back is
+/// the user's intent, not a rewrite of it.
 ///
 /// Deliberately not a full NFKC pass: NFKC would also turn halfwidth katakana
-/// `ｱ` into U+30A2 and emit combining marks, replacing one unusable value with
+/// U+FF71 into U+30A2 and emit combining marks, replacing one unusable value with
 /// another. Mirrors `foldFullwidthHeaderValue` in `@pi-desktop/shared`.
 pub(crate) fn fold_fullwidth(value: &str) -> String {
     value

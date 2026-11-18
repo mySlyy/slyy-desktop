@@ -17,7 +17,7 @@ type HeaderPreset = {
 };
 
 const HEADER_PRESETS: HeaderPreset[] = [
-  { key: "User-Agent", value: `pi-desktop/${APP_VERSION}` },
+  { key: "User-Agent", value: `slyy/${APP_VERSION}` },
   { key: "X-Client-Name", value: "Slyy" },
   { key: "X-Title", value: "Slyy" },
 ];

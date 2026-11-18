@@ -11,7 +11,7 @@ const noPath = () => null;
 
 test("Word text wins over generated image representations", () => {
   assert.equal(
-    preferClipboardText("  Word paragraph\n中文  ", [image()], noPath),
+    preferClipboardText("  Word paragraph\n\u4e2d\u6587  ", [image()], noPath),
     true,
   );
   assert.equal(preferClipboardText("text", [image(), image()], noPath), true);

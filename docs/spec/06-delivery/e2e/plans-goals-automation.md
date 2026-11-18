@@ -98,11 +98,11 @@ being fetched on every subsequent poll.
 - **Status:** Automated in `node scripts/e2e-scheduled.mjs`; run against the
   request candidate per AGENTS.md, with tested head and base recorded.
 
-### Scheduled execution-status wording (English / Simplified Chinese)
+### Scheduled execution-status wording (English / German)
 
 - Open Scheduled with a normally ended session whose transcript reports that
   the requested work could not be completed. Verify that the rail, history and
-  selected-run header say **Session ended** / **会话已结束**, not unqualified
+  selected-run header say **Session ended** (and its German catalog equivalent), not unqualified
   task completion. The history hint states that session completion does not
   confirm task success and asks the reader to verify task evidence.
 - Running, interrupted and error labels also identify the session. No task
@@ -315,7 +315,7 @@ being fetched on every subsequent poll.
 
 ## E2E-117: Agent/Plan/Goal UX and locales contain no Chat controls
 
-- **Preconditions**: App can run in English and zh-CN with an idle session,
+- **Preconditions**: App can run in English and German with an idle session,
   Plan artifact fixture, shell settings, and global search's Commands section
   available.
 - **Steps**: 1) Inspect Agent/Plan/Goal, permission, artifact approval, and shell
@@ -335,7 +335,7 @@ being fetched on every subsequent poll.
   prompt dispatch fails, confirm the complete draft remains editable. 5) Reload
   after a terminal proposal and inspect the session while asserting that
   Electron Main and Host process identities did not change. 6) Repeat in
-  zh-CN. 7) Search visible commands for the removed Chat mode and
+  German. 7) Search visible commands for the removed Chat mode and
   request-changes controls. Host/app restart recovery is exercised separately
   by E2E-108 and E2E-109.
 - **Expected**: Agent is the default; the left-of-input Composer chip is the
@@ -362,7 +362,7 @@ being fetched on every subsequent poll.
   `test:e2e:plan-ui` uses an env-gated Electron Main probe against the existing
   Host, asserts stable Electron/Host PIDs, covers pending restore, live terminal
   controls, rejected and approved/completed terminal-card absence after
-  renderer reload, EN/zh-CN, and 1280×800 / 900×700 rendering. E2E-108/E2E-109
+  renderer reload, EN and DE (case `E2E-117-de`), and 1280×800 / 900×700 rendering. E2E-108/E2E-109
   cover Host restart interruption, stale-action rejection, and no replay.
 
 ## E2E-146a: Approved Plan/Goal progress text continues once
@@ -505,7 +505,7 @@ being fetched on every subsequent poll.
 
 ## E2E-PLAN-005: Plan-mode plugin tools with `planSafeActions` are read-only (D384)
 
-- **Preconditions**: PI-Desktop is built with the bundled Browser
+- **Preconditions**: Slyy is built with the bundled Browser
   plugin (`pi.browser`) enabled and a workspace that exposes one
   http(s) URL the planner can reach. The catalog list is the default
   bundled one; no third-party plugin needs to be installed for this
@@ -618,7 +618,7 @@ preload, API normalization, store events, ToolRow, and Markdown renderer.
 3. Complete execution, submit/reject a revision, and read both newest/older
    pages: retain both exact bodies and statuses, mark only the older Plan
    superseded, and leave unrelated sessions/Goal untouched.
-4. Submit/reject Goal and check localized Chinese status.
+4. Submit/reject Goal and check localized German status.
 5. Continue chat, append a compaction checkpoint, restart host and renderer:
    both versions remain readable; no historical card has approval controls.
 
@@ -664,7 +664,7 @@ compaction injection.
   Stop it, and verify no further continuation. Restored transcript assistant
   rows retain distinct turn ids and contain only the two actual user inputs.
 - `scripts/e2e-goal-layout.mjs` renders the production run status bar with
-  the built stylesheet in isolated Electron. Check English/Chinese layouts at
+  the built stylesheet in isolated Electron. Check English/German layouts at
   320, 480, 720 and 1120 pixels, long objectives/day durations, metadata order,
   and nonoverlap. Duration uses `d`, `h`, `m`, `s`
   with exactly one ASCII space after each number, including `0 s`, in both

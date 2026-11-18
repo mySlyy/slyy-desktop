@@ -37,21 +37,20 @@ test("the first prompt becomes an immediate title, collapsed and capped", () => 
   assert.equal(promptFallbackSessionTitle("  Fix\n the\tlogin  ", "New task"), "Fix the login");
   assert.equal(promptFallbackSessionTitle("p".repeat(60), "New task"), "p".repeat(48));
   assert.equal(promptFallbackSessionTitle("   ", "New task"), "New task");
-  assert.equal(promptFallbackSessionTitle("界".repeat(60), "New task"), "界".repeat(48));
+  // Non-ASCII titles are capped by code point, not split (U+754C).
+  assert.equal(promptFallbackSessionTitle("\u754C".repeat(60), "New task"), "\u754C".repeat(48));
 });
 
 test("the fallback only fires for a still-untitled session the owning host can title", () => {
   assert.equal(isDefaultSessionTitle(promptFallbackSessionTitle("Fix login", "New task")), false);
   assert.equal(isDefaultSessionTitle(untitledTaskTitle()), true);
   // A placeholder is recognized in every shipped locale, not just the active one.
-  for (const placeholder of [
-    "새 작업",
-    "新建任務",
-    "Tarefa sem título",
-    "Yeni görev",
-    "New chat",
-  ]) {
+  for (const placeholder of ["New task", "New chat", "Neue Aufgabe", "Neuer Chat"]) {
     assert.equal(isDefaultSessionTitle(placeholder), true, placeholder);
+  }
+  // Labels of removed upstream locales are ordinary titles now.
+  for (const title of ["Nueva tarea", "Nouvelle t\u00E2che", "\u65B0\u5EFA\u4EFB\u52A1"]) {
+    assert.equal(isDefaultSessionTitle(title), false, title);
   }
   assert.match(queueSlice, /isDefaultSessionTitle\(current\?\.title\)/);
   assert.match(queueSlice, /current\?\.source !== "pi-native"/);
@@ -134,8 +133,8 @@ test("the German placeholders are recognized as default titles (#1755)", async (
   // through to_lowercase so a non-ASCII uppercase letter cannot slip past.
   assert.match(
     host,
-    /"neue aufgabe",\s*\n\s*"nouvelle tâche",\s*\n\s*"nueva tarea",\s*\n\s*"neuer chat",\s*\n\s*"nuevo chat",\s*\n\s*"nouvelle discussion",/,
-    "PLACEHOLDER_TITLES must carry the German, French and Spanish labels for both keys",
+    /"new task",\s*"new chat",\s*"neue aufgabe",\s*"neuer chat"/,
+    "PLACEHOLDER_TITLES must carry the English and German labels for both keys",
   );
   assert.match(
     host,

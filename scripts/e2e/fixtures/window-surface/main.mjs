@@ -16,7 +16,7 @@ const { applyMainWindowBackground, mainWindowBackgroundOptions } = await import(
 
 const radius = Number(process.env.PI_DESKTOP_SURFACE_RADIUS);
 const backdropColor = process.env.PI_DESKTOP_SURFACE_BACKDROP;
-const title = "PI Desktop Surface Candidate";
+const title = "Slyy Surface Candidate";
 let backdropWindow;
 let mainWindow;
 let host;

@@ -185,9 +185,9 @@ matching turn boundary and `turn-process-header.test.mjs` the rendered labels.
 
 ## E2E-024F: Refresh the official marketplace catalog
 
-- **Preconditions**: Network available to `plugins.aiuo.net`.
+- **Preconditions**: Network available to `hub.slyy.ai`.
 - **Steps**: 1) Open Extensions → Marketplace. 2) Use the header Refresh marketplace action. 3) Confirm the official catalog refreshes and the card grid updates.
-- **Expected**: The marketplace uses `plugins.aiuo.net/catalog.json`; the page has no source selector; the cached official catalog remains available if refresh fails.
+- **Expected**: The marketplace uses `hub.slyy.ai/catalog.json`; the page has no source selector; the cached official catalog remains available if refresh fails.
 - **Specs linked**: `07-plugins/07-plugin-marketplace.md`
 - **Acceptance**: G (remote marketplace source)
 - **Status**: Documented / host-core unit covered
@@ -196,7 +196,7 @@ matching turn boundary and `turn-process-header.test.mjs` the rendered labels.
 
 - **Preconditions**: Profiles can be seeded with legacy `pluginMarketSource` values `github`, `mirror`, and `custom`, including a custom URL. Network or a local request stub is available for the official catalog.
 - **Steps**: 1) Start the app with each seeded profile. 2) Open Extensions → Marketplace and refresh. 3) Inspect the catalog request. 4) Install a published plugin from the marketplace.
-- **Expected**: The page has no source controls; every profile requests `https://plugins.aiuo.net/catalog.json` and ignores the persisted source and custom URL; install uses the official platform resolve path, with the official catalog URL as the verified fallback; legacy settings remain readable and require no migration.
+- **Expected**: The page has no source controls; every profile requests `https://hub.slyy.ai/catalog.json` and ignores the persisted source and custom URL; install uses the official platform resolve path, with the official catalog URL as the verified fallback; legacy settings remain readable and require no migration.
 - **Specs linked**: `07-plugins/07-plugin-marketplace.md` §2
 - **Acceptance**: G (remote marketplace source)
 - **Status**: Documented / host-core unit covered
@@ -321,8 +321,8 @@ matching turn boundary and `turn-process-header.test.mjs` the rendered labels.
 ## E2E-024D: Isolated plugin panel host bridge
 
 - **Preconditions**: Plugin with `ui.panel` enabled.
-- **Steps**: 1) Set the app language to English and open a panel whose manifest declares localized `ui.title.en` and `ui.title.zh-CN`; confirm the native window/launcher identity remains available without a host-rendered title. 2) Set the app language to Simplified Chinese and reopen the panel; confirm the panel content remains plugin-owned. 3) While the panel stays open, switch the app language to Korean and confirm the live `appearance:changed` event updates the panel controls, safe-area reminder, and accessible labels without reopening it. 4) Open the panel on macOS, Windows, and Linux; confirm the same frameless 46px drag band, fixed top-right capsule fully contained inside that band, and exactly three accessible controls. 5) Exercise minimize, maximize, restore, close, keyboard focus, light/dark themes, page-defined light/dark backgrounds, and reduced motion on every platform. 6) Render a plugin-owned titlebar/toolbar; verify fixed/sticky UI uses `--pi-plugin-titlebar-height`, its interactive controls use `no-drag`, and clicks outside the capsule in the top 46px are treated as window dragging. 7) On Windows with classic scrollbars, scroll a panel with content overflow and inspect the right edge. 8) Open a development plugin and confirm the localized reminder explains that the top 46px is not clickable outside the capsule. 9) Reopen a minimized panel. 10) Invoke panel bridge APIs (`ui.showToast`, optional fs/net with grants). 11) Close the panel from the capsule and by disabling or uninstalling the plugin. 12) Repeat with a panel and a docked work-panel view open and quit the app, then read the main-process log.
-- **Expected**: Panel runs in its sandboxed window/partition; all three platforms use one host-owned frameless chrome contract with no native traffic lights, host-rendered title, or application menu; the top drag band is exactly 46px, and the minimal capsule stays fixed at the top-right without exceeding it. The capsule contains minimize/maximize-or-restore/close, follows the plugin page's surface/text colors, and never forces a black surface onto a light page. A v2 page marked `pi-plugin-chrome` uses `--pi-plugin-titlebar-height` and starts its own content directly below the 46px band without an additive duplicate spacer; a legacy page keeps the compatibility offset. A panel's stable scrollbar gutter is scoped to its actual content scroller; Windows does not show a second root-level empty side rail outside the page surface. The plugin owns its title and toolbar; the host drag strip remains usable, blocks clicks outside the capsule, and development panels alone show the reminder. Reopening restores the existing panel; switching to Korean while the panel remains open updates the host capsule, reminder, and accessible labels in place; bridge calls remain permission-checked and the host remains stable on panel close. Closing a panel must not throw a main-process `TypeError: Object has been destroyed` or show an uncaught-exception dialog, and neither closing a panel nor quitting with panels and docked views open may log a panel-bridge failure for the page that is closing: a call from a page that is already gone is settled, and the panel and view pages are gone before the plugin runtime and the host stop.
+- **Steps**: 1) Set the app language to English and open a panel whose manifest declares localized `ui.title.en` and `ui.title.zh-CN` (the plugin contract locales); confirm the native window/launcher identity remains available without a host-rendered title. 2) Set the app language to German and reopen the panel; confirm the panel content remains plugin-owned. 3) While the panel stays open, switch the app language back to English and confirm the live `appearance:changed` event updates the panel controls, safe-area reminder, and accessible labels without reopening it. 4) Open the panel on macOS, Windows, and Linux; confirm the same frameless 46px drag band, fixed top-right capsule fully contained inside that band, and exactly three accessible controls. 5) Exercise minimize, maximize, restore, close, keyboard focus, light/dark themes, page-defined light/dark backgrounds, and reduced motion on every platform. 6) Render a plugin-owned titlebar/toolbar; verify fixed/sticky UI uses `--pi-plugin-titlebar-height`, its interactive controls use `no-drag`, and clicks outside the capsule in the top 46px are treated as window dragging. 7) On Windows with classic scrollbars, scroll a panel with content overflow and inspect the right edge. 8) Open a development plugin and confirm the localized reminder explains that the top 46px is not clickable outside the capsule. 9) Reopen a minimized panel. 10) Invoke panel bridge APIs (`ui.showToast`, optional fs/net with grants). 11) Close the panel from the capsule and by disabling or uninstalling the plugin. 12) Repeat with a panel and a docked work-panel view open and quit the app, then read the main-process log.
+- **Expected**: Panel runs in its sandboxed window/partition; all three platforms use one host-owned frameless chrome contract with no native traffic lights, host-rendered title, or application menu; the top drag band is exactly 46px, and the minimal capsule stays fixed at the top-right without exceeding it. The capsule contains minimize/maximize-or-restore/close, follows the plugin page's surface/text colors, and never forces a black surface onto a light page. A v2 page marked `pi-plugin-chrome` uses `--pi-plugin-titlebar-height` and starts its own content directly below the 46px band without an additive duplicate spacer; a legacy page keeps the compatibility offset. A panel's stable scrollbar gutter is scoped to its actual content scroller; Windows does not show a second root-level empty side rail outside the page surface. The plugin owns its title and toolbar; the host drag strip remains usable, blocks clicks outside the capsule, and development panels alone show the reminder. Reopening restores the existing panel; switching back to English while the panel remains open updates the host capsule, reminder, and accessible labels in place; bridge calls remain permission-checked and the host remains stable on panel close. Closing a panel must not throw a main-process `TypeError: Object has been destroyed` or show an uncaught-exception dialog, and neither closing a panel nor quitting with panels and docked views open may log a panel-bridge failure for the page that is closing: a call from a page that is already gone is settled, and the panel and view pages are gone before the plugin runtime and the host stop.
 - **Specs linked**: `03-runtime/01-ipc-protocol.md`, `04-ux/07-ui-design-system.md`, `07-plugins/01-plugin-system.md`, `07-plugins/03-plugin-api.md`, `07-plugins/04-plugin-security.md`, `07-plugins/12-plugin-ipc-and-host-services.md`, ADR 0081, ADR 0082, ADR 0092, ADR 0093
 - **Acceptance**: G (isolated panel)
 - **Status**: Documented
@@ -609,8 +609,8 @@ window; opening a normal panel afterward must still work.
 
 ## E2E-024X: Page copy stays concise in both locales
 
-- **Preconditions**: App running with English and Simplified Chinese available; project archive, Scheduled, Extensions, and Agent capability destinations are reachable.
-- **Steps**: 1) Open each destination in English and inspect its header, toolbar, empty state, and primary action. 2) Switch to 简体中文 and repeat. 3) Trigger a permission, validation, destructive-action, or provider-error state.
+- **Preconditions**: App running with English and German available; project archive, Scheduled, Extensions, and Agent capability destinations are reachable.
+- **Steps**: 1) Open each destination in English and inspect its header, toolbar, empty state, and primary action. 2) Switch to Deutsch and repeat. 3) Trigger a permission, validation, destructive-action, or provider-error state.
 - **Expected**: Page headers do not repeat their title as explanatory subtitles; empty states use a concise title and action, with body text only when context or a required next step is necessary. Settings and capability pages omit prose that only explains obvious controls. Permission, security, validation, destructive-action, keyboard, scope, and error details remain visible in both locales.
 - **Specs linked**: `04-ux/01-ui-ia.md`, `04-ux/07-ui-design-system.md`
 - **Acceptance**: Quality (concise page copy)
@@ -691,7 +691,7 @@ window; opening a normal panel afterward must still work.
   - The lone `Task` in step 2 draws the same card with a single delegate node —
     same root, connector, outcome, runtime and step count — and never the
     compact one-line tool row (D265). Its aggregate line is worded for one
-    subagent, so no locale reads "1 个 Subagents" or "Subagents working".
+    subagent, so no locale reads "1 Subagents" or "Subagents working".
   - The expanded card shows one main-agent root connected to `scout` and
     `pinned` in parent-row order, with no invented edge between delegates. Each
     node shows its agent, short description, explicit outcome, duration and step
@@ -937,7 +937,7 @@ window; opening a normal panel afterward must still work.
   6. In the first project's session, narrow the skill to the *second* project
      and immediately ask the agent to invoke it.
   7. Paste a body over 128 KB.
-  8. Switch the app language to 中文 and revisit every surface above.
+  8. Switch the app language to Deutsch and revisit every surface above.
 - **Expected**:
   - Saving without a description is refused with a message naming the field:
     the description is the only part that enters the prompt.
@@ -949,7 +949,7 @@ window; opening a normal panel afterward must still work.
   - Step 6 fails in the already-open session too — the scope is re-read when the
     body is loaded, not trusted from the catalog that listed it.
   - The byte counter warns before the 128 KB cap and the save is refused past it.
-  - Every label, empty state, error and count renders in Chinese, with counts
+  - Every label, empty state, error and count renders in German, with counts
     reading naturally at 0, 1 and many.
 - **Specs linked**: `07-plugins/01-plugin-system.md` §12.3,
   `03-runtime/01-ipc-protocol.md` §12b, `08-meta/decisions-log.md` (D174, D192,
@@ -1064,21 +1064,23 @@ window; opening a normal panel afterward must still work.
 
 ## E2E-120: Global plugin launch, next-turn editing, and stopped throughput
 
-- **Preconditions**: Install and enable a panel plugin whose Chinese display
-  name is `无限画布`, plus a second panel plugin (for example `邮件助手`).
+- **Preconditions**: Install and enable a panel plugin whose display name is
+  Chinese ("Infinite Canvas" in Chinese, pinyin `wuxianhuabu`, initials
+  `wxhb`), plus a second panel plugin (for example `Mail Assistant`).
   Configure a provider that streams slowly enough to stop a partial answer. Run
   once on macOS and once on Windows.
 - **Steps**:
-  1. Immediately after PI-Desktop finishes booting, leave it unfocused and press
+  1. Immediately after Slyy finishes booting, leave it unfocused and press
      Option+Space on macOS or Alt+Space on Windows while another application
      owns the foreground window. Confirm the first invocation promptly reveals
      a fully rendered, centered launcher on the pointer's display without a
      blank initialization frame, native close, minimize, maximize, resize, or
      taskbar controls. Confirm Windows does not show the active application's
      system menu.
-  2. Search separately for `无限`, `wuxianhuabu`, and `wxhb`. Use Up/Down and
-     Enter for one run and click for another; confirm the existing plugin panel
-     opens. Confirm Chinese IME candidate Enter does not open a result.
+  2. Search separately for the first two characters of its Chinese name,
+     `wuxianhuabu`, and `wxhb`. Use Up/Down and Enter for one run and click for
+     another; confirm the existing plugin panel opens. Confirm an IME
+     candidate Enter does not open a result.
   3. Open the launcher again with an empty query and confirm the plugin opened
      in step 2 is the first result. Open the other panel plugin, then reopen
      the launcher and confirm the two plugins appear in reverse opening order.
@@ -1545,11 +1547,9 @@ window; opening a normal panel afterward must still work.
      the editor, expand Advanced, and confirm the model field renders an
      empty state with an action button instead of a free-text input, and that
      the action opens Models.
-  7. Switch the locale to Simplified Chinese. Confirm the preset chips
-     render the translated names (`探索者`, `代码审查员`, `测试执行者`,
-     `修复者`, `空白开始`) and the picker labels (`沿用当前会话的模型`,
-     `前往模型设置`) resolve; no raw i18n keys appear in
-     either locale.
+  7. Switch the locale to German. Confirm the preset chips render the German
+     catalog names (for example `Code-Reviewer`) and the model picker labels
+     resolve; no raw i18n keys appear in either locale.
 - **Expected**: The editor offers only models the user already configured, so
   the picker is the only way to set a model and every saved pin is resolvable.
   No free-text model id is accepted. When no provider offers a runnable model
@@ -1778,7 +1778,7 @@ window; opening a normal panel afterward must still work.
 - **Specs linked**: `03-runtime/02-agent-runtime.md` §5f, ADR 0279
 - **Acceptance**: C (conversation), Quality
 - **Milestone**: M6+
-- **Not covered (二期)**: reviving a `stopped`/`aborted` delegation, in-chain
+- **Not covered (phase two)**: reviving a `stopped`/`aborted` delegation, in-chain
   compaction, task queuing, and cross-session resumption.
 - **Status**: Draft — chain resolution, resume validation, the reusable list, and
   transcript chain grouping are unit/regression covered
@@ -1867,7 +1867,7 @@ window; opening a normal panel afterward must still work.
   2. Repeat for the definition that declares the two alternatives, recording
      which alternatives the transport is actually asked for.
   3. Repeat with every alternative at the same small window.
-  4. Read the delegation card and the report in English and in Chinese.
+  4. Read the delegation card and the report in English and in German.
   5. Continue the parent turn, then send a new prompt.
 - **Expected**: The run fails with `SUBAGENT_CONTEXT_OVERFLOW`, not retriable,
   and what the parent reads names what it can change — narrow the task,
@@ -1935,12 +1935,13 @@ window; opening a normal panel afterward must still work.
   third delegate reusing the `explorer` definition, call `TaskList`, and read
   the summary. 4) Stop a running delegate and inspect the `TaskStop` row.
   5) Confirm the delegation card's own subagent count is unchanged by all three
-  lifecycle rows. 6) Repeat in Chinese.
+  lifecycle rows. 6) Repeat in German.
 - **Expected**: Every lifecycle row summarizes by agent name — never by its
   `delegationIds` argument, and no bare UUID appears in a collapsed row. Its
   badge uses the shared subagent status vocabulary: running while any member
-  runs, `Failed` / “失败” once a member failed even though a sibling completed,
-  and `Stopped by request` / “已按请求停止” for the stopped delegate — including
+  runs, `Failed` / `Fehlgeschlagen` once a member failed even though a sibling
+  completed, and `Stopped by request` / `Gestoppt durch Anfrage` for the
+  stopped delegate — including
   when the persisted `TaskStop` snapshot still says `running`. The topology
   card's node matches that stopped outcome and is not labelled working after
   the turn ends. A repeated
@@ -2114,11 +2115,11 @@ window; opening a normal panel afterward must still work.
   reported provider usage after this build. Settings is reachable. Plugin
   `pi.token-insights` may be installed.
 - **Steps**: 1) Complete a turn that also settled a subagent. 2) Open
-  Settings. 3) Search settings for "tokens" / "用量". 4) Open Token Insights
-  from the command palette (`usage` / `用量`). 5) Confirm the transcript
+  Settings. 3) Search settings for "tokens" and "usage". 4) Open Token Insights
+  from the command palette (`usage`). 5) Confirm the transcript
   assistant chip.
 - **Expected**:
-  - The rail has no Usage / 用量 destination. Preferences is General, AI,
+  - The rail has no Usage destination. Preferences is General, AI,
     Shortcuts.
   - Settings search does not surface a usage tab.
   - `stats.getTokenUsageHistory` still returns completed-turn totals that
@@ -2126,7 +2127,7 @@ window; opening a normal panel afterward must still work.
   - The assistant chip under the transcript still shows parent-only provider
     usage.
   - Token Insights is the heatmap / KPI dashboard. When the plugin is
-    installed, PI-Desktop remainders from the host turns table appear there
+    installed, Slyy remainders from the host turns table appear there
     without rewriting `message.usage`.
 - **Specs linked**: `04-ux/06-settings-ia.md`,
   `03-runtime/01-ipc-protocol.md`, `03-runtime/06-host-rpc-protocol.md`,
@@ -2172,7 +2173,7 @@ window; opening a normal panel afterward must still work.
 
 ## E2E-189: Bundled Advisor plugin is temporarily unavailable
 
-- **Preconditions**: A packaged or development build of PI-Desktop.
+- **Preconditions**: A packaged or development build of Slyy.
 - **Steps**:
   1. Inspect the bundled plugin resources and confirm `pi.advisor` is absent.
   2. Open the command palette and plugin settings. Confirm `/advisor`, the
@@ -2358,7 +2359,7 @@ window; opening a normal panel afterward must still work.
 
 ## E2E-220: Local MCP control drives a running desktop
 
-- **Preconditions**: Start PI-Desktop with
+- **Preconditions**: Start Slyy with
   `PI_DESKTOP_MCP_CONTROL=1` and a clean profile. A local project directory is
   available, the Electron user-data directory is writable, and the desktop
   has completed backend boot.
@@ -2367,7 +2368,8 @@ window; opening a normal panel afterward must still work.
   `pi_project_open` with the fixture project. 4) Call `pi_session_create`,
   `pi_session_get`, and `pi_agent_status`. 5) Call `pi_agent_prompt` and
   observe the existing desktop session-change event select the target session.
-  6) Call `pi_desktop_invoke` for a reviewed read operation. 7) Attempt
+  6) Call `slyy_invoke` for a reviewed read operation, then the same call as
+  `pi_desktop_invoke` and with an `X-Slyy-Token` header. 7) Attempt
   `pi_session_delete` and `pi_session_configure` without confirmation, then
   repeat with `confirm: true`. 8) Stop the app and inspect the manifest.
 - **Expected**: An unauthenticated request receives 401; `initialize` with an
@@ -2380,7 +2382,10 @@ window; opening a normal panel afterward must still work.
   native-picker channels are absent from `pi_control_describe`; secret-shaped
   fields are stripped; the endpoint binds loopback only; disallowed Origins and
   unsupported protocol version headers are rejected; and the manifest changes
-  to `active: false` on shutdown.
+  to `active: false` on shutdown. The manifest names server `slyy`;
+  `tools/list` lists `slyy_invoke` only, while the `pi_desktop_invoke` alias
+  and the `X-Slyy-Token` / `X-Pi-Desktop-Token` headers authenticate and
+  behave identically.
 - **Specs linked**: `02-architecture/01-architecture.md`,
   `03-runtime/01-ipc-protocol.md`, `05-security/01-security.md`, ADR 0203,
   D370, D372
@@ -2392,7 +2397,7 @@ window; opening a normal panel afterward must still work.
 
 ## E2E-MCP-session-get-projects-large-compaction
 
-- **Preconditions**: Start PI-Desktop with `PI_DESKTOP_MCP_CONTROL=1`. A durable
+- **Preconditions**: Start Slyy with `PI_DESKTOP_MCP_CONTROL=1`. A durable
   session exists whose `session.compaction` record (`summary` / `retainedTail` /
   `details.modifiedFiles`) alone serializes to more than the 512 KiB MCP result
   limit. A second durable session exists whose `session.compactions` history
@@ -2893,15 +2898,15 @@ plugin-form fixtures in an isolated temporary directory at runtime.
 - **Preconditions**: The desktop app is running with a project, a chat error,
   toast, update notice, dialog, sidebar row, pull request, and work-panel file
   available as applicable; the UI language can be changed between English and
-  Simplified Chinese.
+  German.
 - **Steps**: 1) Hover each icon-only action in the error, toast/update,
   dialog, capability search, sidebar, pull-request, and file-viewer surfaces.
   2) Focus the same controls with the keyboard. 3) Repeat after switching the
-  UI language to Simplified Chinese.
+  UI language to German.
 - **Expected**: Each control exposes a localized action purpose on hover and
   focus, has the same localized accessible name, and does not expose a raw icon
   name or URL as its action label. Decorative icons remain silent to assistive
-  technology. English and Simplified Chinese show different catalog values.
+  technology. English and German show different catalog values.
 - **Specs linked**: `04-ux/08-component-spec.md`,
   `04-ux/09-interaction-patterns.md`
 - **Acceptance**: Accessibility, Quality
@@ -2980,40 +2985,21 @@ plugin-form fixtures in an isolated temporary directory at runtime.
 - **Milestone**: M6+
 - **Status**: Rendered desktop journey Draft
 
-## E2E-255: An ideographic comma opens the slash menu
+## E2E-255: An ideographic comma no longer opens the slash menu
 
-- **Preconditions**: A Chinese IME is available, the composer draft is empty,
-  and at least one slash entry exists (builtin alias, template, plugin command,
-  or Skill).
-- **Steps**:
-  1. With the draft empty, compose `、`, inspect the pre-edit text, then commit.
-  2. Continue typing a command name and accept the highlighted row.
-  3. Type a draft that contains `、` between other characters.
-  4. Send a draft whose first character was typed as `、` without accepting any
-     row.
-  5. Cancel a composition, then type `/` again. Also delete text after a
-     dropped `compositionend` and confirm the slash menu still reopens.
-- **Expected**: The committed `、` is rewritten to `/` in place, the ordinary
-  slash menu opens with the same filtering and keyboard behavior as a typed
-  `/`, and the caret stays after the substituted character. A `、` anywhere
-  later in the draft stays untouched text, and the `@` file menu never reacts
-  to the mark. Pre-edit `、` remains unchanged until commit; the result is `/`,
-  never `/、`. Ordinary Chinese composition and punctuation in existing drafts
-  remain unchanged. Cancelling leaves a blank draft, and replacing the draft
-  releases the old composition's empty-draft origin.
+- **Preconditions**: An IME that commits the ideographic comma (U+3001) is
+  available and the composer draft is empty.
+- **Steps**: 1) With the draft empty, commit U+3001 as the first character.
+  2) Type `/` in an empty draft.
+- **Expected**: The committed U+3001 stays ordinary draft text and no slash menu
+  opens; only a typed `/` opens the slash menu.
 - **Specs linked**: `04-ux/04-builtin-commands.md` (§9),
-  `04-ux/08-component-spec.md` (§11), `08-meta/decisions-log.md` (D405),
-  ADR 0024, ADR 0231
-- **Acceptance**: C (conversation & stream), Localization, Quality
+  `08-meta/decisions-log.md` (D405), ADR 0024, ADR 0231
+- **Acceptance**: C (conversation & stream), Quality
 - **Milestone**: M2
-- **Status**: Partially automated. Unit coverage:
-  `packages/shared/src/composer-trigger.test.ts`,
-  `apps/desktop/test/composer-ime.test.mjs`. Rendered Electron coverage:
-  `node scripts/e2e-composer-ime-stack.mjs` mounts the production input, draft,
-  and completion components, drives Chromium composition through CDP, and
-  covers alias commit, ordinary Chinese text, cancellation, draft replacement,
-  completion acceptance, and lost-end recovery. Sending and a physical OS IME
-  candidate window remain manual checks.
+- **Status**: Removed in Slyy (2026-11-18): the Chinese-IME ideographic-comma
+  slash alias of ADR 0231 was withdrawn with the Chinese locale; the upstream
+  scenario remains in git history.
 
 ## E2E-CLONE-accepts-a-lan-remote-and-rejects-metadata
 
@@ -3306,7 +3292,7 @@ plugin-form fixtures in an isolated temporary directory at runtime.
   category and hover or keyboard-focus a provider tile. 3) Select the provider,
   enter a fixture key, and save. 4) Reopen Add provider and search the remaining
   entry by category, provider name, introduction, endpoint, and model ID. 5)
-  Change the app language between English and Simplified Chinese and reopen the
+  Change the app language between English and German and reopen the
   chooser. 6) Load a manifest with malformed localized category/description
   fields, an empty category/description, and values over their length limits.
 - **Expected**: Step 1 groups unconfigured API-key contributions under the
@@ -3469,8 +3455,8 @@ plugin-form fixtures in an isolated temporary directory at runtime.
 
 ## E2E-PLUGIN-official-channel-resolves-through-the-platform: An official-channel install uses platform mirrors when resolve answers promptly
 
-- **Preconditions**: A clean profile on the official channel, a plugin present in `plugins.aiuo.net/catalog.json`, and a request log for the platform and both mirror hosts (a local stub may stand in for each).
-- **Steps**: 1) Open Extensions → Marketplace and confirm the catalog loads. 2) Capture the catalog request and verify it used `plugins.aiuo.net`. 3) Install the plugin. 4) Capture the request the platform received. 5) Inspect which mirror served the package. 6) Install a second plugin, then install the same version of the first one again.
+- **Preconditions**: A clean profile on the official channel, a plugin present in `hub.slyy.ai/catalog.json`, and a request log for the platform and both mirror hosts (a local stub may stand in for each).
+- **Steps**: 1) Open Extensions → Marketplace and confirm the catalog loads. 2) Capture the catalog request and verify it used `hub.slyy.ai`. 3) Install the plugin. 4) Capture the request the platform received. 5) Inspect which mirror served the package. 6) Install a second plugin, then install the same version of the first one again.
 - **Expected**: The marketplace UI has no source selector; exactly one `POST /api/v1/download/resolve` is sent per install or update, with a JSON body carrying `deviceId`, `pluginId`, and the version when one was picked; when resolve answers within three seconds, the package comes from the first entry in `downloads` that answers, and its bytes match the returned `sha256` and `sizeBytes` before anything is extracted; a mirror that is unreachable or fails is abandoned and the next one is used without user interaction; if resolve exceeds its deadline, the install switches to the catalog URL and verifies its catalog digest; reinstalling the same version issues a fresh resolve call rather than reusing the earlier answer, because the response is never cached; the installed plugin passes the ordinary permission review and its record names the official channel as its provider.
 - **Specs linked**: `07-plugins/07-plugin-marketplace.md` §2, `07-plugins/15-plugin-center.md` §10
 - **Acceptance**: G (remote marketplace source)
@@ -3884,17 +3870,19 @@ registry-only installation and credential isolation.
   one launcher trigger (for example `^\d+\s*[\+\-\*/]\s*\d+$`, so `1+1` matches
   it) and whose panel renders the text it received through
   `window.pluginBridge.consumeLauncherPayload()`. A second panel plugin with a
-  Latin name, and at least two installed applications, one of them Chinese with
-  a `wx` / `weixin` / `微信` spelling chain. Run on Windows and macOS.
+  Latin name such as `Pi Notes`, and at least two installed applications, one
+  of them WeChat, reachable as `wx` / `weixin` / its Chinese name. Run on
+  Windows and macOS.
 - **Steps**:
   1. Press `Alt+Space` (`⌥+Space` on macOS) with an empty input. Read the grid:
      group titles, rows, tiles per row, and the two header actions.
   2. Type the trigger expression `1+1` and inspect the first tile and its detail
      line; press `Enter` and read the opened panel.
   3. Reopen the launcher and type a pinyin initial such as `wx`, then `weixin`,
-     then `微信`; confirm the same application is the matching tile each time.
-  4. Type `pi` and confirm the plugin named `PI-Desktop` is listed with a name
-     match, and that the same item is reachable by pinyin and initials.
+     then WeChat's Chinese name; confirm the same application is the matching
+     tile each time.
+  4. Type `pi` and confirm the plugin named `Pi Notes` is listed with a name
+     match.
   5. Drag the panel's edge to a larger and then a smaller size; count the tiles
      per row at each width. Quit and restart the application, then reopen the
      launcher.
@@ -3913,7 +3901,7 @@ registry-only installation and credential isolation.
   plus `All plugins →`. Step 2 lists the trigger plugin as the **first** tile,
   ahead of name matches and without a detail line, and the panel shows `1+1`
   exactly once (a second read returns `null`). Step 3 reaches the same
-  application through all three spellings. Step 4 lists `PI-Desktop` once by
+  application through all three spellings. Step 4 lists `Pi Notes` once by
   name. Step 5 keeps eight columns per row at every width, the panel height
   always matches what it renders, and the dragged width is restored after the
   restart. Step 6 keeps the window at its height cap, reports the dropped count

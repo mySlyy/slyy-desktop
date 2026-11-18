@@ -104,7 +104,7 @@ test("forwards child output with a [sign] prefix and reports a clean exit", asyn
     "--",
     "bash",
     "-c",
-    'echo "Walking... /tmp/PI-Desktop.app/Contents"; echo "notice: nothing to see"; echo "Signing... /tmp/PI-Desktop.app/Contents/MacOS/PI-Desktop"',
+    'echo "Walking... /tmp/Slyy Gen2.app/Contents"; echo "notice: nothing to see"; echo "Signing... /tmp/Slyy Gen2.app/Contents/MacOS/Slyy Gen2"',
   ]);
 
   assert.equal(status, 0);
@@ -386,11 +386,11 @@ exit 0
       "--",
       "bash",
       "-c",
-      'xcrun "$@" && xcrun stapler validate "/tmp/PI Desktop.app"',
+      'xcrun "$@" && xcrun stapler validate "/tmp/Slyy Gen2.app"',
       "bash",
       "stapler",
       "staple",
-      "/tmp/PI Desktop.app",
+      "/tmp/Slyy Gen2.app",
     ],
     {
       env: {
@@ -444,7 +444,7 @@ exit 68
       "--",
       "bash",
       "-c",
-      "xcrun stapler staple /tmp/PI-Desktop.app",
+      'xcrun stapler staple "/tmp/Slyy Gen2.app"',
     ],
     {
       env: {
@@ -488,7 +488,7 @@ exit 0
       "bash",
       "notarytool",
       "submit",
-      "/tmp/PI Desktop.app",
+      "/tmp/Slyy Gen2.app",
     ],
     {
       env: {
@@ -504,7 +504,7 @@ exit 0
   assert.deepEqual((await readFile(callLog, "utf8")).trim().split("\n"), [
     "<notarytool>",
     "<submit>",
-    "</tmp/PI Desktop.app>",
+    "</tmp/Slyy Gen2.app>",
   ]);
   assert.doesNotMatch(stderr, /stapler staple attempt/);
 });
@@ -561,8 +561,8 @@ test("appends a markdown summary to GITHUB_STEP_SUMMARY", async (t) => {
 
 test("recognizes signing phases from the builder output in order", async () => {
   const script = [
-    'console.log("Walking... /tmp/PI-Desktop.app/Contents");',
-    'console.log("Signing... /tmp/PI-Desktop.app/Contents/MacOS/PI-Desktop");',
+    'console.log("Walking... /tmp/Slyy Gen2.app/Contents");',
+    'console.log("Signing... /tmp/Slyy Gen2.app/Contents/MacOS/Slyy Gen2");',
     'console.log("notarizing using notarytool");',
   ].join("\n");
 
@@ -580,5 +580,5 @@ test("recognizes signing phases from the builder output in order", async () => {
     .split("\n")
     .filter((line) => line.startsWith("[sign] phase:"))
     .map((line) => line.slice("[sign] phase: ".length));
-  assert.deepEqual(phases, ["walking", "signing:PI-Desktop", "notarizing"]);
+  assert.deepEqual(phases, ["walking", "signing:Slyy Gen2", "notarizing"]);
 });

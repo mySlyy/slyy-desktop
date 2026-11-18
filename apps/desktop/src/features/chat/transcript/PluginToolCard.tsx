@@ -1,5 +1,5 @@
 /**
- * The `toolCard` slot host (`docs/plugin-plan/ui/tool-card/`).
+ * The `toolCard` slot host (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2).
  *
  * One plugin card replaces the host default card entirely for a claimed
  * tool call; the plugin draws the whole card and failure stays data. The

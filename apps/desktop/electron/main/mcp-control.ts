@@ -27,7 +27,7 @@ export type McpControlOperation = {
   /**
    * Operation requires an authenticated first-party plugin context, so it is
    * excluded from the external MCP surface (tools/list, pi_control_describe and
-   * the pi_desktop_invoke enum) while staying callable by plugins.
+   * the slyy_invoke enum) while staying callable by plugins.
    */
   pluginOnly?: boolean;
 };
@@ -106,7 +106,19 @@ type Logger = (level: "info" | "warn" | "error", message: string, data?: unknown
 
 const MCP_PROTOCOL_VERSION = "2025-06-18";
 const MCP_COMPATIBLE_PROTOCOL_VERSIONS = new Set(["2025-06-18", "2025-03-26"]);
-const MCP_SERVER_NAME = "pi-desktop";
+const MCP_SERVER_NAME = "slyy";
+/** Generic invoke tool; the only one listed in `tools/list`. */
+const MCP_INVOKE_TOOL = "slyy_invoke";
+/**
+ * Pre-rebrand name of the invoke tool. Clients configured before the rebrand
+ * may still call it, so `tools/call` accepts it as an unlisted alias of
+ * the same tool (same schema, same confirm gate).
+ */
+const LEGACY_MCP_INVOKE_TOOL = "pi_desktop_invoke";
+/** Token header for clients that cannot send `Authorization: Bearer`. */
+const MCP_TOKEN_HEADER = "x-slyy-token";
+/** Pre-rebrand token header, still accepted; the token check is unchanged. */
+const LEGACY_MCP_TOKEN_HEADER = "x-pi-desktop-token";
 const DEFAULT_HOST = "127.0.0.1";
 const DEFAULT_PORT = 37_123;
 const MAX_REQUEST_BYTES = 2 * 1024 * 1024;
@@ -1012,7 +1024,7 @@ export class McpControlServer {
     const authorization = this.headerValue(request, "authorization");
     const token = authorization?.startsWith("Bearer ")
       ? authorization.slice("Bearer ".length).trim()
-      : this.headerValue(request, "x-pi-desktop-token");
+      : this.headerValue(request, MCP_TOKEN_HEADER) ?? this.headerValue(request, LEGACY_MCP_TOKEN_HEADER);
     return typeof token === "string" && token.length > 0 && tokensEqual(token, this.token);
   }
 
@@ -1058,7 +1070,7 @@ export class McpControlServer {
     if (request.method === "OPTIONS") {
       result.writeHead(204, {
         Allow: "POST, DELETE, OPTIONS",
-        "Access-Control-Allow-Headers": "Authorization, Content-Type, Mcp-Session-Id, MCP-Protocol-Version, X-Pi-Desktop-Token",
+        "Access-Control-Allow-Headers": "Authorization, Content-Type, Mcp-Session-Id, MCP-Protocol-Version, X-Slyy-Token, X-Pi-Desktop-Token",
         "Access-Control-Allow-Methods": "POST, DELETE, OPTIONS",
       });
       result.end();
@@ -1189,7 +1201,8 @@ export class McpControlServer {
     if (method === "tools/call") {
       const name = typeof params.name === "string" ? params.name : "";
       const input = params.arguments ?? {};
-      const tool = this.toolsList.find((candidate) => candidate.name === name);
+      const toolName = name === LEGACY_MCP_INVOKE_TOOL ? MCP_INVOKE_TOOL : name;
+      const tool = this.toolsList.find((candidate) => candidate.name === toolName);
       if (!tool) return { response: rpcError(id, -32602, `unknown tool: ${name}`) };
       try {
         const raw = await tool.execute(input);
@@ -1240,7 +1253,7 @@ export class McpControlServer {
       } satisfies McpTool];
     });
     const generic: McpTool = {
-      name: "pi_desktop_invoke",
+      name: MCP_INVOKE_TOOL,
       description: "Invoke a reviewed Slyy operation. Use pi_control_describe for ids and argument shapes. Dangerous operations require confirm=true. This is an agent acknowledgement, not a user prompt.",
       inputSchema: objectSchema({
         operation: {

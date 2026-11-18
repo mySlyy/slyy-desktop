@@ -220,7 +220,7 @@ Outer frame that positions Topbar, Sidebar, MainChat, and WorkPanel. Owns resize
 
 | Platform | Top-level chrome | Application menu |
 |---|---|---|
-| macOS | Native inset traffic lights at `{x:16,y:16}`; expanded sidebar Collapse control at right, with no logo/title; work-panel toggle is viewport-fixed at the window's top-right | System menu: PI-Desktop, File, Edit, View, Window, Help |
+| macOS | Native inset traffic lights at `{x:16,y:16}`; expanded sidebar Collapse control at right, with no logo/title; work-panel toggle is viewport-fixed at the window's top-right | System menu: Slyy, File, Edit, View, Window, Help |
 | Windows | Frameless 46px titlebar; sidebar actions at left; work-panel toggle then minimize/maximize/close stay viewport-fixed at the window's top-right | None inside the window |
 | Linux | Frameless 46px titlebar; sidebar actions at left; work-panel toggle then minimize/maximize/close stay viewport-fixed at the window's top-right | None inside the window |
 
@@ -325,13 +325,13 @@ reached from the command palette / application menu, not the top bar.)
 ### 2.2 Anatomy
 
 ```text
-[☰ Sidebar] [Folder · Project / Task title]       [＋ New] [🔍 Search]
+[☰ Sidebar] [Folder · Project / Task title]       [+ New] [Search]
 ```
 
 (Icons described functionally; actual render uses Lucide SVGs. The `[☰ Sidebar]`
 toggle renders **only when the sidebar is collapsed**; when the sidebar is
 expanded it owns that control, so the top bar does not duplicate it. The
-`[🔍 Search]` control is the chrome search entry; the expanded sidebar header
+`[Search]` control is the chrome search entry; the expanded sidebar header
 does not duplicate it. Keyboard shortcuts and the application menu remain
 available.)
 
@@ -488,7 +488,7 @@ their hit areas remain in the layout so revealing them does not shift labels.
 Expanded (~275px, D034/D070):
 +---------------------------+
 | [lights]             [◧] |  macOS
-| [π] PI-Desktop       [◧] |  Windows/Linux
+| [●] Slyy             [◧] |  Windows/Linux
 | PINNED                   |
 |   • Pinned task  project-A|
 | SESSIONS         [msg+][↕]|
@@ -586,7 +586,7 @@ visually distinct from list content.
   transcript prefetch. Selection reuses an in-flight or recent cached result,
   revalidates it in the background, and never waits for an older superseded
   session read before starting the latest read.
-- On Windows/Linux, click the PI-Desktop brand to return the main pane to the
+- On Windows/Linux, click the Slyy brand to return the main pane to the
   chat home while preserving the active conversation and workspace; macOS
   intentionally omits this brand control from the sidebar header
 - Click the footer Plugins icon immediately right of Settings to open the
@@ -743,8 +743,9 @@ visually distinct from list content.
 
 - Projects and Sessions headings have localized names; each disclosure and
   create action has a scope-specific accessible name
-- Under `lang=zh-CN`, section labels keep normal tracking and skip
-  `text-transform: uppercase` so two-glyph labels are not letter-spaced apart
+- Under a CJK `lang` (none ships in Slyy), section labels keep normal tracking
+  and skip `text-transform: uppercase` so two-glyph labels are not letter-spaced
+  apart
 - Session groups use semantic `section` containers
 - Active session: `aria-current="true"`
 - Every visible session indicator has a localized accessible name and tooltip;
@@ -779,7 +780,7 @@ visually distinct from list content.
 
 ### 3.7 Brand and icon contract
 
-- The visible shell name is `PI-Desktop`; Codex is not used as the renderer
+- The visible shell name is `Slyy`; Codex is not used as the renderer
   identity.
 - A control with no label states `.icon-btn-square`, which pins both axes to
   `--ds-control-size` (28px). `.icon-btn` on its own takes its width from its
@@ -857,7 +858,7 @@ account, subscription, or collaboration backend.
 | Footer band | `58px` high, transparent, no top separator; remains outside the scrollable project/session region |
 | Profile trigger | `44px` high, flexible width, rounded hover target; opens the profile menu |
 | User glyph | `30px` circular local-user glyph; decorative when the text label names the control |
-| Identity copy | Primary `Custom`; secondary `Local profile` or localized `本地配置`; two lines truncate independently |
+| Identity copy | Primary `Custom`; secondary `Local profile` or its localized equivalent; two lines truncate independently |
 | Chevron | Trailing disclosure indicator; reflects the menu's open state without motion when reduced motion is requested |
 | Notification shortcut | Separate `32px` square Bell target with unread badge; opens the durable inbox above and to the right of the footer |
 | Profile menu | `280px` wide, bottom anchored `8px` above the footer; opaque elevated surface |
@@ -1015,7 +1016,7 @@ it. Explicit user choices remain authoritative, and a running turn - or a group
 that still owns a running tool or delegation - never folds. The group header
 states what the group did: the actions it contains, joined with the locale's own
 list wording and capped at three with "and more", followed by the call count as
-its own non-truncating token (`搜索并读取文件 · 12 次操作`). Reasoning is named in
+its own non-truncating token (`search and read files · 12 operations`). Reasoning is named in
 that sequence but never counted as an operation, and a reasoning-only group
 counts steps instead. Failures are not repeated here: the tool row that failed
 already reports them.
@@ -1268,7 +1269,7 @@ entirely inside the plugin's isolated page:
   default app or revealing it reaches the file in the folder being browsed
   (ADR 0264).
 - The page follows `app.getAppearance` and `appearance:changed` for base theme
-  and English/Simplified Chinese copy, and `workspace:changed` for the open
+  and localized copy, and `workspace:changed` for the open
   project and its folder list. `workspace.get`, `app.getAppearance`,
   `fs.openDefault`, `fs.openInBrowser`, and `fs.reveal` are the only host channels it calls; its own
   reads and writes go through its host process, which keeps the jail of the one
@@ -1666,7 +1667,7 @@ near-zero duration. A folded group keeps its rows mounted, `aria-hidden`, and
   session path opens `<data_dir>/scratch/<sessionId>/` in the system file
   manager, creating the directory if it does not exist yet. Both actions
   appear only while developer mode is on.
-- Copy conversation link writes the `pi-desktop://session/<id>` reference to
+- Copy conversation link writes the `slyy://session/<id>` reference to
   the clipboard without developer mode. Pasting it into another conversation's
   Composer draft sends a bounded excerpt of that conversation with the turn,
   and the user message then shows it as a chip (§20B).
@@ -1841,7 +1842,8 @@ storage but compose into one assistant turn until the next user message.
   preview up to two snippets with localized sender labels, timestamps, and
   literal keyword highlighting. Metadata matches have a distinct badge.
 - Each body preview shows the sentence or line containing the first match,
-  using Chinese/English sentence punctuation and line breaks as boundaries.
+  using sentence punctuation and line breaks as boundaries. (Slyy removed the
+  upstream CJK sentence-punctuation boundaries on 2026-11-18.)
   Preserve the complete sentence when it fits 180 characters; longer sentences
   use an ellipsized window that always includes the entire query. Render the
   whole bounded preview with normal wrapping, including on narrow windows;
@@ -1992,7 +1994,7 @@ Single message render — either user (plaintext) or assistant (markdown streami
   digits. In user-message prose,
   these are candidates only: show a chip after the existing `fs/resolveRef`
   lookup confirms a real file. Pending, missing, or failed lookups preserve
-  the exact original text, including `使用llama.cpp`. Explicit `@path` refs
+  the exact original text, including a name glued to prose such as `usellama.cpp`. Explicit `@path` refs
   and structured attachments retain their existing chips without speculative
   lookup. At most 32 unique candidates per message are checked, with four
   concurrent lookups across visible rows; additional candidates remain text.
@@ -2308,7 +2310,7 @@ Renderer: `apps/desktop/src/components/Markdown.tsx` + `apps/desktop/src/lib/shi
   result.
 - **Plugins**: `remark-gfm` (tables, task lists, strikethrough, autolinks),
   `remark-cjk-friendly/parseOnly` (CJK emphasis adjacent to quotes, brackets
-  and punctuation, including `这是**“重点”**。`, without rewriting source or
+  and full-width punctuation, without rewriting source or
   changing literal code/escaped markers; shared by splitting and rendering),
   `remark-math` + `rehype-katex` (inline `$…$` or `\(…\)`, display `$$…$$`
   or `\[…\]`). Raw HTML is
@@ -3125,7 +3127,7 @@ reasoning-level control.
 - Font: text-sm for Agent, Plan, and Goal; mode changes semantics and tool
   controls, not the typography
 - The Agent/Plan/Goal mode chip reserves one fixed 96px width, sized from the
-  longest built-in label in English and zh-CN ("Agent" / "智能体") plus its
+  longest built-in label in English and German plus its
   menu caret. Its label stays single-line and ellipsizes if a future locale
   exceeds that budget, so switching modes never reflows the adjacent Composer
   controls. The chip names the committed mode and opens one menu listing the
@@ -3139,9 +3141,9 @@ reasoning-level control.
   toolbar rhythm. Agent and Plan expose the effective selectable permission;
   Goal displays the localized Auto label as a disabled, non-opening chip while
   the approval card remains the separate place for choosing execution policy.
-  The permission menu stays 120px wide; its Chinese Composer short label for
-  Accept edits is `允许编辑` / `允許編輯` so the option remains single-line
-  beside its selection indicator.
+  The permission menu stays 120px wide; every shipped locale keeps a short
+  Composer label for Accept edits so the option remains single-line beside its
+  selection indicator.
 - Accepted Goal input returns the mode chip to Agent, not the executing run.
   The run status bar remains visible and its controls target the Host run.
   A newer picker selection is not overwritten by a delayed send response;
@@ -3196,9 +3198,9 @@ reasoning-level control.
   large radius/dialog shadow tokens, and enters with a short upward fade.
 - The Model submenu establishes a clear provider → model hierarchy: sticky
   provider headings use the stronger `--text-md` section treatment, while
-  indented model options use normal-weight `--text-sm` text. In zh-CN, provider
-  headings remove uppercase transformation and wide tracking so localized labels
-  remain readable.
+  indented model options use normal-weight `--text-sm` text. Under a CJK
+  locale (none ships in Slyy), provider headings remove uppercase transformation
+  and wide tracking so localized labels remain readable.
 - Width: Home and thread-docked composers share one `24px` horizontal gutter
   and a `768px` maximum content envelope. The left-edge conversation minimap
   is absolutely positioned outside that envelope, so its appearance or
@@ -3693,7 +3695,7 @@ Anatomy:
   scroll and `scrollIntoView(nearest)` keyboard follow.
 - Slash mode (`/` typed at position 0, cursor inside the first token, no
   whitespace yet): the placeholder teaches `Type / for commands · @ for files`
-  (localized in zh-CN), and groups appear in order — prompt templates (name +
+  (localized in de), and groups appear in order — prompt templates (name +
   `argument-hint` ghost text + description, project source before
   user-global), app commands (builtin slash aliases), plugin commands,
   extension commands, connected MCP servers, then Skills.
@@ -3777,7 +3779,8 @@ Anatomy:
   main selects image blocks or path fallbacks from the exact model capability.
   Reference-only drafts are sendable. Builtin/plugin dispatch still bypasses
   the model-ready gate when no prompt text or file reference is sent.
-- A `pi-desktop://session/<id>` link in the draft is the reference itself: no
+- A `slyy://session/<id>` link (legacy `pi-desktop://session/<id>` still
+  parsed) in the draft is the reference itself: no
   new trigger symbol joins `@` files and `/` commands, and the link stays
   visible plaintext while the draft is unsent. Immediately before dispatch,
   main resolves each link to another conversation in the same project into a
@@ -3915,7 +3918,7 @@ there is no separate top-bar model selector.
 ### 12.2 Anatomy
 
 ```text
-[✨ model-name · reasoning level ▾]
+[* model-name · reasoning level ▾]
 ```
 
 ### 12.3 States
@@ -4632,7 +4635,7 @@ TASKS (2)                     │ Nightly dependency check   [Enabled] [Run now]
 ### 20B.1 Purpose
 
 Carry another conversation into a turn without retyping it. The
-`pi-desktop://session/<id>` link is the whole interaction: a reader copies it
+`slyy://session/<id>` link is the whole interaction: a reader copies it
 from the conversation overflow menu and pastes it into a Composer draft (issue
 #1324, option B). Copy conversation ID stays the developer-mode identifier.
 
@@ -4642,13 +4645,13 @@ from the conversation overflow menu and pastes it into a Composer draft (issue
 Conversation overflow                    Composer draft (unsent)
 ┌─────────────────────────────┐          ┌──────────────────────────────────┐
 │ Pin conversation            │          │ continue from                    │
-│ Create branch               │          │ [💬 Conversation · ab12cd34]     │
+│ Create branch               │          │ [# Conversation · ab12cd34]      │
 │ Copy conversation link      │          └──────────────────────────────────┘
 │ Delete conversation         │
 └─────────────────────────────┘          Sent user message
                                          ┌──────────────────────────────────┐
                                          │ continue from                    │
-                                         │ [💬 Conversation · Nightly check]│
+                                         │ [# Conversation · Nightly check] │
                                          └──────────────────────────────────┘
 ```
 
@@ -4665,8 +4668,11 @@ Conversation overflow                    Composer draft (unsent)
 
 ### 20B.4 Interaction
 
-- Copy conversation link writes `pi-desktop://session/<sessionId>` from the
-  conversation overflow menu. The durable id is the reference; Copy
+- Copy conversation link writes `slyy://session/<sessionId>` from the
+  conversation overflow menu. Links in the pre-rebrand
+  `pi-desktop://session/<sessionId>` form are still parsed everywhere a
+  `slyy://` link is (draft, sent message, chip), so existing messages keep
+  their references. The durable id is the reference; Copy
   conversation ID still exposes the bare id in developer mode.
 - Sending a turn whose draft holds the link attaches a bounded excerpt of the
   referenced conversation: the 40 newest messages, 8 KB per field, 16 KB for
@@ -4703,9 +4709,10 @@ Conversation overflow                    Composer draft (unsent)
 - The chip carries the button role with a catalog-built accessible name and a
   tooltip naming the conversation it opens; it is keyboard-activatable and leaves
   the surrounding selectable message text intact.
-- `pi-desktop://` is not yet an operating-system protocol handler; opening a
-  link from outside the app is a separate change (issue #1324, option A). This
-  section covers the in-app reference.
+- Neither `slyy://` nor `pi-desktop://` is registered as an operating-system
+  protocol handler, so a separately installed PI-Desktop is never hijacked;
+  opening a link from outside the app is a separate change (issue #1324,
+  option A). This section covers the in-app reference.
 ## 21. Acceptance criteria (all components)
 
 1. All components use semantic color tokens from [07-ui-design-system.md](07-ui-design-system.md) — no raw hex

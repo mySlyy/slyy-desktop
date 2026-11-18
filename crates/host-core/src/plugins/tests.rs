@@ -108,10 +108,13 @@ fn curl_diagnostic_decoding_preserves_utf8() {
 #[cfg(windows)]
 #[test]
 fn curl_diagnostic_decoding_handles_gbk() {
-    // "你好" encoded as GBK, representative of localized curl output on
-    // a Simplified Chinese Windows installation.
+    // U+4F60 U+597D ("hello") encoded as GBK (code page 936), representative
+    // of localized curl output on a Simplified Chinese Windows installation.
     let gbk = [0xC4, 0xE3, 0xBA, 0xC3];
-    assert_eq!(decode_windows_code_page(&gbk, 936).as_deref(), Some("你好"));
+    assert_eq!(
+        decode_windows_code_page(&gbk, 936).as_deref(),
+        Some("\u{4F60}\u{597D}")
+    );
 }
 
 #[test]
@@ -181,7 +184,7 @@ fn marketplace_uses_highest_semver_when_catalog_versions_are_unsorted() {
             id: "pi.todo".into(),
             name: "Fresh Todo".into(),
             description: "Todo plugin".into(),
-            author: "PI-Desktop".into(),
+            author: "Slyy".into(),
             icon_url: None,
             categories: vec![],
             verified: true,
@@ -289,7 +292,7 @@ fn market_entry_offers_an_update_only_when_the_catalog_is_newer() {
             id: "pi.todo".into(),
             name: "Todo".into(),
             description: "Todo plugin".into(),
-            author: "PI-Desktop".into(),
+            author: "Slyy".into(),
             versions: vec![MarketVersion {
                 version: latest.into(),
                 published_at: "2026-08-12T00:00:00Z".into(),
@@ -486,6 +489,28 @@ fn high_risk_permissions_roundtrip_on_notes_plugin() {
     });
 }
 
+/// The official channel is the Slyy hub; reviews and package resolution
+/// derive their origin from it, so no request goes to the upstream center.
+#[test]
+fn the_official_channel_is_the_slyy_hub() {
+    assert_eq!(
+        OFFICIAL_CHANNEL_CATALOG_URL,
+        "https://hub.slyy.ai/catalog.json"
+    );
+    assert_eq!(
+        MarketChannel::Official.catalog_url(),
+        Some("https://hub.slyy.ai/catalog.json")
+    );
+    assert_eq!(
+        super::reviews::review_origin_for_catalog(OFFICIAL_CHANNEL_CATALOG_URL).as_deref(),
+        Some("https://hub.slyy.ai")
+    );
+    assert_eq!(
+        super::resolve::endpoint_for(OFFICIAL_CHANNEL_CATALOG_URL).as_deref(),
+        Some("https://hub.slyy.ai/api/v1/download/resolve")
+    );
+}
+
 #[test]
 fn resolve_relative_package_urls_against_catalog() {
     let resolved = PluginManager::resolve_package_url(
@@ -495,7 +520,7 @@ fn resolve_relative_package_urls_against_catalog() {
     );
     assert_eq!(
         resolved,
-        "https://plugins.aiuo.net/packages/demo.hello-0.2.0.piplug"
+        "https://hub.slyy.ai/packages/demo.hello-0.2.0.piplug"
     );
 }
 
@@ -1174,7 +1199,7 @@ fn view_contributions_require_permission_and_an_existing_entry() {
         capability_manifest(
             view(json!({
                 "id": "a",
-                "title": { "en": "A", "zh-CN": "甲" },
+                "title": { "en": "A", "zh-CN": "\u{7532}" },
                 "entry": "../outside.html"
             })),
             json!(["ui.view"]),
@@ -1672,7 +1697,7 @@ fn v2_catalog(entry: MarketCatalogEntry) -> MarketCatalogFile {
         schema_version: 2,
         provider_id: "official".into(),
         artifact_base_url: Some(
-            "https://github.com/vastsa/pi-plugin-center/releases/download".into(),
+            "https://github.com/acme/pi-plugin-center/releases/download".into(),
         ),
         plugins: vec![entry],
         ..Default::default()
@@ -1681,14 +1706,13 @@ fn v2_catalog(entry: MarketCatalogEntry) -> MarketCatalogFile {
 
 #[test]
 fn package_downloads_are_restricted_to_distribution_hosts() {
-    let catalog = "https://raw.githubusercontent.com/vastsa/pi-plugin-center/main/catalog.json";
+    let catalog = "https://raw.githubusercontent.com/acme/pi-plugin-center/main/catalog.json";
     // GitHub release entry point and the storage hosts it redirects to.
     for url in [
-            "https://github.com/vastsa/pi-plugin-center/releases/download/acme.todo@1.0.0/acme.todo-1.0.0.piplug",
+            "https://github.com/acme/pi-plugin-center/releases/download/acme.todo@1.0.0/acme.todo-1.0.0.piplug",
             "https://objects.githubusercontent.com/github-production-release-asset/1",
             "https://release-assets.githubusercontent.com/github-production-release-asset/1",
             "https://codeload.github.com/acme/pi-plugin-todo/zip/refs/tags/v1.0.0",
-            "https://cnb.cool/aixk/pi-plugin-center/-/releases/download/x.piplug",
         ] {
             package_host_allowed(url, catalog).unwrap_or_else(|e| panic!("{url}: {e}"));
         }
@@ -1699,7 +1723,7 @@ fn package_downloads_are_restricted_to_distribution_hosts() {
         "https://evil.test/acme.todo-1.0.0.piplug",
         "https://notgithub.com/x.piplug",
         "https://github.com.evil.test/x.piplug",
-        "https://cnb.cool.evil.test/x.piplug",
+        "https://githubusercontent.com.evil.test/x.piplug",
     ] {
         let err = package_host_allowed(url, catalog).unwrap_err().to_string();
         assert!(err.contains("PLUGIN_MARKET_UNTRUSTED_HOST"), "{url}: {err}");
@@ -1715,7 +1739,7 @@ fn a_private_catalog_is_trusted_only_for_its_own_host() {
 
 #[test]
 fn package_urls_reject_credentials_and_plain_http() {
-    let catalog = "https://raw.githubusercontent.com/vastsa/pi-plugin-center/main/catalog.json";
+    let catalog = "https://raw.githubusercontent.com/acme/pi-plugin-center/main/catalog.json";
     let err = package_host_allowed("https://user:pass@github.com/a.piplug", catalog)
         .unwrap_err()
         .to_string();
@@ -1732,64 +1756,52 @@ fn package_urls_reject_credentials_and_plain_http() {
 
 #[test]
 fn relative_package_urls_resolve_against_the_declared_artifact_base() {
-    let catalog = "https://raw.githubusercontent.com/vastsa/pi-plugin-center/main/catalog.json";
+    let catalog = "https://raw.githubusercontent.com/acme/pi-plugin-center/main/catalog.json";
     // v2: the declared base wins, so a release asset is reachable even
     // though it does not live under the catalog directory.
     assert_eq!(
             PluginManager::resolve_package_url(
                 catalog,
-                Some("https://github.com/vastsa/pi-plugin-center/releases/download"),
+                Some("https://github.com/acme/pi-plugin-center/releases/download"),
                 "acme.todo@1.0.0/acme.todo-1.0.0.piplug",
             ),
-            "https://github.com/vastsa/pi-plugin-center/releases/download/acme.todo@1.0.0/acme.todo-1.0.0.piplug"
+            "https://github.com/acme/pi-plugin-center/releases/download/acme.todo@1.0.0/acme.todo-1.0.0.piplug"
         );
     // v1: no declared base, so the catalog directory still anchors it.
     assert_eq!(
         PluginManager::resolve_package_url(catalog, None, "packages/x.piplug"),
-        "https://raw.githubusercontent.com/vastsa/pi-plugin-center/main/packages/x.piplug"
+        "https://raw.githubusercontent.com/acme/pi-plugin-center/main/packages/x.piplug"
     );
     // An absolute URL is passed through for the host allowlist to judge.
     assert_eq!(
         PluginManager::resolve_package_url(
             catalog,
             Some("https://base.test/"),
-            "https://cnb.cool/x.piplug"
+            "https://mirror.test/x.piplug"
         ),
-        "https://cnb.cool/x.piplug"
+        "https://mirror.test/x.piplug"
     );
 }
 
-/// The official platform can return package URLs on approved GitHub and CNB
-/// hosts. The catalog's declared base keeps each package on its own host.
+/// The official platform can return package URLs on approved GitHub hosts.
+/// The catalog's declared base keeps each package on its own host.
 #[test]
-fn official_catalog_package_bases_resolve_to_approved_mirror_hosts() {
+fn official_catalog_package_bases_resolve_to_approved_hosts() {
     let relative = "packages/acme.todo-1.0.0.piplug";
 
     let github = PluginManager::resolve_package_url(
         OFFICIAL_CHANNEL_CATALOG_URL,
-        Some("https://raw.githubusercontent.com/AIUO-Net/pi-desktop-plugins/main"),
+        Some("https://raw.githubusercontent.com/acme/plugin-mirror/main"),
         relative,
     );
     assert_eq!(
         github,
-        "https://raw.githubusercontent.com/AIUO-Net/pi-desktop-plugins/main/packages/acme.todo-1.0.0.piplug"
+        "https://raw.githubusercontent.com/acme/plugin-mirror/main/packages/acme.todo-1.0.0.piplug"
     );
 
-    let mirror = PluginManager::resolve_package_url(
-        OFFICIAL_CHANNEL_CATALOG_URL,
-        Some("https://cnb.cool/aixk/pi-desktop-plugins/-/git/raw/main"),
-        relative,
-    );
-    assert_eq!(
-        mirror,
-        "https://cnb.cool/aixk/pi-desktop-plugins/-/git/raw/main/packages/acme.todo-1.0.0.piplug"
-    );
-
-    // Both package hosts are accepted while the catalog stays official.
+    // The package host is accepted while the catalog stays official.
     package_host_allowed(&github, OFFICIAL_CHANNEL_CATALOG_URL).unwrap();
-    package_host_allowed(&mirror, OFFICIAL_CHANNEL_CATALOG_URL).unwrap();
-    assert!(github.starts_with("https://raw.githubusercontent.com/AIUO-Net/"));
-    assert!(mirror.starts_with("https://cnb.cool/"));
+    assert!(github.starts_with("https://raw.githubusercontent.com/acme/"));
 }
 
 #[test]
@@ -2061,7 +2073,7 @@ fn launcher_triggers_are_accepted_and_preserved() {
         {
             "id": "calculator",
             "pattern": "^[0-9+\\-*/(). ]+$",
-            "title": { "en": "Calculator", "zh-CN": "计算器" }
+            "title": { "en": "Calculator", "zh-CN": "\u{8BA1}\u{7B97}\u{5668}" }
         },
         {
             "id": "kilometres",
@@ -2234,8 +2246,8 @@ fn composer_transforms_require_permission_and_localized_titles() {
     let dir = tempdir().unwrap();
     let transform = json!({
         "id": "enhance",
-        "title": { "en": "Enhance prompt", "zh-CN": "增强提示词" },
-        "undoTitle": { "en": "Undo enhancement", "zh-CN": "撤销增强" }
+        "title": { "en": "Enhance prompt", "zh-CN": "\u{589E}\u{5F3A}\u{63D0}\u{793A}\u{8BCD}" },
+        "undoTitle": { "en": "Undo enhancement", "zh-CN": "\u{64A4}\u{9500}\u{589E}\u{5F3A}" }
     });
 
     let valid = dir.path().join("valid");
@@ -2284,13 +2296,13 @@ fn plugin_rows_read_the_i18n_block_for_the_active_locale() {
         json!({
             "schemaVersion": 1,
             "id": "acme.todo",
-            "name": "小清新待办",
+            "name": "\u{5C0F}\u{6E05}\u{65B0}\u{5F85}\u{529E}",
             "version": "0.1.0",
-            "description": "作者原话",
+            "description": "\u{4F5C}\u{8005}\u{539F}\u{8BDD}",
             "main": "main.js",
             "i18n": {
                 "en": { "name": "Todo List", "description": "A calm todo list" },
-                "zh-CN": { "name": "小清新待办", "description": "轻盈的待办清单" }
+                "zh-CN": { "name": "\u{5C0F}\u{6E05}\u{65B0}\u{5F85}\u{529E}", "description": "\u{8F7B}\u{76C8}\u{7684}\u{5F85}\u{529E}\u{6E05}\u{5355}" }
             }
         }),
         &[],
@@ -2304,18 +2316,27 @@ fn plugin_rows_read_the_i18n_block_for_the_active_locale() {
     // Every reader resolves the same way: `list()` and `get()` are what the
     // Extensions page and the plugin launcher actually draw.
     mgr.set_locale("zh-CN");
-    assert_eq!(mgr.get("acme.todo").unwrap().name, "小清新待办");
+    assert_eq!(
+        mgr.get("acme.todo").unwrap().name,
+        "\u{5C0F}\u{6E05}\u{65B0}\u{5F85}\u{529E}"
+    );
     let listed = mgr
         .list()
         .into_iter()
         .find(|candidate| candidate.id == "acme.todo")
         .expect("row missing from the list");
-    assert_eq!(listed.description.as_deref(), Some("轻盈的待办清单"));
+    assert_eq!(
+        listed.description.as_deref(),
+        Some("\u{8F7B}\u{76C8}\u{7684}\u{5F85}\u{529E}\u{6E05}\u{5355}")
+    );
 
     // `zh-Hans` is Simplified Chinese. `zh-TW` is not part of the plugin
     // contract, so it reads English rather than half a translation (ADR 0182).
     mgr.set_locale("zh-Hans");
-    assert_eq!(mgr.get("acme.todo").unwrap().name, "小清新待办");
+    assert_eq!(
+        mgr.get("acme.todo").unwrap().name,
+        "\u{5C0F}\u{6E05}\u{65B0}\u{5F85}\u{529E}"
+    );
     mgr.set_locale("zh-TW");
     assert_eq!(mgr.get("acme.todo").unwrap().name, "Todo List");
     mgr.set_locale("de");
@@ -2389,7 +2410,7 @@ fn the_registry_never_persists_the_i18n_block() {
             "name": "Stored",
             "version": "0.1.0",
             "main": "main.js",
-            "i18n": { "en": { "name": "Stored" }, "zh-CN": { "name": "已存" } }
+            "i18n": { "en": { "name": "Stored" }, "zh-CN": { "name": "\u{5DF2}\u{5B58}" } }
         }),
         &[],
     );
@@ -2407,7 +2428,10 @@ fn the_registry_never_persists_the_i18n_block() {
     // the registry having carried anything.
     let mut reloaded = PluginManager::new(dir.path(), MarketChannel::Official, None);
     reloaded.set_locale("zh-CN");
-    assert_eq!(reloaded.get("acme.stored").unwrap().name, "已存");
+    assert_eq!(
+        reloaded.get("acme.stored").unwrap().name,
+        "\u{5DF2}\u{5B58}"
+    );
 }
 
 #[test]
@@ -2430,9 +2454,13 @@ fn market_cards_and_details_read_the_catalog_i18n_block() {
             (
                 "zh-CN".to_string(),
                 PluginDisplayI18n {
-                    name: Some("待办".into()),
-                    description: Some("发布者自有的插件".into()),
-                    safety_notes: Some("不读取其他内容".into()),
+                    name: Some("\u{5F85}\u{529E}".into()),
+                    description: Some(
+                        "\u{53D1}\u{5E03}\u{8005}\u{81EA}\u{6709}\u{7684}\u{63D2}\u{4EF6}".into(),
+                    ),
+                    safety_notes: Some(
+                        "\u{4E0D}\u{8BFB}\u{53D6}\u{5176}\u{4ED6}\u{5185}\u{5BB9}".into(),
+                    ),
                 },
             ),
         ]
@@ -2447,11 +2475,14 @@ fn market_cards_and_details_read_the_catalog_i18n_block() {
 
     mgr.set_locale("zh-CN");
     let card = mgr.market_search(None, None).unwrap().remove(0);
-    assert_eq!(card.name, "待办");
-    assert_eq!(card.description, "发布者自有的插件");
+    assert_eq!(card.name, "\u{5F85}\u{529E}");
+    assert_eq!(
+        card.description,
+        "\u{53D1}\u{5E03}\u{8005}\u{81EA}\u{6709}\u{7684}\u{63D2}\u{4EF6}"
+    );
     assert_eq!(
         mgr.market_get("acme.todo").unwrap().safety_notes.as_deref(),
-        Some("不读取其他内容")
+        Some("\u{4E0D}\u{8BFB}\u{53D6}\u{5176}\u{4ED6}\u{5185}\u{5BB9}")
     );
     // Search matches either language: the card is drawn in one of them, and a
     // user typing the other must still find it.

@@ -14,27 +14,27 @@ labels:
   type:
     required: true
     options:
-      - { name: bug, description: 功能损坏、报错、崩溃 }
-      - { name: enhancement, description: 新功能或体验改进 }
-      - { name: documentation, description: 文档缺失或错误 }
-      - { name: question, description: 使用疑问 }
-      - { name: performance, description: 速度慢、内存高、资源占用异常 }
-      - { name: security, description: 安全漏洞或敏感信息风险 }
+      - { name: bug, description: "Broken feature, error, or crash" }
+      - { name: enhancement, description: "New feature or experience improvement" }
+      - { name: documentation, description: "Missing or incorrect documentation" }
+      - { name: question, description: "Usage question" }
+      - { name: performance, description: "Slow, high memory, or abnormal resource use" }
+      - { name: security, description: "Security vulnerability or sensitive-data risk" }
 
   # Exactly one is applied.
   priority:
     required: true
     options:
-      - { name: P0, description: 数据丢失/崩溃/安全漏洞/功能完全不可用 }
-      - { name: P1, description: 核心功能受损，存在绕行方案 }
-      - { name: P2, description: 一般缺陷或体验问题，不影响主流程 }
-      - { name: P3, description: 建议、优化、边缘场景 }
+      - { name: P0, description: "Data loss, crash, security vulnerability, or feature fully unusable" }
+      - { name: P1, description: "Core feature impaired, a workaround exists" }
+      - { name: P2, description: "Ordinary defect or experience issue, main flow unaffected" }
+      - { name: P3, description: "Suggestion, optimization, or edge case" }
 
   # At most one is applied.
   state:
     required: false
     options:
-      - { name: needs-info, description: 缺少复现步骤、环境或版本信息 }
+      - { name: needs-info, description: "Missing reproduction steps, environment, or version" }
 
 duplicate:
   label: duplicate
@@ -43,8 +43,8 @@ duplicate:
   include_comments: true
   comment:
     on_new_issue: |
-      疑似与 #{{number}}（{{state}}）重复：{{reason}}
+      Possible duplicate of #{{number}} ({{state}}): {{reason}}
 
-      如果确实是同一个问题，请到 #{{number}} 继续讨论并关闭本 issue。
+      If this is the same problem, please continue the discussion in #{{number}} and close this issue.
     on_original: |
-      该问题被再次提起：#{{new_number}}（{{date}}）。
+      This problem was reported again: #{{new_number}} ({{date}}).

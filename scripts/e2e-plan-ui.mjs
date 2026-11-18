@@ -20,7 +20,7 @@ const REQUIRED_CASE_IDS = PERMISSIONS_ONLY ? [PERMISSION_CASE_ID] : [
   "E2E-106-renderer",
   "E2E-111-renderer",
   "E2E-117-en",
-  "E2E-117-zh-CN",
+  "E2E-117-de",
   "E2E-117-responsive",
   PERMISSION_CASE_ID,
 ];
@@ -463,7 +463,7 @@ async function connectRenderer(state) {
           (target) =>
             target.type === "page" &&
             target.webSocketDebuggerUrl &&
-            (target.url.startsWith("file:") || target.title === "PI-Desktop"),
+            (target.url.startsWith("file:") || target.title === "Slyy"),
         );
       } catch {
         return null;
@@ -625,7 +625,7 @@ async function inspectUi(state) {
       .filter(visible)
       .map((node) => ({ label: text(node), disabled: Boolean(node.disabled) }));
     const operatingModes = modeButtons.filter((item) =>
-      ["Agent", "Plan", "智能体", "规划"].includes(item.label),
+      ["Agent", "Plan"].includes(item.label),
     );
     const bar = document.querySelector('[data-testid="plan-approval-bar"]');
     const approvalMain = bar?.querySelector(".plan-approval-approve-main");
@@ -1106,7 +1106,7 @@ function assertNoLegacyUi(snapshot, scope = "shell") {
 }
 
 function assertShellStructure(snapshot, expectedMode, locale) {
-  const expectedLabel = locale === "zh-CN" ? "规划" : "Plan";
+  const expectedLabel = "Plan";
   assert(snapshot.modeControlCount === 1, `expected one active-session mode control, got ${snapshot.modeControlCount}`);
   assert(snapshot.modeLabels[0] === expectedLabel, `expected Composer ${expectedLabel}, got ${jsonText(snapshot.modeLabels)}`);
   assert(snapshot.topbarModeControlCount === 0, "conversation topbar contains a duplicate operating-mode control");
@@ -1122,12 +1122,12 @@ function assertPendingUi(snapshot, locale, revision) {
   assert(snapshot.bar.title === `Plan UI ${revision}`, `pending title mismatch: ${jsonText(snapshot.bar)}`);
   assert(snapshot.bar.question === "", `pending card rendered the submitted question: ${jsonText(snapshot.bar)}`);
   assert(snapshot.bar.artifactVisible, "pending Plan artifact opener is not visible");
-  assert(snapshot.bar.artifactLabel.includes(locale === "zh-CN" ? "打开规划文件" : "Open plan artifact"), `localized artifact opener missing: ${snapshot.bar.artifactLabel}`);
+  assert(snapshot.bar.artifactLabel.includes(locale === "de" ? "Planartefakt" : "Open plan artifact"), `localized artifact opener missing: ${snapshot.bar.artifactLabel}`);
   assert(snapshot.bar.expiry === "", `pending card rendered the approval deadline: ${jsonText(snapshot.bar)}`);
   assert(snapshot.bar.statusText === "", `pending card rendered a status label: ${jsonText(snapshot.bar)}`);
-  assert(snapshot.bar.rejectLabel === (locale === "zh-CN" ? "拒绝" : "Reject"), `reject label mismatch: ${snapshot.bar.rejectLabel}`);
+  assert(snapshot.bar.rejectLabel === (locale === "de" ? "Ablehnen" : "Reject"), `reject label mismatch: ${snapshot.bar.rejectLabel}`);
   assert(
-    snapshot.bar.approveLabel?.includes(locale === "zh-CN" ? "每次询问" : "Ask"),
+    snapshot.bar.approveLabel?.includes(locale === "de" ? "Fragen" : "Ask"),
     `Ask is not the default approval action: ${snapshot.bar.approveLabel}`,
   );
   assert(snapshot.bar.actionButtonCount === 3, `unexpected pending approval actions: ${snapshot.bar.actionButtonCount}`);
@@ -1151,7 +1151,7 @@ function assertRejectedEditable(snapshot, locale) {
 function assertApprovedTerminal(snapshot, locale) {
   assert(snapshot.bar === null, `approved Plan approval surface remains visible: ${jsonText(snapshot.bar)}`);
   assert(snapshot.promptReadOnly === false && snapshot.promptAriaReadOnly !== "true", "approved session input is still read-only");
-  assert(snapshot.modeLabels[0] === (locale === "zh-CN" ? "智能体" : "Agent"), `approved session did not switch to Agent: ${jsonText(snapshot.modeLabels)}`);
+  assert(snapshot.modeLabels[0] === "Agent", `approved session did not switch to Agent: ${jsonText(snapshot.modeLabels)}`);
   assert(snapshot.modeDisabled === false, "approved session mode control remains gated");
   assert(snapshot.modelDisabled === false, "approved session model control remains gated");
   assert(snapshot.permissionDisabled === false, "approved session permission control remains gated");
@@ -1301,7 +1301,7 @@ async function runPermissionAcceptance(state) {
     const submitted = await submitPlan(state, session.id, "first");
     await waitFor(async () => (await inspectUi(state)).bar?.status === "pending", "permission approval card", state);
     const expectedLabel = {
-      ask: ["Ask", "每次询问"], "accept-edits": ["Accept edits", "自动接受编辑"], auto: ["Auto", "全自动"],
+      ask: ["Ask", "Fragen"], "accept-edits": ["Accept edits", "Änderungen akzeptieren"], auto: ["Auto", "Automatisch"],
     }[scenario.expected];
     const snapshot = await inspectUi(state);
     assert(expectedLabel.some(label => snapshot.bar.approveLabel?.includes(label)),
@@ -1375,7 +1375,7 @@ async function runLiveAcceptance(state) {
       pending.proposal.question === LIVE_CHECKPOINT.question,
     `live proposal metadata is not exact: ${jsonText(pending.proposal)}`,
   );
-  const askLabel = pending.snapshot.lang === "zh-CN" ? "每次询问" : "Ask";
+  const askLabel = pending.snapshot.lang === "de" ? "Fragen" : "Ask";
   assert(
     pending.snapshot.bar.approveLabel?.includes(askLabel),
     `live approval did not default to Ask: ${jsonText(pending.snapshot.bar)}`,
@@ -1421,7 +1421,7 @@ async function runLiveAcceptance(state) {
       const snapshot = await inspectUi(state);
       return snapshot.bar === null &&
         session?.mode === "agent" &&
-        ["Agent", "智能体"].includes(snapshot.modeLabels[0])
+        snapshot.modeLabels[0] === "Agent"
         ? snapshot
         : null;
     },
@@ -1453,7 +1453,7 @@ async function runLiveAcceptance(state) {
   const finalSnapshot = settled.snapshot;
   assertApprovedTerminal(
     finalSnapshot,
-    finalSnapshot.lang === "zh-CN" ? "zh-CN" : "en",
+    finalSnapshot.lang === "de" ? "de" : "en",
   );
   await assertRuntimeIdentity(
     state,
@@ -1537,7 +1537,7 @@ async function runAcceptance(state) {
   assert(seededSession?.mode === "plan", `seeded session is not Plan: ${jsonText(seededSession)}`);
 
   let snapshot = await inspectUi(state);
-  assertShellStructure(snapshot, "plan", snapshot.lang === "zh-CN" ? "zh-CN" : "en");
+  assertShellStructure(snapshot, "plan", snapshot.lang === "de" ? "de" : "en");
   assertNoLegacyUi(snapshot, "initial shell");
 
   await setLanguage(state, "en");
@@ -1596,15 +1596,15 @@ async function runAcceptance(state) {
     "Agent default, sole Composer mode control, pending gate, and session-scoped rejection verified",
   );
 
-  await setLanguage(state, "zh-CN");
+  await setLanguage(state, "de");
   await reloadRenderer(state);
   await assertPlanProbeIdentityAt(state, "identity after rejected renderer reload");
   await selectSession(state, state.sessionId);
   snapshot = await inspectUi(state);
-  assert(snapshot.lang === "zh-CN", `zh-CN settings API did not reconcile: ${jsonText(snapshot)}`);
-  assertShellStructure(snapshot, "plan", "zh-CN");
-  assert(snapshot.modeLabels[0] === "规划", `zh-CN Plan shell label missing: ${jsonText(snapshot.modeLabels)}`);
-  assertReloadedTerminalAbsent(snapshot, "zh-CN", "rejected", "规划");
+  assert(snapshot.lang === "de", `de settings API did not reconcile: ${jsonText(snapshot)}`);
+  assertShellStructure(snapshot, "plan", "de");
+  assert(snapshot.modeLabels[0] === "Plan", `de Plan shell label missing: ${jsonText(snapshot.modeLabels)}`);
+  assertReloadedTerminalAbsent(snapshot, "de", "rejected", "Plan");
 
   const second = await submitPlan(state, state.sessionId, "second");
   assert(second.artifactPath !== first.artifactPath, "resubmission reused the first Plan artifact path");
@@ -1616,18 +1616,18 @@ async function runAcceptance(state) {
       const current = await inspectUi(state);
       return current.bar?.status === "pending" ? current : null;
     },
-    "zh-CN pending Plan card after second SQLite reload",
+    "de pending Plan card after second SQLite reload",
     state,
   );
   snapshot = await inspectUi(state);
-  assertPendingUi(snapshot, "zh-CN", "second");
+  assertPendingUi(snapshot, "de", "second");
   await clickApprovalMenuAndCheckAsk(state);
   record(
     "E2E-117-en",
     true,
     "English Plan shell, immutable approval metadata, Ask default, gated controls, and rejected editable state verified",
   );
-  await captureScreenshot(state, "e2e-117-zh-CN-pending");
+  await captureScreenshot(state, "e2e-117-de-pending");
 
   await assertResponsiveViewport(state, 1280, 800);
   const narrow = await assertResponsiveViewport(state, 900, 700);
@@ -1647,14 +1647,14 @@ async function runAcceptance(state) {
   );
   snapshot = await inspectUi(state);
   await settleExpectedExecutionError(state);
-  assertApprovedTerminal(snapshot, "zh-CN");
+  assertApprovedTerminal(snapshot, "de");
   await assertPlanProbeIdentityAt(state, "identity after approval");
   await captureScreenshot(state, "e2e-117-terminal");
   await reloadRenderer(state);
   await assertPlanProbeIdentityAt(state, "identity after approved terminal renderer reload");
   await selectSession(state, state.sessionId);
   snapshot = await inspectUi(state);
-  assertReloadedTerminalAbsent(snapshot, "zh-CN", "approved/completed", "智能体");
+  assertReloadedTerminalAbsent(snapshot, "de", "approved/completed", "Agent");
   await assertPlanProbeIdentityAt(state, "identity during final assertions");
 
   record(
@@ -1663,9 +1663,9 @@ async function runAcceptance(state) {
     `rejected first checkpoint, editable planning, distinct second artifact, and Ask approval completed (${first.artifactPath} -> ${second.artifactPath})`,
   );
   record(
-    "E2E-117-zh-CN",
+    "E2E-117-de",
     true,
-    "zh-CN labels, Ask default, terminal Agent state, pending-only reload hydration, and no stale actions verified",
+    "de labels, Ask default, terminal Agent state, pending-only reload hydration, and no stale actions verified",
   );
 
   await runPermissionAcceptance(state);

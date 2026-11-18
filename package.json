@@ -1,5 +1,5 @@
 {
-  "name": "pi-desktop",
+  "name": "slyy-desktop",
   "private": true,
   "version": "0.23.0-beta.2",
   "description": "Local-first AI coding agent desktop client",
@@ -93,7 +93,7 @@
     "docs:dev": "pnpm --filter @pi-desktop/docs dev",
     "docs:build": "pnpm --filter @pi-desktop/docs build",
     "docs:preview": "pnpm --filter @pi-desktop/docs preview",
-    "docs:check": "pnpm --filter @pi-desktop/docs check:locales && pnpm --filter @pi-desktop/docs check:docs",
+    "docs:check": "pnpm --filter @pi-desktop/docs check:docs",
     "lint": "pnpm lint:biome && pnpm -r --if-present lint",
     "host:dev": "cargo run -p host-core",
     "clean": "pnpm -r --if-present clean && cargo clean",

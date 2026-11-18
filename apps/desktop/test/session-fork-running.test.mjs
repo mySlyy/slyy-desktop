@@ -92,7 +92,7 @@ test("a superseded fork does not clear the newer session selection", async (t) =
 
 test("fork activation clears an in-flight selection so the child is visible immediately", async (t) => {
   const h = harness(t);
-  // 侧边栏分支可以在旧会话后台重新验证时触发。
+  // A sidebar fork can fire while the old session revalidates in the background.
   h.set({ isRunning: false, runningSessions: {}, selectingSessionId: "parent" });
   t.mock.method(api, "forkSession", async () => ({ session: { id: "child", title: "Branch", mode: "agent", messages: [] } }));
   await h.slice.forkSession("parent");

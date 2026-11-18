@@ -6,11 +6,9 @@ The rig in ``apps/desktop/electron/main/index.ts`` writes 2400x1600 PNGs to
 frames are the source of truth for every screenshot the project ships, so the
 docs never drift from the shell the e2e UI scenarios describe.
 
-Run the rig once per locale (append ``--lang=zh-CN`` to the electron command for
-the Chinese pass), then publish each pass:
+Run the rig with the English UI, then publish the pass:
 
     python3 scripts/publish-screenshots.py --source /tmp/shots-en --locale en
-    python3 scripts/publish-screenshots.py --source /tmp/shots-zh --locale zh
 
 Scenes land in ``docs/public/screenshots/app/<locale>/`` for the gallery page and
 the README subset lands in ``docs/public/readme/``. Scenes the rig produces but
@@ -30,11 +28,11 @@ GALLERY_ROOT = ROOT / "docs" / "public" / "screenshots" / "app"
 README_ROOT = ROOT / "docs" / "public" / "readme"
 
 # Rendered at 2x the ~800px docs content column; webp keeps each frame around
-# 35 KB, so the whole bilingual gallery costs a few megabytes.
+# 35 KB, so the whole gallery costs a few megabytes.
 TARGET_WIDTH = 1600
 QUALITY = 82
 
-LOCALES = ("en", "zh")
+LOCALES = ("en",)
 
 # Scene id (the rig's shot() name without the "pi-" prefix) in gallery order.
 SCENES = (
@@ -96,7 +94,7 @@ SCENES = (
     "dark-home",
 )
 
-# Gallery scene -> README file stem. The Chinese README reads the ".zh" variant.
+# Gallery scene -> README file stem. A non-English locale gets a ".<locale>" suffix.
 README_SHOTS = {
     "home-light": "home",
     "minimap": "conversation",

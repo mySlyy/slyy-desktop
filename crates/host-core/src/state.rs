@@ -17,6 +17,18 @@ use crate::workspace::WorkspaceState;
 
 pub const PROTOCOL_VERSION: u32 = 11;
 pub const HOST_VERSION: &str = env!("CARGO_PKG_VERSION");
+
+/// Data directory name under the home directory, used only when
+/// `PI_DESKTOP_DATA_DIR` is unset (Electron always sets it). Matches the Slyy
+/// installation identity (ADR slyy-downstream-branding). The
+/// `~/.pi-desktop` of an upstream PI-Desktop install is deliberately never
+/// read, so the two never share data.
+pub const DEFAULT_DATA_DIR_NAME: &str = ".slyy-gen2";
+
+/// The data directory host-core uses when `PI_DESKTOP_DATA_DIR` is unset.
+pub fn default_data_dir(home: &std::path::Path) -> std::path::PathBuf {
+    home.join(DEFAULT_DATA_DIR_NAME)
+}
 const BASH_ABORT_TOMBSTONE_TTL: Duration = Duration::from_secs(60);
 const MAX_BASH_ABORT_TOMBSTONES: usize = 1024;
 const TOOL_ABORT_TOMBSTONE_TTL: Duration = Duration::from_secs(60);

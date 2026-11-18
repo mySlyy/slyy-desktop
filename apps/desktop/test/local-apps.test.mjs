@@ -121,7 +121,6 @@ test("windows shortcuts that are uninstallers, help files or readmes are skipped
   const uninstaller = "C:\\Program Files\\Google\\Chrome\\Application\\unins000.exe";
   const readme = "C:\\Program Files\\Tool\\readme.html";
   const help = "C:\\Program Files\\Tool\\ToolHelp.chm";
-  const chineseUninstaller = "C:\\Program Files\\Foo\\卸载.exe";
   const missing = "C:\\Program Files\\Gone\\gone.exe";
   const { deps } = createFakeHost({
     shortcuts: {
@@ -129,10 +128,9 @@ test("windows shortcuts that are uninstallers, help files or readmes are skipped
       [`${START_MENU}\\Uninstall Chrome.lnk`]: { target: uninstaller },
       [`${START_MENU}\\Read me.lnk`]: { target: readme },
       [`${START_MENU}\\Tool Help.lnk`]: { target: help },
-      [`${START_MENU}\\卸载 Foo.lnk`]: { target: chineseUninstaller },
       [`${START_MENU}\\Gone.lnk`]: { target: missing },
     },
-    existing: [CHROME_TARGET, uninstaller, readme, help, chineseUninstaller],
+    existing: [CHROME_TARGET, uninstaller, readme, help],
   });
 
   const apps = await createLocalAppCatalog(deps).list();

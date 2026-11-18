@@ -34,9 +34,9 @@ const message = {
       {
         type: "text",
         text: [
-          "Which **deployment** target?：Desktop",
-          "Which platforms should be supported?：macOS、Linux",
-          "Should beta updates be enabled?：",
+          "Which **deployment** target?: Desktop",
+          "Which platforms should be supported?: macOS, Linux",
+          "Should beta updates be enabled?: ",
         ].join("\n---\n"),
       },
     ],
@@ -86,7 +86,7 @@ test("asktool rows retain generic output when structured history is unavailable"
   const { buildToolPresentation } = await ssr.load("/src/lib/tool-presentation.ts");
   const legacy = buildToolPresentation({
     ...message,
-    toolResult: "Which deployment target?：Desktop",
+    toolResult: "Which deployment target?: Desktop",
   });
   assert.ok(legacy.some((block) => block.kind === "code" && block.role === "output"));
   assert.ok(legacy.some((block) => block.role === "input"));

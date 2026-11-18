@@ -124,7 +124,7 @@ Deliverables:
 - one-Agent `EnterPlanMode` / `SubmitPlan` and `EnterGoalMode` / `SubmitGoal`
   lifecycles with approve/reject-only resolution and fail-closed recovery
 - Plan artifact approval IPC/RPC/events, current-lifetime renderer projection,
-  pending-only reload hydration, shell selection, approval UX, and EN/zh-CN copy
+  pending-only reload hydration, shell selection, approval UX, and localized copy
 - plugin denial, scheduled contract rejection, selectable shell execution,
   focused unit/integration verification, and the current extension/subagent
   flows documented in the E2E plan
@@ -171,7 +171,7 @@ Remaining work is tracked as product hardening rather than unstarted MVP scope:
 - stronger plugin runtime sandboxing and publisher signatures
 - qualification of a tagged macOS release build and native Windows/Linux qualification
 - full Playwright/UI-driven E2E coverage
-- additional locales beyond the shipped zh-CN catalog
+- additional locales beyond the shipped `en` and `de` catalogs
 
 ## Release constraint
 

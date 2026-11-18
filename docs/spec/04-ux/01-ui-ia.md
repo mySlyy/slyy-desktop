@@ -42,8 +42,8 @@ destination, chat as the home surface, tools and permissions inline.
   discoverable through Settings → Project archive.
   Collapsible to an icon rail (Cmd/Ctrl+B). Its expanded column is user-resizable
   from 240px to 520px (default 275px); dragging below 160px collapses it.
-- **Product identity**: runtime shell copy uses `PI-Desktop`; the home hero and
-  sidebar reuse the derived `src/assets/brand/logo-*.png` marks, while composer prompt
+- **Product identity**: runtime shell copy uses `Slyy`; the home hero and
+  sidebar reuse the Slyy dot mark `src/assets/brand/slyy-mark.svg`, while composer prompt
   rows have no leading brand icon and session-creation controls use a dedicated
   message-plus icon. On
   Windows/Linux, the expanded sidebar begins with a keyboard-accessible Home
@@ -358,7 +358,7 @@ and leaves the reader on this page. Automatic runs never steal foreground
 focus. See [desktop automations](../../adr/scheduled-desktop-automations.md).
 
 Run status describes the execution session, not verified task success. In the
-English and Simplified Chinese catalogs, `completed` reads as **Session ended**
+English catalog, `completed` reads as **Session ended**
 rather than an unqualified completion claim. History copy directs the reader to
 the transcript and task evidence for actual outcome verification. No business
 outcome is inferred from a normal session ending; storage and dispatch semantics
@@ -423,7 +423,7 @@ contains independent Skills, MCP, and Subagents destinations alongside
 Instructions and Model configuration; selecting one
 changes the page destination rather than a tab inside a shared capability panel.
 Appearance lives inside General; global AI behavior (permissions and context
-management) lives inside 全局 AI; keyboard shortcuts and global/project
+management) lives inside the global AI destination; keyboard shortcuts and global/project
 instructions have their own destinations; provider management lives inside
 Model configuration. Models, Skills, and MCP each open their external-store
 import workbench inline within the owning Settings destination; scans start
@@ -565,6 +565,8 @@ shared capability contract:
 
 ## 8. i18n
 
-English is the source locale. Shipped translations (zh-CN, zh-TW, Turkish, German, Spanish, French, and
-Korean) cover shell chrome; labels are asserted by US-UI e2e scenarios.
+English is the source locale. The only shipped translation is German (`de`,
+formal "Sie"); Slyy removed the upstream zh-CN, zh-TW, Turkish, Spanish,
+French, and Korean catalogs. Shell-chrome labels are asserted by US-UI e2e
+scenarios.
 Copy rules live in [02-i18n-english-first](02-i18n-english-first.md).

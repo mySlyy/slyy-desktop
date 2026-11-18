@@ -45,7 +45,6 @@ await build({
 const require = createRequire(import.meta.url);
 const { modeRunElapsedMs, formatModeRunElapsed, renderPanel, EN_TRANSLATION, DE_TRANSLATION } = require(entry);
 const EN_UNITS = { day: "d", hour: "h", minute: "m", second: "s" };
-const ZH_UNITS = { day: "天", hour: "小时", minute: "分", second: "秒" };
 const translation = (units) => ({
   settings: { modeGoal: "Goal" },
   modes: { run: {

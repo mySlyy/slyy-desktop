@@ -30,7 +30,7 @@ globalThis.imageGenerationProbe = async () => {
   const i18n = createInstance();
   await i18n.init({
     lng: "en",
-    resources: { en: { translation: catalogs.en }, "zh-CN": { translation: catalogs["zh-CN"] } },
+    resources: { en: { translation: catalogs.en }, de: { translation: catalogs.de } },
   });
   let settings = {
     defaultMode: "agent",
@@ -127,7 +127,7 @@ globalThis.imageGenerationProbe = async () => {
       ".provider-chosen-capability input[type=\"checkbox\"]",
     )].find((element) => element.getAttribute("aria-label") === label);
   try {
-    for (const locale of ["en", "zh-CN"]) {
+    for (const locale of ["en", "de"]) {
       await i18n.changeLanguage(locale);
       // The scenario precondition is "no image model configured", so each locale
       // pass starts unmarked instead of inheriting the candidates the previous
@@ -398,7 +398,7 @@ globalThis.imageGenerationProbe = async () => {
     }
     return {
       ok: true,
-      locales: ["en", "zh-CN"],
+      locales: ["en", "de"],
       scenarios: [
         "provider-save-feedback-for-image-mark-and-unmark",
         "remove-marked-model-cancel-save-reopen-and-clear",

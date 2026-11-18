@@ -1,6 +1,6 @@
 ---
 title: Screens
-description: Every PI-Desktop surface, captured from the running app.
+description: Every Slyy surface, captured from the running app.
 ---
 
 # Screens
@@ -12,18 +12,18 @@ each surface, and writes the PNGs that `scripts/publish-screenshots.py` converts
 for this page. The screenshots therefore show the shipped shell rather than a
 mockup, including the empty states a fresh install starts from.
 
-Session titles and transcripts come from the capture fixture, so the chrome is
-English while the sample conversation is Chinese. The
-[中文版本](/zh-CN/guide/screenshots) shows the same surfaces with Chinese chrome.
+Session titles and transcripts come from the capture fixture. The frames on
+this page predate the Slyy rebrand and still show the upstream PI-Desktop
+theme; they are regenerated with the steps at the end of this page.
 
 ## Home and conversation
 
 The home screen is the first surface a new install shows: a hero, the composer,
 and the sidebar with sessions grouped by project.
 
-![PI-Desktop home in the light theme](../public/screenshots/app/en/home-light.webp)
+![Slyy home in the light theme](../public/screenshots/app/en/home-light.webp)
 
-![PI-Desktop home in the dark theme](../public/screenshots/app/en/home-dark.webp)
+![Slyy home in the dark theme](../public/screenshots/app/en/home-dark.webp)
 
 ![The chat destination in the dark theme](../public/screenshots/app/en/dark-home.webp)
 
@@ -156,13 +156,13 @@ Settings is a full-page destination with a searchable tab rail.
 ## Regenerating these frames
 
 Build the renderer, make sure `target/debug/pi-desktop-host-core` exists, create
-`/tmp/codex-screens`, then run the app once per locale and publish each pass:
+`/tmp/codex-screens`, then run the app and publish the pass:
 
 ```bash
 pnpm --filter @pi-desktop/desktop build
 mkdir -p /tmp/codex-screens
 
-# English pass; append --lang=zh-CN for the Chinese pass.
+# English pass.
 cd apps/desktop && PI_DESKTOP_CAPTURE=1 PI_DESKTOP_DATA_DIR=$(mktemp -d) \
   ELECTRON_RENDERER_URL= ./node_modules/.bin/electron .
 

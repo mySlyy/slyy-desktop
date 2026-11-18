@@ -2368,7 +2368,7 @@
 
 /*
  * The operation count beside a group label never truncates: the composition
- * phrase ellipsizes first, because "12 次操作" is the part that has to survive a
+ * phrase ellipsizes first, because "12 operations" is the part that has to survive a
  * narrow band (see `.tool-activity-label`).
  */
 .tool-activity-count.tool-activity-ops {

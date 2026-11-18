@@ -17,6 +17,8 @@ product that offers parallel local work isolates it in a git worktree.
 1. An isolated session is opt-in per new session and owns one worktree on branch
    `pi-desktop/<id>` under `~/.pi-desktop/worktrees/<project-key>/`, created from the
    project's current branch tip; uncommitted project changes are not carried over.
+   (Slyy: new branches are `slyy/<id>` under `<data_dir>/worktrees/`; stored
+   `pi-desktop/<id>` rows keep working. See ADR slyy-downstream-branding.)
 2. host-core owns all git execution, worktree paths, and the `worktrees` registry, and
    the renderer and runtime send only a session id or delegation id.
 3. Containment is unchanged in mechanism: the session's root is its worktree (or

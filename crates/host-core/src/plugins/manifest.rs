@@ -10,7 +10,7 @@ pub struct PluginManifest {
     pub main: String,
     /// Renderer entry module (relative path). Declaring it requires the
     /// `renderer.extension` permission; the module registers UI slot
-    /// components in the host renderer (`docs/plugin-plan/ui/`).
+    /// components in the host renderer (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2).
     #[serde(default, rename = "renderer")]
     pub renderer: Option<String>,
     /// Outbound actions the renderer components may dispatch; the desktop
@@ -165,7 +165,14 @@ mod tests {
 
     #[test]
     fn ids_that_would_share_a_directory_or_partition_are_rejected() {
-        for id in ["foo!bar", "foo/bar", "foo bar", "插件", "..", "."] {
+        for id in [
+            "foo!bar",
+            "foo/bar",
+            "foo bar",
+            "\u{63D2}\u{4EF6}",
+            "..",
+            ".",
+        ] {
             let error = read_with_id(id).unwrap_err();
             assert_eq!(
                 error.to_string(),

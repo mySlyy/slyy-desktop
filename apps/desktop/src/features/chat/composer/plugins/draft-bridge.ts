@@ -1,6 +1,6 @@
 /**
  * The composer end of the plugin draft and attachment actions
- * (`docs/plugin-plan/render/draft/`, `docs/plugin-plan/render/attachments/`).
+ * (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2).
  *
  * A composer taking input registers a handle; the last one registered is the
  * one plugins reach, so a composer that mounts over another takes over until

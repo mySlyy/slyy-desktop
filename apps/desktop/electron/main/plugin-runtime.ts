@@ -1768,7 +1768,7 @@ export class PluginRuntime {
   /**
    * Source resolver behind the `plugin-renderer://` scheme: the current load
    * of a permission-granted plugin serves module files from inside its own
-   * package, and nothing else (`docs/plugin-plan/ui/`).
+   * package, and nothing else (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2).
    */
   resolveRendererSource(pluginId: string, generation: number, requestPath: string): string | null {
     return resolveRendererSourcePath(this.loaded.get(pluginId), generation, requestPath);
@@ -1781,7 +1781,7 @@ export class PluginRuntime {
 
   /**
    * The `plugin.call` relay: a renderer slot component asks its own plugin
-   * for one JSON answer (`docs/plugin-plan/render/plugin-call/`).
+   * for one JSON answer (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2).
    */
   async callRenderer(pluginId: string, method: string, args: unknown): Promise<unknown> {
     const loaded = this.loaded.get(pluginId);

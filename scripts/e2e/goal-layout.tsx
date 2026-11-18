@@ -60,7 +60,7 @@ async function advance(ms: number) {
   await settle();
 }
 
-const objective = "Verify a very long Goal objective without hiding controls. ".repeat(70) + "目标验收条件".repeat(80) + "x".repeat(500);
+const objective = "Verify a very long Goal objective without hiding controls. ".repeat(70) + "\u76ee\u6807\u9a8c\u6536\u6761\u4ef6".repeat(80) + "x".repeat(500);
 const longElapsed = (1234 * 86_400 + 5 * 3600 + 6 * 60 + 7) * 1000;
 let run: ModeRun = {
   id: "layout-run", sessionId: "layout-session", modeId: "goal", snapshotHash: "fixture",
@@ -177,9 +177,9 @@ function elapsedText() { return element(".mode-run-elapsed").textContent; }
 function seconds(value: number) { return `${value} s`; }
 
 const probe = {
-  async mount(language: "en" | "zh-CN") {
+  async mount(language: "en" | "de") {
     await i18n.init({ lng: language, fallbackLng: "en", resources: {
-      en: { translation: catalogs.en }, "zh-CN": { translation: catalogs["zh-CN"] },
+      en: { translation: catalogs.en }, de: { translation: catalogs.de },
     }, interpolation: { escapeValue: false } });
     document.documentElement.lang = language;
     document.documentElement.dataset.theme = "dark";

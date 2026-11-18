@@ -1,6 +1,6 @@
 /**
  * The action-bar sides of `userAction` / `assistantAction`
- * (`docs/plugin-plan/ui/user-action/`, `docs/plugin-plan/ui/assistant-action/`).
+ * (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2).
  *
  * A bar renders its left side, its host keys, then its right side; a plugin
  * can add around the host keys but never change, hide or fold them. Each side

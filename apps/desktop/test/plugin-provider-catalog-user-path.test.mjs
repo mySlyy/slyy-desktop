@@ -67,14 +67,14 @@ window.piDesktop = {
         pluginId: "community.ai-sites",
         providerId,
         pluginName: "PI Community AI Sites",
-        category: "公益 AI 站",
-        description: "通过签到获取额度的公益 API 服务。",
+        category: "Community AI sites",
+        description: "A community API service with daily check-in credits.",
       }, {
         pluginId: "community.ai-sites",
         providerId: remainingProviderId,
         pluginName: "PI Community AI Sites",
-        category: "公益 AI 站",
-        description: "面向社区用户开放的模型 API 服务。",
+        category: "Community AI sites",
+        description: "A model API service open to community users.",
       }] };
     }
     if (channel === "pi-desktop/providers/setSecret") {
@@ -172,7 +172,7 @@ window.pluginProviderCatalogProbe = async () => {
 
   mount(React.createElement(PluginCatalogSurface));
   const category = await waitFor(
-    () => document.querySelector('[data-plugin-provider-category="公益 AI 站"]'),
+    () => document.querySelector('[data-plugin-provider-category="Community AI sites"]'),
     "the plugin's declared category was not shown",
   );
   const tile = document.querySelector('[data-plugin-provider-id="' + providerId + '"]');
@@ -185,7 +185,7 @@ window.pluginProviderCatalogProbe = async () => {
     () => document.querySelector('[role="tooltip"]'),
     "hovering a station did not show its introduction",
   );
-  const introductionShown = tooltip.textContent === "通过签到获取额度的公益 API 服务。";
+  const introductionShown = tooltip.textContent === "A community API service with daily check-in credits.";
   flushSync(() => tile.click());
 
   const input = await waitFor(

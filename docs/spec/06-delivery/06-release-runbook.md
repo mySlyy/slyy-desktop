@@ -22,15 +22,15 @@ not pass.
 
 On macOS, `pnpm dev` creates and reuses a fingerprinted branded Electron host
 bundle under `.cache/electron-dev/`. Its bundle name, executable, identifier,
-and ICNS resource are development-only PI-Desktop values, so AppKit shows
-PI-Desktop in the application menu and uses the canonical icon in the native
+and ICNS resource are development-only Slyy values, so AppKit shows
+Slyy in the application menu and uses the canonical icon in the native
 About panel. The runtime also applies `build/icon_1024.png` to the Dock. Stock
 files under `node_modules` are never modified. Windows/Linux development keeps
 the normal electron-vite executable. Windows Main nevertheless registers the
-same `net.aiuo.pi-desktop` AppUserModelID used by the NSIS package before
+same `ai.slyy.desktop.gen2` AppUserModelID used by the NSIS package before
 Electron readiness, preventing the stock host identity from owning native
 notifications or taskbar groups. The Windows package additionally pins the
-`PI-Desktop` executable and Start menu shortcut names. The launcher sets
+`Slyy Gen2` executable and `Slyy` Start menu shortcut names. The launcher sets
 `PI_DESKTOP_DEV=1` so runtime packaging checks keep update delivery disabled
 and preserve developer workspace defaults despite the branded executable name.
 The first `pnpm dev` on Electron 43+ downloads the Electron binary on demand
@@ -46,14 +46,17 @@ when macOS `iconutil` is available, without overwriting the canonical source.
 ## 2. Prerequisites (release lane)
 
 1. Apple Developer account with a **Developer ID Application** certificate in
-   the login keychain. Official certificate:
-   `Developer ID Application: XingYu Liu (DUV63RKYTW)` (Team ID `DUV63RKYTW`).
+   the login keychain, issued to the Slyy (Wapsol GmbH) Developer ID team. The
+   team id and the certificate common name are kept in the repository variables
+   `SLYY_APPLE_TEAM_ID` and `SLYY_MAC_SIGNING_IDENTITY`, not in this document.
 2. Environment variables for the local signed lane:
-   - `MAC_SIGNING_IDENTITY` — bare common name `XingYu Liu (DUV63RKYTW)`;
-     electron-builder rejects a name that keeps the
-     `Developer ID Application:` prefix, so the script strips it
+   - `MAC_SIGNING_IDENTITY` — the bare Slyy Developer ID common name (the value
+     of `SLYY_MAC_SIGNING_IDENTITY`); electron-builder rejects a name that keeps
+     the `Developer ID Application:` prefix, so the script strips it
    - `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID` — required for
-     notarization (`APPLE_TEAM_ID` must be `DUV63RKYTW`)
+     notarization
+   - `SLYY_APPLE_TEAM_ID` — the frozen Slyy team id; `APPLE_TEAM_ID` must equal
+     it or `scripts/release-macos.sh` stops
 3. Rust toolchain and pnpm workspace installed. The Rust toolchain must run on
    the native macOS runner: arm64 for Apple Silicon or x86_64 for Intel.
 
@@ -82,12 +85,11 @@ when macOS `iconutil` is available, without overwriting the canonical source.
 - `Resources/app.asar` — Electron Main, preload, renderer output, and only the
   runtime-resolved production modules. Renderer libraries are already present
   in Vite output and are not copied again as raw package trees.
-- Chromium locale packs for English, Simplified Chinese, Traditional Chinese,
-  Turkish, German, Spanish, French, and Korean. Product catalogs remain bundled
-  independently of Chromium locales.
+- Chromium locale packs for English and German (`electronLanguages`). Product
+  catalogs remain bundled independently of Chromium locales.
 - App icons `build/icon.icns` and `build/icon.ico` (derived from canonical
   `build/icon_1024.png` by `scripts/make-icon.py`).
-- macOS menu bar template `build/tray-icon-mac.png`, derived from the dark PI
+- macOS menu bar template `build/tray-icon-mac.png`, derived from the Slyy dot
   mark with a transparent background; Windows/Linux use the product PNG tray
   resource.
 
@@ -110,12 +112,12 @@ Surfaces in scope:
 |---|---|
 | `apps/desktop/resources/models.dev/api.json` | Refreshed from https://models.dev/api.json before tagging; the release workflow packages this snapshot unchanged |
 | `packages/shared/src/changelog-en.ts` | Newest-first English entries (source of truth, ADR 0009) |
-| `packages/shared/src/changelog-zh-CN.ts`, `changelog-zh-TW.ts`, `changelog-tr.ts`, `changelog-de.ts`, `changelog-es.ts`, `changelog-fr.ts`, `changelog-ko.ts`, `changelog-pt-BR.ts` | Same version set and highlight counts as English; a newly shipped locale is also registered in `packages/shared/src/changelog.ts` |
+| `packages/shared/src/changelog-de.ts` | Same version set and highlight counts as English; a newly shipped locale is also registered in `packages/shared/src/changelog.ts` |
 | `packages/shared/src/changelog.test.ts` | Version added at the top of the newest-first list |
 | `package.json`, `apps/*/package.json`, `packages/*/package.json`, `docs/package.json` | Same version (`docs` is a third workspace root, not under `apps`/`packages`) |
 | `Cargo.toml` `[workspace.package]`, `Cargo.lock` `host-core` | Same version |
 | `packages/shared/src/protocol.ts` `APP_VERSION` | Same version |
-| `README.md`, `README.zh-CN.md` | Status section states the current `<major>.<minor>.x` release line; toolchain, command, and roadmap claims still true |
+| `README.md` | Status section states the current `<major>.<minor>.x` release line; toolchain, command, and roadmap claims still true |
 
 Blocking steps:
 
@@ -132,8 +134,8 @@ Blocking steps:
 2. Edit `packages/shared/src/changelog-en.ts` **before**
    `node scripts/release.mjs <version>` / `git tag`:
    - Add a **newest-first** entry under `en` and every shipped product locale
-     (`zh-CN` / `zh-TW` in `changelog-zh-CN.ts` / `changelog-zh-TW.ts`; the
-     remaining catalogs are the sibling `packages/shared/src/changelog-*.ts` files).
+     (`de` in `changelog-de.ts`; any further catalog is a sibling
+     `packages/shared/src/changelog-*.ts` file).
    - Same `version` string (semver **without** a leading `v`, matching
      `apps/desktop` / `APP_VERSION` for a stable cut).
    - Optional ISO `date` (`YYYY-MM-DD`).
@@ -149,11 +151,9 @@ Blocking steps:
    `packages/shared/src/changelog.test.ts` (add the new stable version at the
    top), then run `pnpm --filter @pi-desktop/shared test` and confirm catalog
    alignment (version sets + highlight counts) still passes.
-5. Update `README.md` and `README.zh-CN.md` when the release line changes
-   (`0.10.x` → `0.11.x`) and whenever the release ships user-visible behavior
-   the Highlights, Download, Getting started, Status, or Development sections
-   now describe incorrectly. Both locales stay structurally in sync; English is
-   the source of truth and the zh-CN file links the `docs/zh-CN/` mirrors.
+5. Update `README.md` when the release line changes (`0.10.x` → `0.11.x`) and
+   whenever the release ships user-visible behavior its sections now describe
+   incorrectly.
 6. Run the preflight and fix every reported surface:
    `pnpm check:release-docs [version]` (`node scripts/check-release-docs.mjs`).
    For a prerelease, run it against the **stable** version being previewed
@@ -166,8 +166,9 @@ Blocking steps:
    non-release bump.
 7. Commit the documentation updates so the tagged commit contains notes and
    accurate version claims for that version (alone or adjacent to the bump).
-8. GitHub Release bodies may still use `generate_release_notes: true` for the
-   web page; they remain web-only and are **not** the in-app notes source.
+8. GitHub Release bodies are written by `release.yml` (platform table and
+   unsigned-build notices); they remain web-only and are **not** the in-app
+   notes source.
 
 Pre-tag checklist:
 
@@ -175,11 +176,11 @@ Pre-tag checklist:
       current in the tagged tree
 - [ ] `packages/shared/src/changelog-en.ts` and every shipped locale catalog
       carry entries for the stable version being shipped or previewed
-- [ ] `packages/shared/src/changelog-de.ts` and the other locale catalogs
+- [ ] `packages/shared/src/changelog-de.ts` and any other locale catalog
       match the English version set and highlight counts
 - [ ] Highlight counts match across locales
 - [ ] Shared changelog tests pass
-- [ ] `README.md` and `README.zh-CN.md` state the current release line and
+- [ ] `README.md` states the current release line and
       contain no claims the release invalidates
 - [ ] `node scripts/check-release-docs.mjs` passes on the release commit
       (use the stable version when tagging a prerelease preview)
@@ -189,10 +190,11 @@ Pre-tag checklist:
 ### 4.2 Build / package
 
 ```bash
-export MAC_SIGNING_IDENTITY="XingYu Liu (DUV63RKYTW)"
+export MAC_SIGNING_IDENTITY=...   # value of SLYY_MAC_SIGNING_IDENTITY
 export APPLE_ID=...
 export APPLE_APP_SPECIFIC_PASSWORD=...
-export APPLE_TEAM_ID=...
+export APPLE_TEAM_ID=...          # must equal SLYY_APPLE_TEAM_ID
+export SLYY_APPLE_TEAM_ID=...
 scripts/release-macos.sh
 ```
 
@@ -218,23 +220,29 @@ runtime, verifying the host build, building the Desktop application once, and
 invoking electron-builder. This avoids a redundant Desktop build without
 changing the package scripts or release artifacts.
 
-**Default macOS release policy:** GitHub tag releases Developer ID-sign,
+**Default macOS release policy:** with the repository variable
+`SLYY_MAC_SIGNING_ENABLED=true`, GitHub tag releases Developer ID-sign,
 notarize, staple, and Gatekeeper-verify macOS DMG/ZIP before upload (D450 /
-ADR 0289). Missing signing or notarization secrets fail the job. A
-`workflow_dispatch` run may set `sign_macos: false` only to produce unsigned
-debug artifacts; that path must not be used for a GitHub Release tag. Local
-`scripts/release-macos.sh` remains the explicit signed local lane; `pnpm dist:mac`
-stays unsigned without a configured certificate (D078).
+ADR 0289), and missing signing or notarization secrets fail the job. While the
+variable is unset (Slyy has no Apple secrets yet), tag builds package macOS
+unsigned and the release is published as a GitHub pre-release whose notes state
+that macOS (Gatekeeper warning, no in-app update) and Windows are unsigned
+(ADR `slyy-downstream-branding`). A `workflow_dispatch` run follows its
+`sign_macos` input instead (default `true`); dispatched on a `v*` tag ref it
+also publishes. Local `scripts/release-macos.sh` remains the explicit signed
+local lane; `pnpm dist:mac` stays unsigned without a configured certificate
+(D078).
 
 The macOS matrix uses `macos-15` for arm64 and `macos-15-intel` for Intel x64.
 Each job verifies `uname -m`, passes the matching `--arm64` or `--x64` flag to
 electron-builder, and builds `pi-desktop-host-core` on that same native
-runner. Tag builds and `sign_macos: true` (the dispatch default) receive
+runner. Signed tag builds and `sign_macos: true` (the dispatch default) receive
 `CSC_LINK`, `CSC_KEY_PASSWORD`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, and
-`APPLE_TEAM_ID` only from GitHub Actions secrets, pin the certificate through
-`CSC_NAME=XingYu Liu (DUV63RKYTW)` (bare common name — electron-builder rejects
-the `Developer ID Application:` prefix), force code signing and
-`notarytool` notarization of `PI-Desktop.app`. The DMG is then submitted to the
+`APPLE_TEAM_ID` only from GitHub Actions secrets, require `APPLE_TEAM_ID` to
+equal the `SLYY_APPLE_TEAM_ID` repository variable, pin the certificate through
+`CSC_NAME` from the `SLYY_MAC_SIGNING_IDENTITY` repository variable (bare
+common name — electron-builder rejects the `Developer ID Application:`
+prefix), force code signing and `notarytool` notarization of `Slyy Gen2.app`. The DMG is then submitted to the
 same service on its own (`scripts/notarize-and-staple-macos-release-dmg.sh`),
 and only an `Accepted` status allows the ticket to be stapled. Verification
 then checks the identity, code-signing integrity (including
@@ -256,9 +264,9 @@ tickets on the app and DMG.
 The shared electron-builder configuration applies the architecture-labelled
 pattern at the macOS platform level for ZIPs and overrides it at the DMG target
 level. Both public architectures are therefore explicit: the arm64 lane
-publishes `PI-Desktop-<version>-arm64.dmg` and
-`PI-Desktop-<version>-arm64-mac.zip`, while the Intel x64 lane publishes
-`PI-Desktop-<version>-x64.dmg` and `PI-Desktop-<version>-x64-mac.zip`. This
+publishes `Slyy-<version>-arm64.dmg` and
+`Slyy-<version>-arm64-mac.zip`, while the Intel x64 lane publishes
+`Slyy-<version>-x64.dmg` and `Slyy-<version>-x64-mac.zip`. This
 applies to both unsigned and signed macOS lanes, including local release builds,
 and ensures each generated updater feed references its architecture-labelled
 asset names and matching checksums. Before upload, each macOS runner requires
@@ -268,17 +276,17 @@ any unlabelled or wrong-architecture macOS artifact.
 The DMG uses a branded 720×440 background with a two-icon drag-to-Applications
 gesture. The app and Applications link are the only items in the window.
 
-The macOS ZIP contains `PI-Desktop.app` at its root. Neither the DMG nor ZIP
+The macOS ZIP contains `Slyy Gen2.app` at its root. Neither the DMG nor ZIP
 ships an opening-help note or executable first-launch helper, including local
-and unsigned debug builds. Tagged artifacts remain signed and notarized; the
-unsigned lane is for debugging and does not imply Gatekeeper qualification.
+and unsigned builds. Unsigned macOS artifacts are not Gatekeeper-qualified;
+they ship only as GitHub pre-releases.
 
 DMG, ZIP, NSIS, AppImage, deb, rpm, blockmap, and updater feed outputs are already
 compressed or compression-insensitive. The workflow therefore uploads their
 temporary Actions artifacts with compression level zero before the publish job
 assembles the GitHub Release. The Linux runners also copy their unpacked
 `resources/app.asar` (`linux-unpacked` on x64, `linux-arm64-unpacked` on arm64)
-to the versioned `PI-Desktop-<version>-linux-<arch>.asar` asset before upload.
+to the versioned `Slyy-<version>-linux-<arch>.asar` asset before upload.
 This preserves the exact archive used by the Linux installers for downstream
 repackaging with a system Electron.
 
@@ -287,42 +295,62 @@ The Linux updater feeds carry the architecture they were built for:
 channel files `electron-updater` requests on the matching architecture, so a
 lane fails before upload if its own feed is missing.
 
-### 4.4 CNB mirror trigger
+### 4.4 Release repository (CNB mirror removed)
 
-After `softprops/action-gh-release` publishes or updates a GitHub Release,
-`.github/workflows/mirror-to-cnb.yml` starts the CNB pipeline at
-`aixk/Pi-Desktop`. GitHub Release remains the canonical artifact source; CNB
-is a copy of the same tag for users who pull from
-https://cnb.cool/aixk/Pi-Desktop.
+Upstream PI-Desktop mirrors each GitHub Release to a CNB (cnb.cool) pipeline
+through `.github/workflows/mirror-to-cnb.yml`. Slyy removed that workflow.
 
-The job:
+The source repository `mySlyy/slyy-desktop` is private, so the publish job
+creates the release in the public repository `mySlyy/releases` under the same
+tag name (`softprops/action-gh-release` with `repository: mySlyy/releases`).
+GitHub Releases on `mySlyy/releases` are the only artifact source, the only
+electron-updater feed (`build.publish`, `resources/app-update.yml`), and the
+source of the remote `pi-host-<version>-linux-<arch>.tar.gz` (+ `.sha256`)
+bundles the SSH bootstrap downloads (`GITHUB_RELEASES_REPO`). The tag is created
+in `mySlyy/releases` on its default branch, so that repository needs at least
+one commit (for example a README). Release notes are written by the workflow
+(`generate_release_notes` would summarize the releases repository's own
+history); the in-app notes remain the changelog catalogs. Releases with a `-`
+in the version or an unsigned macOS build are marked pre-release.
 
-- runs only on `vastsa/PI-Desktop`
-- fires on `release` `published` / `edited`, and on `workflow_dispatch` with
-  an explicit tag such as `v0.14.6`
-- sends event `api_trigger_mirror` and `MIRROR_TAGS` set to that tag
-- uses repository secret `CNB_MIRROR_TOKEN` (already configured) and fails
-  closed if the secret is empty
-- builds the JSON body with `jq` so a missing tag cannot produce an empty
-  `MIRROR_TAGS` value on a manual run
+Trigger after the release commit is on `main`:
 
-Re-running the workflow for the same tag is safe if the CNB pipeline is
-idempotent. It does not rebuild desktop artifacts and does not change
-electron-updater feeds.
+```bash
+git fetch origin main
+git tag v<version> origin/main
+git push origin v<version>
+```
 
-### 4.5 GitHub Actions secrets for macOS signing
+Never push a tag fetched from upstream PI-Desktop: a local
+`v<version>` created from `upstream` points at upstream code. Delete it first
+(`git tag -d v<version>`).
 
-Create these under GitHub → repository `vastsa/PI-Desktop` → Settings →
-Secrets and variables → Actions. Never commit the p12, password, Apple ID, or
+### 4.5 GitHub Actions secrets
+
+`SLYY_RELEASES_TOKEN` (required for every tag release): a fine-grained personal
+access token, resource owner `mySlyy`, repository access only `mySlyy/releases`,
+repository permission Contents: Read and write (Metadata: Read is implied). The
+default `GITHUB_TOKEN` cannot write to another repository. The `verify` job
+fails a tag run without it before any platform build starts.
+
+```bash
+gh secret set SLYY_RELEASES_TOKEN -R mySlyy/slyy-desktop   # paste the token at the prompt
+```
+
+macOS signing: create these under GitHub → repository `mySlyy/slyy-desktop` →
+Settings → Secrets and variables → Actions, then turn signing on for tag builds
+with `gh variable set SLYY_MAC_SIGNING_ENABLED -R mySlyy/slyy-desktop --body true`.
+The repository variables `SLYY_APPLE_TEAM_ID` and `SLYY_MAC_SIGNING_IDENTITY`
+hold the frozen Slyy team id and certificate common name. Never commit the p12, password, Apple ID, or
 app-specific password. Never `echo` these values in CI.
 
 | Secret | Value |
 |---|---|
 | `CSC_LINK` | Base64 of the exported Developer ID Application `.p12` (Certificate + Private Key). electron-builder also accepts a file path, but CI uses the secret body. |
 | `CSC_KEY_PASSWORD` | Password used when exporting that `.p12` |
-| `APPLE_ID` | Apple ID email that belongs to team `DUV63RKYTW` |
+| `APPLE_ID` | Apple ID email that belongs to the Slyy Developer ID team |
 | `APPLE_APP_SPECIFIC_PASSWORD` | App-specific password from https://appleid.apple.com → Sign-In and Security → App-Specific Passwords |
-| `APPLE_TEAM_ID` | `DUV63RKYTW` |
+| `APPLE_TEAM_ID` | The Slyy team id; must equal the `SLYY_APPLE_TEAM_ID` variable |
 
 Encode the p12 locally (do not paste the output into chat or the repo):
 
@@ -336,13 +364,13 @@ enter git: `*.p12`, `*.cer`, `*.p8`, `*.mobileprovision`.
 ### 4.6 macOS signing observability and timeouts
 
 `electron-builder` prints one line before signing — `signing
-file=release/mac-arm64/PI-Desktop.app platform=darwin type=distribution
+file=release/mac-arm64/Slyy Gen2.app platform=darwin type=distribution
 identityName=...` — and then nothing until the phase is over. Three mechanisms
 hide in that gap, and the macOS lanes now expose all three:
 
 | Point in the phase | What happens | How it is visible |
 |---|---|---|
-| Walk | `@electron/osx-sign` walks `PI-Desktop.app/Contents` and collects every Mach-O file plus nested `.app` and `.framework` bundles | `DEBUG=electron-osx-sign*` prints `Walking... <dir>`; `scripts/macos-bundle-inventory.mjs` prints the same bundle's counts right after packaging |
+| Walk | `@electron/osx-sign` walks `Slyy Gen2.app/Contents` and collects every Mach-O file plus nested `.app` and `.framework` bundles | `DEBUG=electron-osx-sign*` prints `Walking... <dir>`; `scripts/macos-bundle-inventory.mjs` prints the same bundle's counts right after packaging |
 | Per-file signing | `codesign --force --sign <identity> --timestamp --entitlements ... <file>` runs serially, deepest file first, the app bundle last | `DEBUG=electron-osx-sign*` prints `Signing... <file>` and `Executing... <file> codesign ...`; the codesign shim times every invocation. If a keychain ever refuses to hand the key to a wrapped `codesign`, `PI_SIGNING_NO_CODESIGN_SHIM=1` runs the phase without the shim |
 | Silent retry | A failing pass is retried up to three more times with a 5s/10s/15s backoff and no log line | The watchdog's `codesign-calls` and `failures` lines expose repeated passes |
 | App notarization | `@electron/notarize` zips the app, uploads it, and waits for Apple's queue (`mac.notarize=true`) | `DEBUG=electron-notarize*` prints `zipping application to`, `attempting to upload file to Apple`, `notarization success`, then electron-builder prints `notarization successful` |
@@ -409,17 +437,18 @@ above.
 
 ## 5. Verification gates
 
-Unsigned debug artifacts (`workflow_dispatch` with `sign_macos: false`) are
-not Gatekeeper-qualified. Tag releases must pass the signature, notarization,
-and staple checks below or the workflow fails.
+Unsigned macOS artifacts (tag builds without `SLYY_MAC_SIGNING_ENABLED=true`,
+or `workflow_dispatch` with `sign_macos: false`) are not Gatekeeper-qualified
+and publish only as pre-releases. Signed releases must pass the signature,
+notarization, and staple checks below or the workflow fails.
 
 Two separate notarization submissions exist, because Apple notarizes one
 artifact per submission and electron-builder only covers the app:
 
 | Artifact | Submitted by | Ticket |
 |---|---|---|
-| `PI-Desktop.app` (inside the ZIP) | electron-builder `-c.mac.notarize=true` | stapled and validated by electron-builder through the watchdog's bounded stapler retry shim |
-| `PI-Desktop-<version>-<arch>.dmg` | `scripts/notarize-and-staple-macos-release-dmg.sh` (`notarytool submit --wait`) | stapled and validated by the same script after `status: Accepted` |
+| `Slyy Gen2.app` (inside the ZIP) | electron-builder `-c.mac.notarize=true` | stapled and validated by electron-builder through the watchdog's bounded stapler retry shim |
+| `Slyy-<version>-<arch>.dmg` | `scripts/notarize-and-staple-macos-release-dmg.sh` (`notarytool submit --wait`) | stapled and validated by the same script after `status: Accepted` |
 
 A DMG that was never submitted has no ticket, so stapling it fails with
 `Could not find base64 encoded ticket ... Error 65`. Stapler retries are only
@@ -430,7 +459,7 @@ configured attempt limit is exhausted.
 Run after every signed release build:
 
 ```bash
-for APP in apps/desktop/release/mac-*/PI-Desktop.app; do
+for APP in apps/desktop/release/mac-*/"Slyy Gen2.app"; do
   codesign -dv --verbose=4 "$APP"          # identity + hardened runtime flags
   codesign --verify --deep --strict --verbose=2 "$APP"
   spctl --assess --type execute --verbose=4 "$APP"
@@ -467,8 +496,7 @@ The package inventory must confirm:
   tree in ASAR
 - required third-party license and notice files remain in ASAR or
   `Resources/licenses` when their non-runtime package trees are pruned
-- only the configured English, Simplified Chinese, Traditional Chinese,
-  Turkish, German, Spanish, French, and Korean Chromium locale packs
+- only the configured English and German Chromium locale packs
 
 The first audited optimized package establishes the platform baseline. Keep
 per-platform measurements rather than applying one budget to different
@@ -508,9 +536,10 @@ publication:
   plugin removes `woff` and `truetype` `src` entries before Vite registers
   them as assets. The bundled Chromium supports `woff2` universally, so those
   faces would be emitted and never served.
-- **Brand marks are renderer-sized.** `src/assets/brand/logo-{light,dark}.png`
-  are the renderer assets. `build/icon_1024.png` and `build/logo_dark.png` are
-  electron-builder installer icons and must not be imported by the renderer.
+- **Brand marks are renderer-sized.** `src/assets/brand/slyy-mark.svg` is the
+  renderer asset (it replaced the upstream `logo-{light,dark}.png` marks).
+  `build/icon_1024.png` is the electron-builder installer icon and must not be
+  imported by the renderer.
 
 Renderer output measured on 2026-08-26 after applying these three controls,
 against the same tree at `v0.10.8`:
@@ -542,9 +571,9 @@ removal:
 The entire difference is the four deleted faces, at the sizes the build reports:
 `lxgw-wenkai.woff2` 8,016.75 kB, `noto-sans-sc.woff2` 7,782.07 kB,
 `inter.woff2` 352.24 kB, and `geist.woff2` 69.65 kB — 16,220.71 kB, which is the
-whole 15.47 MiB drop in the total. Chinese text now renders from the system tier
-(`PingFang SC`, `Hiragino Sans GB`, `Microsoft YaHei`), so no glyph coverage is
-lost to subsetting: no face ships.
+whole 15.47 MiB drop in the total. CJK text in user content now renders from
+the operating system's CJK font tier, so no glyph coverage is lost to
+subsetting: no face ships.
 The other two controls are unchanged: minification stays explicit, and the
 legacy `woff`/`truetype` strip stays because KaTeX still declares those sources.
 
@@ -553,21 +582,20 @@ so its `woff2` row is no longer current.
 
 Manual smoke on a clean profile (`PI_DESKTOP_DATA_DIR=$(mktemp -d)`):
 
-1. `pnpm dev` launches with `PI-Desktop` in the macOS application menu and the
+1. `pnpm dev` launches with `Slyy` in the macOS application menu and the
    canonical icon in both the Dock and native About panel; no Electron brand is
    visible.
 2. App launches from DMG install, window appears, and the application-menu,
    About-panel, and Dock branding match the development lane.
-3. Empty home and expanded/collapsed sidebar show the canonical PI-Desktop
-   logo; composer prompt rows have no leading brand icon; New task and
+3. Empty home and expanded/collapsed sidebar show the Slyy dot mark; composer prompt rows have no leading brand icon; New task and
    project/Temporary create controls use the message-plus session icon.
 4. Onboarding checklist appears; configure provider; one streamed chat turn.
 5. One permissioned tool call (Write) allow + deny paths.
 6. Quit/relaunch → session history restored, window bounds restored.
-7. `~/.pi-desktop/logs/` contains categorized NDJSON under `app/`, `host/`,
+7. `~/.slyy-gen2/logs/` contains categorized NDJSON under `app/`, `host/`,
    and `agent/`; key lifecycle, tool, provider, plugin, and error records are
    available without dedicated timing files.
-8. With network access disabled, the shell still starts; English/Chinese
+8. With network access disabled, the shell still starts; English/German
    switching, syntax highlighting, shell highlighting, KaTeX, Mermaid
    fallback/rendering, host health, and sidecar health continue to use packaged
    local assets.
@@ -599,15 +627,16 @@ D126/D285/D603.
 
 Native-runner output matrix:
 
-- macOS arm64: `PI-Desktop-<version>-arm64.dmg` and
-  `PI-Desktop-<version>-arm64-mac.zip`
-- macOS Intel x64: `PI-Desktop-<version>-x64.dmg` and
-  `PI-Desktop-<version>-x64-mac.zip`
-- Windows x64: NSIS installer `PI-Desktop-Setup-<version>.exe` and portable
-  ZIP `PI-Desktop-Portable-<version>.zip`
-- Linux x64 and arm64: AppImage, deb, and rpm
-- Linux system Electron assets: `PI-Desktop-<version>-linux-x64.asar` and
-  `PI-Desktop-<version>-linux-arm64.asar`
+- macOS arm64: `Slyy-<version>-arm64.dmg` and
+  `Slyy-<version>-arm64-mac.zip`
+- macOS Intel x64: `Slyy-<version>-x64.dmg` and
+  `Slyy-<version>-x64-mac.zip`
+- Windows x64: NSIS installer `Slyy-Setup-<version>.exe` and portable
+  ZIP `Slyy-Portable-<version>.zip`
+- Linux x64 and arm64: AppImage `Slyy-<version>-linux-<arch>.AppImage`, deb
+  `slyy-gen2_<version>_<arch>.deb`, and rpm `slyy-gen2-<version>-<arch>.rpm`
+- Linux system Electron assets: `Slyy-<version>-linux-x64.asar` and
+  `Slyy-<version>-linux-arm64.asar`
 
 The portable Windows ZIP target does not write `latest.yml`. The Windows
 release helper builds NSIS and ZIP separately and stamps the ZIP app metadata
@@ -615,11 +644,11 @@ with `piDistribution = "zip"`; packaged ZIP runs use notify-and-link delivery.
 Legacy portable executables remain manual when `PORTABLE_EXECUTABLE_FILE` is
 present. NSIS keeps the in-app download and quit-and-install lane. Data stays
 in the existing application data directory. Users extract the ZIP and launch
-`PI-Desktop.exe` directly, so the package does not run a self-extracting
+`Slyy Gen2.exe` directly, so the package does not run a self-extracting
 wrapper or request administrator execution.
 
 RPM targets pass `_build_id_links none` to FPM. Bundled Electron binaries live
-under `/opt/PI-Desktop`; omitting global `/usr/lib/.build-id` links prevents
+under `/opt/Slyy Gen2`; omitting global `/usr/lib/.build-id` links prevents
 collisions with other applications that bundle the same Electron binaries.
 
 The ASAR asset contains the Electron application archive, not a complete Linux
@@ -628,7 +657,7 @@ target Electron resources layout together with the native host and other
 resources from the target package, then launch it with:
 
 ```bash
-electron PI-Desktop-<version>-linux-<arch>.asar
+electron Slyy-<version>-linux-<arch>.asar
 ```
 
 Shell smoke on each native runner:

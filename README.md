@@ -6,7 +6,7 @@
 
 macOS · Windows · Linux — a brand of Wapsol GmbH · [slyy.ai](https://slyy.ai)
 
-**[Download](https://github.com/mySlyy/slyy-desktop/releases/latest)** · [slyy.ai](https://slyy.ai) · [Plugin development](docs/plugin-development.md)
+**[Download](https://github.com/mySlyy/releases/releases/latest)** · [slyy.ai](https://slyy.ai) · [Plugin development](docs/plugin-development.md)
 
 </div>
 
@@ -19,7 +19,7 @@ replaceable. The UI ships in English and German.
 ## Install and update
 
 Download the installer for your platform from
-[Releases](https://github.com/mySlyy/slyy-desktop/releases/latest):
+[Releases](https://github.com/mySlyy/releases/releases/latest):
 
 | Platform | Package | Updates |
 | --- | --- | --- |

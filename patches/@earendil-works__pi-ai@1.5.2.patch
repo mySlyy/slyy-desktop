@@ -326,7 +326,7 @@ index 51de5ed18b59979d0e7aa883f46ecdc05ab274a7..da385ff92649735f8850b6ac6511f46d
                      }
                      continue;
                  }
-+                // Mistral 不回放托管搜索；只把真正的客户端工具调用转换为 function。
++                // Mistral does not replay hosted search; only real client tool calls become functions.
 +                if (block.type !== "toolCall")
 +                    continue;
                  toolCalls.push({
@@ -662,7 +662,7 @@ index 0977a46594d2caa8c92b90e267158ee5efb74938..84594bc4ee233f095a2dc200373b6c6e
                  ...(options?.timeoutMs !== undefined ? { timeout: options.timeoutMs } : {}),
                  maxRetries: 0,
              };
-+            // 在进入网络边界前验证可序列化性，不把网络 TypeError 当作本地错误。
++            // Validate serializability before the network boundary; do not treat a network TypeError as a local error.
 +            JSON.stringify(params);
 +            preparingRequest = false;
              const { data: openaiStream, response } = await retryProviderRequest(() => client.responses.create(params, requestOptions).withResponse(), {
@@ -1490,7 +1490,7 @@ index 0000000000000000000000000000000000000000..5c63b882ae4cb618e964c5d2ce8d3c18
 +        return prepare();
 +    }
 +    catch (error) {
-+        // 只包围同步 setup/buildBaseOptions；网络及响应解析仍由原 adapter 处理。
++        // Wrap only the synchronous setup/buildBaseOptions; network and response parsing stay with the original adapter.
 +        const details = localRequestErrorDetails(asLocalRequestError(error, "request-preparation"));
 +        const aborted = options?.signal?.aborted === true;
 +        const message = {

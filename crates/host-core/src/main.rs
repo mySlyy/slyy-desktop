@@ -76,9 +76,9 @@ async fn main() -> anyhow::Result<()> {
     let data_dir = std::env::var("PI_DESKTOP_DATA_DIR")
         .map(std::path::PathBuf::from)
         .unwrap_or_else(|_| {
-            dirs::home_dir()
-                .unwrap_or_else(|| std::path::PathBuf::from("."))
-                .join(".pi-desktop")
+            state::default_data_dir(
+                &dirs::home_dir().unwrap_or_else(|| std::path::PathBuf::from(".")),
+            )
         });
 
     std::fs::create_dir_all(&data_dir)?;

@@ -51,7 +51,7 @@ function assert(value: unknown, message: string): asserts value {
 async function markdownLinkInteractionProbe(
   i18n: ReturnType<typeof createInstance>,
 ) {
-  const destination = "https://github.com/vastsa/PI-Desktop/issues/1106";
+  const destination = "https://github.com/mySlyy/slyy-desktop/issues/1106";
   const initialState = useAppStore.getState();
   const openedUrls: string[] = [];
   const host = document.createElement("div");
@@ -73,7 +73,7 @@ async function markdownLinkInteractionProbe(
       root.render(
         <I18nextProvider i18n={i18n}>
           <Markdown
-            source="[#1106](([github.com](https://github.com/vastsa/PI-Desktop/issues/1106)))"
+            source="[#1106](([github.com](https://github.com/mySlyy/slyy-desktop/issues/1106)))"
           />
         </I18nextProvider>,
       ),
@@ -681,7 +681,7 @@ globalThis.transcriptRenderProbe = async () => {
       "Task completion timing did not update to 4s",
     );
 
-    // 系统通知后重建会话时，仍运行的 Task 不应变成已停止。
+    // When the session is rebuilt after a system notice, a Task that is still running must not turn into stopped.
     for (const smoothStreaming of [false, true]) {
       for (const inlineVisualizations of [false, true]) {
         flushSync(() => useAppStore.setState({ settings: {

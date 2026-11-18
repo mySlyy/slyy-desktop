@@ -354,7 +354,7 @@ test("plugin auto-title APIs require the narrow permission and forward only boun
               await pi.ui.showToast("updated:" + result.updated);
               try {
                 await pi.session.setAutoTitle({
-                  sessionId: "s1", expectedTitle: "New task", title: "界".repeat(81)
+                  sessionId: "s1", expectedTitle: "New task", title: "\u754c".repeat(81)
                 });
               } catch (error) { await pi.ui.showToast("long:" + error.code); }
             }

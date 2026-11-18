@@ -380,7 +380,7 @@ means the host will retry, and it never widens a scope.
 | `COMPUTER_GRANT_EXPIRED` | no | the grant hit its idle expiry, was revoked, or its target closed |
 | `COMPUTER_BUDGET_EXHAUSTED` | no | the grant's remaining input-action budget reached zero |
 | `COMPUTER_SCOPE_VIOLATION` | no | the request resolved outside the granted window or application |
-| `COMPUTER_SELF_TARGET_REFUSED` | no | the target is a PI-Desktop window; refused under every mode |
+| `COMPUTER_SELF_TARGET_REFUSED` | no | the target is a Slyy window; refused under every mode |
 | `COMPUTER_TARGET_DENYLISTED` | no | the target is on the credential-surface or user denylist |
 | `COMPUTER_SECURE_INPUT_REFUSED` | no | the OS reports secure input or a password field holds focus |
 | `COMPUTER_STALE_BASIS` | yes | the coordinate basis does not match a current capture of this scope |
@@ -576,8 +576,9 @@ reason popover shows the localized summary, the stable code, and — for a
 network failure — the transport errno (`NETWORK_ERROR · ENOTFOUND`), so the
 failing layer is visible during the retry loop as well as in the log record.
 The assistant error card offers a localized
-Continue action that resends the continuation prompt (`继续当前任务` /
-`Continue the current task`) in the same session without truncating the failed
+Continue action that resends the continuation prompt (`Continue the current
+task` / `Mit der aktuellen Aufgabe fortfahren`) in the same session without
+truncating the failed
 turn. The session-scoped failed-turn recovery card is used only when no
 structured assistant error is present; neither failure surface offers
 Regenerate.

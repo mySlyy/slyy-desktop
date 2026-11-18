@@ -1,6 +1,6 @@
 /**
  * The message a message-anchored slot sees (`PluginSlotMessage`,
- * `docs/plugin-plan/slot-contract.html` §2): its id, the role the slot is
+ * `docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2): its id, the role the slot is
  * for, its text and its time. Nothing else of the host's message crosses into
  * plugin code.
  */

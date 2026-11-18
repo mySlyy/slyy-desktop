@@ -61,7 +61,7 @@ const PROSE_BOUNDARIES = new Set([
   "copy", "create", "created", "delete", "edit", "find", "fix", "for",
   "generated", "i", "is", "move", "now", "open", "or", "please", "read",
   "remove", "review", "saved", "see", "show", "then", "this", "update",
-  "use", "view", "with", "write", "和", "与", "再看", "然后", "接着",
+  "use", "view", "with", "write",
 ]);
 
 function createStats(): ChatLinkScanStats {
@@ -349,9 +349,16 @@ function isCandidateBoundary(text: string, index: number): boolean {
   return !pathWordAt(text, previous) && text[previous] !== "/" && text[previous] !== "\\";
 }
 
+/**
+ * Mirrors `SESSION_LINK_PREFIXES` in `@pi-desktop/shared` (session-link.ts):
+ * `slyy://session/` and the pre-rebrand `pi-desktop://session/`. Kept local so
+ * this scanner stays free of package imports.
+ */
+const SESSION_LINK_PREFIXES = ["slyy://session/", "pi-desktop://session/"] as const;
+
 function sessionLinkEnd(text: string, start: number): number {
-  const prefix = "pi-desktop://session/";
-  if (!text.startsWith(prefix, start)) return start;
+  const prefix = SESSION_LINK_PREFIXES.find((candidate) => text.startsWith(candidate, start));
+  if (!prefix) return start;
   let end = start + prefix.length;
   const idStart = end;
   while (end < text.length && end - idStart < 65) {

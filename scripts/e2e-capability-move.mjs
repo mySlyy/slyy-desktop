@@ -233,27 +233,27 @@ try {
   );
 
   // ── Skill: the scan, not the file name, decides the id ────────────────────
-  // A Chinese name slugs to nothing, so the id falls back to the path stem, and
+  // A Han-script name slugs to nothing, so the id falls back to the path stem, and
   // a same-named document at the other level collides with it. Planning the move
   // against the file stem alone would delete the source and then fail to find
   // the arrival, and a colliding id would let the scan hide one of the two.
   mkdirSync(join(skillsDir(home), "code-review"), { recursive: true });
   writeFileSync(
     join(skillsDir(home), "code-review", "SKILL.md"),
-    "---\nname: 代码审查\n---\n\nGlobal copy.\n",
+    "---\nname: \u4ee3\u7801\u5ba1\u67e5\n---\n\nGlobal copy.\n",
   );
   writeFileSync(join(skillsDir(home), "code-review", "scripts.sh"), "#!/bin/sh\necho hi\n");
   mkdirSync(join(skillsDir(projectA), "code-review"), { recursive: true });
   writeFileSync(
     join(skillsDir(projectA), "code-review", "SKILL.md"),
-    "---\nname: 代码审查\n---\n\nProject copy.\n",
+    "---\nname: \u4ee3\u7801\u5ba1\u67e5\n---\n\nProject copy.\n",
   );
   const globalSkills = await host.call("skills.list", { level: "global" });
   record(
     "skill-without-an-ascii-name-is-catalogued-under-its-path-stem",
     globalSkills.skills.length === 1 &&
       globalSkills.skills[0].id === "code-review" &&
-      globalSkills.skills[0].name === "代码审查",
+      globalSkills.skills[0].name === "\u4ee3\u7801\u5ba1\u67e5",
     JSON.stringify(globalSkills.skills),
   );
 

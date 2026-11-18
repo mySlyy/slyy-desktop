@@ -1464,7 +1464,7 @@ describe("custom system prompt files (issue #542)", () => {
     const prompt = promptOf(runtime);
 
     expect(prompt).toContain(persona);
-    expect(prompt).not.toContain("You are PI-Desktop");
+    expect(prompt).not.toContain("You are Slyy");
     // Operational rules from the default prompt must survive the replacement.
     expect(prompt).toContain("Complete the requested work and relevant checks");
     expect(prompt).toContain("Before each tool batch, briefly state its purpose");
@@ -1487,10 +1487,10 @@ describe("custom system prompt files (issue #542)", () => {
     const prompt = promptOf(runtime);
 
     expect(prompt).toContain(appendix);
-    expect(prompt).toContain("You are PI-Desktop");
+    expect(prompt).toContain("You are Slyy");
     expect(prompt).toContain("Run unit tests.");
     expect(prompt.indexOf(appendix)).toBeGreaterThan(
-      prompt.indexOf("You are PI-Desktop"),
+      prompt.indexOf("You are Slyy"),
     );
     expect(prompt.indexOf("Run unit tests.")).toBeGreaterThan(
       prompt.indexOf(appendix),
@@ -1507,7 +1507,7 @@ describe("custom system prompt files (issue #542)", () => {
 
     expect(prompt).toContain(persona);
     expect(prompt).toContain(appendix);
-    expect(prompt).not.toContain("You are PI-Desktop");
+    expect(prompt).not.toContain("You are Slyy");
 
     await runtime.dispose();
   });
@@ -1516,7 +1516,7 @@ describe("custom system prompt files (issue #542)", () => {
     const runtime = createRuntime();
     const prompt = promptOf(runtime);
 
-    expect(prompt).toContain("You are PI-Desktop");
+    expect(prompt).toContain("You are Slyy");
     expect(prompt).toContain("File references: when citing a real local file, use a Markdown link");
     expect(prompt).not.toContain("MARKER-XYZ-123");
 
@@ -3171,8 +3171,8 @@ describe("DesktopAgentRuntime configuration matching", () => {
     expect(truncated?.length).toBe(TOOL_PROGRESS_CAP_CHARS);
     expect(truncated?.indexOf(marker)).toBe(head);
 
-    const within = await flushedBashProgress(["hello ", "😀世界"]);
-    expect(within).toEqual(["hello ", "hello 😀世界"]);
+    const within = await flushedBashProgress(["hello ", "\u{1F600}\u4e16\u754c"]);
+    expect(within).toEqual(["hello ", "hello \u{1F600}\u4e16\u754c"]);
 
     const exact = "e".repeat(TOOL_PROGRESS_CAP_CHARS);
     const [atCap] = await flushedBashProgress([exact]);
@@ -3971,7 +3971,7 @@ describe("DesktopAgentRuntime deferred tool catalog", () => {
       }),
     ).toEqual({ ok: true });
     await expect(pending).resolves.toMatchObject({
-      content: [{ text: "**Color?**：**Blue**\n---\nTargets?：" }],
+      content: [{ text: "**Color?**: **Blue**\n---\nTargets?: " }],
       details: { answers: [["**Blue**"], null] },
     });
     await runtime.dispose();
@@ -4036,7 +4036,7 @@ describe("DesktopAgentRuntime deferred tool catalog", () => {
       }),
     ).toEqual({ ok: true });
     await expect(pendingAtLimit).resolves.toMatchObject({
-      content: [{ text: `${validQuestion}：Continue` }],
+      content: [{ text: `${validQuestion}: Continue` }],
       details: { answers: [["Continue"]] },
     });
     await runtime.dispose();
@@ -8600,7 +8600,7 @@ describe("DesktopAgentRuntime per-turn context protection", () => {
       timestamp: `2026-07-30T00:00:0${index}Z`,
       message: {
         role: "user",
-        content: `${label}:${"中".repeat(index === 1 ? 50_000 : 100)}`,
+        content: `${label}:${"\u4e2d".repeat(index === 1 ? 50_000 : 100)}`,
         timestamp: index + 1,
       },
     }));
@@ -12477,7 +12477,7 @@ describe("DesktopAgentRuntime compaction request headers", () => {
     expect(calls[0]?.sessionId).toBe("session-1");
     expect(calls[0]?.headers).toMatchObject({
       "x-opencode-session": "session-1",
-      "x-opencode-client": "pi-desktop",
+      "x-opencode-client": "slyy",
       "X-Team": "platform",
     });
     await runtime.dispose();

@@ -3,7 +3,7 @@ import test from "node:test";
 import { absoluteImagePath, remarkLocalImagePaths } from "../src/lib/markdown-image-paths.ts";
 
 test("absolute image paths survive URL encoding without enabling URL protocols", () => {
-  for (const path of [String.raw`C:\scratch\cup.png`, "D:/work/cup image.png", "/tmp/scratch/杯子.png"]) {
+  for (const path of [String.raw`C:\scratch\cup.png`, "D:/work/cup image.png", "/tmp/scratch/\u676f\u5b50.png"]) {
     assert.equal(absoluteImagePath(path), path);
     assert.equal(absoluteImagePath(encodeURIComponent(path)), path);
     const tree = { type: "root", children: [{ type: "image", url: path }] };

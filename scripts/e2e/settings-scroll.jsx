@@ -33,7 +33,7 @@ let updateState = {
   status: "available",
   currentVersion: "0.15.8",
   availableVersion: "0.15.9",
-  releasesUrl: "https://github.com/vastsa/PI-Desktop/releases/latest",
+  releasesUrl: "https://github.com/mySlyy/releases/releases/latest",
 };
 const updateStateListeners = new Set();
 window.piDesktop = {
@@ -91,8 +91,7 @@ await i18n.use(initReactI18next).init({
   keySeparator: false,
   resources: {
     en: { translation: flattenCatalog(catalogs.en) },
-    "pt-BR": { translation: flattenCatalog(catalogs["pt-BR"]) },
-    "zh-CN": { translation: flattenCatalog(catalogs["zh-CN"]) },
+    de: { translation: flattenCatalog(catalogs.de) },
   },
   interpolation: { escapeValue: false },
 });
@@ -227,7 +226,7 @@ async function exerciseUpdatePreference() {
   return { updatePreference: settings.updatePreference, updateMode: updateState.mode };
 }
 
-async function exerciseBrazilianPortuguese() {
+async function exerciseGerman() {
   await select("Appearance");
   const trigger = document.querySelector(".settings-language-trigger");
   assert(trigger instanceof HTMLButtonElement, "Language picker trigger must render");
@@ -238,28 +237,28 @@ async function exerciseBrazilianPortuguese() {
   assert(search instanceof HTMLInputElement, "Language picker search must render");
   const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
   assert(setter, "Language search input must expose its value setter");
-  setter.call(search, "Português (Brasil)");
+  setter.call(search, "Deutsch");
   search.dispatchEvent(new Event("input", { bubbles: true }));
   await settle();
 
   const option = [...document.querySelectorAll(".settings-language-option")]
-    .find((candidate) => candidate.textContent?.includes("Português (Brasil)"));
-  assert(option instanceof HTMLButtonElement, "Brazilian Portuguese must be searchable");
+    .find((candidate) => candidate.textContent?.includes("Deutsch"));
+  assert(option instanceof HTMLButtonElement, "German must be searchable");
   const languageChanged = new Promise((resolve) => i18n.once("languageChanged", resolve));
   flushSync(() => option.click());
   await languageChanged;
   await settle();
 
-  assert(settings.language === "pt-BR", "Choosing Portuguese must persist pt-BR");
-  assert(useAppStore.getState().settings?.language === "pt-BR", "App settings must retain pt-BR");
-  assert(document.documentElement.lang === "pt-BR", "Document language must update to pt-BR");
-  assert(navButton("Aparência"), "Settings navigation must switch to Brazilian Portuguese");
+  assert(settings.language === "de", "Choosing German must persist de");
+  assert(useAppStore.getState().settings?.language === "de", "App settings must retain de");
+  assert(document.documentElement.lang === "de", "Document language must update to de");
+  assert(navButton("Darstellung"), "Settings navigation must switch to German");
   assert(!navButton("Appearance"), "English navigation must be replaced after switching locales");
   const languageTitle = [...document.querySelectorAll(".settings-row-title")]
-    .find((node) => node.textContent?.trim() === "Idioma");
+    .find((node) => node.textContent?.trim() === "Sprache");
   assert(languageTitle, "The language setting label must be translated");
   const selectedLabel = document.querySelector(".settings-language-trigger-label");
-  assert(selectedLabel?.textContent?.trim() === "Português (Brasil)", "Picker must show the selected native name");
+  assert(selectedLabel?.textContent?.trim() === "Deutsch", "Picker must show the selected native name");
   return { locale: i18n.language, language: settings.language, label: selectedLabel.textContent.trim() };
 }
 async function exerciseProxyDraftRestoration() {
@@ -375,7 +374,7 @@ window.settingsScrollProbe = async () => {
     checks.push({ theme, ok: true });
   }
   checks.push(await exerciseUpdatePreference());
-  checks.push(await exerciseBrazilianPortuguese());
+  checks.push(await exerciseGerman());
   return { ok: true, checks };
 };
 

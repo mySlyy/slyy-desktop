@@ -485,7 +485,7 @@ Object.assign(globalThis, {
     check(composer.disabled === true, "unavailable probe: composer is not disabled");
     const fallbackWrite = find<HTMLAnchorElement>(".plugins-reviews-write");
     check(
-      fallbackWrite.href === "https://plugins.aiuo.net/plugins/test.focus#reviews",
+      fallbackWrite.href === "https://hub.slyy.ai/plugins/test.focus#reviews",
       `unavailable probe: fallback write link: ${fallbackWrite.href}`,
     );
 

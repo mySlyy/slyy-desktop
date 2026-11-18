@@ -278,7 +278,7 @@ mod tests {
         let mut recorder = Recorder::default();
         {
             let mut report = DownloadReport::new(&mut recorder, "acme.todo", "1.2.0");
-            report.mirror(Some("cnb"), 2, 3);
+            report.mirror(Some("backup"), 2, 3);
             report.bytes(120, 480);
             report.phase(InstallPhase::Verify);
         }
@@ -286,7 +286,7 @@ mod tests {
         let bytes = &recorder.events[0];
         assert_eq!(bytes.plugin_id, "acme.todo");
         assert_eq!(bytes.phase, InstallPhase::Download);
-        assert_eq!(bytes.source.as_deref(), Some("cnb"));
+        assert_eq!(bytes.source.as_deref(), Some("backup"));
         assert_eq!((bytes.attempt, bytes.attempts), (2, 3));
         assert_eq!((bytes.received_bytes, bytes.total_bytes), (120, 480));
         assert_eq!(recorder.events[1].phase, InstallPhase::Verify);

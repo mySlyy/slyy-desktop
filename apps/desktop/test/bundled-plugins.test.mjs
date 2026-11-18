@@ -34,9 +34,8 @@ test("the file view ships as an ordinary plugin, not a privileged one", () => {
   assert.deepEqual([...manifest.permissions].sort(), ["fs.read", "ui.view"]);
   assert.equal(manifest.fs.read.root, "workspace");
   assert.deepEqual(manifest.fs.read.scope, ["**"]);
-  // A localized title, because the panel menu shows it to the user.
-  assert.equal(typeof manifest.contributes.views[0].title.en, "string");
-  assert.equal(typeof manifest.contributes.views[0].title["zh-CN"], "string");
+  // The panel menu shows the view title to the user (English-only build).
+  assert.equal(manifest.contributes.views[0].title, "File Manager");
   // Vendored from an MIT-licensed repository, so the license travels with it.
   assert.equal(manifest.license, "MIT");
   assert.ok(existsSync(resolve(`${FILE_MANAGER}/LICENSE`)));
@@ -141,8 +140,7 @@ test("Browser ships as an ordinary plugin over the public CDP API", () => {
     [...browserManifest.permissions].sort(),
     ["agent.tool.register", "browser.cdp", "ui.view"],
   );
-  assert.equal(typeof browserManifest.contributes.views[0].title.en, "string");
-  assert.equal(typeof browserManifest.contributes.views[0].title["zh-CN"], "string");
+  assert.equal(browserManifest.contributes.views[0].title, "Browser");
   assert.match(browserMain, /pi\.agent\.registerTool/);
   assert.match(browserMain, /pi\.browser\.(navigate|snapshot|cdp)/);
   assert.match(browserView, /pluginBridge/);

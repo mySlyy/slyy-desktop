@@ -10,11 +10,11 @@ import { isBlockingOverlayActive } from "../../src/lib/blocking-overlay";
 
 const i18n = createInstance();
 await i18n.init({ lng: "en", resources: Object.fromEntries(
-  ["en", "zh-CN"].map((locale) => [locale, { translation: catalogs[locale] }]),
+  ["en", "de"].map((locale) => [locale, { translation: catalogs[locale] }]),
 ), interpolation: { escapeValue: false } });
 const root = createRoot(document.getElementById("root"));
 window.tableFixture = {
-  source: "Intro\n\n| **Product** | Note |\n| :--- | ---: |\n| Pi | 你好, world |\n| ZCode | say \"hi\"<br>again |\n\nSecond\n\n| Other |\n| --- |\n| untouched |",
+  source: "Intro\n\n| **Product** | Note |\n| :--- | ---: |\n| Pi | \u4f60\u597d, world |\n| ZCode | say \"hi\"<br>again |\n\nSecond\n\n| Other |\n| --- |\n| untouched |",
   isBlockingOverlayActive,
   async render(source = this.source, locale = "en", theme = "light") {
     this.source = source;

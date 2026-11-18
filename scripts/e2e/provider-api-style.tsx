@@ -38,7 +38,7 @@ const fixture = (apiStyle: string): ProviderPublic => ({
 globalThis.providerApiStyleProbe = async (reasoningOnly = false) => {
   const i18n = createInstance();
   await i18n.init({ lng: "en", resources: {
-    en: { translation: catalogs.en }, "zh-CN": { translation: catalogs["zh-CN"] }, de: { translation: catalogs.de },
+    en: { translation: catalogs.en }, de: { translation: catalogs.de },
   }, interpolation: { escapeValue: false } });
   const creates: ProviderCreateInput[] = [];
   const updates: ProviderUpdateInput[] = [];
@@ -216,7 +216,7 @@ globalThis.providerApiStyleProbe = async (reasoningOnly = false) => {
     await until(() => Boolean(searchInput()), "model capability settings");
   };
   try {
-    for (const locale of (reasoningOnly ? ["en", "zh-CN", "de"] : ["en", "zh-CN"])) {
+    for (const locale of ["en", "de"]) {
       await i18n.changeLanguage(locale);
       if (reasoningOnly) {
         await verifyReasoningEffort({ render, fixture, i18n, updates, click, control, until, frame });

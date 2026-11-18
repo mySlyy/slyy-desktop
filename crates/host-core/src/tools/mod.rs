@@ -3983,7 +3983,11 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("status.log");
         let mut log = vec![0xfe, 0xff];
-        log.extend("开始\n完成\n".encode_utf16().flat_map(u16::to_be_bytes));
+        log.extend(
+            "\u{5F00}\u{59CB}\n\u{5B8C}\u{6210}\n"
+                .encode_utf16()
+                .flat_map(u16::to_be_bytes),
+        );
         std::fs::write(&path, log).unwrap();
 
         let read = execute_tool(
@@ -3996,8 +4000,8 @@ mod tests {
         .await;
         assert!(read.ok, "UTF-16BE Read failed: {:?}", read.content);
         let content = read.content["content"].as_str().unwrap();
-        assert!(content.contains("1:开始"));
-        assert!(content.contains("2:完成"));
+        assert!(content.contains("1:\u{5F00}\u{59CB}"));
+        assert!(content.contains("2:\u{5B8C}\u{6210}"));
 
         let edit = execute_tool(
             Some(dir.path()),
@@ -4006,7 +4010,7 @@ mod tests {
             &serde_json::json!({
                 "path": "status.log",
                 "tag": read.content["tag"],
-                "ops": "PUT 2.=2:\n+已完成\n"
+                "ops": "PUT 2.=2:\n+\u{5DF2}\u{5B8C}\u{6210}\n"
             }),
             5_000,
         )
@@ -4014,9 +4018,16 @@ mod tests {
         assert!(edit.ok, "UTF-16BE Edit failed: {:?}", edit.content);
         let written = std::fs::read(path).unwrap();
         let mut expected = vec![0xfe, 0xff];
-        expected.extend("开始\n已完成\n".encode_utf16().flat_map(u16::to_be_bytes));
+        expected.extend(
+            "\u{5F00}\u{59CB}\n\u{5DF2}\u{5B8C}\u{6210}\n"
+                .encode_utf16()
+                .flat_map(u16::to_be_bytes),
+        );
         assert_eq!(written, expected);
-        assert_eq!(hashline::normalize_file(&written).text, "开始\n已完成\n");
+        assert_eq!(
+            hashline::normalize_file(&written).text,
+            "\u{5F00}\u{59CB}\n\u{5DF2}\u{5B8C}\u{6210}\n"
+        );
     }
 
     #[tokio::test]
@@ -4245,7 +4256,11 @@ mod tests {
         std::fs::write(dir.path().join("generated/out.txt"), "needle\n").unwrap();
         std::fs::write(dir.path().join("debug.log"), "needle\n").unwrap();
         std::fs::write(dir.path().join("src.txt"), "needle\n").unwrap();
-        std::fs::write(dir.path().join(".pi-desktopignore"), "generated/\n").unwrap();
+        std::fs::create_dir_all(dir.path().join("legacy")).unwrap();
+        std::fs::write(dir.path().join("legacy/out.txt"), "needle\n").unwrap();
+        std::fs::write(dir.path().join(".slyyignore"), "generated/\n").unwrap();
+        // The pre-rebrand file name is still honored next to `.slyyignore`.
+        std::fs::write(dir.path().join(".pi-desktopignore"), "legacy/\n").unwrap();
 
         let unscoped = execute_tool(
             Some(dir.path()),
@@ -4263,7 +4278,11 @@ mod tests {
         );
         assert!(
             !shown.contains("generated"),
-            ".pi-desktopignore is honored: {shown}"
+            ".slyyignore is honored: {shown}"
+        );
+        assert!(
+            !shown.contains("legacy"),
+            ".pi-desktopignore is still honored: {shown}"
         );
         assert!(
             !shown.contains("debug.log"),
@@ -5327,7 +5346,7 @@ mod tests {
             None,
             "Bash",
             &serde_json::json!({
-                "command": "[Console]::Out.Write('stdout π \"quoted\" & <meta>'); [Console]::Error.Write('stderr π \"quoted\" & <meta>')"
+                "command": "[Console]::Out.Write('stdout \u{3C0} \"quoted\" & <meta>'); [Console]::Error.Write('stderr \u{3C0} \"quoted\" & <meta>')"
             }),
             Some(5_000),
             Some(options()),
@@ -5337,11 +5356,11 @@ mod tests {
         assert!(output.content["stdout"]
             .as_str()
             .unwrap()
-            .contains("stdout π"));
+            .contains("stdout \u{3C0}"));
         assert!(output.content["stderr"]
             .as_str()
             .unwrap()
-            .contains("stderr π"));
+            .contains("stderr \u{3C0}"));
         assert!(output.content["stdout"]
             .as_str()
             .unwrap()

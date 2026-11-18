@@ -716,7 +716,7 @@ describe("classifyAgentError", () => {
   // Zhipu/Z.ai code 1308 is the plan usage cap, sent as 429; it resets after
   // hours, so the rate-limit budget must not replay it (pi #11537).
   it.each([
-    '429 {"error":{"code":"1308","message":"已达到 5 小时的使用上限。您的限额将在 2026-11-06 23:00:00 重置。"}}',
+    '429 {"error":{"code":"1308","message":"Usage limit for 5 hours reached. Your limit resets at 2026-11-06 23:00:00."}}',
     '429: {"error":{"code":1308,"message":"Usage limit reached for 5 hour."}}',
   ])("does not retry the Zhipu usage-limit code: %s", (message) => {
     expect(classifyAgentError(Object.assign(new Error(message), { status: 429 }))).toMatchObject({

@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-PI-Desktop uses a layered desktop architecture:
+Slyy uses a layered desktop architecture:
 
 ```text
 ┌──────────────────────────────────────────────────────────┐

@@ -25,6 +25,7 @@ import electronUpdaterPkg from "electron-updater";
 import type { AppUpdater, UpdateInfo, ProgressInfo } from "electron-updater";
 import {
   formatChangelogNotes,
+  GITHUB_RELEASES_URL,
   IPC,
   type UpdatePreference,
   type UpdateState,
@@ -72,7 +73,7 @@ function createRelocatedUpdater(
   return platform === "win32" ? new RelocatedNsisUpdater(baseCachePath) : null;
 }
 
-export const RELEASES_URL = "https://github.com/mySlyy/slyy-desktop/releases/latest";
+export const RELEASES_URL = GITHUB_RELEASES_URL;
 
 const AUTO_CHECK_INITIAL_DELAY_MS = 15_000;
 const AUTO_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;

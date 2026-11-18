@@ -733,16 +733,6 @@
   text-transform: uppercase;
 }
 
-/* CJK has no case and wide tracking splits glyphs unnaturally. */
-:lang(zh-CN) .sidebar-list-label,
-:lang(zh-CN) .dest-section-label,
-:lang(zh-CN) .shortcut-group-label,
-:lang(zh-CN) .import-group-name,
-:lang(zh-TW) .import-group-name {
-  letter-spacing: var(--tracking-normal);
-  text-transform: none;
-}
-
 .sidebar-toolbar-button {
   display: inline-flex;
   width: 22px;

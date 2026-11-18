@@ -5,8 +5,8 @@ import { catalogs } from "@pi-desktop/i18n";
 import { StorageSettingsSection } from "../../apps/desktop/src/features/settings/StorageSettingsSection";
 
 await i18n.use(initReactI18next).init({
-  lng: "zh-CN", interpolation: { escapeValue: false },
-  resources: { "zh-CN": { translation: catalogs["zh-CN"] } },
+  lng: "de", interpolation: { escapeValue: false },
+  resources: { de: { translation: catalogs.de } },
 });
 createRoot(document.getElementById("root")).render(<main style={{ padding: 32 }}><StorageSettingsSection /></main>);
 

@@ -28,22 +28,41 @@ fn front_matter_reads_folded_yaml_descriptions() {
 #[test]
 fn capability_id_falls_back_to_skill_directory_then_hash() {
     let dir_skill = Path::new("/tmp/code-review/SKILL.md");
-    assert_eq!(capability_id("代码审查", dir_skill, 64), "code-review");
+    assert_eq!(
+        capability_id("\u{4EE3}\u{7801}\u{5BA1}\u{67E5}", dir_skill, 64),
+        "code-review"
+    );
     assert_eq!(path_stem_for_id(dir_skill), "code-review");
 
-    let hashed = capability_id("代码审查", Path::new("/tmp/代码审查.md"), 64);
+    let hashed = capability_id(
+        "\u{4EE3}\u{7801}\u{5BA1}\u{67E5}",
+        Path::new("/tmp/\u{4EE3}\u{7801}\u{5BA1}\u{67E5}.md"),
+        64,
+    );
     assert!(hashed.starts_with("skill-"));
     assert!(valid_capability_id(&hashed, 64));
     assert_eq!(
         hashed,
-        capability_id("代码审查", Path::new("/elsewhere/代码审查.md"), 64)
+        capability_id(
+            "\u{4EE3}\u{7801}\u{5BA1}\u{67E5}",
+            Path::new("/elsewhere/\u{4EE3}\u{7801}\u{5BA1}\u{67E5}.md"),
+            64
+        )
     );
     assert_eq!(
-        capability_id("代码审查", Path::new("/Users/me/Downloads/SKILL.md"), 64),
+        capability_id(
+            "\u{4EE3}\u{7801}\u{5BA1}\u{67E5}",
+            Path::new("/Users/me/Downloads/SKILL.md"),
+            64
+        ),
         hashed
     );
     assert_ne!(
-        capability_id("代码审查", Path::new("/Users/me/Downloads/SKILL.md"), 64),
+        capability_id(
+            "\u{4EE3}\u{7801}\u{5BA1}\u{67E5}",
+            Path::new("/Users/me/Downloads/SKILL.md"),
+            64
+        ),
         "downloads"
     );
 }

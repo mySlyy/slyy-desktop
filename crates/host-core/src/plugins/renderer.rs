@@ -3,7 +3,7 @@
 //! The desktop host evaluates the renderer entry inside its own window, so
 //! the install-time checks here keep the declaration well formed and the entry
 //! a real module file inside the package. The whitelists themselves are
-//! enforced by the desktop host at runtime (`docs/plugin-plan/slot-contract.html`).
+//! enforced by the desktop host at runtime (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2).
 
 use super::*;
 

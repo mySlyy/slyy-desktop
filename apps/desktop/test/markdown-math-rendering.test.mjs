@@ -50,9 +50,9 @@ test("TeX math and wrapped HTTP links render through the production Markdown pip
 
     for (const streaming of [false, true]) {
       for (const [source, body] of [
-        ['这是**“重点内容”**，请查看。', '“重点内容”'],
-        ['这是**重点。**后续内容。', '重点。'],
-        ['这是**（重点）**后续内容。', '（重点）'],
+        ['\u8fd9\u662f**\u201c\u91cd\u70b9\u5185\u5bb9\u201d**\uff0c\u8bf7\u67e5\u770b\u3002', '\u201c\u91cd\u70b9\u5185\u5bb9\u201d'],
+        ['\u8fd9\u662f**\u91cd\u70b9\u3002**\u540e\u7eed\u5185\u5bb9\u3002', '\u91cd\u70b9\u3002'],
+        ['\u8fd9\u662f**\uff08\u91cd\u70b9\uff09**\u540e\u7eed\u5185\u5bb9\u3002', '\uff08\u91cd\u70b9\uff09'],
       ]) {
         const html = render(source, streaming);
         assert.match(html, new RegExp(`<strong[^>]*>${body}</strong>`));
@@ -64,11 +64,11 @@ test("TeX math and wrapped HTTP links render through the production Markdown pip
     // A nested linked-host destination must be normalized before the
     // production rehype sanitizer removes its invalid wrapper href.
     const wrappedLink = render(
-      "[#1106](([github.com](https://github.com/vastsa/PI-Desktop/issues/1106)))",
+      "[#1106](([github.com](https://github.com/mySlyy/slyy-desktop/issues/1106)))",
     );
     assert.match(
       wrappedLink,
-      /<a[^>]*href="https:\/\/github\.com\/vastsa\/PI-Desktop\/issues\/1106"/,
+      /<a[^>]*href="https:\/\/github\.com\/mySlyy\/slyy-desktop\/issues\/1106"/,
     );
     assert.match(wrappedLink, /target="_blank"/);
 

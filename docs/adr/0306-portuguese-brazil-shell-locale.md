@@ -4,6 +4,8 @@
 - Date: 2026-09-23
 - Related: ADR 0160, ADR 0182, ADR 0183, ADR 0185, D314, D605
 
+> **Withdrawn in Slyy (2026-11-18).** Slyy ships only English and German UI catalogs; the `pt-BR` catalog is not shipped. The record below is upstream history.
+
 ## Context
 
 The locale registry supports complete shell catalogs, but Brazilian Portuguese

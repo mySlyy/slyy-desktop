@@ -27,7 +27,7 @@ function startupFixture(startFailure, isQuitting = () => false) {
     join() {},
     dataDir: "/fixture",
     logger: { app() {} },
-    APP_NAME: "PI-Desktop",
+    APP_NAME: "Slyy",
     APP_VERSION: "fixture",
     PROTOCOL_VERSION: 11,
     runtimeState: { host: { async call() { return {}; } } },

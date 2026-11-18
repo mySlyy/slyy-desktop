@@ -21,7 +21,7 @@ const command = (name: string, description?: string, extra = {}): AutocompleteIt
 const longDescription = "Review the codebase, find regressions, and propose focused fixes. ".repeat(16);
 const items: AutocompleteItem[] = [
   command("caveman", longDescription),
-  command("qa-agent", "审查代码并验证功能。".repeat(80)),
+  command("qa-agent", "\u5ba1\u67e5\u4ee3\u7801\u5e76\u9a8c\u8bc1\u529f\u80fd\u3002".repeat(80)),
   command("short", "Brief description"),
   command("bare"),
   command("skill:review", longDescription, { title: "Code review", argumentHint: "<path>" }),

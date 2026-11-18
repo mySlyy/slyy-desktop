@@ -350,7 +350,7 @@ host-core. They do not change the loopback-only rule above.
 | Dependency poisoning | lockfiles, few deps, native-module review |
 | Malicious local plugin | declared permissions, no secret access, process isolation tracked post-MVP (ADR 0008) |
 | Skill market SSRF via user source URL | public-HTTPS classifier + DNS + per-hop redirect checks in main; renderer CSP forbids the fetch (ADR 0243) |
-| Synthetic input approving this app's own dialogs | computer use refuses PI-Desktop windows and credential surfaces unconditionally, on every window the grant binds (ADR 0342, ADR 0344) |
+| Synthetic input approving this app's own dialogs | computer use refuses Slyy windows and credential surfaces unconditionally, on every window the grant binds (ADR 0342, ADR 0344) |
 
 ## 11. Security acceptance gates
 
@@ -372,7 +372,7 @@ host-core. They do not change the loopback-only rule above.
     excludes secret writes and native pickers, and requires confirmation for
     session permission-mode changes
 11. Computer use cannot run unless the user enabled it, cannot target
-    PI-Desktop's own windows or a secure input state under any mode, re-applies
+    Slyy's own windows or a secure input state under any mode, re-applies
     every refusal each time its grant binds a window, refuses a stale basis or
     revision instead of synthesizing input, holds the user's Stop against the
     agent's next automatic grant, and is denied outright in Plan and Goal
@@ -387,7 +387,7 @@ header id and cwd; path traversal and symlink escape are rejected. A relative
 `sessionDir` is resolved only for a known local project. Custom directories are
 not walked recursively.
 
-Writable continuation requires a mode-0600 cooperative PI-Desktop lease beside
+Writable continuation requires a mode-0600 cooperative Slyy lease beside
 the session and full-byte identity checks before each SDK append. After an
 append, the adapter accepts only the unchanged prior prefix plus exactly one
 entry whose id and parent match the SDK operation. Any foreign/interleaved
@@ -435,7 +435,7 @@ revokes the grant, aborts the turn holding it, and blocks the agent's next
 automatic grant for a cooldown, so stopping ends a run rather than a call.
 
 Two refusals hold under every permission mode, setting, and grant option: the
-capability never targets PI-Desktop's own windows — approval cards, settings,
+capability never targets Slyy's own windows — approval cards, settings,
 secrets surfaces, the Live Voice widget, plugin views — and both capture and
 synthesis refuse while the OS reports a secure input state or a password field
 holds focus. A user-editable application denylist sits above them, and its

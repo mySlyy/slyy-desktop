@@ -120,7 +120,7 @@ Rules:
 These two refusals are not reachable by any permission mode, setting, grant
 option, or `auto` policy:
 
-1. **The capability never targets PI-Desktop's own windows** — approval cards,
+1. **The capability never targets Slyy's own windows** — approval cards,
    settings, secrets surfaces, the Live Voice widget, plugin views. Synthetic
    input into this application is a direct permission-broker bypass.
 2. **Capture and synthesis both refuse while the OS reports a secure input
@@ -287,7 +287,7 @@ never a no-op reported as success.
   controls and actionable status without card/row descriptions or a static
   scope note. Permission diagnostics and the missing-model hint remain visible.
   The scope is not selectable: one window at a time, the agent may switch,
-  PI-Desktop's own windows and credential surfaces are never reachable, and
+  Slyy's own windows and credential surfaces are never reachable, and
   Stop ends the run. There is no input-approval row while `confirm-each` has
   no card behind it.
 - The model binding is explicit. Settings offers the provider rows the user

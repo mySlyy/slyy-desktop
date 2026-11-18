@@ -7,7 +7,7 @@
 ## Context
 
 New Task created a session immediately, so sidebar history gained a
-default-titled `新建任务` / "New task" row even when nothing was typed. The reuse
+default-titled "New task" row even when nothing was typed. The reuse
 rule (D088/D093) kept at most one empty draft per project or temporary scope, but
 that row was visible at once and the draft also persisted in the host database.
 

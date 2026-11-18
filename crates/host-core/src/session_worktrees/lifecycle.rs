@@ -17,7 +17,7 @@ use tokio::sync::Mutex;
 use super::git::GitRunner;
 use super::include::{copy_included, IncludeReport};
 use super::merge::{self, MergeOutcome, MergePreview, SyncOutcome};
-use super::probe::{probe, BRANCH_NAMESPACE};
+use super::probe::{probe, BRANCH_NAMESPACE, LEGACY_BRANCH_NAMESPACE};
 use super::registry::{self, NewWorktree, SetupStatus, WorktreeRow, WorktreeStatus};
 use super::remove::{is_real_dir, is_real_dir_chain, remove_worktree};
 use super::{fnv1a64, repo_lock, WorktreeError};
@@ -352,7 +352,7 @@ pub async fn create_session_worktree(
                 "worktree",
                 "lock",
                 "--reason",
-                &format!("PI-Desktop session {session_id}"),
+                &format!("Slyy session {session_id}"),
                 &root_text,
             ],
         )
@@ -793,9 +793,13 @@ pub(super) async fn unmerged_commits(
             ];
             args.push(format!("--exclude={}", row.branch));
             if let Some(session_id) = row.session_id.as_deref() {
-                let session_branch = format!("{BRANCH_NAMESPACE}/{}", short_id(session_id));
-                args.push(format!("--exclude={session_branch}"));
-                args.push(format!("--exclude={session_branch}-*"));
+                // A session started before the rebrand keeps its
+                // `pi-desktop/` branches; exclude both namespaces.
+                for namespace in [BRANCH_NAMESPACE, LEGACY_BRANCH_NAMESPACE] {
+                    let session_branch = format!("{namespace}/{}", short_id(session_id));
+                    args.push(format!("--exclude={session_branch}"));
+                    args.push(format!("--exclude={session_branch}-*"));
+                }
             }
             args.push("--branches".to_string());
             let args: Vec<&str> = args.iter().map(String::as_str).collect();

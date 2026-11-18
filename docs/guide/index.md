@@ -1,13 +1,14 @@
 ---
 title: Start here
-description: A short orientation to the PI-Desktop product and its documentation.
+description: A short orientation to the Slyy product and its documentation.
 ---
 
 # Start here
 
-PI-Desktop is a local-first AI coding agent desktop client. The app keeps the
-workspace, host process, agent runtime, and provider configuration visible and
-inspectable while still making everyday coding work feel direct.
+Slyy is a local-first AI coding agent desktop client, based on PI-Desktop
+(LGPL-3.0). The app keeps the workspace, host process, agent runtime, and
+provider configuration visible and inspectable while still making everyday
+coding work feel direct.
 
 ## Choose a path
 
@@ -22,9 +23,6 @@ inspectable while still making everyday coding work feel direct.
 | Build an extension | [Plugin development](/plugin-development) |
 | Understand why a decision exists | [ADR index](/adr/README) |
 | Validate a user-visible change | [E2E test plan](/spec/06-delivery/04-e2e-test-plan) |
-
-The Chinese entry follows this same path: [open the bilingual guide](/zh-CN/guide/)
-to read the localized orientation and jump into the matching topic map.
 
 ## The mental model
 
@@ -43,11 +41,7 @@ provider-facing model work.
 
 ## Working with the docs
 
-The documentation is English-first at the source-of-truth level. The [中文入口](/zh-CN/)
-provides the same information architecture and a complete translated companion
-for every specification. Each Chinese page links back to its English source;
-technical identifiers remain unchanged so search and cross-reference paths stay
-stable. Use global search when you know a term, protocol method, or decision
+The documentation is written in English. Use global search when you know a term, protocol method, or decision
 number; use the sidebar when you are exploring a domain.
 
 ## Before you change a boundary

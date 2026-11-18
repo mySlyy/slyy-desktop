@@ -265,7 +265,7 @@ normal secret-store path.
 
 OpenCode Go (and any `opencode.ai` host) requires a stable
 `x-opencode-session` header on LLM requests. Agent-runtime sends that header
-plus `x-opencode-client: pi-desktop` and `User-Agent: pi-desktop/<APP_VERSION>`
+plus `x-opencode-client: slyy` and `User-Agent: slyy/<APP_VERSION>`
 on session turns, subagent turns, plugin-owned prompt enhancement, and other
 plugin one-shots.
 Caller-supplied headers override the client and User-Agent values; a missing
@@ -274,7 +274,7 @@ or empty session header is always restored from the conversation id.
 `headers` is an optional per-row map stored in `config_json.headers`. Empty,
 omitted, or update `{}` keeps the adapter default (pi-ai's `pi (…)` string,
 Anthropic OAuth's `claude-cli/<version>`, or OpenCode's
-`pi-desktop/<APP_VERSION>`). A non-empty map is last-writer on that row's
+`slyy/<APP_VERSION>`). A non-empty map is last-writer on that row's
 outbound HTTP — session turns, subagents, plugin one-shots (including
 plugin-owned prompt enhancement),
 `/models` discovery (including unsaved form values), connection tests, and

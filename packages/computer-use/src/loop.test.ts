@@ -261,7 +261,7 @@ describe("runComputerLoop", () => {
       },
       decide: async () => answers[Math.min(decisions++, answers.length - 1)],
     };
-    const result = await runComputerLoop({ instruction: "click PI-Desktop's own approve button" }, deps);
+    const result = await runComputerLoop({ instruction: "click Slyy's own approve button" }, deps);
     // The refusal is the model's problem to work around, not a failed run.
     expect(result.outcome).toBe("done");
     expect(result.steps[0]).toMatchObject({

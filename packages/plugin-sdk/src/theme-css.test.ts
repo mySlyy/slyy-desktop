@@ -77,7 +77,7 @@ describe("sanitizeThemeCss", () => {
   });
 
   it("measures the cap in bytes, not characters", () => {
-    const result = sanitizeThemeCss(`/*${"字".repeat(40)}*/:root{}`, 64);
+    const result = sanitizeThemeCss(`/*${"\u5b57".repeat(40)}*/:root{}`, 64);
     expect(result.ok).toBe(false);
   });
 });

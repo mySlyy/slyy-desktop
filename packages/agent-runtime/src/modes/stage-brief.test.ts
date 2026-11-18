@@ -220,7 +220,7 @@ describe("artifact injects", () => {
   });
 
   it("caps an injected artifact at 32 KiB", async () => {
-    const big = "é".repeat(MODE_INJECT_MAX_BYTES); // two bytes each: 64 KiB
+    const big = "\u00e9".repeat(MODE_INJECT_MAX_BYTES); // two bytes each: 64 KiB
     const [block] = await resolveModeInjects(release.stages[0].onCompaction, release, turn(), readerOf({ [NOTES_PATH]: big }));
     const body = /<mode-artifact id="notes">\n([\s\S]*)\n<\/mode-artifact>/.exec(block)?.[1] ?? "";
     const [content, marker] = body.split("\n");

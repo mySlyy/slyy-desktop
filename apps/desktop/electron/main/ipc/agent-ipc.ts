@@ -508,7 +508,7 @@ export function registerAgentIpc({
       });
       throw error;
     }
-    // A `pi-desktop://session/<id>` link in the draft becomes a bounded excerpt
+    // A `slyy://session/<id>` link in the draft becomes a bounded excerpt
     // that travels with this message from now on (issue #1324). A skipped link
     // stays plain text; nothing else about the prompt changes.
     const sessionReferences = await resolveSessionReferences({

@@ -135,7 +135,7 @@ test("review reads forward the query and return the page unchanged", async () =>
       neutralCount: 0,
       negativeCount: 0,
     },
-    reviewUrl: "https://plugins.aiuo.net/plugins/demo.hello#reviews",
+    reviewUrl: "https://hub.slyy.ai/plugins/demo.hello#reviews",
   };
   const query = {
     pluginId: "demo.hello",

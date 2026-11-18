@@ -24,7 +24,7 @@ test("segmented controls preserve selection semantics and stable tab-panel links
       value, options, label: "Add host", role: "tablist",
       onChange: (next) => { value = next; }, ...props,
     });
-    for (const label of ["Add host", "添加主机"]) {
+    for (const label of ["Add host", "Host hinzuf\u00fcgen"]) {
       const html = renderToStaticMarkup(render({ label }));
       assert.match(html, /role="tab" id="host-ssh" aria-controls="panel-ssh" aria-selected="true"/);
       assert.match(html, /role="tab" id="host-pair" aria-controls="panel-pair" aria-selected="false"/);

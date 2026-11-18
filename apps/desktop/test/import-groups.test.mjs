@@ -89,6 +89,6 @@ test("extracts project names from POSIX and Windows paths", () => {
 test("formats import dates with the selected app locale", () => {
   const timestamp = "2026-07-25T12:00:00.000Z";
   assert.match(formatImportDate(timestamp, "en-US"), /Jul/);
-  assert.match(formatImportDate(timestamp, "zh-CN"), /2026/);
-  assert.equal(formatImportDate("not-a-date", "zh-CN"), "not-a-date");
+  assert.match(formatImportDate(timestamp, "de"), /2026/);
+  assert.equal(formatImportDate("not-a-date", "de"), "not-a-date");
 });

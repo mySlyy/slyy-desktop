@@ -62,7 +62,7 @@ function start(directory = dataDir) {
 function row(index) {
   const image = { type: "image", data: screenshot(index + 1), mimeType: "image/png" };
   const content = [{ type: "text", text: `Screenshot ${index + 1}` }, image];
-  const result = { content, details: { content, imageCount: 1, label: "保留 metadata" } };
+  const result = { content, details: { content, imageCount: 1, label: "\u4fdd\u7559 metadata" } };
   return { id: `call-${index}`, role: "tool", toolCallId: `call-${index}`, toolName: "mcp_windows_mcp_Snapshot", toolStatus: "success", content: JSON.stringify(result, null, 2), toolResult: result, createdAt };
 }
 function nestedRow(path) {
@@ -70,7 +70,7 @@ function nestedRow(path) {
   let result = { content: [image], details: { path } };
   for (let level = 0; level < 3; level++) {
     const text = JSON.stringify(result, null, 2);
-    result = { content: [image], source: `层${level}😀`, nested: { result, text } };
+    result = { content: [image], source: `\u5c42${level}\u{1F600}`, nested: { result, text } };
   }
   return { id: "nested-result", role: "tool", toolCallId: "nested-result", toolName: "Snapshot", toolStatus: "success", content: JSON.stringify(result, null, 2), toolResult: result, createdAt };
 }

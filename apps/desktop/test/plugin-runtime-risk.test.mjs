@@ -212,7 +212,7 @@ test("marketplace package downloads stay inside the host allowlist", () => {
   const hostSrc = validationSrc + "\n" + installSrc;
   assert.match(
     hostSrc,
-    /const PACKAGE_HOST_ALLOWLIST: &\[&str\] = &\["github\.com", "githubusercontent\.com", "cnb\.cool"\]/,
+    /const PACKAGE_HOST_ALLOWLIST: &\[&str\] = &\["github\.com", "githubusercontent\.com"\]/,
   );
   assert.match(hostSrc, /fn package_host_allowed\(package_url: &str, catalog_url: &str\) -> Result<\(\)>/);
   // Refuse before the request leaves the machine, then hold the redirect

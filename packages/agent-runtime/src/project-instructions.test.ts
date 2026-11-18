@@ -79,14 +79,14 @@ describe("loadProjectInstructions", () => {
 
   it("caps the project chain at 32 KiB without splitting UTF-8 characters and marks the cut", async () => {
     root = await mkdtemp(join(tmpdir(), "pi-desktop-instructions-"));
-    await writeFile(join(root, "AGENTS.md"), "中".repeat(20_000));
+    await writeFile(join(root, "AGENTS.md"), "\u4e2d".repeat(20_000));
 
     const loaded = await loadProjectInstructions(root);
     const [content, notice] = loaded!.entries[0].content.split("\n\n");
     expect(Buffer.byteLength(content, "utf8")).toBeLessThanOrEqual(32 * 1024);
-    expect(content.endsWith("中")).toBe(true);
+    expect(content.endsWith("\u4e2d")).toBe(true);
     expect(notice).toBe(
-      "[PI-Desktop truncated AGENTS.md: loaded the first 32766 of 60000 bytes; the rest of this file is not in context.]",
+      "[Slyy truncated AGENTS.md: loaded the first 32766 of 60000 bytes; the rest of this file is not in context.]",
     );
   });
 
@@ -99,7 +99,7 @@ describe("loadProjectInstructions", () => {
     const loaded = await loadProjectInstructions(root, "packages/index.ts");
     expect(loaded!.entries.map((entry) => entry.source)).toEqual(["AGENTS.md"]);
     expect(loaded!.entries[0].content).toBe(
-      `${"r".repeat(32 * 1024)}\n\n[PI-Desktop truncated AGENTS.md: loaded the first 32768 of 40960 bytes; the rest of this file is not in context.]`,
+      `${"r".repeat(32 * 1024)}\n\n[Slyy truncated AGENTS.md: loaded the first 32768 of 40960 bytes; the rest of this file is not in context.]`,
     );
   });
 
@@ -205,7 +205,7 @@ describe("loadInstructionChain", () => {
       entries: [
         {
           source: "~/.pi/agent/AGENTS.md",
-          content: `${"a".repeat(32 * 1024)}\n\n[PI-Desktop truncated ~/.pi/agent/AGENTS.md: loaded the first 32768 of 65536 bytes; the rest of this file is not in context.]`,
+          content: `${"a".repeat(32 * 1024)}\n\n[Slyy truncated ~/.pi/agent/AGENTS.md: loaded the first 32768 of 65536 bytes; the rest of this file is not in context.]`,
         },
         { source: "AGENTS.md", content: "Use project conventions." },
       ],

@@ -50,13 +50,6 @@ test("copyable surfaces use theme-aware selection and caret colors", () => {
   );
 });
 
-test("CJK section labels drop Latin-only uppercase tracking", () => {
-  assert.match(
-    globalStyles,
-    /:lang\(zh-CN\) \.sidebar-list-label[\s\S]*?letter-spacing:\s*var\(--tracking-normal\);[\s\S]*?text-transform:\s*none;/,
-  );
-});
-
 test("brand hover chip uses a defined radius token", () => {
   assert.doesNotMatch(globalStyles, /--radius-token-row/);
   assert.match(

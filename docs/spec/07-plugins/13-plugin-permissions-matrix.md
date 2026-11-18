@@ -152,57 +152,57 @@ sandbox (ADR 0211).
 
 ## 4. Permission display copy
 
-The copy below is the `plugins.permissions.*` entry in the en and zh-CN catalogs
-(`packages/i18n/src/locales/`). The install and update review shows this label
+The copy below is the `plugins.permissions.*` entry in the en catalog
+(`packages/i18n/src/locales/`); the de catalog translates the same keys. The install and update review shows this label
 with the matching `plugins.permissionHelp.*` line under it, and the Plugins page
 shows it as a chip; the label falls back to the raw permission key when the
 catalog has no entry.
 The declared file scope is shown beside the permissions on the installed
 plugin's row (Files), so "Edit files" is followed by the list.
 
-| Permission | English copy | zh-CN copy |
-|---|---|---|
-| `fs.read` | Read files | 读取文件 |
-| `clipboard.read` | Read the clipboard and its history | 读取剪贴板及其历史 |
-| `fs.write` | Edit files | 修改文件 |
-| `fs.delete` | Delete files | 删除文件 |
-| `notify` | Show in-app and native notifications | 显示应用内和系统通知 |
-| `agent.tool.register` | Add tools for the agent | 为智能体添加工具 |
-| `agent.prompt.inject` | Adjust agent instructions | 调整智能体指令 |
-| `agent.extension` | Run code inside the agent | 在 agent 内运行代码 |
-| `renderer.extension` | Draw UI in chat slots | 在聊天插槽绘制界面 |
-| `net.fetch` | Use the network | 访问网络 |
-| `shell.openExternal` | Open external links | 打开外部链接 |
-| `ui.theme` | Provide a theme | 提供主题 |
-| `ui.window.appearance` | Customize window appearance | 自定义窗口外观 |
-| `mcp.server.local` | Run a local MCP server | 运行本地 MCP 服务 |
-| `mcp.server.remote` | Reach a remote MCP server | 连接远端 MCP 服务 |
-| `background.service` | Keep a background service running | 保持后台服务运行 |
-| `bus.publish` | Send messages to other plugins | 向其他插件发送消息 |
-| `bus.subscribe` | Receive messages from other plugins | 接收其他插件的消息 |
-| `browser.cdp` | Control the work-panel browser | 控制工作面板浏览器 |
-| `models.list` | List authenticated models | 列出已登录的模型 |
-| `session.read` | Read the current conversation sent to the model | 读取当前发给模型的对话 |
-| `usage.read` | Read usage statistics | 读取用量统计 |
-| `agent.complete` | Run a one-shot completion with your models | 用你的模型发起一次补全 |
-| `composer.transform` | Transform text in the Composer | 转换输入框中的文本 |
-| `composer.suggest` | Offer a suggestion in the Composer | 在输入框中给出建议 |
-| `speech.adapter.register` | Register a speech adapter | 注册语音适配器 |
-| `audio.capture.background` | Use the microphone in the background | 后台使用麦克风 |
-| `audio.playback.background` | Play audio in the background | 后台播放声音 |
-| `keyboard.globalShortcut` | Register system-wide shortcuts | 注册系统级快捷键 |
-| `net.websocket` | Open real-time connections | 建立实时双向连接 |
-| `ui.panel` | Show a plugin panel | 显示插件面板 |
-| `ui.microphone` | Use the microphone | 使用麦克风 |
-| `clipboard.write` | Write to the clipboard | 写入剪贴板 |
-| `provider.register` | Add providers to the model list | 将服务添加到模型列表 |
-| `provider.oauth` | Sign in to a provider with OAuth | 通过 OAuth 登录 Provider |
-| `desktop.control` | Control the desktop | 控制桌面操作 |
-| `net.anyHost` | Access any network address | 访问任意网络地址 |
-| `session.autoTitle` | Read first-turn title context and update automatic titles | 读取首轮标题上下文并更新自动标题 |
-| `session.read.all` | Read any conversation, including yours | 读取任意会话，包括你自己的对话 |
-| `session.update.all` | Rewrite any conversation, including its messages | 改写任意会话，包括修改其消息 |
-| `session.delete.all` | Delete any conversation, including yours | 删除任意会话，包括你自己的对话 |
+| Permission | English copy |
+|---|---|
+| `fs.read` | Read files |
+| `clipboard.read` | Read the clipboard and its history |
+| `fs.write` | Edit files |
+| `fs.delete` | Delete files |
+| `notify` | Show in-app and native notifications |
+| `agent.tool.register` | Add tools for the agent |
+| `agent.prompt.inject` | Adjust agent instructions |
+| `agent.extension` | Run code inside the agent |
+| `renderer.extension` | Draw UI in chat slots |
+| `net.fetch` | Use the network |
+| `shell.openExternal` | Open external links |
+| `ui.theme` | Provide a theme |
+| `ui.window.appearance` | Customize window appearance |
+| `mcp.server.local` | Run a local MCP server |
+| `mcp.server.remote` | Reach a remote MCP server |
+| `background.service` | Keep a background service running |
+| `bus.publish` | Send messages to other plugins |
+| `bus.subscribe` | Receive messages from other plugins |
+| `browser.cdp` | Control the work-panel browser |
+| `models.list` | List authenticated models |
+| `session.read` | Read the current conversation sent to the model |
+| `usage.read` | Read usage statistics |
+| `agent.complete` | Run a one-shot completion with your models |
+| `composer.transform` | Transform text in the Composer |
+| `composer.suggest` | Offer a suggestion in the Composer |
+| `speech.adapter.register` | Register a speech adapter |
+| `audio.capture.background` | Use the microphone in the background |
+| `audio.playback.background` | Play audio in the background |
+| `keyboard.globalShortcut` | Register system-wide shortcuts |
+| `net.websocket` | Open real-time connections |
+| `ui.panel` | Show a plugin panel |
+| `ui.microphone` | Use the microphone |
+| `clipboard.write` | Write to the clipboard |
+| `provider.register` | Add providers to the model list |
+| `provider.oauth` | Sign in to a provider with OAuth |
+| `desktop.control` | Control the desktop |
+| `net.anyHost` | Access any network address |
+| `session.autoTitle` | Read first-turn title context and update automatic titles |
+| `session.read.all` | Read any conversation, including yours |
+| `session.update.all` | Rewrite any conversation, including its messages |
+| `session.delete.all` | Delete any conversation, including yours |
 
 These permissions have no catalog entry today and are shown as their raw key:
 `ui.settings`, `session.import`, `session.read.own`, `session.update.own`, `session.delete.own`, `ui.view`, `project.create`.

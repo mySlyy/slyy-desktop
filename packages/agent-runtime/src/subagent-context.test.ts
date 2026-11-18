@@ -375,7 +375,7 @@ describe("prepareDelegateTurnContext", () => {
   });
 
   it("truncates a long CJK brief to the output-cap retention budget", async () => {
-    const brief = "中".repeat(32_000);
+    const brief = "\u4e2d".repeat(32_000);
     const model = retentionModel();
     const { factory } = summaryModels(() => summarySuccess("SUMMARY TEXT"));
     const outcome = await prepareDelegateTurnContext({
@@ -398,7 +398,7 @@ describe("prepareDelegateTurnContext", () => {
     expect(typeof retained.content).toBe("string");
     const text = retained.content as string;
     const budget = retainedUserMessageBudget(contextBudgetLimitsFor(model));
-    expect(text).toContain("中");
+    expect(text).toContain("\u4e2d");
     expect(text).toContain("delegate context truncated");
     expect(estimateOutputCapInputTokens({
       messages: [{ role: "user", content: text }],

@@ -269,7 +269,7 @@ async function run(name, mode, style = "chat_completions") {
         scenario.breakStream();
         scenario.breakStream = undefined;
       }
-      if (/重试|Retrying/.test(text) && !retryShot) {
+      if (/Retrying/.test(text) && !retryShot) {
         retryShot = true;
         statuses.push(text);
         await screenshot(`${name}-retry`);
@@ -336,7 +336,7 @@ async function continueAfterFailure(record) {
   scenario.mode = "success";
   await evaluate("window.__events699 = []");
   const clicked = await evaluate(`(() => {
-    const button = [...document.querySelectorAll('button')].find(node => node.textContent.trim() === '继续');
+    const button = [...document.querySelectorAll('button')].find(node => node.textContent.trim() === 'Continue');
     if (!button) return false;
     button.click(); return true;
   })()`);
@@ -392,7 +392,7 @@ try {
     "desktop ready",
   );
   const settings = await ipc("settingsGet");
-  await ipc("settingsSet", { ...settings, language: "zh-CN", autoGenerateTitle: false });
+  await ipc("settingsSet", { ...settings, language: "en", autoGenerateTitle: false });
   console.log("ARTIFACTS", artifacts);
   await run("01-network-recovery", "recover");
   await run("02-stream-recovery", "stream");

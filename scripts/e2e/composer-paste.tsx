@@ -417,7 +417,7 @@ globalThis.composerPasteProbe = async (screenshotOnly = false, fileReferencesOnl
         "native image file lost its attachment path");
       return { ok: true, screenshotWithoutDirectoryScan: true, nativeImagePreserved: true };
     }
-    const text = "Word paragraph 中文\nsecond line";
+    const text = "Word paragraph \u4e2d\u6587\nsecond line";
     let editor = await paste(text, [image]);
     assert(
       readEditorValue(editor) === `prefix ${text} suffix`,
@@ -531,7 +531,7 @@ globalThis.composerPasteProbe = async (screenshotOnly = false, fileReferencesOnl
       "cross-BR redo changed text",
     );
 
-    const longText = "字".repeat(601);
+    const longText = "\u5b57".repeat(601);
     editor = await paste(longText, [image]);
     assert(
       controller.fileReferences.length === 1 &&

@@ -9,12 +9,12 @@ import { SettingsPage } from "../../apps/desktop/src/features/settings/SettingsP
 import { useAppStore } from "../../apps/desktop/src/stores/app-store";
 
 const baseline = {
-  dataPath: "/old/PI-Desktop", browserPath: "/old/chromium", managed: true,
+  dataPath: "/old/Slyy", browserPath: "/old/chromium", managed: true,
   cacheBytes: 2 * 1024 * 1024, pendingPath: null, lastError: null,
-  backupPaths: ["/previous/PI-Desktop"],
+  backupPaths: ["/previous/Slyy"],
 };
 let info = { ...baseline };
-let chosen = "/new/PI-Desktop";
+let chosen = "/new/Slyy";
 let settingsReadError = true;
 let readError = false;
 let operationError = false;
@@ -87,7 +87,7 @@ window.storageSettingsProbe = async () => {
   click("settings.storage.choose");
   await settled();
   assert(!scope().querySelector(".settings-storage-confirmation"), "Canceling native picker must not begin migration");
-  chosen = "/new/PI-Desktop";
+  chosen = "/new/Slyy";
   click("settings.storage.choose");
   await settled();
   assert(scope().querySelector(".settings-storage-confirmation").textContent.includes(chosen), "Chosen target must be shown before confirmation");
@@ -158,13 +158,13 @@ window.storageSettingsProbe = async () => {
   click("settings.storage.retry");
   await settled();
   assert(button("settings.storage.choose"), "Retry must restore the loaded storage controls");
-  await i18n.changeLanguage("zh-CN");
+  await i18n.changeLanguage("de");
   await settled();
   click("settings.storage.clearCache");
   click("settings.storage.cacheRestart");
   await settled();
-  assert(calls.at(-1).input.language === "zh-CN", "Restart workflow must use current UI locale");
-  assert(scope().textContent.includes("数据保存路径"), "Storage labels must translate with the UI");
+  assert(calls.at(-1).input.language === "de", "Restart workflow must use current UI locale");
+  assert(scope().textContent.includes("Datenspeicherort"), "Storage labels must translate with the UI");
   checks.push("read recovery and localization");
   root.unmount();
   return { ok: true, checks };

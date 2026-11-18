@@ -455,7 +455,7 @@ mod tests {
         let mut harness = Harness::new();
         let session_id = harness.session("agent").await;
         let turn_id = harness.begin_turn(&session_id).await;
-        let long = "日".repeat(todos::MAX_TODO_CONTENT_CHARS + 5);
+        let long = "\u{65E5}".repeat(todos::MAX_TODO_CONTENT_CHARS + 5);
 
         let result = harness
             .call(

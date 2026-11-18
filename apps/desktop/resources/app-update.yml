@@ -1,4 +1,4 @@
 provider: github
 owner: mySlyy
-repo: slyy-desktop
+repo: releases
 updaterCacheDirName: 'slyy-gen2-updater'

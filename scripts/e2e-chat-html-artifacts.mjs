@@ -58,7 +58,7 @@ try {
     [isolated, worktree, "Isolated worktree", "relative"],
   ]) {
     await mkdir(dir, { recursive: true });
-    const name = spelling === "url" ? "鹈鹕 animation.html" : label.replaceAll(" ", "-") + ".html";
+    const name = spelling === "url" ? "\u9e48\u9e55 animation.html" : label.replaceAll(" ", "-") + ".html";
     const file = join(dir, name);
     await writeFile(file, html);
     const href = spelling === "relative" ? name : spelling === "url" ? pathToFileURL(file).href : file.replaceAll("\\", "/");
@@ -85,7 +85,7 @@ try {
   // ADR 0339: an exact absolute path outside every managed root opens the file
   // the user clicked, dotfile folders included.
   await mkdir(join(output, "outside notes"), { recursive: true });
-  outsideNote = join(output, "outside notes", "考核 notes.txt");
+  outsideNote = join(output, "outside notes", "\u8003\u6838 notes.txt");
   await writeFile(outsideNote, "External note body\n");
   await mkdir(join(output, ".ssh"), { recursive: true });
   outsideDotfile = join(output, ".ssh", "notes.txt");

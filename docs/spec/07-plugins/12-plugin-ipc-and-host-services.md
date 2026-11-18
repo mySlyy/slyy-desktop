@@ -56,8 +56,8 @@ registrations, rather than the conceptual services above, define what is callabl
   permissions and refresh the development-plugin permission ceiling
 - `plugin/createFromTemplate` — scaffold files and return the same load review;
   scaffolding does not grant permission to load the plugin
-- `plugin/installFromPath` ✅
-- `plugin/installFromPackage` ✅
+- `plugin/installFromPath` (done)
+- `plugin/installFromPackage` (done)
 - `plugin/enable`
 - `plugin/disable`
 - `plugin/setScope`
@@ -66,12 +66,12 @@ registrations, rather than the conceptual services above, define what is callabl
 - `plugin/settings/set`
 - `plugin/openPanel`
 - `plugin/setAutoUpdate`
-- `plugin/themes` ✅ — every loaded plugin's sanitized theme CSS, for the theme
+- `plugin/themes` (done) — every loaded plugin's sanitized theme CSS, for the theme
   picker and the injected `<style>` element
 - `plugin/providerCatalog`
 - `plugin/scenicThemes/destinations`
 - `plugin/scenicThemes/setBlur`
-- `plugin/services` ✅ — resident service status (`starting` | `running` |
+- `plugin/services` (done) — resident service status (`starting` | `running` |
   `stopped` | `failed`) plus the restart count, for the Plugins page chips
 - `plugin/views`
 - `plugin/view/open`

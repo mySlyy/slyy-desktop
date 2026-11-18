@@ -1,10 +1,9 @@
 /**
  * Props and layout of the additive action slots `userAction` and
- * `assistantAction` (`docs/plugin-plan/ui/user-action/`,
- * `docs/plugin-plan/ui/assistant-action/`). React-free so logic tests can
+ * `assistantAction` (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2). React-free so logic tests can
  * drive it directly.
  *
- * The bar is 【left items】【host keys】【right items】. Each side shows at most
+ * The bar is [left items] [host keys] [right items]. Each side shows at most
  * three items; the fourth onward folds into that side's host "⋯" menu, which
  * sits before the host keys on the left and last on the right. The host keys
  * never fold.

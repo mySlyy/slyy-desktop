@@ -50,7 +50,7 @@ const catalog = Array.from({ length: 60 }, (_, i) => ({
   installable: true,
   downloads: 100 - i,
 }));
-const labels = { writing: { en: "Writing", "zh-CN": "写作与文档" }, tools: { en: "Tools", "zh-CN": "工具" } };
+const labels = { writing: { en: "Writing", "zh-CN": "Writing (zh-CN)" }, tools: { en: "Tools", "zh-CN": "Tools (zh-CN)" } };
 const browseCalls = [];
 let hold = null;
 let failNext = null;

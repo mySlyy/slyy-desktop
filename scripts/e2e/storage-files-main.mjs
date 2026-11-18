@@ -24,7 +24,7 @@ void (async () => {
     }
     const missing = join(directory, "missing-dependency");
     if (name === "dangling-directory-link") await fs.symlink(missing, join(source.data, "node_modules"), process.platform === "win32" ? "junction" : "dir");
-    const linkNames = ["internal directory", "external directory", "missing 迁移-'directory", "missing file", "existing file", "blocked directory"];
+    const linkNames = ["internal directory", "external directory", "missing \u8fc1\u79fb-'directory", "missing file", "existing file", "blocked directory"];
     if (name === "mixed-links") {
       const internal = join(source.data, "z resources");
       const external = join(directory, "external resources");
@@ -33,7 +33,7 @@ void (async () => {
       await fs.writeFile(join(external, "payload.txt"), "retained external data");
       await fs.symlink(internal, join(source.data, linkNames[0]), process.platform === "win32" ? "junction" : "dir");
       await fs.symlink(external, join(source.data, linkNames[1]), process.platform === "win32" ? "junction" : "dir");
-      await fs.symlink(join(directory, "missing-迁移-'folder"), join(source.data, linkNames[2]), process.platform === "win32" ? "junction" : "dir");
+      await fs.symlink(join(directory, "missing-\u8fc1\u79fb-'folder"), join(source.data, linkNames[2]), process.platform === "win32" ? "junction" : "dir");
       await fs.symlink(relative(source.data, join(directory, "missing-'document.txt")), join(source.data, linkNames[3]), "file");
       await fs.symlink(relative(source.data, join(external, "payload.txt")), join(source.data, linkNames[4]), "file");
       await fs.symlink(join(source.data, file, "not a directory"), join(source.data, linkNames[5]), process.platform === "win32" ? "junction" : "dir");

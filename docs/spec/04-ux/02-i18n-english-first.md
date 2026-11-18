@@ -2,7 +2,7 @@
 
 ## 1. Policy
 
-PI-Desktop is a global product.
+Slyy is a global product.
 
 - **Default locale:** `en`
 - **Source language:** English
@@ -35,14 +35,7 @@ catalogs or translated.
 ```text
 packages/i18n/src/locales/
 ├── en/index.ts
-├── zh-CN/index.ts
-├── zh-TW/index.ts
-├── tr/index.ts
-├── de/index.ts
-├── es/index.ts
-├── fr/index.ts
-├── ko/index.ts
-└── pt-BR/index.ts
+└── de/index.ts
 ```
 
 The English catalog is the source type for translated catalogs. A registry in

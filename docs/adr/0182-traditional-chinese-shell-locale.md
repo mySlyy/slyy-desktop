@@ -4,6 +4,8 @@
 - Date: 2026-09-08
 - Related: ADR 0160, D314, E2E-091
 
+> **Withdrawn in Slyy (2026-11-18).** Slyy ships only English and German UI catalogs; the `zh-TW` catalog is not shipped. The record below is upstream history.
+
 ## Context
 
 The locale registry made the language picker extensible, but every Traditional
@@ -12,7 +14,7 @@ wrong for those users.
 
 ## Decision
 
-Ship `zh-TW` as an independent full shell catalog named `繁體中文`, resolving
+Ship `zh-TW` as an independent full shell catalog named after its native name (Traditional Chinese), resolving
 `zh-TW`, `zh-Hant`, `zh-HK`, and `zh-MO` (including underscore forms) to it while
 generic `zh` and Simplified regions stay on `zh-CN`. Add `zh-TW` to
 `AppSettings.language`, package the `zh-TW` and `zh_TW` Electron locale

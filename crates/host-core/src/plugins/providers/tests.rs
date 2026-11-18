@@ -584,8 +584,8 @@ fn the_declaration_shape_is_validated() {
     let long_localized_provider = json!([{
         "id": "demo",
         "name": "Demo",
-        "category": { "en": "C".repeat(128), "zh-CN": "公".repeat(128) },
-        "description": { "en": "A".repeat(280), "zh-CN": "公益".repeat(140) },
+        "category": { "en": "C".repeat(128), "zh-CN": "\u{516C}".repeat(128) },
+        "description": { "en": "A".repeat(280), "zh-CN": "\u{516C}\u{76CA}".repeat(140) },
         "baseUrl": "https://api.example.com/v1",
         "models": [{ "id": "m" }]
     }]);
@@ -608,7 +608,7 @@ fn the_declaration_shape_is_validated() {
     write_plugin(
         &root,
         declaration_manifest(
-            json!([{ "id": "demo", "name": "Demo", "description": "公".repeat(281),
+            json!([{ "id": "demo", "name": "Demo", "description": "\u{516C}".repeat(281),
                      "baseUrl": "https://api.example.com/v1", "models": [{ "id": "m" }] }]),
             permissions.clone(),
         ),

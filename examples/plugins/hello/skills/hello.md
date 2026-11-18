@@ -1,15 +1,15 @@
 ---
-name: Hello 插件演示
-description: 演示 PI-Desktop 插件能力时的操作步骤（回显、面板、主题、总线）
+name: Hello plugin demo
+description: Steps to follow when demonstrating Slyy plugin capabilities (echo, panel, theme, bus)
 ---
 
 # Hello Skill
 
-当用户在演示插件能力时，优先使用 `echo_text` 工具回显文本，并提示这是 PI-Desktop 插件系统示例。
+When the user is demonstrating plugin capabilities, prefer the `echo_text` tool to echo text back, and mention that this is a Slyy plugin system example.
 
-演示顺序建议：
+Suggested demo order:
 
-1. 用 `echo_text` 回显一段文本，说明这是插件提供的 Agent 工具。
-2. 提示用户在命令面板执行 `Hello: Open Panel`，面板打开时插件会向总线发布 `demo.hello.greeted`。
-3. 提示用户在 设置 → 通用 → 主题 里选择 `Hello Midnight`，说明主题 CSS 来自插件；禁用插件后会自动回落到系统主题。
-4. 提示用户在 插件 页查看 `Greeter heartbeat` 常驻服务状态与重启次数。
+1. Use `echo_text` to echo some text and explain that it is an agent tool provided by the plugin.
+2. Ask the user to run `Hello: Open Panel` from the command palette; when the panel opens, the plugin publishes `demo.hello.greeted` on the bus.
+3. Ask the user to pick `Hello Midnight` under Settings -> General -> Theme, and explain that the theme CSS comes from the plugin; disabling the plugin falls back to the system theme.
+4. Ask the user to check the `Greeter heartbeat` background service status and restart count on the Plugins page.

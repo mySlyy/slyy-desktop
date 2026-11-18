@@ -209,7 +209,8 @@ fn nested_mirror(depth: usize) -> Value {
     let mut result = json!({"content":[{"type":"image","data":"YWJjLw==","mimeType":"image/png"}], "details":{"path":"/old/project/file.png"}});
     for level in 0..depth {
         let text = serde_json::to_string_pretty(&result).unwrap();
-        result = json!({"source":format!("层{level}😀"), "nested":{"result":result,"text":text}});
+        result =
+            json!({"source":format!("\u{5C42}{level}😀"), "nested":{"result":result,"text":text}});
     }
     let content = serde_json::to_string_pretty(&result).unwrap();
     json!({"toolResult":result,"content":content})

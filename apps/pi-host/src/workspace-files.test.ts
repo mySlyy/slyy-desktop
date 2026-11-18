@@ -41,10 +41,10 @@ describe("sessionless SSH file views", () => {
     await writeFile(join(path, "AGENTS.md"), "repository");
     await writeFile(join(path, "AGENTS.override.md"), "override");
     expect(await files.read({ path, operation: "instructions" })).toEqual({ entries: [{ source: "AGENTS.override.md", content: "override" }] });
-    await writeFile(join(path, "AGENTS.override.md"), "界".repeat(20_000));
+    await writeFile(join(path, "AGENTS.override.md"), "\u754c".repeat(20_000));
     const loaded = await files.read({ path, operation: "instructions" }) as { entries: Array<{ source: string; content: string }> };
     expect(loaded.entries).toHaveLength(1);
-    expect(loaded.entries[0]?.content).toContain("PI-Desktop truncated AGENTS.override.md");
+    expect(loaded.entries[0]?.content).toContain("Slyy truncated AGENTS.override.md");
     expect(Buffer.byteLength(loaded.entries[0]?.content ?? "")).toBeLessThan(33_000);
     expect(loaded.entries[0]?.content).not.toContain("�");
   });

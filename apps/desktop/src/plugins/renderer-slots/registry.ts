@@ -1,5 +1,5 @@
 /**
- * The renderer-side slot registry (`docs/plugin-plan/slot-contract.html`).
+ * The renderer-side slot registry (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2).
  *
  * A plugin's renderer entry registers components through `pi.slots.register`;
  * this store owns the resulting catalog. It is React-free so logic tests can

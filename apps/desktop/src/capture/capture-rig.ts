@@ -116,35 +116,35 @@ export function installCaptureRig(): CaptureRig {
       }
       const base = Date.parse("2026-07-20T09:00:00Z");
       const samples: [role: "user" | "assistant", content: string][] = [
-        ["user", "帮我配置一下这个项目并启动"],
+        ["user", "Set up this project and start it"],
         [
           "assistant",
-          "好的。先安装依赖并生成本地配置：\n\n1. `pnpm install`\n2. 复制 `.env.example` 为 `.env`\n3. `pnpm dev` 启动开发服务\n\n启动后默认监听 5173 端口。",
+          "Sure. First install the dependencies and create the local config:\n\n1. `pnpm install`\n2. Copy `.env.example` to `.env`\n3. `pnpm dev` starts the dev server\n\nOnce started it listens on port 5173 by default.",
         ],
-        ["user", "启动报错了，说找不到 host 二进制"],
+        ["user", "Startup failed, it says the host binary is missing"],
         [
           "assistant",
-          "这是因为 Rust 侧还没编译。运行 `cargo build -p pi-desktop-host-core`，产物会出现在 `target/debug/` 下，Electron 主进程会自动拾取。",
+          "That is because the Rust side is not built yet. Run `cargo build -p pi-desktop-host-core`; the binary lands in `target/debug/` and the Electron main process picks it up automatically.",
         ],
-        ["user", "编译通过了，界面也起来了"],
+        ["user", "The build passed and the UI is up"],
         [
           "assistant",
-          "很好。接下来可以在设置里添加模型提供方并保存 API 密钥，然后打开一个项目文件夹就能开始对话了。",
+          "Great. Next, add a model provider in Settings and save its API key, then open a project folder to start chatting.",
         ],
-        ["user", "顺便把侧边栏最近会话按项目分组"],
+        ["user", "Also group the recent sessions in the sidebar by project"],
         [
           "assistant",
-          "已按项目路径分组：每组显示项目名与最近活动时间，未关联项目的会话归入“临时会话”。分组逻辑在 `sidebar-session-groups.ts`。",
+          "Grouped by project path: each group shows the project name and last activity; sessions without a project go under \"Scratch sessions\". The grouping logic is in `sidebar-session-groups.ts`.",
         ],
-        ["user", "分组标题的字号再小一点"],
+        ["user", "Make the group headings a bit smaller"],
         [
           "assistant",
-          "已把分组标题从 `--text-sm` 调整为 `--text-2xs`，同时收紧了上下间距，现在与 Slyy 的密度一致。",
+          "Changed the group headings from `--text-sm` to `--text-2xs` and tightened the vertical spacing; it now matches the Slyy density.",
         ],
-        ["user", "最后跑一遍检查"],
+        ["user", "Finally, run the checks once more"],
         [
           "assistant",
-          "`pnpm typecheck` 与样式令牌检查均通过，无回归。",
+          "`pnpm typecheck` and the style token check both pass, no regressions.",
         ],
       ];
       const messages = Array.from(
@@ -255,7 +255,7 @@ export function installCaptureRig(): CaptureRig {
             id: `capture-review-user-${i}`,
             role: "user" as const,
             content:
-              i === 0 ? "把审阅面板里每条改动的样式简化一下" : `继续第 ${i + 1} 处`,
+              i === 0 ? "Simplify the styling of each change in the review panel" : `Continue with spot ${i + 1}`,
             createdAt: new Date(base + i * 120_000).toISOString(),
             status: "complete" as const,
           },
@@ -337,7 +337,7 @@ export function installCaptureRig(): CaptureRig {
         {
           id: "capture-turn-user",
           role: "user" as const,
-          content: "把发送按钮的禁用条件补上",
+          content: "Add the missing disabled condition to the send button",
           createdAt: at(0),
           status: "complete" as const,
         },
@@ -345,7 +345,7 @@ export function installCaptureRig(): CaptureRig {
         {
           id: "capture-turn-reply",
           role: "assistant" as const,
-          content: "已改：草稿为空或流式时禁用发送。",
+          content: "Done: send is disabled while the draft is empty or a reply is streaming.",
           createdAt: at(2 + files),
           status: "complete" as const,
         },
@@ -401,7 +401,7 @@ export function installCaptureRig(): CaptureRig {
           {
             id: `capture-run-user-${i}`,
             role: "user" as const,
-            content: i === 0 ? "跑一下测试" : `再跑 ${sample.command}`,
+            content: i === 0 ? "Run the tests" : `Now run ${sample.command}`,
             createdAt: new Date(base + i * 120_000).toISOString(),
             status: "complete" as const,
           },
@@ -479,7 +479,7 @@ export function installCaptureRig(): CaptureRig {
         {
           id: "capture-task-user-0",
           role: "user" as const,
-          content: "帮我审一下 store 的改动",
+          content: "Review the store changes for me",
           createdAt: new Date(base - 30_000).toISOString(),
           status: "complete" as const,
         },
@@ -488,14 +488,14 @@ export function installCaptureRig(): CaptureRig {
         {
           id: "capture-task-answer-0",
           role: "assistant" as const,
-          content: "审阅完成：队列按 id 丢弃请求，没有发现回归。",
+          content: "Review done: the queue drops requests by id, no regressions found.",
           createdAt: new Date(base + 40_000).toISOString(),
           status: "complete" as const,
         },
         {
           id: "capture-task-user-1",
           role: "user" as const,
-          content: "再并行看下 runtime 和 shared",
+          content: "Now look at runtime and shared in parallel",
           createdAt: new Date(base + 55_000).toISOString(),
           status: "complete" as const,
         },
@@ -1056,16 +1056,16 @@ export function installCaptureRig(): CaptureRig {
       }
       const now = Date.now();
       const titles = [
-        "重新设计设置页面插件板块手机端 UI 布局并验证所有断点",
-        "修复 host-core 启动失败并补充错误恢复测试",
-        "同步代码",
+        "Redesign the mobile UI layout of the plugins section in Settings and verify every breakpoint",
+        "Fix the host-core startup failure and add error recovery tests",
+        "Sync code",
       ];
       // The inbox lists failures only, so every fixture row is a failure.
       const notifications = Array.from({ length: count }, (_, index) => ({
         id: `capture-notification-${index}`,
         kind: "task.failed" as const,
         sessionId: `capture-session-${index}`,
-        sessionTitle: titles[index] ?? `后台任务 ${index + 1}`,
+        sessionTitle: titles[index] ?? `Background task ${index + 1}`,
         turnId: `capture-turn-${index}`,
         ...(index % 2 === 1 ? { errorCode: "MODEL_REQUEST_TIMEOUT" } : {}),
         createdAt: new Date(now - (index + 1) * 60_000).toISOString(),
@@ -1142,14 +1142,14 @@ export function installCaptureRig(): CaptureRig {
           (useAppStore.getState().sessions || []).map((s) => (s.title || "").trim()),
         );
         const titles = [
-          "同步代码",
-          "你好",
-          "终止进程里面有一个注册机的",
-          "加一下",
-          "帮我彻底卸载比特浏览器",
-          "帮我配置一下这个项目并启动",
-          "重新设计设置页面插件板块手机端ui布局",
-          "制作台的布局重新设计，需要现代化简",
+          "Sync code",
+          "Hello",
+          "One of the processes to kill is a keygen",
+          "Add it",
+          "Completely uninstall the old browser for me",
+          "Set up this project and start it",
+          "Redesign the mobile UI layout of the plugins section in Settings",
+          "Redesign the workbench layout, modern and minimal",
         ];
         for (const title of titles) {
           if (existing.has(title)) continue;
@@ -1160,7 +1160,7 @@ export function installCaptureRig(): CaptureRig {
         await useAppStore.getState().refreshSessions();
         const preferred = useAppStore
           .getState()
-          .sessions.find((s) => (s.title || "").trim() === "同步代码");
+          .sessions.find((s) => (s.title || "").trim() === "Sync code");
         if (preferred) {
           try {
             const raw = localStorage.getItem("pi.desktop.pinnedSessions");

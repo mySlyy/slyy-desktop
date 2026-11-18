@@ -16,7 +16,7 @@ from ADR 0013 had no place for that management surface.
 ## Decision
 
 Remove the standalone Projects destination from the sidebar, app page state, and
-global page search, and add **Project archive** (`项目归档`) to Settings after
+global page search, and add **Project archive** to Settings after
 Import and before Info, making five destinations. The archive reuses the durable
 Projects index with its search, add, activate, session expansion, pin,
 archive/restore, and close actions, always includes archived rows, and does not

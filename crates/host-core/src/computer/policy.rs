@@ -86,7 +86,7 @@ const SELF_APP_KEYS: &[&str] = &[
 
 /// Why this window cannot be picked, or `None` when it can.
 ///
-/// The self-target check comes first and is unconditional: a PI-Desktop window
+/// The self-target check comes first and is unconditional: a Slyy window
 /// is refused even if the user added it to an allowlist, because synthetic
 /// input into our own approval cards bypasses the permission broker entirely.
 pub fn refusal_for_target(
@@ -174,7 +174,7 @@ fn target_label(raw: &RawTarget) -> String {
 ///
 /// Backends enumerate front-to-back, so the first survivor is the window the
 /// user is looking at. Our own windows and the denylist drop out here, which is
-/// why "the frontmost window" can never be PI-Desktop's approval card even when
+/// why "the frontmost window" can never be Slyy's approval card even when
 /// that is literally what is in front.
 fn frontmost_usable(
     desktop: &dyn Desktop,

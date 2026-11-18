@@ -68,15 +68,19 @@ selected label; rendering is presentation-only. For each question, content is
 serialized as:
 
 ```text
-question text：answer label 1、answer label 2
+question text: answer label 1, answer label 2
 ```
+
+`formatAskToolOutput` (`packages/shared/src/types/agent.ts`) joins the question
+and its answers with an ASCII colon plus space (`: `) and separates multiple
+answers with an ASCII comma plus space (`, `). Removed in Slyy: the upstream
+fullwidth colon (U+FF1A) and ideographic comma (U+3001) separators. Tool results
+persisted before this change keep their original text; the transcript summary
+reads structured `details`, so it is unaffected.
 
 Multiple questions are separated by `\n---\n`. A skipped or unanswered
-question keeps the question text and uses an empty placeholder:
-
-```text
-question text：
-```
+question keeps the question text and the `: ` separator, followed by an empty
+answer (`question text: `).
 
 This format is deterministic, preserves question order, and makes multi-select
 answers distinguishable without exposing a renderer-only state object to the

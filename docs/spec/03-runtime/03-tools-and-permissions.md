@@ -548,9 +548,15 @@ validation and its write.
 
 A session created with `isolated: true` in a git project owns a dedicated
 worktree at `<data_dir>/worktrees/<project-key>/<id>` on branch
-`pi-desktop/<id>`, created from the project's current `HEAD` (uncommitted
+`slyy/<id>`, created from the project's current `HEAD` (uncommitted
 project changes are not copied; git-ignored files listed in
-`.worktreeinclude` are, without following links). For such a session:
+`.worktreeinclude` are, without following links). A local branch named
+`slyy` blocks isolation (`a branch named \`slyy\` exists, so \`slyy/...\`
+branches cannot be created`); a plain `pi-desktop` branch does not. Rows
+created before the rebrand keep their stored `pi-desktop/<id>` branch and
+still resume, merge, sync, and clean up; their `pi-desktop/<id>-*` subagent
+branches count as the session's own (ADR slyy-downstream-branding). For
+such a session:
 
 - the worktree replaces the project path as `workspaceRoot` for every rule in
   §4–§5, so file tools, Bash's working directory, review snapshots, and

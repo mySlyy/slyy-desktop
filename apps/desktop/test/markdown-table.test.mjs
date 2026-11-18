@@ -21,12 +21,12 @@ function exportsOf(source) {
 }
 
 test("each table keeps its own Markdown formatting and column alignment", () => {
-  const source = "Before\n\n| **Name** | Value |\n| :--- | ---: |\n| [Docs](https://example.com) | `a\\|b` |\n\nOther\n\n| Next |\n| --- |\n| 二 |";
+  const source = "Before\n\n| **Name** | Value |\n| :--- | ---: |\n| [Docs](https://example.com) | `a\\|b` |\n\nOther\n\n| Next |\n| --- |\n| \u4e8c |";
   const [first, second] = exportsOf(source);
   assert.equal(first.markdown, "| **Name** | Value |\n| :--- | ---: |\n| [Docs](https://example.com) | `a\\|b` |");
   assert.equal(first.csv, '\uFEFF"Name","Value"\r\n"Docs","a|b"\r\n');
-  assert.equal(second.markdown, "| Next |\n| --- |\n| 二 |");
-  assert.equal(second.csv, '\uFEFF"Next"\r\n"二"\r\n');
+  assert.equal(second.markdown, "| Next |\n| --- |\n| \u4e8c |");
+  assert.equal(second.csv, '\uFEFF"Next"\r\n"\u4e8c"\r\n');
 });
 
 test("quoted/list tables copy as standalone tables, including Windows line endings", () => {
@@ -39,8 +39,8 @@ test("quoted/list tables copy as standalone tables, including Windows line endin
 });
 
 test("CSV quotes delimiters, quotes, Unicode, empty cells and line breaks", () => {
-  const [data] = exportsOf('| A | B | C |\n| --- | --- | --- |\n| 你好, world | say "hi"<br>again | |');
-  assert.equal(data.csv, '\uFEFF"A","B","C"\r\n"你好, world","say ""hi""\nagain",""\r\n');
+  const [data] = exportsOf('| A | B | C |\n| --- | --- | --- |\n| \u4f60\u597d, world | say "hi"<br>again | |');
+  assert.equal(data.csv, '\uFEFF"A","B","C"\r\n"\u4f60\u597d, world","say ""hi""\nagain",""\r\n');
 });
 
 test("pipe-less Markdown rows may start with inline HTML", () => {

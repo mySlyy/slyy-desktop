@@ -107,7 +107,7 @@ test("a session with a registered turn refuses deletion before the host is calle
 });
 
 test("a turn registered while a prompt held the operation is still refused", async () => {
-  // vastsa's repro: the prompt setup acquires the operation, registers its
+  // The upstream repro: the prompt setup acquires the operation, registers its
   // durable turn, and releases; a delete issued afterwards must still see
   // the turn because the check now runs after acquiring.
   let deleteCalls = 0;

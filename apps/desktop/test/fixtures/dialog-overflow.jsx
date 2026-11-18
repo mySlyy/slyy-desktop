@@ -35,7 +35,7 @@ window.piDesktop = {
   },
 };
 await i18n.use(initReactI18next).init({ lng: "en", fallbackLng: "en", keySeparator: false,
-  resources: Object.fromEntries(["en", "zh-CN"].map((locale) => [locale, { translation: flattenCatalog(catalogs[locale]) }])),
+  resources: Object.fromEntries(["en", "de"].map((locale) => [locale, { translation: flattenCatalog(catalogs[locale]) }])),
   interpolation: { escapeValue: false } });
 const root = createRoot(document.getElementById("root"));
 let revision = 0;

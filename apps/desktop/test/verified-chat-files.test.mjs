@@ -9,7 +9,7 @@ import {
 } from "../src/lib/verified-chat-files.ts";
 
 const ROOT = "/Users/dev/project";
-const ISSUE_PROSE = "使用llama.cpp，给我迁移步骤，只读。";
+const ISSUE_PROSE = "Use llama.cpp, give me the migration steps, read-only.";
 
 function deferred() {
   let resolve;
@@ -25,18 +25,18 @@ test("dotted prose stays text until a lookup confirms the file", () => {
     segments
       .filter((segment) => segment.kind === "target" && segment.target.kind === "file")
       .map((segment) => segment.target.path),
-    ["使用llama.cpp"],
+    ["llama.cpp"],
   );
-  assert.deepEqual(chatFileCandidates(segments), ["使用llama.cpp"]);
+  assert.deepEqual(chatFileCandidates(segments), ["llama.cpp"]);
 
   const pending = verifiedChatSegments(segments, new Set());
   assert.ok(pending.every((segment) => segment.kind === "text"));
   assert.equal(pending.map((segment) => segment.text).join(""), ISSUE_PROSE);
 
-  const confirmed = verifiedChatSegments(segments, new Set(["使用llama.cpp"]));
+  const confirmed = verifiedChatSegments(segments, new Set(["llama.cpp"]));
   assert.equal(
     confirmed.find((segment) => segment.kind === "target")?.target.path,
-    "使用llama.cpp",
+    "llama.cpp",
   );
 });
 

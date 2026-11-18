@@ -8,7 +8,7 @@ pub(crate) use catalog::{built_in_catalog_at, bundled_package_bytes};
 /// The catalog it serves is the client's listing contract, and an install asks
 /// the same host where the package is (`plugins::resolve`) instead of resolving
 /// a relative package URL against a git host.
-pub const OFFICIAL_CHANNEL_CATALOG_URL: &str = "https://plugins.aiuo.net/catalog.json";
+pub const OFFICIAL_CHANNEL_CATALOG_URL: &str = "https://hub.slyy.ai/catalog.json";
 
 /// The catalog source used by the plugin manager.
 ///
@@ -515,7 +515,7 @@ impl PluginManager {
         }
         if !host_supports_version(&selected) {
             bail!(
-                "PLUGIN_HOST_TOO_OLD: version {} requires PI-Desktop {} or newer, this host is {}",
+                "PLUGIN_HOST_TOO_OLD: version {} requires Slyy {} or newer, this host is {}",
                 selected.version,
                 selected.min_pi_desktop.as_deref().unwrap_or("newer"),
                 crate::state::HOST_VERSION

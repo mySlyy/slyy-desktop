@@ -1,5 +1,5 @@
 /**
- * The `entryExtra` slot mount (`docs/plugin-plan/ui/entry-extra/`).
+ * The `entryExtra` slot mount (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2).
  *
  * Additive blocks under a finished assistant reply, stacked in registration
  * order. The host owns the height: a collapsed block clamps at 320px, fades

@@ -12,341 +12,588 @@
 - Show root and nested directory failures with their actual error and Retry
   action, rather than incorrectly showing Loading indefinitely.
 
-- HTML、HTM 与 XHTML 文件的「通过…打开」菜单新增「在内置浏览器中打开」，仅在宿主提供 Browser API 时显示；与宿主声明的 `fs.read` 文件范围一致。
-- 重新整理目录树右键菜单的分组与顺序，并补齐右键刷新；空白区域只显示新建和刷新，文件与文件夹按类型显示操作。
-- 新增 **PDF 只读预览**：连续上下滚动，支持「单页 / 双页 / 双页（封面单独）」布局、上一页 / 下一页、输入页码跳转、10%–400% 手动缩放、适应宽度、100% 实际大小，以及有文字层时的选择与复制。
-- 新增可收起的 **导航侧栏**：按可见范围渲染的缩略图与当前页标记、可展开的嵌套目录 / 书签（支持显式与命名目标）、文件名 / 体积 / 页数及 PDF Info / XMP 元数据；无内置目录时明确提示，PDF 页码标签与物理页码同时显示。窄面板中侧栏覆盖显示，跳转后自动收起，Escape 可关闭；界面跟随中英文与亮暗主题。
-- PDF.js 兼容构建、Worker、CMaps、标准字体、WASM 解码器与 ICC 色彩资源全部随包内置，支持离线 `file://` 视图；随构建输出第三方许可声明。PDF 独立设置 **24 MiB** 上限，需要密码、损坏、空文件与超限文件均显示明确提示。
-- 适应宽度按当前布局中已知最宽页面组的实际尺寸计算，兼容横竖混排、旋转与特殊页面单位；滚动切页保持比例，独立封面和末尾落单页不会触发反复缩放与渲染。面板或侧栏尺寸变化时重新适应，仅收集已经初始化页面的尺寸，兼容惰性加载。
-- 主视图由 PDF.js 管理邻近页面渲染与缓存，缩略图复用其清理事件释放主缓存外的页资源；限制画布像素，切换文件、加载失败或离开查看器时清理文档、监听器、Worker 与 Blob URL。返回缓存页时同步加载状态，快速切页后缩放保留最新阅读位置。
-- 新增 `verify:pdf` 并纳入 `verify`，覆盖二进制传递、大小边界、路径限制、切换文件夹、稳定页面组宽度、混合尺寸和惰性 / 乱序加载；查看器路由校验补充 PDF 只读类型。浏览器验收覆盖导航与内容显示、交界滚动和拖动稳定性，以及错误恢复和资源释放。
-- PDF 全文查找复用匹配版本的 `PDFFindController`，支持中英文命中高亮、计数、前后匹配、Enter / Shift+Enter 与阅读区内 Ctrl/Cmd+F；清空、关闭、重载或切换文档时重置查找。输入法组合按键保留候选词操作，普通输入沿用 PDF.js 的防抖。
-- PDF 查找按钮使用 SVG 放大镜，明确图标尺寸并随工具栏字号缩放；保留窄面板换行与可访问标签，避免字体字符过小或因系统字体而改变外观。
-- PDF 全文查找新增区分大小写、全字匹配与正则表达式开关，可组合使用；无效或不支持的表达式会清除高亮并给出可访问提示，修正后恢复。
-- PDF 三种查找开关使用界面内的悬停与键盘聚焦提示，搜索框为空或清空后也能显示；中英文说明不再依赖宿主的原生 title 提示。
-- 正则匹配移入离线独立 Worker，按页串行执行，单页超时（1 秒）或超过 10 万个命中时停止并提示；清空、关闭、切换模式与文档时取消旧任务，丢弃过期结果，空闲 Worker 自动释放。
-- 修复 PDF Worker 故障及无响应时的销毁：有限等待后清理文档所属字体、滤镜、页面任务与消息监听，再终止端口和撤销 Blob URL；启动和渲染取消的等待同样受限。
-- 修复重复书签导航的文字层监听累积：每个文档只保留一个导航监听，已完成目标直接聚焦，新跳转或销毁取消旧目标。
-- 修复嵌入字体 PDF 的文字层横向度量：优先使用 PDF.js 已加载的嵌入字体，并保留词间空白的独立几何项；普通正文的选区与画布对齐得到改善，Type3 / 缺失字体继续使用 fallback。
-- 有效后续页加载失败进入既有错误与资源释放流程；打开文件的监听判断使用当前路径，恢复 PDF / 普通文本自动重读，有未保存文本时仅提示并保留编辑。
-- 新增隔离 Electron 桌面回归检查，使用临时项目与 profile、合成 PDF 和生产 `file://` 视图，覆盖查找、监听、损坏页与 Worker 故障恢复。
+- The "Open with…" menu of HTML, HTM and XHTML files gains "Open in built-in
+  browser", shown only when the host provides the Browser API; it matches the
+  host-declared `fs.read` file scope.
+- Regrouped and reordered the tree context menu and added refresh to it; empty
+  space shows only create and refresh, files and folders show type-specific
+  actions.
+- New **read-only PDF preview**: continuous vertical scrolling, "single /
+  double / double with separate cover" layouts, previous / next page, page
+  number input, 10%-400% manual zoom, fit width, 100% actual size, and text
+  selection and copying when a text layer exists.
+- New collapsible **navigation sidebar**: thumbnails rendered for the visible
+  range with a current-page marker, an expandable nested outline / bookmarks
+  (explicit and named destinations), file name / size / page count and PDF
+  Info / XMP metadata; a missing outline is stated explicitly, and PDF page
+  labels are shown with physical page numbers. On narrow panels the sidebar
+  overlays, closes after a jump and closes with Escape; the UI follows the
+  language and light/dark theme.
+- The PDF.js compatibility build, worker, CMaps, standard fonts, WASM decoders
+  and ICC colour resources are all bundled for the offline `file://` view; the
+  build emits third-party license notices. PDF has its own **24 MiB** limit;
+  password-protected, corrupt, empty and oversized files show clear messages.
+- Fit width is computed from the actual size of the widest known page group in
+  the current layout, handling mixed portrait/landscape, rotation and special
+  page units; scrolling keeps proportions, and a separate cover or a lone last
+  page no longer triggers repeated zooming and rendering. Panel or sidebar size
+  changes refit, using only sizes of pages already initialised, compatible with
+  lazy loading.
+- PDF.js manages rendering and caching of nearby pages in the main view;
+  thumbnails reuse its cleanup events to release page resources outside the
+  main cache; canvas pixels are capped, and switching files, load failures or
+  leaving the viewer clean up the document, listeners, worker and Blob URLs.
+  Returning to a cached page syncs its loading state, and zoom after fast page
+  changes keeps the latest reading position.
+- New `verify:pdf`, included in `verify`, covering binary transfer, size
+  boundaries, path limits, folder switching, stable page group widths, mixed
+  sizes and lazy / out-of-order loading; viewer routing checks add the
+  read-only PDF type. Browser acceptance covers navigation and content display,
+  scrolling and dragging stability across boundaries, error recovery and
+  resource release.
+- PDF full-text search reuses the matching `PDFFindController`, with match
+  highlighting for Latin and CJK text, counts, previous/next match, Enter /
+  Shift+Enter and Ctrl/Cmd+F inside the reader; clearing, closing, reloading or
+  switching documents resets the search. IME composition keys keep candidate
+  handling, plain input keeps PDF.js debouncing.
+- The PDF find button uses an SVG magnifier with an explicit icon size that
+  scales with the toolbar font size; narrow-panel wrapping and accessible
+  labels are kept, so the glyph is neither too small nor dependent on system
+  fonts.
+- PDF full-text search adds combinable match case, whole word and regular
+  expression toggles; an invalid or unsupported expression clears highlights
+  with an accessible message and recovers once fixed.
+- The three PDF search toggles use in-UI hover and keyboard focus tooltips,
+  also shown when the search box is empty or cleared; the descriptions no
+  longer depend on the host's native title tooltip.
+- Regex matching moves into a separate offline worker, run page by page;
+  a page timeout (1 second) or more than 100,000 matches stops with a notice;
+  clearing, closing, switching mode or document cancels the old task, discards
+  stale results, and idle workers are released automatically.
+- Fix teardown on PDF worker failure or hang: after a bounded wait, clean up
+  the document's fonts, filters, page tasks and message listeners, then close
+  the port and revoke the Blob URL; startup and render cancellation waits are
+  bounded too.
+- Fix accumulating text-layer listeners on repeated outline navigation: one
+  navigation listener per document; a completed target is focused directly,
+  and a new jump or teardown cancels the old target.
+- Fix horizontal text-layer metrics for PDFs with embedded fonts: prefer the
+  embedded fonts PDF.js has loaded and keep separate geometry items for
+  word spaces; selections in ordinary body text align better with the canvas,
+  Type3 / missing fonts still use the fallback.
+- A failed load of a valid later page enters the existing error and resource
+  release flow; the open-file watch check uses the current path, restoring
+  automatic re-reading for PDF / plain text, and with unsaved text only a
+  notice appears and edits are kept.
+- New isolated Electron desktop regression checks using a temporary project
+  and profile, synthetic PDFs and the production `file://` view, covering
+  search, watching, corrupt pages and worker failure recovery.
 
 ## 0.9.0
 
-- **右键菜单新增三项**：**复制相对路径**、**复制绝对路径**，以及二级子菜单
-  **「通过…打开」**——鼠标停在它上面就展开，列出这台机器上真的装了的程序，
-  选中即用那个程序打开当前条目（文件或文件夹都行）。
-- **按文件类型过滤**：编辑器什么都能打开，**浏览器只出现在它真能渲染的网页类文件上**
-  （`.html` / `.htm` / `.shtml` / `.xhtml` / `.mhtml` / `.svg` / `.pdf` / `.xml`）。
-  拿 Chrome 打开 `App.tsx` 只会看到一个纯文本加载页——那是噪音，所以干脆不列；
-  文件夹同理（浏览器打开文件夹只是一个目录列表）。这条判定是 `lib/editors.ts` 的纯函数：
-  主进程只标注「这是什么程序」（`kind`：editor / browser，它才知道 Chrome 是浏览器），
-  视图拿「正在右键的是哪个文件」去过滤——两边各管一半，加一款浏览器不用改两处。
-- **编辑器探测不做目录遍历。** 四类来源，每类都是 O(候选数)：注册表 App Paths
-  （HKLM / WOW6432Node / HKCU，安装器几乎都会在这里留一条 `<name>.exe` → 绝对路径）、
-  注册表 StartMenuInternet 的 `shell\open\command`（Chrome / Edge / Firefox / Zen
-  这类浏览器只在这里注册）、PATH 上按候选命令名找可执行文件、以及少数由用户主目录
-  推导出来的固定安装位置各一次 `stat`。「遍历磁盘找软件」是这个需求最容易写出来的
-  错误版本，也正好是最慢的那个。
-- **一天只探一次，多开共享。** 结果按**日期**（本地时区）缓存到插件数据目录的
-  `editors.json`：同一台机器同一天里，第二个窗口、第二次启动都直接读这份缓存，
-  不会再跑一遍注册表。写盘失败只是退回进程内缓存；并发调用共用同一次探测。
-  注册表那几条查询并行发起，冷启实测 600ms 上下，之后都是 0ms。
-- **找不到就诚实。** 探测不到任何编辑器时，二级菜单里只留「系统默认应用」，
-  绝不放一个点了没反应的条目；探测本身不可用时也只是少一层菜单。
-- **可执行文件不出主进程。** 视图只拿到 `id` 与显示名，递回来也只能是 `id`——
-  编辑器路径由主进程从自己探测的结果里查，视图指定不了要跑什么。被打开的路径先过
-  与其它通道同一套根内包含校验与凭据黑名单（`.env*` / `.ssh/` / `*.pem` / `.git/**`
-  照旧拒绝）；`spawn` 不经 shell，参数只有一条绝对路径；子进程 `detached` +
-  `stdio: ignore` + `unref`，编辑器不随面板关闭而消失，也不会吊住插件进程；
-  每次打开记一条写入审计。
-- **只认真正的 `.exe`（Windows）。** `.cmd` / `.bat` shim 要经 `cmd.exe` 执行，
-  把用户项目里的路径拼进命令行是多余的注入面；App Paths 与 PATH 上的编辑器几乎总能
-  给出真正的 `.exe`，所以这条限制不漏掉它们。
-- **子菜单是一等交互**：hover 展开，`→` 进入、`←` 返回上一层、`↑↓` / `Home` / `End`
-  在本层移动、`Escape` 整个关掉；超出视口时翻到触发器左侧，不会跑到屏幕外。
-- 新增离线校验 `pnpm verify:editors`（注册表 / 命令行 / PATH 候选名的文本解析夹具 +
-  真 `main.js` 端到端 + 第二个进程读同一份缓存的「一天一次」断言 + 视图拿不到可执行
-  文件路径的边界 + **真的启动一次编辑器进程** + 适用面纯函数 + 「`kind` 确实一路传到
-  视图、且视图走的就是那个过滤器」的接线断言）。
+- **Three new context menu items**: **Copy relative path**, **Copy absolute
+  path**, and the **"Open with…"** submenu, which expands on hover, lists the
+  programs actually installed on this machine and opens the current entry
+  (file or folder) in the chosen one.
+- **Filtered by file type**: editors open anything; **browsers appear only for
+  web files they can actually render** (`.html` / `.htm` / `.shtml` / `.xhtml`
+  / `.mhtml` / `.svg` / `.pdf` / `.xml`). Opening `App.tsx` in Chrome only
+  shows a plain-text page, which is noise, so it is not listed; the same goes
+  for folders (a browser only shows a directory listing). The rule is a pure
+  function in `lib/editors.ts`: the main process only labels what a program is
+  (`kind`: editor / browser; only it knows Chrome is a browser), and the view
+  filters by the right-clicked file; each side owns half, so adding a browser
+  needs one change.
+- **Editor detection never walks directories.** Four sources, each
+  O(candidates): registry App Paths (HKLM / WOW6432Node / HKCU; installers
+  almost always leave a `<name>.exe` → absolute path entry there), registry
+  StartMenuInternet `shell\open\command` (browsers such as Chrome / Edge /
+  Firefox / Zen register only there), executables on PATH by candidate command
+  name, and one `stat` each for a few fixed install locations derived from the
+  user's home directory. "Walk the disk to find software" is the easiest wrong
+  version of this feature, and also the slowest.
+- **Probe once a day, shared across instances.** Results are cached by **date**
+  (local time zone) in `editors.json` in the plugin data directory: a second
+  window or second launch on the same machine and day reads that cache instead
+  of querying the registry again. A failed write falls back to the in-process
+  cache; concurrent calls share one probe. The registry queries run in
+  parallel: about 600ms cold, 0ms afterwards.
+- **Honest when nothing is found.** With no editor detected, the submenu keeps
+  only "System default app", never an entry that does nothing; if detection is
+  unavailable there is just one menu level fewer.
+- **Executables never leave the main process.** The view only gets an `id` and
+  a display name and can only pass back an `id`; the main process looks up the
+  editor path in its own detection results, so the view cannot choose what
+  runs. The opened path first passes the same root containment check and
+  credential deny list as every other channel (`.env*` / `.ssh/` / `*.pem` /
+  `.git/**` are still refused); `spawn` uses no shell and a single absolute
+  path argument; the child is `detached` + `stdio: ignore` + `unref`, so the
+  editor survives the panel closing and never holds the plugin process; every
+  launch is recorded in the write audit.
+- **Only real `.exe` files (Windows).** `.cmd` / `.bat` shims run through
+  `cmd.exe`, and splicing user project paths into a command line is an
+  unnecessary injection surface; editors in App Paths and on PATH almost always
+  provide a real `.exe`, so this limit does not miss them.
+- **The submenu is a first-class interaction**: hover expands, `→` enters, `←`
+  goes back one level, `↑↓` / `Home` / `End` move within a level, `Escape`
+  closes everything; when it would overflow the viewport it flips to the left
+  of its trigger instead of going off screen.
+- New offline check `pnpm verify:editors` (text parsing fixtures for registry /
+  command line / PATH candidate names + end-to-end with the real `main.js` +
+  a "once a day" assertion with a second process reading the same cache + the
+  boundary that the view never gets executable paths + **actually launching an
+  editor process once** + the applicability pure function + a wiring assertion
+  that `kind` reaches the view and the view uses that filter).
 
 ## 0.8.2
 
-- **修掉「自己保存（`Ctrl+S`）仍被判成外部改动」**：0.8.0 已经记下「这个文件是我自己写的」，
-  但 Windows 的递归监听在我们写盘时，还会额外给它**所在的每一层目录**各报一次 `change <目录>`
-  （实测：写 `src/deep/x.ts` 会报 `change src/deep` 与 `change src`；文件名并没有丢，只是名字是目录）。
-  这几笔没有进抑制表，于是每按一次 `Ctrl+S` 都可能被其中一条判成「外部改动」，刚保存的文档被重装
-  一遍——光标与滚动位置一起丢，正是 0.8.0 想防的那件事。
-  现在 `noteSelfWrite` 除了文件路径，连它每一层祖先目录一并记上（根目录自身不发这种目录事件，
-  所以只记到最外层目录为止）；`pnpm verify:watch` 补上这条回归（单元层 + 嵌套路径端到端）：
-  **修复前这两条断言稳定失败，修复后连续 6 次全绿**。
-- **顺带修掉 `verify:watch` 里一处时序竞争**：上一段（外部新建 / 删除）迟到的目录事件会落进
-  本次保存的窗口，让断言偶尔红一次（实测 5 次里红 1 次）。取游标前先静默到「连着两轮都没有新变化」，
-  断言从此只反映它自己要测的那一次操作。
-- 非 Windows 上这次改动是空操作（那些平台不会发出祖先目录事件），行为与 0.8.1 完全一致。
+- **Fix own saves (`Ctrl+S`) still being treated as external changes**: 0.8.0
+  already noted "I wrote this file myself", but the recursive watcher on
+  Windows additionally reports `change <dir>` once for **every ancestor
+  directory** of a written file (tested: writing `src/deep/x.ts` reports
+  `change src/deep` and `change src`; the file name is not lost, the name is
+  just a directory). Those events were not in the suppression table, so any
+  `Ctrl+S` could be judged an external change and the just-saved document was
+  reloaded, losing cursor and scroll position, exactly what 0.8.0 meant to
+  prevent.
+  `noteSelfWrite` now records every ancestor directory along with the file
+  path (the root itself emits no such directory event, so recording stops at
+  the outermost directory); `pnpm verify:watch` adds this regression (unit
+  layer + nested-path end to end): **both assertions failed reliably before the
+  fix and passed 6 runs in a row after it**.
+- **Also fix a timing race in `verify:watch`**: late directory events from the
+  previous step (external create / delete) could land in the current save
+  window and occasionally fail the assertion (1 in 5 runs). Before taking the
+  cursor it now waits until two consecutive rounds show no new change, so the
+  assertion reflects only the operation it tests.
+- On non-Windows platforms this change is a no-op (they emit no ancestor
+  directory events); behaviour is identical to 0.8.1.
 
 ## 0.8.1
 
-- **修掉「文件在预览模式下打开变更时，预览与差异视图重叠」**：两处结构问题合起来才让这件事
-  发生——① 「变更」原本是 tablist **之外**的独立开关（用 `aria-pressed`），与「编辑 / 预览」不互斥，
-  「预览开着 + 变更开着」因此是合法组合；② 内容区按各自的布尔条件各渲染各的，Markdown 预览与
-  差异视图两个整块高的视图会同时挂载、压在一起。
-- **现在收成一处判定**（`views-src/src/lib/pane.ts`）：`contentKind()` 给出内容区**唯一**该渲染的
-  那一种（变更优先级高于预览 > 字节类），`tabs()` / `activeTabKey()` 给出头部那组互斥页签。
-  `EditorPane` 只按这个单值渲染——「两个整块视图同时在场」不是靠渲染层记得加条件挡住的，
-  而是结构上根本没有第二个 true。
-- **「变更」现在是 tablist 里的第三个页签**（编辑 / 预览 / 变更同组）：从任何一侧都能点进去，
-  点「编辑」或「预览」即等于关掉变更并回到原先那一种看法；选中项由 `activeTabKey()` 保证唯一。
-- 顺带两处收口：变更页签只对**文本文件**给出（图片 / 音视频 / 数据库各自占住内容区，逐行差异
-  对它们没有意义）；`tabs()` 自己会去重 mode——重复的 key 会让 React 复用出错的节点，而这种问题
-  只在某个 mode 恰好重复时才出现。
-- **回归钉在 `verify-viewers.mjs`**：全输入组合扫描断言内容视图恒为单值、十种视图都可达、
-  「变更压过预览 / 关掉变更后预览照旧」、页签组内选中项唯一。
+- **Fix preview and diff overlapping when opening changes in preview mode**:
+  two structural issues combined: (1) "Changes" was a separate toggle
+  **outside** the tablist (`aria-pressed`), not exclusive with "Edit /
+  Preview", so "preview on + changes on" was a valid combination; (2) the
+  content area rendered each view by its own boolean, so the Markdown preview
+  and the diff, both full height, could mount together and overlap.
+- **Now one decision point** (`views-src/src/lib/pane.ts`): `contentKind()`
+  gives the **single** view the content area renders (changes over preview >
+  byte kinds), and `tabs()` / `activeTabKey()` give the mutually exclusive tab
+  group in the header. `EditorPane` renders only that single value: two full
+  views at once is not prevented by remembering a render condition, there is
+  structurally no second true.
+- **"Changes" is now the third tab in the tablist** (Edit / Preview / Changes
+  in one group): reachable from either side; clicking "Edit" or "Preview"
+  closes changes and returns to the previous view; `activeTabKey()` keeps the
+  selection unique.
+- Two more fixes: the Changes tab is offered only for **text files** (images /
+  media / databases own the content area, and a line diff means nothing for
+  them); `tabs()` de-duplicates modes itself, since duplicate keys make React
+  reuse the wrong node, which only shows when a mode happens to repeat.
+- **Regression pinned in `verify-viewers.mjs`**: an exhaustive input scan
+  asserts the content view is always single-valued, all ten views are
+  reachable, "changes beat preview / preview returns after closing changes",
+  and the tab group has one selected item.
 
 ## 0.8.0
 
-- **文件监听（自动刷新）**：文件在本视图之外被改动——外部编辑器、`git checkout`、构建产物、另一个窗口——
-  在一秒多内被自动发现并**重新读取**，树与列表一起刷新（体积、mtime、git 徽标、新建与删除），不必再点「刷新」。
-  主进程用 `fs.watch` 对**当前基点 root** 开一只递归监听（`persistent: false`），变化去抖 250ms 后并入有界
-  游标历史（上限 400 条），视图每 1.2 秒取一次增量——宿主没有给插件「向视图推送」的通道，视图只能自己来取；
-  面板不可见时跳过这一轮。
-- **三条边界**：① **没有未保存改动时**才自动重新读取打开的文件；**有未保存改动时只亮一条提示条、绝不覆盖**，
-  提示条上的「重新加载」仍走既有的未保存确认框；② 本插件自己的保存（临时文件 + rename）先记一笔，
-  同名事件在 1.5 秒内不算「外部改动」——否则每按一次 `Ctrl+S` 都会把自己的文档重装一遍，光标与滚动位置一起丢；
-  ③ 一次外部改动最多顺手刷新 8 个目录，剩下的留给下一次或手动刷新，不把面板打满。
-- **噪声与生命周期**：`.git/`、任意层级的 `node_modules/`、凭据类路径（`.env*` / `.ssh` / `*.pem`…）与本插件的
-  原子写临时文件都不上报；换基点时监听跟着换；插件卸载时监听一并关闭；运行时不支持递归 `fs.watch` 时
-  只是关掉自动刷新，手动刷新与其它功能一律不受影响。
-- **界面**：顶部新增「自动刷新」开关（可关；监听不可用时整颗按钮禁用并说明原因，不给永远没反应的入口），
-  有未保存改动时的外部改动提示条；**两个手动刷新按钮原样保留**——监听只是省掉那一下点击。
-- **新增离线校验 `pnpm verify:watch`**（已挂进 `pnpm verify`）：噪声过滤与自己写入的抑制、真实 `fs.watch`
-  的端到端（改 / 建 / 删、幂等、抑制时限、换基点、无项目、`onUnload`），以及视图侧「重读还是提示」判定纯函数。
+- **File watching (auto-refresh)**: files changed outside this view (another
+  editor, `git checkout`, build output, another window) are detected within
+  about a second and **re-read**, and tree and list refresh (size, mtime, git
+  badges, created and deleted entries) without pressing "Refresh". The main
+  process opens one recursive `fs.watch` on the **current base root**
+  (`persistent: false`); changes are debounced for 250ms into a bounded cursor
+  history (400 entries), and the view fetches the delta every 1.2 seconds (the
+  host gives plugins no push channel to a view, so the view polls); the round
+  is skipped while the panel is hidden.
+- **Three rules**: (1) an open file is re-read automatically **only without
+  unsaved changes; with unsaved changes only a notice bar appears and nothing
+  is overwritten**, and the bar's "Reload" still uses the existing
+  unsaved-changes confirmation; (2) the plugin's own saves (temp file + rename)
+  are noted first, and a same-path event within 1.5 seconds is not an external
+  change, otherwise every `Ctrl+S` would reload your own document and lose
+  cursor and scroll position; (3) one external change refreshes at most 8
+  folders, the rest is left for the next round or a manual refresh, so the
+  panel is not flooded.
+- **Noise and lifecycle**: `.git/`, `node_modules/` at any depth, credential
+  paths (`.env*` / `.ssh` / `*.pem`…) and the plugin's atomic-write temp files
+  are never reported; the watcher follows base switches and closes when the
+  plugin unloads; if the runtime cannot watch recursively, only auto-refresh is
+  off and manual refresh and everything else are unaffected.
+- **UI**: a new "Auto-refresh" switch at the top (can be turned off; disabled
+  with an explanation when watching is unavailable, never a dead control), and
+  a notice bar for external changes while there are unsaved edits; **both
+  manual refresh buttons stay**: watching only saves a click.
+- **New offline check `pnpm verify:watch`** (part of `pnpm verify`): noise
+  filtering and own-write suppression, end to end with a real `fs.watch`
+  (edit / create / delete, idempotence, suppression window, base switch, no
+  project, `onUnload`), and the view's "re-read or notify" pure function.
 
 ## 0.7.0
 
-- **文件列表接入 git 状态**：每一行按 git 自己的心智模型给一个徽标——绿 `A` 新增（含未跟踪的新文件）、
-  琥珀 `M` 已修改、红 `D` 已删除、蓝 `R` 已重命名、紫 `U` 冲突——文件行尾再给相对上次提交的 `+N` / `−N`；
-  **目录上给的是整棵子树的汇总**（最值得注意的状态 + 受影响文件数），所以不展开也能看出哪个目录脏了。
-  悬停补全「是否已暂存 / 是否未跟踪」，左侧列表顶部一句话概览当前分支与各类变化的文件数。
-- **逐行查看变更内容**：打开有改动的文件后工具栏出现「变更」按钮（右键菜单里是「查看变更」），点开是
-  逐行对照的 unified diff——新增绿底、删除红底、两侧行号、hunk 头保留所在函数名；**已暂存（HEAD → 暂存区）
-  与未暂存（暂存区 → 磁盘）分段标注**，未跟踪的新文件按「全文都是新增」展示，被删除的文件仍能看它删掉了什么。
-  差异视图自带刷新与「回到文件」，保存后徽标与差异立刻跟上。
-- **状态与差异来自工作区里真实的 git**：只读子命令 `status` / `diff` / `rev-parse`，不写索引、不联网、
-  不碰 `.git/**`（`GIT_OPTIONAL_LOCKS=0` / `GIT_TERMINAL_PROMPT=0` / `GIT_LITERAL_PATHSPECS=1`），
-  每个子命令 5s 超时并有输出上限，结果缓存 2s 并在插件自己保存后立刻作废。`porcelain` / `numstat` /
-  `unified diff` 三种输出形态由插件自己解析。
-- **降级是完整的**：没有 git、不是仓库、git 超时或缺失时，所有标记与入口整体消失，列目录 / 读 / 写 /
-  保存 / 删除与 0.6.0 完全一致；路径限制与凭据黑名单一条没放松（`fm.git.diff` 同样先过根内包含校验）。
-- **新增离线校验 `pnpm verify:git`**（已挂进 `pnpm verify`）：纯函数夹具钉住 git 三种输出格式，加临时真仓库
-  的端到端（`fm.list` 徽标 / `fm.read` 状态 / `fm.git.diff` 具体改动行 / 越界与凭据被拒 / 保存后立刻更新 /
-  非仓库降级）。本机没装 git 时端到端那层跳过。
+- **Git status in the file list**: each row gets a badge following git's own
+  model: green `A` added (including untracked new files), amber `M` modified,
+  red `D` deleted, blue `R` renamed, purple `U` conflicted; the end of the row
+  shows `+N` / `−N` against the last commit; **folders show a rollup of their
+  whole subtree** (most notable status + number of affected files), so a dirty
+  folder is visible without expanding. Hover adds "staged or not / untracked or
+  not", and the top of the left list summarises the current branch and the
+  file count per change kind.
+- **Line-by-line changes**: for a changed file the toolbar shows a "Changes"
+  button ("View changes" in the context menu) that opens a line-by-line unified
+  diff: additions green, deletions red, line numbers on both sides, hunk
+  headers keep the enclosing function name; **staged (HEAD → index) and
+  unstaged (index → disk) sections are labelled separately**, untracked new
+  files show as all-added, and deleted files still show what was removed. The
+  diff view has its own refresh and "Back to file", and badges and diffs update
+  immediately after saving.
+- **Status and diffs come from the real git in the working copy**: read-only
+  subcommands `status` / `diff` / `rev-parse`, no index writes, no network,
+  nothing inside `.git/**` (`GIT_OPTIONAL_LOCKS=0` / `GIT_TERMINAL_PROMPT=0` /
+  `GIT_LITERAL_PATHSPECS=1`); each subcommand has a 5s timeout and an output
+  cap, results are cached for 2s and invalidated immediately after the plugin's
+  own saves. The plugin parses the `porcelain` / `numstat` / `unified diff`
+  output forms itself.
+- **Complete degradation**: without git, outside a repository, or when git
+  times out or is missing, all marks and entries disappear, and listing /
+  reading / writing / saving / deleting behave exactly as in 0.6.0; path limits
+  and the credential deny list are not relaxed (`fm.git.diff` also passes the
+  root containment check first).
+- **New offline check `pnpm verify:git`** (part of `pnpm verify`): pure
+  function fixtures pin git's three output formats, plus end to end with a
+  real temporary repository (`fm.list` badges / `fm.read` status /
+  `fm.git.diff` changed lines / out-of-root and credential refusal / immediate
+  update after save / degradation outside a repository). The end-to-end layer
+  is skipped when git is not installed.
 
 ## 0.6.1
 
-- **修掉「Markdown 预览过窄且不随侧边栏拖动变化」**：预览正文被 `.md-body` 残留的 `max-width: 78ch`
-  钉在约 78 字符的固定列宽上，拖动分栏分隔条时也纹丝不动；现改为 `max-width: 100%`，预览占满
-  编辑区全宽并实时跟随分栏宽度（无头浏览器实测：预览容器 1081px 全宽、拖动后布局正确）。
- 
+- **Fix the Markdown preview being too narrow and not following the sidebar
+  divider**: the preview body was pinned to a fixed column of about 78
+  characters by a leftover `max-width: 78ch` on `.md-body` and did not move
+  when dragging the split divider; it is now `max-width: 100%`, so the preview
+  fills the editor area and follows the split width live (tested in a headless
+  browser: preview container 1081px full width, correct layout after dragging).
+
 ## 0.5.2
 
-- **修掉「切了文件夹但列表没跟着换」**：宿主报的目录是正斜杠（`C:/Users/…`），而插件把记忆写盘时用 Node 的
-  `path.resolve()` 存成了反斜杠（`C:\Users\…`）；两边比较只做「原样」与「忽略大小写」两次比对，没有统一
-  分隔符，于是记忆匹配不上任何一个 root，包含基点退回主文件夹——视图用自己那份原样字符串还能匹配，所以
-  头部名字换了、列表与编辑器却停在主文件夹，关掉重开也记不住。现在路径比较与分隔符无关（`samePath` /
-  `matchRoot`，`main.js` 与 `lib/roots.ts` 同步改），**已经写坏的旧记忆也一并救回**，无需用户重新切一次。
-- 用例补上这条链路：`verify-roots.mjs` 断言分隔符不同的同一个目录算命中；`verify-jail.mjs` 的桩宿主改成
-  **正斜杠**（跟真实宿主一致）并断言切换后列的是兄弟文件夹自己的文件——修复前这一节必然失败。
+- **Fix the list not following a folder switch**: the host reports
+  directories with forward slashes (`C:/Users/…`), while the plugin stored its
+  memory via Node's `path.resolve()` with backslashes (`C:\Users\…`); the
+  comparison only tried "as is" and "case-insensitive", without normalising
+  separators, so the memory matched no root and the containment base fell back
+  to the primary folder. The view still matched with its own raw string, so
+  the header name changed while list and editor stayed on the primary folder,
+  and the choice was not remembered across reopening. Path comparison is now
+  separator-independent (`samePath` / `matchRoot`, changed in both `main.js`
+  and `lib/roots.ts`), and **already corrupted memory entries are recovered**
+  without the user switching again.
+- Tests cover the path: `verify-roots.mjs` asserts the same directory with
+  different separators matches; the `verify-jail.mjs` stub host now uses
+  **forward slashes** (like the real host) and asserts that after switching the
+  sibling folder's own files are listed; this section failed before the fix.
 
 ## 0.5.1
 
-- **修掉换文件夹后「用默认应用打开」/「在文件夹中显示」打开错文件**：这两条通道由宿主执行、只接受
-  工作区相对路径，基点切到项目组里的兄弟文件夹时，相对路径会被宿主按**主文件夹**解析——两个文件夹
-  里有同名文件就会打开另一个（0.5.0 的缺陷）。现在基点不是主文件夹时改送绝对路径，宿主对「本项目
-  已注册文件夹根」下的绝对路径有对应的窄放行（ADR 0253）；基点仍是主文件夹时行为与 0.5.0 / 0.4
-  完全一致。
-- **换文件夹会把编辑器一起清干净**：树、展开、选中、搜索与已打开的文件整体重来，编辑器缓冲区也随
-  文件关闭而清空（面板显示空态时不再留着上一个文件夹的文档），未保存的改动照旧先问过才切。
+- **Fix "Open with default app" / "Show in folder" opening the wrong file
+  after switching folders**: these two channels are executed by the host and
+  only accept workspace-relative paths, so with the base switched to a sibling
+  folder in the project group the host resolved the relative path against the
+  **primary folder**, opening the other file when both folders had the same
+  name (a 0.5.0 defect). With a non-primary base an absolute path is now sent,
+  and the host has a matching narrow allowance for absolute paths under the
+  project's registered folder roots (ADR 0253); with the primary base the
+  behaviour is identical to 0.5.0 / 0.4.
+- **Switching folders also clears the editor**: tree, expansion, selection,
+  search and open files are reset, and the editor buffer is cleared as files
+  close (the empty panel no longer keeps the previous folder's document);
+  unsaved changes are still confirmed before switching.
 
 ## 0.5.0
 
-- **项目组多文件夹**：宿主可以把一个项目注册成多个本地文件夹（`workspace.get()` 与首次握手带上 `roots` /
-  `projectId`）。面板左上角的文件夹名成了切换器：组的文件夹多于一个时点开就是这组 folder 的菜单
-  （标出主文件夹、当前在看的那个打勾），键盘可达、带 `aria-haspopup` / `aria-expanded`，Escape 与点到
-  外面都能关；只有一个文件夹（或老宿主不送组信息）时头部与 0.4.0 完全一样，不留点了没反应的入口。
-- **看的是哪个 folder 按项目记住**：键 `p:<projectId>`（宿主没给 projectId 时用 `r:<主根路径>`），值必须
-  命中当前 roots 才被信任、否则退回主根，最多 20 条、按最近写入淘汰；新项目从主文件夹开始。
-- **包含基点始终只有一个 root**：树 / 读 / 写 / 新建 / 重命名 / 移动 / 搜索 / SQLite 一律相对当前选中的
-  那个 root 解析，`..`、符号链接与 junction 逃逸、凭据黑名单一条都没放松；落在同项目另一个 root 下的
-  绝对路径会先把基点切过去，再按「相对该 root」解析。
-- **切换会重建视图状态**（树、展开、选中、搜索、已打开的文件），并照旧先过「未保存改动」确认——取消就
-  什么都不换。
+- **Multi-folder project groups**: the host can register one project as
+  several local folders (`workspace.get()` and the initial handshake carry
+  `roots` / `projectId`). The folder name at the top left of the panel becomes
+  a switcher: with more than one folder it opens the group's folder menu
+  (primary folder marked, current one checked), keyboard accessible with
+  `aria-haspopup` / `aria-expanded`, closed by Escape or a click outside; with
+  a single folder (or an older host sending no group info) the header is
+  identical to 0.4.0, with no dead entry.
+- **The browsed folder is remembered per project**: key `p:<projectId>`
+  (`r:<primary root path>` when the host gives no projectId); a value is
+  trusted only if it matches a current root, otherwise the primary root is
+  used; at most 20 entries, evicted by most recent write; new projects start at
+  the primary folder.
+- **The containment base is always a single root**: tree / read / write /
+  create / rename / move / search / SQLite all resolve against the selected
+  root; `..`, symlink and junction escapes and the credential deny list are not
+  relaxed; an absolute path under another root of the same project switches the
+  base first and is then resolved relative to that root.
+- **Switching rebuilds the view state** (tree, expansion, selection, search,
+  open files) and still asks for confirmation on unsaved changes first;
+  cancelling changes nothing.
 
 ## 0.4.0
 
-- **宿主驱动的打开请求**：入口 URL 的 `?piViewOpen=` 载荷与 `view:open` 推送两条路径都接住（挂载时同步读
-  一次，加载完成后用于实时更新；加载完成前宿主改写 URL 重新加载），同一条请求重复投递只处理一次。项目
-  内路径照旧展开并加载祖先目录，脏缓冲守卫照旧生效。
-- **项目外的绝对路径也能打开与保存**：宿主自己选定的会话临时目录 / 附件路径带 `external` 标记，插件对它
-  不做根内包含校验——它本来就在根外——凭据类黑名单照旧在原始、规范化与 realpath 三态全量生效。
-- **左侧文件列表可整块收起**：宿主请求打开文件时自动收起并持久化，分栏宽度保留、展开即恢复，工具栏新增
-  键盘可达的切换按钮。
+- **Host-driven open requests**: both the `?piViewOpen=` payload of the entry
+  URL and the `view:open` push are handled (read once synchronously at mount,
+  used for live updates after load; before load completes the host rewrites
+  the URL and reloads), and a duplicate delivery is processed once.
+  Project-relative paths still expand and load their ancestors, and the dirty
+  buffer guard still applies.
+- **Absolute paths outside the project can be opened and saved**: session
+  scratch / attachment paths chosen by the host carry an `external` flag; the
+  plugin skips root containment for them (they are outside the root by
+  definition), while the credential deny list stays fully enforced on the raw,
+  normalised and realpath forms.
+- **The left file list can be collapsed as a whole**: it collapses
+  automatically (and persists) on host open requests, keeps the split width
+  and restores it on expanding; the toolbar gains a keyboard-accessible toggle.
 
 ## 0.3.1
 
-- **「用默认应用打开」与「在文件夹中显示」**：文件右键即可（走宿主的 `fs.openDefault` / `fs.reveal`）。
-  这两个动作只能由宿主代为执行，因此 manifest 首次声明 `fs.read`（root `workspace`、scope `**`）
-  ——与内置 Files 视图逐项相同；插件自身的读写仍走自己进程内的 Node fs，网关不介入。
-  目录对这两个动作无效（宿主返回 `INVALID_ARGUMENT`），所以只对文件提供。
+- **"Open with default app" and "Show in folder"**: from a file's context menu
+  (via the host's `fs.openDefault` / `fs.reveal`). Only the host can perform
+  these actions, so the manifest declares `fs.read` for the first time (root
+  `workspace`, scope `**`), identical to the built-in Files view; the plugin's
+  own reads and writes still use Node fs in its own process, not mediated by
+  the gateway. Folders are invalid for these actions (the host returns
+  `INVALID_ARGUMENT`), so they are offered for files only.
 
 ## 0.3.0
 
-**从「只能编辑文本」扩到「看得见各种文件」**：图片、音视频、分隔符文本、JSON 各自有了
-自己的查看方式；剩下的二进制（zip / apk / exe）明确说「不支持预览」，不再含糊成
-「疑似二进制」。
+**From "edit text only" to "see all kinds of files"**: images, audio/video,
+delimited text and JSON each get their own viewer; the remaining binaries (zip
+/ apk / exe) clearly say "preview not supported" instead of a vague "probably
+binary".
 
-- **图片查看**：png / jpg / jpeg / gif / webp / avif / bmp / ico / svg。默认适应窗口，
-  可切「实际大小」（超出即滚动），底部显示像素尺寸与体积，舞台铺棋盘格让透明区域可见。
-  字节由主进程读成 **data URI** 随响应带过来——面板是 `file://` 的沙箱页，没有文件系统，
-  相对路径只会指回视图自己，这也是本插件以前「检测得到图片但显示不出来」的根因。
-- **音视频播放**：mp4 / m4v / mov / webm / ogv / mkv 用 `<video>`，mp3 / m4a / aac /
-  wav / flac / ogg / opus / weba 用 `<audio>`。不自动播放（面板可能在用户没留意时切到
-  媒体文件上，出声是越界的）；编码或封装不被支持时给出明确提示，而不是留一块黑框。
-- **分隔符文本表格视图**：`.csv` / `.tsv` 打开即表格，首行当表头，表头吸顶、悬停整行。
-  手写解析器支持引号包裹、`""` 转义、字段内换行、CRLF、参差的行；行数封顶 1000、
-  列数封顶 60，超出时在表下说明。
-- **JSON 折叠树**：`.json` / `.jsonc` / `.json5` 可切换树视图。默认展开两层，单节点
-  最多直接渲染 100 个键，超长字符串截断显示（完整值在 title 里）。解析失败不是崩溃
-  而是结果——`//` 注释、尾逗号这类非严格 JSON 会显示「解析失败 + 原因」，源码视图照常可编辑。
-- **二进制文件说清楚**：zip / apk / exe 这类没有可预览形态的文件，提示改为
-  「二进制文件（zip、apk、exe 等），暂不支持预览」，并给出该类型是否超限的具体数字。
-- **体积上限分档**：文本 2 MiB、图片 8 MiB、音视频 24 MiB（后两类要走 base64，
-  膨胀约 1/3，所以单独设限）。超限时提示里带上具体上限值。
+- **Image viewing**: png / jpg / jpeg / gif / webp / avif / bmp / ico / svg.
+  Fit to window by default, switchable to "actual size" (scrolls when larger),
+  pixel dimensions and size at the bottom, checkerboard stage so transparency
+  is visible. Bytes are read by the main process into a **data URI** sent with
+  the response: the panel is a `file://` sandbox page without filesystem
+  access, and relative paths only point back at the view itself, which was the
+  root cause of "image detected but not shown" before.
+- **Audio and video**: mp4 / m4v / mov / webm / ogv / mkv use `<video>`, mp3 /
+  m4a / aac / wav / flac / ogg / opus / weba use `<audio>`. No autoplay (the
+  panel may switch to a media file without the user noticing, and making sound
+  would overstep); an unsupported codec or container shows a clear message
+  instead of a black box.
+- **Table view for delimited text**: `.csv` / `.tsv` open as a table, first row
+  as a sticky header, whole-row hover. The hand-written parser supports
+  quoting, `""` escapes, newlines in fields, CRLF and ragged rows; capped at
+  1000 rows and 60 columns, with a note below the table when exceeded.
+- **JSON tree**: `.json` / `.jsonc` / `.json5` can switch to a tree view.
+  Expanded two levels by default, at most 100 keys rendered directly per node,
+  overlong strings truncated (full value in the title). A parse failure is a
+  result, not a crash: non-strict JSON such as `//` comments or trailing commas
+  shows "parse failed + reason", and the source view stays editable.
+- **Binaries are labelled**: files without a previewable form, such as zip /
+  apk / exe, now show "Binary file (zip, apk, exe, etc.), preview not
+  supported", with the exact numbers when a type exceeds its limit.
+- **Tiered size limits**: text 2 MiB, images 8 MiB, audio/video 24 MiB (the
+  latter two travel as base64, about 1/3 larger, hence separate limits). The
+  message names the exact limit when exceeded.
 
-### SQLite：只读浏览 + 结构 + 自定义 SQL 查询
+### SQLite: read-only browsing + structure + custom SQL queries
 
-- **新预览类型 `kind: "sqlite"`**：`.db` / `.sqlite` / `.sqlite3` / `.db3`，扩展名 + 文件头
-  `SQLite format 3\0` 双重判定（Windows 的 `thumbs.db` 其实是 OLE 文件，只看扩展名会误判；
-  魔数不对就退回普通文件处理）。fm.read 只读 100 字节的头部就返回概览，**因此不做体积限制**
-  ——这是插件里唯一能打开大文件（几百 MB 的库）的预览类型。
-- **字节不进视图**：数据库留在主进程里查，新增 `fm.sqlite.open` / `.rows` / `.query` 三个通道，
-  每次只把一页行发给视图。分页与排序因此必须下推到 SQL。
-- **浏览**：表/视图清单（`sqlite_schema`），分页取数（每页行数沿用表格那档偏好）、点表头排序、
-  最左 `rowid` 列（视图与 WITHOUT ROWID 表自动退回普通取数）、`NULL` 灰显、BLOB 只显示体积、
-  列类型与 PK/NOT NULL 放在表头悬停里。
-- **结构面板**：列与类型、索引、触发器，以及 `CREATE` 原文（都在 schema 里，顺手就能给）。
-- **只读 SQL 查询框**：`Ctrl/Cmd+Enter` 运行，可选行数上限（100–5000），显示耗时与截断提示；
-  结果网格复用同一套表格（本地分页 + 本地排序，因为结果已被上限截断）。
-- **只读是三层钉的**：`readOnly: true` 打开 → `PRAGMA query_only = 1`（实测 `DROP`/`INSERT`
-  被 SQLite 拒绝）→ 语句白名单（只放行 `select`/`with`/`values`/`explain` 与只读 `pragma`，
-  并强制**单条**语句：`node:sqlite` 的 prepare 对多语句是放行的，实测 `select 1; select 2`
-  只执行第一条且不报错）。表名/列名先与 schema 核对再拼引号，排序方向只认 `asc`/`desc`。
-- **性能与边界**：句柄 LRU（最多 2 个、闲置 60 秒关闭、文件被外部改动后自动重开）、
-  单次取数上限 5000 行、单元格 4 KB 截断、OFFSET ≤ 10 万行（同步 API 没有中断接口，
-  只能让查询天生有界）、行数用 `max(rowid)` 估算而非精确 `COUNT(*)`。
-- **优雅降级**：运行时探测 `node:sqlite`，拿不到就只显示概览并说明原因，绝不让插件崩。
+- **New preview type `kind: "sqlite"`**: `.db` / `.sqlite` / `.sqlite3` /
+  `.db3`, detected by extension plus the `SQLite format 3\0` file header
+  (Windows `thumbs.db` is actually an OLE file, so the extension alone would
+  misjudge it; a wrong magic number falls back to an ordinary file). fm.read
+  reads only the 100-byte header to return the overview, **so there is no size
+  limit**: this is the only preview type in the plugin that can open large
+  files (databases of hundreds of MB).
+- **Bytes never reach the view**: the database is queried in the main process
+  through three new channels `fm.sqlite.open` / `.rows` / `.query`, sending one
+  page of rows at a time. Paging and sorting are therefore pushed down to SQL.
+- **Browse**: table/view list (`sqlite_schema`), paged rows (page size reuses
+  the table preference), sortable headers, a leftmost `rowid` column (views and
+  WITHOUT ROWID tables fall back to plain fetching), `NULL` greyed out, BLOBs
+  shown by size only, column types and PK/NOT NULL in the header tooltip.
+- **Structure panel**: columns and types, indexes, triggers, and the original
+  `CREATE` text (all in the schema anyway).
+- **Read-only SQL query box**: `Ctrl/Cmd+Enter` runs, optional row limit
+  (100-5000), shows duration and truncation; the result grid reuses the same
+  table (local paging + local sorting, since results are already capped).
+- **Read-only in three layers**: opened with `readOnly: true` → `PRAGMA
+  query_only = 1` (tested: SQLite refuses `DROP`/`INSERT`) → statement
+  allowlist (only `select`/`with`/`values`/`explain` and read-only `pragma`,
+  and **single** statements enforced: `node:sqlite` prepare accepts multiple
+  statements; tested, `select 1; select 2` runs only the first without error).
+  Table and column names are checked against the schema before quoting, and
+  sort direction accepts only `asc`/`desc`.
+- **Performance and limits**: handle LRU (at most 2, closed after 60 seconds
+  idle, reopened automatically after an external change), at most 5000 rows
+  per fetch, cells truncated at 4 KB, OFFSET ≤ 100,000 rows (the synchronous API
+  has no interrupt, so queries must be bounded by design), row counts estimated
+  with `max(rowid)` instead of an exact `COUNT(*)`.
+- **Graceful degradation**: `node:sqlite` is probed at runtime; without it only
+  the overview shows with an explanation, and the plugin never crashes.
 
-### CSV / TSV：分页 + 排序 + 布局重做
+### CSV / TSV: paging + sorting + layout rework
 
-- **分页取代截断**。以前是「只显示前 1000 行」——第 1001 行往后就永远看不到了。现在整份
-  文件一次解析、按页渲染，默认**每页 1000 行**；底部工具条给出「当前范围 / 总行数」
-  「第几页 / 共几页」与前五页翻页，并能改每页行数（100 / 200 / 500 / 1000 / 2000 / 5000，
-  选择会记住）。分页同时也是性能上限：文件再大，一次也只铺一页的单元格。
-- **点击表头排序**：整格是按钮，一下升序、两下降序、**三下回到文件原序**（行号列会把原序
-  显出来，所以「取消排序」是有意义的一档，不只是复位）。排序只重排数据行，表头不动，
-  翻页自动回到第 1 页。
-  - 整列都是数字 → 按数值比：`10` 排在 `2` 后面、`-10` 排在 `-5` 前面、`9.25` 排在 `9.5` 前面。
-  - 否则按自然序文本比：`file2` 排在 `file10` 前面，大小写不敏感。
-  - **空值永远沉底**，升序降序都一样（不然一按降序，空行全飘到最前面）。
-  - 数字位与右对齐共用「整列都是数字」这一条判据，不会出现「右对齐却按文本排」的错位。
-  - 排序键先算一遍再排（O(n) + 排序），并复用单个 `Intl.Collator` 实例——比较函数会被
-    调用几十万次，每次新建 collator 会让大文件卡住。
-- **布局改成「滚动区 + 钉在底部的工具条」**。以前行数说明写在表格后面，得滚到最底下才
-  看得见；现在工具条固定，翻页、范围、每页行数一直在。
-- **最左一列行号**（吸左）：横向滚动和翻页时都知道自己在第几行，序号跨页连续。
-- **表头吸顶 + 行号吸左同时生效**：宽表两个方向都固定得住。吸顶/吸左的格子用不透明底色，
-  不会透出下层内容。
-- **斑马纹 + 整行悬停**：横向扫一行时不串行。
-- **数字列自动右对齐**：整列（当前页、允许空值）都是数字才右对齐，小数点对得齐、量级一
-  眼看得出来；混进一个非数字就退回左对齐。
-- **单元格补 `title`**：被省略号截断的值，悬停可看全。
-- 列数上限仍是 60，超出在工具条说明；解析上限改为 200,000 行（文件本身已被 2 MiB 限制，
-  这里只是内存兜底）。
+- **Paging replaces truncation.** Previously only the first 1000 rows were
+  shown, so row 1001 and later were never visible. The whole file is now parsed
+  once and rendered per page, **1000 rows per page** by default; the bottom bar
+  shows "current range / total rows", "page x of y" and the first five page
+  buttons, and the page size can be changed (100 / 200 / 500 / 1000 / 2000 /
+  5000, remembered). Paging also caps cost: however large the file, only one
+  page of cells is laid out.
+- **Click a header to sort**: the whole cell is a button; one click ascending,
+  two descending, **three back to file order** (the row number column shows the
+  original order, so "unsorted" is a meaningful state, not just a reset).
+  Sorting reorders data rows only, the header stays, and paging returns to page
+  1.
+  - All-numeric column → numeric comparison: `10` after `2`, `-10` before
+    `-5`, `9.25` before `9.5`.
+  - Otherwise natural text order: `file2` before `file10`, case-insensitive.
+  - **Empty values always sink to the bottom**, ascending or descending
+    (otherwise descending would float all empty rows to the top).
+  - Numeric sorting and right alignment share the same "whole column is
+    numeric" criterion, so a right-aligned column never sorts as text.
+  - Sort keys are computed once before sorting (O(n) + sort) and a single
+    `Intl.Collator` instance is reused: the comparator runs hundreds of
+    thousands of times, and a new collator per call would freeze large files.
+- **Layout is now "scroll area + bar pinned at the bottom".** The row count
+  note used to follow the table and was visible only at the very bottom; the
+  bar is now fixed, with paging, range and page size always available.
+- **Leftmost row number column** (sticky left): you always know your row while
+  scrolling horizontally or paging; numbers continue across pages.
+- **Sticky header and sticky row numbers together**: wide tables stay anchored
+  in both directions. Sticky cells have an opaque background, so nothing shows
+  through.
+- **Zebra stripes + whole-row hover**: scanning a row never drifts into the
+  next.
+- **Numeric columns are right-aligned automatically**: only when the whole
+  column (current page, empty values allowed) is numeric, so decimal points
+  line up and magnitudes are obvious; one non-number falls back to left
+  alignment.
+- **Cells get a `title`**: ellipsis-truncated values show in full on hover.
+- The column limit stays at 60, noted in the bar when exceeded; the parse limit
+  is now 200,000 rows (the file is already limited to 2 MiB; this is only a
+  memory safeguard).
 
-### 保存链路：深度检查后修掉的问题
+### Save path: issues fixed after an in-depth review
 
-- **保存后编辑器内容会退回旧版本（严重）**。保存成功时 `openFile` 必须换新对象——要把
-  新的 `mtime` / `size` 作为下一次乐观锁的期望值——而 `EditorPane` 的 effect 依赖
-  `[file]`，于是重新执行 `setDocument(file.text, …)`，把整个文档换成了**打开时那份旧文本**：
-  光标归零、滚动回顶，界面却同时显示「已保存」。更糟的是紧接着再按一次 `Ctrl+S`
-  （保存当时没有脏检查），会把这份旧文本写回磁盘，真的丢改动。
-  现在「从磁盘装载」单独带一个 `loadToken`：换文件 / 重新加载 → 新 token；保存 →
-  token 不变，编辑器据此跳过重装。
-- **没有改动也会写盘**：习惯性按一下 `Ctrl+S` 就会抬一次 `mtime`、写一行审计；如果文件
-  正好在别处被改过，还会莫名弹出冲突框。现在没有改动直接返回（冲突框里的「覆盖」是
-  显式意图，照写）。
-- **连按两下 `Ctrl+S` 会自己撞出冲突**：第二次用的是同一个 `mtime` 期望值。现在同一个
-  文件的重复请求复用正在进行的那次保存，不发出第二次写。
-- **保存回来时用户可能已经切走**：元数据、脏标记、冲突框会落到新打开的文件上，导致
-  下一次保存必然误报冲突。现在只在目标文件仍是当前文件时才应用结果。
-- **`Ctrl+S` 只在编辑器有焦点时有效**：点了工具栏按钮、或停在预览 / 表格 / 树视图上就按
-  不动。现在窗口级也监听（编辑器内部照旧，已 `preventDefault` 的会跳过，不会存两次）。
-- **「从磁盘重新加载」在干净文件上是灰的**：外部改了文件反而拉不进来。现在一直可用
-  （有未保存改动时仍先弹确认）。
+- **Editor content reverted to an old version after saving (severe).** On a
+  successful save `openFile` must become a new object, carrying the new
+  `mtime` / `size` as the next optimistic lock expectation, but the
+  `EditorPane` effect depended on `[file]` and re-ran `setDocument(file.text,
+  …)`, replacing the whole document with **the old text from when it was
+  opened**: cursor reset, scroll back to the top, while the UI showed "Saved".
+  Worse, pressing `Ctrl+S` again right after (saving had no dirty check) wrote
+  that old text back to disk, really losing changes.
+  Loading from disk now carries its own `loadToken`: switching file / reloading
+  → new token; saving → same token, and the editor skips reloading.
+- **Writing without changes**: a habitual `Ctrl+S` bumped the `mtime` and
+  wrote an audit line, and if the file had been changed elsewhere a conflict
+  dialog appeared out of nowhere. Without changes it now returns immediately
+  ("Overwrite" in the conflict dialog is explicit intent and still writes).
+- **Pressing `Ctrl+S` twice caused a self-conflict**: the second save used the
+  same `mtime` expectation. Repeated requests for the same file now reuse the
+  save in flight instead of issuing a second write.
+- **The user may have switched away when a save returns**: metadata, dirty
+  flag and conflict dialog landed on the newly opened file, making the next
+  save report a false conflict. Results now apply only if the target is still
+  the current file.
+- **`Ctrl+S` only worked with editor focus**: after clicking a toolbar button,
+  or on the preview / table / tree, it did nothing. It is now also handled at
+  window level (the editor's own handling is unchanged; events already
+  `preventDefault`ed are skipped, so nothing saves twice).
+- **"Reload from disk" was disabled on clean files**: so external changes could
+  not be pulled in. It is now always available (still confirming first when
+  there are unsaved changes).
 
-### 顺带修掉的两个真问题
+### Two real issues fixed along the way
 
-- **长 Markdown 预览被裁掉且滚不动**：`.md-scroll` 是普通流里的子块（`height:auto`），
-  父级又是定高 + `overflow:hidden`，于是内容一旦超过一屏就被裁掉，而 `overflow:auto`
-  因为高度没被约束根本不出现滚动条。现改为四种查看器统一绝对定位铺满内容区。
-- **预览渲染的是「打开时」的文本**：改了内容再切到预览，看到的是磁盘上的旧版本。现改为
-  读编辑器里的当前文本（文件刚换、编辑器还没装载新内容时退回文件内容，不会串文件）。
+- **Long Markdown previews were clipped and could not scroll**: `.md-scroll`
+  was an in-flow child block (`height:auto`) inside a fixed-height parent with
+  `overflow:hidden`, so content beyond one screen was clipped and
+  `overflow:auto` never showed a scrollbar because the height was
+  unconstrained. All four viewers are now absolutely positioned to fill the
+  content area.
+- **The preview rendered the text from when the file was opened**: editing and
+  then switching to preview showed the old version from disk. It now reads the
+  editor's current text (falling back to the file content while the editor has
+  not loaded a just-switched file, so files never mix).
 
-### 校验
+### Verification
 
-- 新增 **`pnpm verify:viewers`**（已并入 `pnpm verify`）：CSV 解析的 12 个用例、
-  JSON 合法/非法、「哪个文件有哪几种看法、默认落在哪一侧」的判定，以及**保存不得更换
-  `loadToken`** 这条不变式（它一旦被破，上面那个「保存后内容回退」就会回来），全部离线断言。
-- 冒烟测试补 `[4b]`：用保存返回的 `mtimeMs` / `size` 紧接着保存第二次（视图正是这么做的，
-  有偏差用户就会吃到假冲突）、CRLF 转换后的 `size` 与磁盘一致、外部删掉文件后保存会重建。
+- New **`pnpm verify:viewers`** (part of `pnpm verify`): 12 CSV parsing cases,
+  valid / invalid JSON, which views a file has and which is the default, and
+  the invariant that **saving must not change `loadToken`** (breaking it brings
+  back the "content reverts after saving" bug above), all asserted offline.
+- Smoke test adds `[4b]`: a second save right after, using the `mtimeMs` /
+  `size` returned by the first (exactly what the view does; any mismatch gives
+  the user a false conflict), `size` matching disk after CRLF conversion, and
+  saving after an external delete recreating the file.
 
 ## 0.2.0
 
-- **修复代码没有语法高亮**：根因是 `codemirror` 的 `basicSetup` 内部注册了
-  `syntaxHighlighting(defaultHighlightStyle, { fallback: true })`，与插件自己的高亮样式
-  形成两个 fallback 高亮器，谁生效并不确定。现改为显式组装扩展列表，高亮器只有一个。
-- **语言解析改为显式注册表**：不再用 `@codemirror/language-data` 的启发式匹配
-  （它会让 `.ts` 匹配到错误的语言，并且把 Angular/Jinja/Liquid/Wast 等一堆用不到的语言
-  也打进包里）。现在按扩展名/文件名精确映射，产物同时从 1.87 MB 降到 1.30 MB，
-  并新增 C#、Kotlin、Scala、Dart、Objective-C 支持。
-- **新增 `pnpm verify`**：两个离线校验脚本，覆盖「静默失败」的两条链路——语法高亮
-  （跑完整的解析→高亮 token 链路）与 Markdown 预览（断言真实元素树、链接白名单、
-  无 `dangerouslySetInnerHTML`）。
-- **文件列表选中态与悬停态明确区分**：悬停是淡中性底色；选中是强调色底 + 左侧强调色竖条
-  + 前景色文字 + 中等字重，鼠标移开保持、悬停到选中行上再加深一档。
-- **新增右键菜单**：文件/文件夹上右键可新建文件、新建文件夹、重命名、移动、打开、刷新；
-  列表空白处右键提供「在此新建」与刷新。支持 ↑↓ / Home / End / Enter / Esc。
-- **新增 Markdown 预览 / 编辑切换**：`.md` / `.markdown` / `.mdx` 工具栏出现切换按钮，选择会记住。
-  预览支持标题、围栏代码块（复用编辑器的语法高亮）、引用、分隔线、有序/无序/任务列表
-  （按缩进嵌套）、表格（含对齐）、行内 code / 粗体 / 斜体 / 删除线 / 链接 / 图片。
-  预览渲染为 React 元素而非 `innerHTML`，结构上不存在注入面；链接不导航。
+- **Fix missing syntax highlighting**: the root cause was that `codemirror`'s
+  `basicSetup` registers
+  `syntaxHighlighting(defaultHighlightStyle, { fallback: true })` internally,
+  creating two fallback highlighters alongside the plugin's own style, with
+  undefined precedence. The extension list is now assembled explicitly, with a
+  single highlighter.
+- **Language resolution via an explicit registry**: no more heuristic matching
+  from `@codemirror/language-data` (it matched `.ts` to the wrong language and
+  bundled many unused languages such as Angular/Jinja/Liquid/Wast). Extensions
+  and file names now map exactly, the bundle shrinks from 1.87 MB to 1.30 MB,
+  and C#, Kotlin, Scala, Dart and Objective-C are added.
+- **New `pnpm verify`**: two offline verification scripts covering two paths
+  that fail silently: syntax highlighting (the full parse → highlight token
+  chain) and Markdown preview (asserting the real element tree, the link
+  allowlist and the absence of `dangerouslySetInnerHTML`).
+- **Selected and hover states in the file list are distinct**: hover is a faint
+  neutral tint; selection is an accent background + accent bar on the left +
+  foreground text + medium weight, kept when the mouse leaves and one step
+  darker on hover.
+- **New context menu**: right-click a file or folder to create a file, create
+  a folder, rename, move, open or refresh; right-click empty list space for
+  "New here" and refresh. Supports ↑↓ / Home / End / Enter / Esc.
+- **New Markdown preview / edit toggle**: `.md` / `.markdown` / `.mdx` show a
+  toggle in the toolbar; the choice is remembered. The preview supports
+  headings, fenced code blocks (reusing the editor's highlighting), quotes,
+  rules, ordered / unordered / task lists (nested by indentation), tables
+  (with alignment), inline code / bold / italic / strikethrough / links /
+  images. It renders React elements instead of `innerHTML`, so there is
+  structurally no injection surface; links do not navigate.
 
-### 开发期修掉的两个真问题
+### Two real issues fixed during development
 
-- Markdown 行内解析在递归处理嵌套强调时共享了同一个带 `g` 的正则，内层调用破坏外层的
-  `lastIndex`，导致预览卡死并吃光内存。现改为每次调用新建正则。
-- 右键菜单的副作用依赖了每次渲染都新建的数组，会让方向键导航时焦点不断被拽回第一项。
-  现改为用 ref 取最新值、副作用只在挂载时建立。
+- Markdown inline parsing shared one `g`-flagged regex across recursive
+  handling of nested emphasis; inner calls clobbered the outer `lastIndex`,
+  hanging the preview and exhausting memory. Each call now creates a new
+  regex.
+- A context menu effect depended on an array recreated on every render, which
+  kept pulling focus back to the first item during arrow-key navigation. It
+  now reads the latest value through a ref and sets the effect up only on
+  mount.
 
 ## 0.1.0
 
-首个版本。
+First release.
 
-- **右侧工作面板视图**（`contributes.views` + `ui.view`）：完整目录树、左右分栏、内容可编辑保存。
-- **目录树**：懒加载、目录优先、键盘导航（↑↓ Home End ←→ Enter）；行图标随文件类型变化，覆盖代码、配置、样式、标记、数据、脚本、图片、压缩包、字体、锁文件等常见类型，并对 `package.json` / `Dockerfile` / `LICENSE` 等特殊文件名单独判定。
-- **编辑器**：CodeMirror 6，行号、查找替换、多光标、括号匹配、代码折叠。
-- **文件操作**：新建文件、新建文件夹、重命名、移动。
-- **按文件名搜索**：项目级分页搜索，结果可直接跳转并展开定位。
-- **忽略规则**：按 `.gitignore` / `.ignore` 隐藏条目，可一键切回显示；没有规则文件时展示全部条目。
-- **安全护栏**：路径包含校验（拒绝 `..` 与符号链接/junction 逃逸）、敏感路径黑名单、原子写（临时文件 + fsync + rename）、`mtimeMs` + size 乐观锁的冲突检测、写入审计日志、预览与写入体积上限。
-- **跟随宿主外观**：亮/暗与中英文跟随 PI-Desktop 主体。
+- **Right work panel view** (`contributes.views` + `ui.view`): full directory
+  tree, split layout, editable and savable content.
+- **Directory tree**: lazy loading, folders first, keyboard navigation (↑↓
+  Home End ←→ Enter); row icons follow the file type, covering code, config,
+  styles, markup, data, scripts, images, archives, fonts, lock files and other
+  common types, with special handling for names such as `package.json` /
+  `Dockerfile` / `LICENSE`.
+- **Editor**: CodeMirror 6 with line numbers, find/replace, multiple cursors,
+  bracket matching and code folding.
+- **File operations**: new file, new folder, rename, move.
+- **Filename search**: paged project-wide search; results jump to and reveal
+  the file.
+- **Ignore rules**: entries hidden by `.gitignore` / `.ignore`, with a
+  one-click toggle to show them; without rule files every entry is shown.
+- **Safety rails**: path containment (refusing `..` and symlink/junction
+  escapes), sensitive path deny list, atomic writes (temp file + fsync +
+  rename), conflict detection with an `mtimeMs` + size optimistic lock, a
+  write audit log, and preview and write size limits.
+- **Follows the host appearance**: light/dark and UI language follow the
+  Desktop shell.

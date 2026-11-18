@@ -22,8 +22,8 @@ declare global {
     reviewReloadProbe(): Promise<{ checks: string[] }>;
   }
 }
-await i18n.use(initReactI18next).init({ lng: "zh-CN", fallbackLng: "en", keySeparator: false,
-  resources: { "zh-CN": { translation: flattenCatalog(catalogs["zh-CN"]) }, en: { translation: flattenCatalog(catalogs.en) } }, interpolation: { escapeValue: false } });
+await i18n.use(initReactI18next).init({ lng: "en", fallbackLng: "en", keySeparator: false,
+  resources: { en: { translation: flattenCatalog(catalogs.en) } }, interpolation: { escapeValue: false } });
 document.documentElement.dataset.theme = "light";
 const root = createRoot(document.getElementById("root")!);
 // Yield one renderer task; hidden-window animation frames may be suspended.
@@ -89,14 +89,14 @@ async function choose(label: string, value: string) {
   const node = select(label);
   checkSelectStyle(node);
   assert([...node.options].some(option => option.value === value), 'Requested option exists');
-  if (label === '对话轮次') assert([...node.options].every(option => !option.textContent?.includes('·')), 'Round labels show date and time only');
+  if (label === 'Conversation round') assert([...node.options].every(option => !option.textContent?.includes('·')), 'Round labels show date and time only');
   const setter = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value')!.set!;
   setter.call(node, value);
   node.dispatchEvent(new Event('change', { bubbles: true }));
   await frame();
 }
 async function mode(history: boolean) {
-  await choose("审阅范围", history ? "history" : "last");
+  await choose("Review scope", history ? "history" : "last");
 }
 async function contextLines(lines: 1 | 3 | 5, expected?: 1 | 3 | 5) {
   document.querySelector<HTMLButtonElement>(".review-settings-button")!.click();
@@ -118,7 +118,7 @@ const scroller = () => document.querySelector<HTMLElement>(".review-scroll")!;
 async function ready() { await until(() => document.querySelector(".review-history")?.getAttribute("aria-busy") === "false", "Review read must settle"); assert(!document.querySelector('[role="alert"]'), document.querySelector('[role="alert"]')?.textContent ?? "Review error"); }
 async function mount(session: SessionSummary, wait = true, tools: readonly UiMessage[] = []) {
   useAppStore.setState({ activeSessionId: session.id, sessions: [session], messages: [], isRunning: false });
-  flushSync(() => root.render(<main className="fixture"><p className="fixture-label">受控测试数据 · 原生审阅实现预览</p>
+  flushSync(() => root.render(<main className="fixture"><p className="fixture-label">Controlled test data · native review implementation preview</p>
     {tools.length > 0 && <SlotSessionProvider sessionId={session.id}><TurnChangesCard tools={tools} /></SlotSessionProvider>}
     <div className="fixture-panel"><ReviewTab /></div></main>));
   if (wait) await ready();
@@ -187,11 +187,11 @@ window.reviewProbe = async () => {
   await until(() => useAppStore.getState().workPanelTabs.some(tab => tab.location === 'latest.txt' && tab.resource === 'pi.file-manager/manager'), "Internal action opens the file manager tab");
   checks.push('file-menu-disabled-internal-loaded-plugin-and-external-current-file');
   await action("screenshot", "review-latest.png");
-  assert(!select('对话轮次'), "History selector is hidden by default");
-  assert(!document.querySelector('select[aria-label="上下文"]'), "No main context selector");
+  assert(!select('Conversation round'), "History selector is hidden by default");
+  assert(!document.querySelector('select[aria-label="Context"]'), "No main context selector");
   await mode(true);
-  await until(() => !!select('对话轮次'), "History adds its own row");
-  const roundSelect = select("对话轮次");
+  await until(() => !!select('Conversation round'), "History adds its own row");
+  const roundSelect = select("Conversation round");
   const totals = [...roundSelect.options].map(option => [option.value, option.querySelector('.review-turn-counts')?.textContent]);
   assert(totals.some(([id, text]) => id === seed.latest && text === '+1 −0'), 'Latest history option shows actual recorded +1/-0');
   assert(totals.some(([id, text]) => id === seed.round && text === '+7 −3'), 'Older option totals include parent and delegate edits only once');
@@ -204,19 +204,19 @@ window.reviewProbe = async () => {
     try { checkSelectStyle(geometry); } finally { geometry.remove(); }
   }
   checks.push('native-review-select-sidebar-colors-and-outer-only-corners');
-  await choose("对话轮次", seed.round); await ready();
+  await choose("Conversation round", seed.round); await ready();
   const recorded = await api.workspaceReviewChanges({ sessionId: seed.session.id, turnId: seed.round });
   assert(recorded.changes.length === 5, "Zero-counter native evidence stays available in the Host response");
   assert(headers().length === 3, "Workspace, delegated and approved outside changes share one file list, excluding the zero-counter file");
   assert(!headers().some(header => header.textContent?.includes("zero-preview.txt")), "Both-zero file is absent from Review");
-  assert(document.querySelector('.review-summary')?.textContent === '3 个文件', 'Five records across four paths must report only the three positive-counter files');
+  assert(document.querySelector('.review-summary')?.textContent === '3 files', 'Five records across four paths must report only the three positive-counter files');
   checks.push("zero-counter-file-hidden-without-losing-native-evidence");
   const selected = document.querySelector<HTMLElement>('.review-round-selected selectedcontent')!;
   await until(() => selected?.textContent?.includes('+7') === true, 'Native selectedcontent reflects the chosen round');
   const time = selected.querySelector<HTMLElement>('.review-turn-time')!, counts = selected.querySelector<HTMLElement>('.review-turn-counts')!;
   assert(counts.getBoundingClientRect().left > time.getBoundingClientRect().right + 8, 'Closed selection keeps a gap before right-aligned counts');
   assert(getComputedStyle(counts.querySelector('.diff-count-add')!).color !== getComputedStyle(counts.querySelector('.diff-count-del')!).color, 'Closed selection preserves add/delete colors');
-  assert(selected.getBoundingClientRect().right <= select('对话轮次').getBoundingClientRect().right - 12, 'Closed selected counts reserve the caret lane');
+  assert(selected.getBoundingClientRect().right <= select('Conversation round').getBoundingClientRect().right - 12, 'Closed selected counts reserve the caret lane');
   assert(headers()[2].querySelector('.review-change-card-path')?.textContent === '.../review-open-tests-source.mjs', "Real outside Write shows only basename with three-dot prefix");
   assert(getComputedStyle(headers()[2].querySelector('.review-change-card-path')!).direction === 'ltr', "Outside prefix must stay before the filename visually");
   assert(headers()[2].title.includes('outside') && !headers()[2].title.includes('/workspace/'), "Outside title retains actual path, without prepending workspace");
@@ -247,7 +247,7 @@ window.reviewProbe = async () => {
   await until(() => document.querySelectorAll(".review-history-record").length === 2, "All same-file change records expand together");
   assert(document.querySelectorAll('.review-history-file-body .review-change-card-actions').length === 1, "One action bar per file");
   assert(document.querySelectorAll('.review-change-copy').length === 1 && document.querySelectorAll('.review-change-rollback').length === 1, "Exactly one copy and rollback for all operations");
-  assert(!document.querySelector('.review-history-file-body')!.textContent?.includes('修改记录'), "No per-operation title");
+  assert(!document.querySelector('.review-history-file-body')!.textContent?.match(/Change \d+ of \d+/), "No per-operation title");
   assert(Math.abs(headers()[0].getBoundingClientRect().width - closedWidth) < 1, 'Expanding an overflowing diff cannot shrink file rows');
   assert(Math.abs(headers()[0].querySelector('.diff-counts')!.getBoundingClientRect().right - closedCountRight) < 1, 'Statistics stay fixed when the vertical scrollbar appears');
   assert(getComputedStyle(headers()[0].querySelector('.review-file-disclosure svg')!).transform !== 'none', 'Expanded disclosure faces down');
@@ -269,7 +269,7 @@ window.reviewProbe = async () => {
   await until(() => document.querySelector('.review-change-diff')?.textContent?.includes("line_025") === true, "5-line context is loaded from bounded history");
   assert(!document.querySelector('.review-change-diff')?.textContent?.includes("line_001"), "No full-file context is rendered");
   assert(!document.querySelector('.review-change-diff')?.textContent?.includes("external-current-only"), "Current disk never supplies historical context");
-  assert(!document.querySelector('.review-history-file-body')!.textContent?.includes('差异过大'), "3100-line file with small edits stays reviewable");
+  assert(!document.querySelector('.review-history-file-body')!.textContent?.includes('Diff is too large'), "3100-line file with small edits stays reviewable");
   checks.push("trimmed-3100-line-file-keeps-numbered-finite-context");
   checks.push("hover-menu-only-1-3-5-context-and-numbered-lines");
   const nested = [...scroller().querySelectorAll<HTMLElement>("*")].filter(node => ["auto", "scroll"].includes(getComputedStyle(node).overflowY) && node.scrollHeight > node.clientHeight + 1);
@@ -356,7 +356,7 @@ window.reviewProbe = async () => {
   await until(() => headers().some(node => node.textContent?.includes("running.txt")), "First live modification becomes Latest");
   await action("runningEnd"); useAppStore.setState({ isRunning: false }); await ready();
   checks.push("inflight-session-switch-and-first-live-modification");
-  await mode(true); await choose("对话轮次", seed.round); await ready();
+  await mode(true); await choose("Conversation round", seed.round); await ready();
   await action('resetCurrent'); headers()[0].click();
   await until(() => !!document.querySelector('.review-change-rollback'), "Grouped rollback is reachable from file footer");
   document.querySelector<HTMLButtonElement>('.review-change-rollback')!.click();
@@ -384,14 +384,14 @@ window.reviewProbe = async () => {
   const sourceFocus = currentReviewFocusRequest();
   await mount(seed.populated);
   const returnedFiles = headers().map(node => node.querySelector('.review-change-card-path')?.textContent);
-  const returnedTotals = select('对话轮次')?.selectedOptions[0]?.querySelector('.review-turn-counts')?.textContent;
+  const returnedTotals = select('Conversation round')?.selectedOptions[0]?.querySelector('.review-turn-counts')?.textContent;
   await mode(false); await ready(); await mode(true); await ready();
   const afterScopeCycle = headers().map(node => node.querySelector('.review-change-card-path')?.textContent);
   console.log('REVIEW_SELECTION_SWITCH ' + JSON.stringify({ returnedFiles, returnedTotals, afterScopeCycle, requestSession: sourceFocus?.sessionId }));
   assert(returnedFiles.length === 1 && returnedFiles[0] === 'other-session.txt', "Returning to a populated session must not show an empty list beneath another session's stale focus");
   assert(JSON.stringify(returnedFiles) === JSON.stringify(afterScopeCycle), "Last round / History cycling must not repair a missing initial file list");
   assert(sourceFocus?.sessionId === seed.session.id, "The transcript summary binds focus to its owning session");
-  assert(select('对话轮次').selectedOptions[0]?.querySelector('.review-turn-counts')?.textContent === '+1 −0', "The selected history counts agree with the visible current-session file");
+  assert(select('Conversation round').selectedOptions[0]?.querySelector('.review-turn-counts')?.textContent === '+1 −0', "The selected history counts agree with the visible current-session file");
   checks.push('real-turn-summary-focus-is-scoped-across-returning-session-and-history-cycle');
   await mount(seed.session);
   return { checks };

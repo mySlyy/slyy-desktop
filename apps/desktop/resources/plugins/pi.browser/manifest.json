@@ -8,22 +8,15 @@
     "en": {
       "name": "Browser",
       "description": "Work-panel browser chrome and agent CDP against the host guest page."
-    },
-    "zh-CN": {
-      "name": "浏览器",
-      "description": "工作面板里的浏览器外壳，并为 Agent 提供针对宿主访客页的 CDP 调试能力。"
     }
   },
-  "author": "PI-Desktop",
+  "author": "Wapsol GmbH",
   "main": "main.js",
   "contributes": {
     "views": [
       {
         "id": "browser",
-        "title": {
-          "en": "Browser",
-          "zh-CN": "浏览器"
-        },
+        "title": "Browser",
         "icon": "browser",
         "entry": "views/browser.html",
         "order": 10

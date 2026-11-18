@@ -314,7 +314,7 @@ test("large pasted text is preserved byte-for-byte in session scratch", async ()
     "../electron/main/composer-paste.ts"
   );
   const root = await mkdtemp(join(tmpdir(), "pi-composer-paste-text-"));
-  const text = "第一行\nsecond line — exact bytes\n";
+  const text = "\u7b2c\u4e00\u884c\nsecond line \u2014 exact bytes\n";
   try {
     const [file] = await saveComposerPasteFiles(root, "session-text", [
       {

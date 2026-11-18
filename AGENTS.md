@@ -1,8 +1,9 @@
 # AGENTS.md
 
-Policy-Sync: 2026-11-17.1
+Policy-Sync: 2026-11-18.1
 
-Mandatory rules for AI coding agents working in PI-Desktop.
+Mandatory rules for AI coding agents working in Slyy
+(`mySlyy/slyy-desktop`, based on PI-Desktop).
 
 `CLAUDE.md` is the Claude Code / Claude Cowork entry point and a condensed
 mirror of the non-negotiables in this file. This file is authoritative.
@@ -10,7 +11,7 @@ When you change either file, update the other so the non-negotiables stay
 aligned, and set the same `Policy-Sync:` token in both. The gate is
 `pnpm check:agent-policy` (`scripts/check-agent-policy-sync.mjs`).
 
-PI-Desktop is released software with real users. Treat every change as
+Slyy is released software with real users. Treat every change as
 production maintenance, not prototype work.
 
 Optimize for, in order:
@@ -30,10 +31,11 @@ Optimize for, in order:
 
 ## 0. Interaction Language
 
-- Reply to the user in the language they used. When the request is in
-  Chinese, answer in Chinese and keep it terse.
-- Keep code, identifiers, comments, commit messages, specs, ADRs, log
-  strings, protocol field names, and repository documentation in English.
+- Reply to the user in the language they used, and keep it terse.
+- All repository content is English only: code, identifiers, comments,
+  commit messages, specs, ADRs, log strings, protocol field names, and
+  repository documentation. The only exception is the German UI catalog
+  (`packages/i18n/src/locales/de`).
 - GitHub issue / PR discussion follows the original author's language.
 
 ---
@@ -231,6 +233,8 @@ git worktree add \
 
 cd <worktree-path>
 ```
+
+Suggested worktree path: `../slyy-desktop-worktrees/<short-description>`.
 
 All implementation, targeted validation, conflict resolution, and
 task-candidate E2E happen inside the task's dedicated worktree.

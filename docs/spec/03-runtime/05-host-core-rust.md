@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-`host-core` is the privileged local backend of PI-Desktop.
+`host-core` is the privileged local backend of Slyy.
 
 It does **not** replace pi. It provides safe host capabilities to:
 
@@ -135,7 +135,7 @@ notification.list
     resolved from the host's own enumeration and never from a request-supplied
     handle, binding another window re-applies every refusal and moves the
     revision, the grant revision and geometry are re-validated before every
-    synthesis, PI-Desktop's own windows and a secure input state are refused
+    synthesis, Slyy's own windows and a secure input state are refused
     unconditionally, a user Stop blocks the agent's next automatic grant for a
     cooldown, and grants are never persisted
 

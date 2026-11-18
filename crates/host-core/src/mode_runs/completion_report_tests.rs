@@ -73,7 +73,7 @@ fn invalid_reports() -> Vec<Value> {
     cases.push(missing);
     for (key, value) in [
         ("criterion", json!(" \n ")),
-        ("criterion", json!("界".repeat(1366))),
+        ("criterion", json!("\u{754C}".repeat(1366))),
         ("evidence", json!("\t")),
         ("evidence", json!("x".repeat(16385))),
         ("outcome", json!("unmet")),
@@ -90,7 +90,7 @@ fn invalid_reports() -> Vec<Value> {
         ("blockerReason", json!(" \n")),
         ("blockerReason", json!("x".repeat(16385))),
         ("remainingWork", json!([" "])),
-        ("remainingWork", json!(["界".repeat(1366)])),
+        ("remainingWork", json!(["\u{754C}".repeat(1366)])),
         ("remainingWork", json!(vec!["work"; 65])),
     ] {
         let mut report = blocked();
@@ -366,7 +366,7 @@ fn completion_report_accepts_byte_limits_and_each_valid_blocked_shape() {
     for met_with_work in [false, true] {
         let (fx, run) = setup();
         let mut report = blocked();
-        report["outcomes"][0]["criterion"] = json!("界".repeat(1365) + "a");
+        report["outcomes"][0]["criterion"] = json!("\u{754C}".repeat(1365) + "a");
         report["outcomes"][0]["evidence"] = json!("x".repeat(16384));
         report["blockerReason"] = json!("x".repeat(16384));
         report["remainingWork"] = if met_with_work {

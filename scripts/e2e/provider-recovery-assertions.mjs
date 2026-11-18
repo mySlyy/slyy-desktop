@@ -42,7 +42,7 @@ export function verifyProviderRecovery(cases) {
         retries.map((r) => r.retryDelayMs),
         expectedDelays,
       );
-      assert(result.text.includes("NETWORK_ERROR") && result.text.includes("继续"));
+      assert(result.text.includes("NETWORK_ERROR") && result.text.includes("Continue"));
     }
     if (index === 3) {
       const gaps = result.requests.slice(1).map((r, i) => r.at - result.requests[i].at);

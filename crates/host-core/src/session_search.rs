@@ -185,7 +185,7 @@ fn sentence_excerpt(text: &str, query: &str, budget: usize) -> String {
         return excerpt(text, query, budget);
     };
     let chars: Vec<char> = text.chars().collect();
-    let is_closing = |ch: char| matches!(ch, '"' | '\'' | '”' | '’' | '」' | '』' | ')' | '）');
+    let is_closing = |ch: char| matches!(ch, '"' | '\'' | '\u{201D}' | '\u{2019}' | ')');
     let mut start = 0;
     let mut end = chars.len();
     let mut index = 0;
@@ -193,7 +193,7 @@ fn sentence_excerpt(text: &str, query: &str, budget: usize) -> String {
         let ch = chars[index];
         let newline = matches!(ch, '\n' | '\r' | '\u{2028}' | '\u{2029}');
         let boundary = newline
-            || matches!(ch, '。' | '！' | '？' | '!' | '?')
+            || matches!(ch, '!' | '?')
             || (ch == '.'
                 && chars
                     .get(index + 1)
@@ -204,8 +204,7 @@ fn sentence_excerpt(text: &str, query: &str, budget: usize) -> String {
         }
         if !newline {
             while index < chars.len()
-                && (is_closing(chars[index])
-                    || matches!(chars[index], '.' | '!' | '?' | '。' | '！' | '？'))
+                && (is_closing(chars[index]) || matches!(chars[index], '.' | '!' | '?'))
             {
                 index += 1;
             }
@@ -610,19 +609,19 @@ mod tests {
         let db = Database::open(&dir.path().join("test.sqlite")).unwrap();
         let session = sessions::create_session(&db, None, None, None, None, None).unwrap();
         let text = format!(
-            "{} 中文 短 100% a_b C:\\path \"quote\" MiXeD WÖRTER İxx Key",
+            "{} \u{4E2D}\u{6587} \u{77ED} 100% a_b C:\\path \"quote\" MiXeD W\u{D6}RTER \u{130}xx Key",
             "prefix ".repeat(100)
         );
         sessions::append_message(&db, &session.id, &message("one", &text), None).unwrap();
         for query in [
-            "中文",
-            "短",
+            "\u{4E2D}\u{6587}",
+            "\u{77ED}",
             "%",
             "a_b",
             "C:\\path",
             "\"quote\"",
             "mixed",
-            "wörter",
+            "w\u{F6}rter",
             "i\u{0307}xx",
             "key",
         ] {
@@ -678,13 +677,15 @@ mod tests {
                 params![session.id],
             )
             .unwrap();
-        assert!(search(&db, "中文", 0, SEARCH_PAGE_SIZE)
+        assert!(search(&db, "\u{4E2D}\u{6587}", 0, SEARCH_PAGE_SIZE)
             .unwrap()
             .hits
             .is_empty());
-        assert!(context(&db, &session.id, "one", "around", "中文")
-            .unwrap()
-            .is_none());
+        assert!(
+            context(&db, &session.id, "one", "around", "\u{4E2D}\u{6587}")
+                .unwrap()
+                .is_none()
+        );
     }
 
     #[test]
@@ -699,7 +700,10 @@ mod tests {
                 sessions::append_message(&db, &session.id, &msg, None).unwrap();
             }
         }
-        let target = message("target", &format!("{}命中内容", "x".repeat(100_000)));
+        let target = message(
+            "target",
+            &format!("{}\u{547D}\u{4E2D}\u{5185}\u{5BB9}", "x".repeat(100_000)),
+        );
         sessions::append_message(&db, &session.id, &target, None).unwrap();
         let page = context(&db, &session.id, "m50", "around", "context")
             .unwrap()
@@ -719,11 +723,11 @@ mod tests {
         .unwrap()
         .unwrap();
         assert_eq!(next.messages.first().unwrap().id, "m61");
-        let last = context(&db, &session.id, "target", "around", "命中")
+        let last = context(&db, &session.id, "target", "around", "\u{547D}\u{4E2D}")
             .unwrap()
             .unwrap();
         let found = last.messages.iter().find(|m| m.id == "target").unwrap();
-        assert!(found.content.contains("命中"));
+        assert!(found.content.contains("\u{547D}\u{4E2D}"));
         assert!(found.content.chars().count() <= 65538);
         assert!(!last.has_more_after);
         assert!(context(&db, &session.id, "missing", "around", "")
@@ -735,7 +739,7 @@ mod tests {
                 [],
             )
             .unwrap();
-        let canonical = context(&db, &session.id, "target", "around", "命中")
+        let canonical = context(&db, &session.id, "target", "around", "\u{547D}\u{4E2D}")
             .unwrap()
             .unwrap();
         assert!(canonical
@@ -744,11 +748,13 @@ mod tests {
             .find(|m| m.id == "target")
             .unwrap()
             .content
-            .contains("命中"));
+            .contains("\u{547D}\u{4E2D}"));
         sessions::replace_messages(&db, &session.id, &[message("replacement", "other")]).unwrap();
-        assert!(context(&db, &session.id, "target", "around", "命中")
-            .unwrap()
-            .is_none());
+        assert!(
+            context(&db, &session.id, "target", "around", "\u{547D}\u{4E2D}")
+                .unwrap()
+                .is_none()
+        );
     }
 
     #[test]
@@ -757,10 +763,11 @@ mod tests {
         let db = Database::open(&dir.path().join("test.sqlite")).unwrap();
         let session = sessions::create_session(&db, None, None, None, None, None).unwrap();
         for (text, query, expected) in [
+            // A fullwidth full stop (U+3002) is not a sentence boundary.
             (
-                "前一句。消息一直在排队，没有继续执行。后一句。",
-                "排队",
-                "消息一直在排队，没有继续执行。",
+                "Before\u{3002}The needle waits. After.",
+                "needle",
+                "Before\u{3002}The needle waits.",
             ),
             (
                 "Before. The NEEDLE is here! After.",
@@ -778,14 +785,14 @@ mod tests {
                 "The needle is here",
             ),
             (
-                "前一句。“消息还在排队！”后一句。",
-                "排队",
-                "“消息还在排队！”",
+                "Before. \u{201C}The needle waits!\u{201D} After.",
+                "needle",
+                "\u{201C}The needle waits!\u{201D}",
             ),
             (
-                "Before. İSTANBUL is here. After.",
+                "Before. \u{130}STANBUL is here. After.",
                 "i\u{0307}stanbul",
-                "İSTANBUL is here.",
+                "\u{130}STANBUL is here.",
             ),
         ] {
             sessions::replace_messages(&db, &session.id, &[message("target", text)]).unwrap();
@@ -817,16 +824,16 @@ mod tests {
             sentence_excerpt("Before. One.\nTwo match! After.", "One.\nTwo", 180),
             "One.\nTwo match!"
         );
-        let query = "中".repeat(300);
-        let text = format!("Before. {}{} tail. After.", "İ".repeat(300), query);
+        let query = "\u{4E2D}".repeat(300);
+        let text = format!("Before. {}{} tail. After.", "\u{130}".repeat(300), query);
         assert!(sentence_excerpt(&text, &query, 180).contains(&query));
     }
 
     #[test]
     fn excerpts_include_the_whole_query_when_it_exceeds_the_preview_budget() {
-        let shifted = format!("{}命中", "İ".repeat(300));
-        assert!(excerpt(&shifted, "命中", 180).contains("命中"));
-        let query = "中".repeat(300);
+        let shifted = format!("{}\u{547D}\u{4E2D}", "\u{130}".repeat(300));
+        assert!(excerpt(&shifted, "\u{547D}\u{4E2D}", 180).contains("\u{547D}\u{4E2D}"));
+        let query = "\u{4E2D}".repeat(300);
         let text = format!("{}{} tail", "prefix ".repeat(50), query);
         assert!(excerpt(&text, &query, 180).contains(&query));
     }

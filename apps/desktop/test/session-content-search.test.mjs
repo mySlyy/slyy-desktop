@@ -18,8 +18,8 @@ function hit(id) {
 test("literal highlighting agrees with host Unicode folding and preserves UTF-16 offsets", () => {
   for (const [text, query, expected] of [
     [
-      "😀 中文 中文",
-      "中文",
+      "\u{1f600} \u4e2d\u6587 \u4e2d\u6587",
+      "\u4e2d\u6587",
       [
         [3, 5],
         [6, 8],
@@ -35,19 +35,19 @@ test("literal highlighting agrees with host Unicode folding and preserves UTF-16
     ],
     ["100% a_b C:\\path", "%", [[3, 4]]],
     [
-      "Ä ä",
-      "ä",
+      "\u00c4 \u00e4",
+      "\u00e4",
       [
         [0, 1],
         [2, 3],
       ],
     ],
     ["x", "   ", []],
-    ["中", "中", [[0, 1]]],
-    ["İ prefix 中文", "中文", [[9, 11]]],
-    ["İ XX", "xx", [[2, 4]]],
-    ["İ", "\u0307", [[0, 1]]],
-    ["WÖRTER", "wörter", [[0, 6]]],
+    ["\u4e2d", "\u4e2d", [[0, 1]]],
+    ["\u0130 prefix \u4e2d\u6587", "\u4e2d\u6587", [[9, 11]]],
+    ["\u0130 XX", "xx", [[2, 4]]],
+    ["\u0130", "\u0307", [[0, 1]]],
+    ["W\u00d6RTER", "w\u00f6rter", [[0, 6]]],
   ])
     assert.deepEqual(searchMatchRanges(text, query), expected);
 });

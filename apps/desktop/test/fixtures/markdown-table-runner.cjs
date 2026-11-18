@@ -45,7 +45,7 @@ app.whenReady().then(async () => {
   check("production Markdown renders one toolbar per table", await evaluate('document.querySelectorAll(".markdown-table-actions").length === 2'));
   await click('.markdown-table button[aria-label="Copy table as Markdown"]');
   await wait('window.tableFixture.toast()?.message === "Table copied"');
-  check("copy preserves this table's inline Markdown and alignment", clipboard.readText().replaceAll("\r\n", "\n") === '| **Product** | Note |\n| :--- | ---: |\n| Pi | 你好, world |\n| ZCode | say "hi"<br>again |');
+  check("copy preserves this table's inline Markdown and alignment", clipboard.readText().replaceAll("\r\n", "\n") === '| **Product** | Note |\n| :--- | ---: |\n| Pi | \u4f60\u597d, world |\n| ZCode | say "hi"<br>again |');
   const downloaded = new Promise((resolve, reject) => {
     win.webContents.session.once("will-download", (_event, item) => {
       item.setSavePath(join(dir, "table.csv"));
@@ -54,11 +54,11 @@ app.whenReady().then(async () => {
   });
   await click('.markdown-table button[aria-label="Download table as CSV"]');
   await downloaded;
-  check("CSV download contains UTF-8, escaped quotes and cell line breaks", readFileSync(join(dir, "table.csv"), "utf8") === '\uFEFF"Product","Note"\r\n"Pi","你好, world"\r\n"ZCode","say ""hi""\nagain"\r\n');
+  check("CSV download contains UTF-8, escaped quotes and cell line breaks", readFileSync(join(dir, "table.csv"), "utf8") === '\uFEFF"Product","Note"\r\n"Pi","\u4f60\u597d, world"\r\n"ZCode","say ""hi""\nagain"\r\n');
   await click('.markdown-table button[aria-label="Expand table"]');
   await wait('Boolean(document.querySelector("[role=dialog]"))');
   check("preview uses modal semantics and masks native views", await evaluate('document.querySelector("[role=dialog]").getAttribute("aria-modal") === "true" && window.tableFixture.isBlockingOverlayActive()'));
-  check("preview contains only its own table", await evaluate('document.querySelector("[role=dialog]").textContent.includes("你好") && !document.querySelector("[role=dialog]").textContent.includes("untouched")'));
+  check("preview contains only its own table", await evaluate('document.querySelector("[role=dialog]").textContent.includes("\u4f60\u597d") && !document.querySelector("[role=dialog]").textContent.includes("untouched")'));
   check("focus starts on close", await evaluate('document.activeElement.getAttribute("aria-label") === "Close table preview"'));
   await key("Tab", ["shift"]);
   check("Shift-Tab stays inside the modal", await evaluate('Boolean(document.activeElement.closest("[role=dialog]"))'));
@@ -77,11 +77,11 @@ app.whenReady().then(async () => {
   check("copy feedback is visible above the preview", await evaluate('(() => { const toast = [...document.querySelectorAll(".toast")].at(-1); const r = toast.getBoundingClientRect(); return document.elementsFromPoint(r.x + r.width / 2, r.y + r.height / 2).some(el => el === toast || el.closest(".toast") === toast); })()'));
   await click('button[aria-label="Close table preview"]');
   await wait('!document.querySelector("[role=dialog]")');
-  await evaluate('window.tableFixture.render("| Product | Notes |\\n| --- | --- |\\n" + Array.from({length: 40}, (_, i) => `| Item ${i + 1} | A longer description to check wrapping 中文 |`).join("\\n"))');
+  await evaluate('window.tableFixture.render("| Product | Notes |\\n| --- | --- |\\n" + Array.from({length: 40}, (_, i) => `| Item ${i + 1} | A longer description to check wrapping \u4e2d\u6587 |`).join("\\n"))');
   for (const theme of ["light", "dark"]) {
     win.setContentSize(360, 500);
-    await evaluate(`window.tableFixture.render(window.tableFixture.source, "zh-CN", ${JSON.stringify(theme)})`);
-    await click('button[aria-label="放大表格"]');
+    await evaluate(`window.tableFixture.render(window.tableFixture.source, "de", ${JSON.stringify(theme)})`);
+    await click('button[aria-label="Tabelle vergr\u00f6\u00dfern"]');
     await wait('Boolean(document.querySelector("[role=dialog]"))');
     check(`${theme} narrow preview stays within viewport`, await evaluate('(() => { const r = document.querySelector("[role=dialog]").getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight; })()'));
     check(`${theme} long table scrolls inside the preview`, await evaluate('(() => { const body = document.querySelector(".markdown-table-preview-body"); return body.scrollHeight > body.clientHeight && getComputedStyle(body).overflowY === "auto"; })()'));
@@ -102,12 +102,12 @@ app.whenReady().then(async () => {
   win.setContentSize(1100, 800);
   await wait('innerWidth >= 1000 && innerHeight >= 700');
   await evaluate('Object.defineProperty(navigator, "clipboard", {configurable:true,value:{writeText:async()=>{throw Error("denied")}}})');
-  await click('button[aria-label="复制表格为 Markdown"]');
-  await wait('window.tableFixture.toast()?.message === "无法复制表格"');
+  await click('button[aria-label="Tabelle als Markdown kopieren"]');
+  await wait('window.tableFixture.toast()?.message === "Tabelle konnte nicht kopiert werden"');
   check("clipboard denial produces an error instead of success", await evaluate('window.tableFixture.toast()?.variant === "error"'));
   await evaluate('URL.createObjectURL = () => { throw Error("unavailable") }; void 0');
-  await click('button[aria-label="下载表格为 CSV"]');
-  await wait('window.tableFixture.toast()?.message === "无法下载表格"');
+  await click('button[aria-label="Tabelle als CSV herunterladen"]');
+  await wait('window.tableFixture.toast()?.message === "Tabelle konnte nicht heruntergeladen werden"');
   check("download setup failure produces an error", await evaluate('window.tableFixture.toast()?.variant === "error"'));
   console.log(`${passed} table interaction checks passed`);
   clearTimeout(watchdog);

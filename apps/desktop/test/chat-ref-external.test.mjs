@@ -37,8 +37,8 @@ function projectRoots(workspace, extra = {}) {
 
 test("an exact absolute path outside every root resolves to that file", async () => {
   const workspace = tempTree("ws", ["src/a.ts"]);
-  const outside = tempTree("outside", ["专业实践 考核.txt", "notes/report.md"]);
-  const target = join(outside, "专业实践 考核.txt");
+  const outside = tempTree("outside", ["\u4e13\u4e1a\u5b9e\u8df5 \u8003\u6838.txt", "notes/report.md"]);
+  const target = join(outside, "\u4e13\u4e1a\u5b9e\u8df5 \u8003\u6838.txt");
   const roots = projectRoots(workspace);
 
   assert.equal(await isChatRefOutsideRoots(target, roots), true);
@@ -47,7 +47,7 @@ test("an exact absolute path outside every root resolves to that file", async ()
   assert.deepEqual(result, {
     match: {
       root: "external",
-      relativePath: "专业实践 考核.txt",
+      relativePath: "\u4e13\u4e1a\u5b9e\u8df5 \u8003\u6838.txt",
       absolutePath: target,
       matchedBy: "exact-absolute",
     },

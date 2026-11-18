@@ -73,7 +73,7 @@ async function boot() {
     i18n = createInstance();
     await i18n.init({
       lng: "en",
-      resources: { en: { translation: catalogs.en }, "zh-CN": { translation: catalogs["zh-CN"] } },
+      resources: { en: { translation: catalogs.en }, de: { translation: catalogs.de } },
     });
   }
   api.getSettings = async () => structuredClone(settings);
@@ -121,7 +121,7 @@ const typeSearch = (value: string) => {
 globalThis.marketRetryProbe = async () => {
   await boot();
   try {
-    for (const locale of ["en", "zh-CN"]) {
+    for (const locale of ["en", "de"]) {
       await i18n.changeLanguage(locale);
       let skillCalls = 0;
       api.searchSkillMarket = async () => {
@@ -233,12 +233,12 @@ globalThis.marketRetryProbe = async () => {
 
 /**
  * One state per call, for review screenshots: `error-with-snapshot`,
- * `retry-loading`, `error-no-snapshot`, `recovered`. Renders with zh-CN, the
+ * `retry-loading`, `error-no-snapshot`, `recovered`. Renders with en, the
  * locale the reviewer reads, and leaves the state painted when it resolves.
  */
 globalThis.marketSnapshotStage = async (stage: string) => {
   await boot();
-  await i18n.changeLanguage("zh-CN");
+  await i18n.changeLanguage("en");
   const skillCalls = { count: 0 };
   let pending: ((value: unknown) => void) | null = null;
   api.searchSkillMarket = async () => {

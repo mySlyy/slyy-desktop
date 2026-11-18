@@ -7,7 +7,7 @@ Two workspaces share one repository: pnpm owns every JavaScript package
 `package.json` scripts fan out to both.
 
 ```text
-PI-Desktop/
+slyy-desktop/
 ├── apps/
 │ └── desktop/                # Electron product shell
 │   ├── electron/
@@ -44,16 +44,14 @@ PI-Desktop/
 ├── examples/
 │ ├── plugins/                # hello and roundtable sample plugins
 │ └── fixtures/sample-project # workspace fixture for E2E scenarios
-├── docs/                     # VitePress site and the English source of truth
+├── docs/                     # VitePress site and the source of truth (English only)
 │ ├── spec/                   # numbered specification domains (see spec/README.md)
 │ ├── adr/                    # architecture decision records
 │ ├── project/                # historical records still cited by specs and tests
 │ ├── implementation/         # evidence and coverage maps cited by specs
-│ ├── plugin-plan/            # plugin slot, render, runtime, and host API catalog (HTML)
 │ ├── guide/                  # user-facing quick guide
-│ ├── zh-CN/                  # Chinese entry points: home, guides, plugin guide, ADR map, spec index
 │ ├── public/                 # static assets for the site and the repository READMEs
-│ ├── scripts/                # docs-only checks (check-locales.mjs, check-docs.mjs)
+│ ├── scripts/                # docs-only checks (check-docs.mjs)
 │ └── .vitepress/             # site config and theme
 ├── scripts/                  # repository automation (see scripts/README.md)
 ├── .github/                  # CI and release workflows, issue templates
@@ -61,7 +59,7 @@ PI-Desktop/
 ├── package.json              # root scripts, pnpm workspace
 ├── pnpm-workspace.yaml
 ├── Cargo.toml                # Rust workspace
-└── README.md · README.zh-CN.md
+└── README.md
 ```
 
 ## Split-domain facades

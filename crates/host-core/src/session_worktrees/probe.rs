@@ -12,7 +12,13 @@ use super::git::{parse_version, GitError, GitRunner};
 pub const MIN_GIT_VERSION: (u32, u32) = (2, 29);
 
 /// Every branch host-core creates lives under this namespace.
-pub const BRANCH_NAMESPACE: &str = "pi-desktop";
+pub const BRANCH_NAMESPACE: &str = "slyy";
+
+/// Namespace of branches created before the Slyy rebrand. Never used for a
+/// new branch; existing rows keep their stored branch name, so those
+/// worktrees still resume, merge and clean up, and their subagent branches
+/// are still recognized as the session's own (ADR slyy-downstream-branding).
+pub const LEGACY_BRANCH_NAMESPACE: &str = "pi-desktop";
 
 /// Where an isolatable project lives inside its repository.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -40,7 +46,7 @@ pub enum ProbeError {
     NoCommits,
     #[error("the project is on a detached HEAD; check out a branch first")]
     DetachedHead,
-    #[error("a branch named `pi-desktop` exists, so `pi-desktop/...` branches cannot be created")]
+    #[error("a branch named `slyy` exists, so `slyy/...` branches cannot be created")]
     BranchNamespaceTaken,
     #[error(transparent)]
     Git(#[from] GitError),
@@ -158,8 +164,18 @@ mod tests {
         assert_eq!(probe_code(&detached).await, "WORKTREE_DETACHED_HEAD");
 
         let taken = init_repo(&dir.path().join("taken"));
-        git_cmd(&taken, &["branch", "pi-desktop"]);
+        git_cmd(&taken, &["branch", "slyy"]);
         assert_eq!(probe_code(&taken).await, "WORKTREE_BRANCH_NAMESPACE_TAKEN");
+    }
+
+    /// New branches live under `slyy/`, so a plain `pi-desktop` branch (for
+    /// example from a separately installed PI-Desktop) no longer blocks.
+    #[tokio::test]
+    async fn a_legacy_namespace_branch_does_not_block_isolation() {
+        let dir = tempfile::tempdir().unwrap();
+        let repo = init_repo(&dir.path().join("legacy"));
+        git_cmd(&repo, &["branch", LEGACY_BRANCH_NAMESPACE]);
+        assert_eq!(probe_code(&repo).await, "OK");
     }
 
     #[tokio::test]

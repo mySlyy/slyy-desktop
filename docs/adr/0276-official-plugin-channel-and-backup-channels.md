@@ -3,6 +3,10 @@
 > Amended 2026-10-08: the marketplace uses only the official channel and legacy
 > source values are ignored; a resolve request is capped at three seconds and
 > falls back to the catalog URL on timeout, rate limit, or `NO_DOWNLOAD_SOURCE`.
+>
+> Slyy: the official center is `hub.slyy.ai`. Read `plugins.aiuo.net` below as
+> `hub.slyy.ai` (`https://hub.slyy.ai/catalog.json`, `hub.slyy.ai/api/v1/...`);
+> no request goes to the upstream center (ADR slyy-downstream-branding).
 
 - Status: Accepted for implementation
 - Date: 2026-09-17

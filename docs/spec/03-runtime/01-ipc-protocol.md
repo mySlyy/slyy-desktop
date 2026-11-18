@@ -951,10 +951,10 @@ and a shown notification restores/shows and focuses the window before emitting
 `activated`. No permission, scheduled-reminder, or plugin source enters the
 task notification contract. Native delivery is best-effort; the durable
 inbox remains authoritative when the OS suppresses a banner. On Windows,
-Electron Main registers `net.aiuo.pi-desktop` as the process AppUserModelID
+Electron Main registers `ai.slyy.desktop.gen2` as the process AppUserModelID
 before readiness and before any window is created. The ID matches the NSIS
 package identity so notification attribution, notification settings, taskbar
-grouping, and installed shortcuts resolve to `PI-Desktop`, never the stock
+grouping, and installed shortcuts resolve to `Slyy`, never the stock
 Electron host.
 
 Task native objects are retained by durable notification id, with at most one
@@ -2482,7 +2482,7 @@ app/openFeedback() -> { ok: true }
 ```
 
 Electron Main builds a fixed GitHub bug-form URL
-(`https://github.com/vastsa/PI-Desktop/issues/new?template=bug_report.yml`)
+(`https://github.com/mySlyy/slyy-desktop/issues/new?template=bug_report.yml`)
 and opens it with `shell.openExternal`. Query fields `app-version`, `os`, and
 `environment` are filled from Main-owned version info. The renderer cannot
 supply a URL. Construction that leaves that origin or template is rejected.
@@ -2491,7 +2491,7 @@ protocol version.
 
 ## 13d. Local MCP control API (D370)
 
-PI-Desktop can expose a local automation surface for an external Agent without
+Slyy can expose a local automation surface for an external Agent without
 changing the renderer preload contract or host RPC protocol. The server is
 disabled by default and starts only when the Electron process receives:
 
@@ -2521,7 +2521,7 @@ connection record to `mcp-control.json`:
 ```json
 {
   "active": true,
-  "serverName": "pi-desktop",
+  "serverName": "slyy",
   "protocol": "streamable-http",
   "url": "http://127.0.0.1:37123/mcp",
   "token": "<redacted>",
@@ -2532,7 +2532,8 @@ connection record to `mcp-control.json`:
 
 Both files are written with mode `0600` where the platform supports POSIX
 permissions. Every request must include `Authorization: Bearer <token>` (the
-`X-Pi-Desktop-Token` header is retained for simple local clients). Requests to
+`X-Slyy-Token` header is retained for simple local clients; the pre-rebrand
+`X-Pi-Desktop-Token` is still accepted with the same token check). Requests to
 other paths, requests without the token, and methods other than
 POST/DELETE/OPTIONS are rejected. The server is stopped before Electron waits
 for host shutdown and the manifest is marked inactive.
@@ -2558,8 +2559,10 @@ The named tools cover the common Agent workflow:
 - `pi_plans_pending`, `pi_plans_resolve`
 - `pi_workspace_diff`, `pi_fs_list`, `pi_fs_read`
 
-`pi_control_describe` returns the reviewed operation catalog. `pi_desktop_invoke`
-accepts an operation id and positional IPC arguments:
+`pi_control_describe` returns the reviewed operation catalog. `slyy_invoke`
+accepts an operation id and positional IPC arguments (the pre-rebrand name
+`pi_desktop_invoke` is still accepted on `tools/call` as an unlisted alias with
+the same confirm gate; `tools/list` shows only `slyy_invoke`):
 
 ```json
 {
@@ -2600,7 +2603,7 @@ The six `session/collaboration/*` operations are first-party-plugin-only: they
 require an authenticated plugin tool invocation context, so they appear in
 `pi.desktop.listOperations` and are callable through `pi.desktop.invoke`, but
 they are excluded from the MCP-visible catalog (`tools/list`,
-`pi_control_describe`, and the `pi_desktop_invoke` operation enum) and an MCP
+`pi_control_describe`, and the `slyy_invoke` operation enum) and an MCP
 caller cannot invoke them.
 
 After successful **mutating** external calls, Electron Main may emit the existing

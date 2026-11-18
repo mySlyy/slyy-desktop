@@ -4,6 +4,10 @@
 > Distribution repository: [AIUO-Net/pi-desktop-plugins](https://github.com/AIUO-Net/pi-desktop-plugins)
 > Decision record: [ADR 0102](../../adr/0102-publisher-owned-plugin-source-and-git-hosted-artifacts.md)
 > Client contract: [07-plugin-marketplace.md](07-plugin-marketplace.md)
+>
+> Slyy serves the official center from `hub.slyy.ai`. The management and
+> distribution repository names in this document are the upstream PI-Desktop
+> design references; Slyy's own center repositories are not specified here.
 
 This document defines the distribution system that replaces the single-repository
 marketplace. It is the normative plan for the center service; the marketplace
@@ -13,7 +17,7 @@ Implementation scope: this repository contains the desktop client and
 `packages/plugin-devkit/src/publish.ts`, which prepares local package/submission
 files and does not upload. Center API, worker, identity, and signing sections
 below describe the separate service's design, not SDK methods or proof of a
-running server. The current client defaults to `https://plugins.aiuo.net/catalog.json`
+running server. The current client defaults to `https://hub.slyy.ai/catalog.json`
 and uses the documented `/api/v1` resolve/review routes; see the marketplace
 contract and `crates/host-core/src/plugins/marketplace`, `reviews.rs`, and `resolve.rs`.
 
@@ -42,7 +46,7 @@ machine that the client would not otherwise accept.
 | Distribution mirror | Center | CNB Git mirror of the distribution repository |
 | Install decision | User | Desktop permission review |
 
-Plugin source is never copied into a PI-Desktop-owned Git repository. The center
+Plugin source is never copied into a Slyy-owned Git repository. The center
 retains an immutable snapshot of the pinned commit for build and review evidence;
 that snapshot is storage, not a Git mirror, and is not published.
 
@@ -471,7 +475,7 @@ rollback, rate limits, alerting.
 
 ## 14. Explicitly not doing
 
-- Copying publisher source into a PI-Desktop repository.
+- Copying publisher source into a Slyy repository.
 - Personal access tokens as a publishing credential.
 - Executing plugin code, installing dependencies, or running tests inside the API process.
 - Letting the frontend, an ordinary admin route, or a model output set `published`.

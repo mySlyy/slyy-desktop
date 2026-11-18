@@ -504,7 +504,7 @@ export function FileRefChip({
 
 /**
  * A referenced conversation as a chip. The draft carried a
- * `pi-desktop://session/<id>` link; main attached a bounded excerpt for the
+ * `slyy://session/<id>` link; main attached a bounded excerpt for the
  * model, and this chip is how the reader sees and reopens it.
  */
 function SessionChip({ sessionId, fallbackName, ...position }: {
@@ -555,7 +555,7 @@ function SessionChip({ sessionId, fallbackName, ...position }: {
   );
 }
 
-/** A bare `pi-desktop://session/<id>` link in prose, rendered as that chip. */
+/** A bare `slyy://session/<id>` link in prose, rendered as that chip. */
 export function SessionLinkChip({ sessionId, ...position }: { sessionId: string } & SourcePositionProps) {
   return (
     <SessionChip sessionId={sessionId} fallbackName={sessionId.slice(0, 8)} {...position} />

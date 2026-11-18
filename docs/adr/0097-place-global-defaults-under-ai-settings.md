@@ -14,7 +14,7 @@ appearance controls.
 ## Decision
 
 Keep the eight-destination Settings directory. Basics owns Appearance and
-platform-supported close behavior; the **全局 AI / AI** destination owns
+platform-supported close behavior; the **AI** destination (labelled "Global AI" in the upstream Chinese UI) owns
 Permissions and the Defaults card with default operating mode (Agent / Plan /
 Goal), command shell selection with its host-backed fallback status, and
 Enter-to-send. Model configuration keeps the default provider/model selector

@@ -2,9 +2,8 @@
 
 ADRs record decisions that should not silently change.
 
-The [Chinese ADR entry](/zh-CN/adr/) follows the same decision map and points to
-these records. Decision IDs, status, and the English record remain the source of
-truth for both locales.
+Slyy keeps the upstream PI-Desktop records as history. A record that Slyy
+withdrew or superseded carries a note at its top and in the Status column below.
 
 ## Format
 
@@ -132,7 +131,7 @@ git history.
 | 0076 | Capture the Windows-reserved plugin launcher chord in host-core | Accepted |
 | 0077 | Add an interactive multi-question asktool | Accepted for implementation |
 | 0078 | Cross-platform tray-resident minimize | Accepted for implementation (amended by 0117, 0123, and tray-session-shortcuts) |
-| 0079 | Use VitePress for the bilingual documentation site | Accepted; Chinese mirror scope amended by ADR chinese-docs-entry-points-only |
+| 0079 | Use VitePress for the bilingual documentation site | Accepted; Chinese mirror scope amended by ADR chinese-docs-entry-points-only; English only in Slyy |
 | 0080 | Prewarm the global plugin launcher after boot | Accepted |
 | 0081 | Host-owned cross-platform plugin panel chrome | Accepted |
 | 0082 | Localized and page-adaptive plugin panel chrome | Accepted |
@@ -235,10 +234,10 @@ git history.
 | 0179 | Import model configuration from local agent stores | Accepted |
 | 0180 | Custom global UI type scale | Accepted |
 | 0181 | Main-owned picker capabilities | Accepted |
-| 0182 | Traditional Chinese shell locale | Accepted (amends 0160) |
-| 0183 | P0 international shell locales | Accepted (amends 0160 / 0182) |
+| 0182 | Traditional Chinese shell locale | Withdrawn in Slyy (amends 0160) |
+| 0183 | P0 international shell locales | Accepted (amends 0160 / 0182); Slyy keeps only `de` |
 | 0184 | Dock the context usage inspector in the composer toolbar | Accepted (amends 0047 / 0103) |
-| 0185 | Korean shell locale | Accepted (amends 0160 / 0183) |
+| 0185 | Korean shell locale | Withdrawn in Slyy (amends 0160 / 0183) |
 | 0186 | Summarize First-Turn Session Titles with a Main-Owned One-Shot | Superseded by 0323 |
 | 0187 | Focus-Aware Native Task Notifications | Accepted (amends 0107 / D117) |
 | 0188 | Preserve distinct credentials during model configuration import | Accepted (amends 0179 / D342) |
@@ -286,7 +285,7 @@ git history.
 | 0228 | Long-press the project title to reorder | Accepted (amended by 0229) |
 | 0229 | Press-and-move project title reorder | Accepted (amends 0228) |
 | 0230 | Skill ships with the Agent core tool set | Accepted (amends D174 / ADR 0048 / ADR 0219; issue #204) |
-| 0231 | Ideographic comma opens the composer slash menu | Accepted (amends D123 / D139 / ADR 0024; issue #65) |
+| 0231 | Ideographic comma opens the composer slash menu | Withdrawn in Slyy (amends D123 / D139 / ADR 0024; issue #65) |
 | 0232 | Keep macOS DMG opening guidance text-only | Superseded for macOS distribution by 0309 |
 | 0233 | Renderer-owned multi-folder project creation | Accepted (amends ADR 0011 / ADR 0016) |
 | 0234 | Keep project memory host-owned and path-scoped | Accepted |
@@ -366,7 +365,7 @@ git history.
 | 0303 | [A skill package carries resources far above the document cap](0303-skill-package-resource-limits.md) | Accepted for implementation (amends ADR 0300) |
 | 0304 | [Trust the network endpoints the user enters themselves](0304-user-supplied-endpoint-trust.md) | Accepted for implementation (amends ADR 0243 / 0245 / 0247; follows ADR 0142 / 0257 / 0300) |
 | 0305 | [Keep scheduled-task execution settings task-owned](0305-scheduled-task-execution-settings.md) | Accepted for implementation (amends scheduled-desktop-automations) |
-| 0306 | [Brazilian Portuguese (pt-BR) shell locale](0306-portuguese-brazil-shell-locale.md) | Accepted (amends ADR 0160 / 0183 / 0185) |
+| 0306 | [Brazilian Portuguese (pt-BR) shell locale](0306-portuguese-brazil-shell-locale.md) | Withdrawn in Slyy (amends ADR 0160 / 0183 / 0185) |
 | 0307 | [Sync the API-key service catalog with pi-ai's built-in providers](0307-pi-ai-api-key-provider-sync.md) | Accepted (amends ADR 0012 / 0020 / 0116 / 0155) |
 | 0308 | [Remove the Pull Requests destination and listing tool](0308-remove-pull-requests-destination.md) | Accepted |
 | 0309 | [Remove bundled macOS first-launch guidance](0309-remove-macos-first-launch-artifacts.md) | Accepted (D634; amends D457 / ADR 0296) |
@@ -418,6 +417,7 @@ git history.
 | 0345 | [One settings destination owns one subject](0345-one-settings-destination-one-subject.md) | Accepted (D684; amends D143, D166, D678) |
 | 0346 | [`@agent` mentions route a turn to a named subagent](0346-composer-agent-mentions.md) | Accepted (issue #986; extends 0024 / 0062) |
 | composer-local-file-references | [Pasted local files are live references](composer-local-file-references.md) | Accepted (issue #2314) |
-| chinese-docs-entry-points-only | [Chinese documentation keeps entry points only](chinese-docs-entry-points-only.md) | Accepted; amends ADR 0079 |
+| chinese-docs-entry-points-only | [Chinese documentation keeps entry points only](chinese-docs-entry-points-only.md) | Superseded in Slyy (documentation is English only); amends ADR 0079 |
 | windows-native-snap-without-frame-insets | [Restore Windows snapping without Electron frame insets](windows-native-snap-without-frame-insets.md) | Accepted (issue #2330; amends ADR 0317) |
 | plan-approval-session-permission | [Plan approval defaults to the owning Session's permission](plan-approval-session-permission.md) | Accepted; amends ADR 0053 and ADR 0158 |
+| slyy-downstream-branding | [Slyy downstream branding](slyy-downstream-branding.md) | Accepted |

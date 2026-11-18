@@ -217,7 +217,8 @@ export function AgentMcpPage() {
     const candidateLabel = editor.draft.label.trim().toLocaleLowerCase();
     setSaving(true);
     try {
-      // 保存校验跟随编辑器的归属，并读取最新列表，避免页面切换后的记录误拦截。
+      // Save validation follows the editor's owner and reads the latest list,
+      // so a record from before a page switch cannot block the save by mistake.
       const { servers } = await api.listMcpServers({ level: editor.level, projectPath });
       const sameLevel = servers.some(
         (server) =>

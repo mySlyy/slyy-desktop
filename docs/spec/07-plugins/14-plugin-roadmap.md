@@ -8,7 +8,7 @@ Local plugins usable → developer-friendly → marketplace distribution → sig
 
 ## 2. Roadmap
 
-### R1 — Foundation (with M4) ✅
+### R1 — Foundation (with M4) (done)
 - manifest v1
 - Local directory loading
 - enable/disable/uninstall
@@ -16,9 +16,9 @@ Local plugins usable → developer-friendly → marketplace distribution → sig
 - hello example plugin
 - permission declaration display
 
-### R2 — Agent Extension (partial ✅)
-- Full agentTools pipeline ✅
-- Official `pi.session-orchestrator` worker-session plugin ✅ — real durable
+### R2 — Agent Extension (partial)
+- Full agentTools pipeline (done)
+- Official `pi.session-orchestrator` worker-session plugin (done) — real durable
   sessions, host-owned bidirectional delivery, turn-bound results,
   at-most-once completion callbacks, bounded status projections, and
   parent-scoped persistence; it composes the reviewed `desktop.control`
@@ -26,8 +26,8 @@ Local plugins usable → developer-friendly → marketplace distribution → sig
   0239)
 - Skills contribution is activated: declared skills reach the model as a `# Skills`
   catalog in the system prompt when `agent.prompt.inject` is granted, and the model
-  loads a body on demand through the `Skill` tool ✅ (ADR 0039, D174)
-- Unified namespace and audit ✅
+  loads a body on demand through the `Skill` tool (done) (ADR 0039, D174)
+- Unified namespace and audit (done)
 - Per-plugin settings API and generated settings UI are implemented. The UI
   supports string/number/boolean/select/json fields and plugin-local command
   shortcuts. OS-global bindings are implemented separately through
@@ -35,34 +35,34 @@ Local plugins usable → developer-friendly → marketplace distribution → sig
 - Plugin log panel remains planned; runtime audit logs exist without a dedicated
   plugin-log surface
 
-### R3 — DX & Packaging ✅
-- plugin-sdk ✅
-- Template generation ✅ (`panel-basic`, `agent-tool-basic`, `skill-pack`,
+### R3 — DX & Packaging (done)
+- plugin-sdk (done)
+- Template generation (done) (`panel-basic`, `agent-tool-basic`, `skill-pack`,
   `full-demo`, from the plugins page, the agent, or `pi-plugin init`)
-- `pi-plugin check/pack` ✅ (`@pi-desktop/plugin-devkit`, also exposed as the
+- `pi-plugin check/pack` (done) (`@pi-desktop/plugin-devkit`, also exposed as the
   `PluginCheck` / `PluginScaffold` / `PluginPack` agent tools)
-- `.piplug` install ✅
-- dev hot reload ✅ (watch + debounce, and a reload can never widen permissions)
+- `.piplug` install (done)
+- dev hot reload (done) (watch + debounce, and a reload can never widen permissions)
 
-### R4 — Marketplace Read-only ✅
+### R4 — Marketplace Read-only (done)
 - market provider abstraction (official remote GitHub catalog provider)
-- Official-source browse/search from `vastsa/pi-desktop-plugins` *(superseded: the official source is the plugin center, `plugins.aiuo.net`)*
+- Official-source browse/search from `vastsa/pi-desktop-plugins` *(superseded: the official source is the plugin center, `hub.slyy.ai`)*
 - Download + checksum install
 - updates list (manual update)
 
-### R5 — Trust & Auto Update (partial ✅)
+### R5 — Trust & Auto Update (partial)
 - Publisher verification (verified flag in catalog)
 - Signature verification (still planned; checksum enforced now)
-- Permission-diff upgrade ✅
-- Auto-update policy ✅
+- Permission-diff upgrade (done)
+- Auto-update policy (done)
 - Malicious-version yank response (still planned)
 
-### R6 — Advanced Ecosystem (partial ✅)
-- MCP plugin type ✅ — `contributes.mcpServers` over stdio and remote HTTP (D176)
-- Background service plugins ✅ — `contributes.services` with supervised
+### R6 — Advanced Ecosystem (partial)
+- MCP plugin type (done) — `contributes.mcpServers` over stdio and remote HTTP (D176)
+- Background service plugins (done) — `contributes.services` with supervised
   restarts (D177)
-- Inter-plugin message bus ✅ — declared topics, `pi.bus.*` (D178)
-- Theme plugins ✅ — plugins ship CSS files (D175)
+- Inter-plugin message bus (done) — declared topics, `pi.bus.*` (D178)
+- Theme plugins (done) — plugins ship CSS files (D175)
 - Enterprise private sources (still planned)
 - Marketplace reviews / quality score (partial: the desktop reads public
   summaries and reviews anonymously and links out to the centre to write;
@@ -80,7 +80,7 @@ Local plugins usable → developer-friendly → marketplace distribution → sig
 - Bounded WebSockets and host-owned global shortcuts
 - Background audio remains callable but returns `UNSUPPORTED`; no device backend
 
-### R7 — Agent extensions (v1.1 ✅, D387 / D388)
+### R7 — Agent extensions (v1.1 done, D387 / D388)
 - v1: ExtensionAPI adapter in the Agent sidecar; tools, commands, lifecycle and
   provider hooks, basic UI prompts
 - v1.1: modules are a plugin contribution (`contributes.agentExtensions`, permission

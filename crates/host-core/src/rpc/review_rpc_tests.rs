@@ -59,7 +59,7 @@ impl Fixture {
 
     async fn user(&self, id: &str, turn: Option<&str>) {
         self.append(
-            json!({"id":id,"role":"user","content":format!("Prompt {id} {}", "界".repeat(90)),
+            json!({"id":id,"role":"user","content":format!("Prompt {id} {}", "\u{754C}".repeat(90)),
             "createdAt":"2026-10-20T00:00:00Z"}),
             turn,
         )

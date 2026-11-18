@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import { IPC } from "@pi-desktop/shared";
-import { remoteEn, remoteZh } from "../../apps/desktop/src/locales/remote";
+import { remoteEn } from "../../apps/desktop/src/locales/remote";
 import { useAppStore } from "../../apps/desktop/src/stores/app-store";
 import { RemoteHostSessions } from "../../apps/desktop/src/components/settings/RemoteHostSessions";
 import { RemoteHostsPage } from "../../apps/desktop/src/components/settings/RemoteHostsPage";
@@ -110,7 +110,7 @@ globalThis.remoteMvpProbe = async () => {
     fallbackLng: "en",
     resources: {
       en: { remote: remoteEn, translation: catalogs.en },
-      "zh-CN": { remote: remoteZh, translation: catalogs["zh-CN"] },
+      de: { remote: remoteEn, translation: catalogs.de },
     },
     interpolation: { escapeValue: false },
   });
@@ -162,7 +162,7 @@ globalThis.remoteMvpProbe = async () => {
   const dialog = () => document.querySelector('.settings-remote-host-add-dialog[role="dialog"]');
   const sshPanel = () => dialog()?.querySelector("#remote-host-add-panel-ssh");
   const pairPanel = () => dialog()?.querySelector("#remote-host-add-panel-pair");
-  const settingsLabels = () => catalogs[i18n.language === "zh-CN" ? "zh-CN" : "en"].settings.remoteHosts;
+  const settingsLabels = () => catalogs[i18n.language === "de" ? "de" : "en"].settings.remoteHosts;
   const inputFor = (panel, key) => [...(panel?.querySelectorAll("input") ?? [])]
     .find(field => field.getAttribute("aria-label") === settingsLabels()[key]);
   const cancelButton = panel => panel?.querySelector('.settings-remote-host-form-actions button[type="button"]');
@@ -191,8 +191,8 @@ globalThis.remoteMvpProbe = async () => {
   pairPanel().querySelector('button[type="submit"]').click();
   await until(() => !dialog() && calls.some(call => call.channel === IPC.invoke.remoteHostPair), "successful pairing did not close the dialog");
   await waitForFocus(pairAction, "Pair success did not restore trigger focus");
-  await i18n.changeLanguage("zh-CN");
-  const localizedPairAction = catalogs["zh-CN"].settings.remoteHosts.addPair;
+  await i18n.changeLanguage("de");
+  const localizedPairAction = catalogs.de.settings.remoteHosts.addPair;
   await until(
     () => pairAction.textContent.trim() === localizedPairAction,
     `Pair action did not localize in ${i18n.language}: ${pairAction.textContent.trim()}`,

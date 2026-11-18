@@ -9,7 +9,6 @@ const [
   releaseWorkflowSource,
   desktopPackageSource,
   linuxPackageWorkflowSource,
-  mirrorToCnbWorkflowSource,
   agentRuntimePackageSource,
   i18nPackageSource,
   pluginSdkPackageSource,
@@ -21,7 +20,6 @@ const [
   read("../../../.github/workflows/release.yml"),
   read("../package.json"),
   read("../../../.github/workflows/linux-package.yml"),
-  read("../../../.github/workflows/mirror-to-cnb.yml"),
   read("../../../packages/agent-runtime/package.json"),
   read("../../../packages/i18n/package.json"),
   read("../../../packages/plugin-sdk/package.json"),
@@ -108,7 +106,67 @@ test("release builds are gated on the CI checks and least-privilege permissions"
   }
   const publishJob = releaseWorkflowSource.match(/^  publish:\n[\s\S]*$/m)?.[0];
   assert.ok(publishJob, "release publish job is missing");
-  assert.match(publishJob, /^    permissions:\n      contents: write$/m);
+  // The release lands in the public mySlyy/releases repository through
+  // SLYY_RELEASES_TOKEN, so the job needs no write access to this repository.
+  assert.match(publishJob, /^    permissions:\n      contents: read$/m);
+  assert.doesNotMatch(releaseWorkflowSource, /contents: write/);
+});
+
+test("releases publish to the public mySlyy/releases repository", () => {
+  assert.match(releaseWorkflowSource, /^  RELEASES_REPOSITORY: mySlyy\/releases$/m);
+  const verifyJob = releaseWorkflowSource.match(/^  verify:\n[\s\S]*?(?=^  build:)/m)?.[0];
+  assert.ok(verifyJob, "release verify job is missing");
+  // A missing token fails the tag run before any platform build starts.
+  assert.match(
+    verifyJob,
+    /steps:\n      - name: Require the releases-repository token on tag builds\n        [\s\S]*?if: startsWith\(github\.ref, 'refs\/tags\/v'\)[\s\S]*?SLYY_RELEASES_TOKEN: \$\{\{ secrets\.SLYY_RELEASES_TOKEN \}\}[\s\S]*?Missing GitHub Actions secret SLYY_RELEASES_TOKEN/,
+  );
+  const publishJob = releaseWorkflowSource.match(/^  publish:\n[\s\S]*$/m)?.[0];
+  assert.ok(publishJob, "release publish job is missing");
+  const releaseStep = publishJob.match(/- name: Create GitHub Release\n[\s\S]*$/)?.[0];
+  assert.ok(releaseStep, "release step is missing");
+  assert.match(releaseStep, /uses: softprops\/action-gh-release@v3/);
+  assert.match(releaseStep, /repository: \$\{\{ env\.RELEASES_REPOSITORY \}\}/);
+  assert.match(releaseStep, /token: \$\{\{ secrets\.SLYY_RELEASES_TOKEN \}\}/);
+  assert.match(releaseStep, /tag_name: \$\{\{ github\.ref_name \}\}/);
+  assert.match(releaseStep, /body_path: release-notes\.md/);
+  assert.match(releaseStep, /generate_release_notes: false/);
+  // target_commitish would name a source commit the releases repo lacks.
+  assert.doesNotMatch(releaseStep, /target_commitish/);
+  // Secrets are only referenced, never printed.
+  assert.doesNotMatch(releaseWorkflowSource, /echo[^\n]*secrets\./);
+  assert.doesNotMatch(releaseWorkflowSource, /echo[^\n]*\$\{?SLYY_RELEASES_TOKEN/);
+});
+
+test("unsigned releases are pre-releases whose notes say so", () => {
+  const publishJob = releaseWorkflowSource.match(/^  publish:\n[\s\S]*$/m)?.[0];
+  assert.ok(publishJob, "release publish job is missing");
+  assert.ok(
+    publishJob.includes(
+      "prerelease: ${{ contains(github.ref_name, '-') || env.MACOS_SIGN_RELEASE != 'true' }}",
+    ),
+  );
+  const notesStep = publishJob.match(/- name: Write release notes\n[\s\S]*?(?=\n      - name:)/)?.[0];
+  assert.ok(notesStep, "release notes step is missing");
+  assert.match(
+    notesStep,
+    /if \[ "\$\{MACOS_SIGN_RELEASE\}" != "true" \]; then[\s\S]*?Unsigned pre-release[\s\S]*?Gatekeeper[\s\S]*?macOS in-app updates do not work[\s\S]*?fi/,
+  );
+  assert.match(notesStep, /The Windows builds are unsigned/);
+});
+
+test("the release carries the pi-host bundles the remote bootstrap downloads", () => {
+  const publishJob = releaseWorkflowSource.match(/^  publish:\n[\s\S]*$/m)?.[0];
+  assert.ok(publishJob, "release publish job is missing");
+  assert.match(publishJob, /^    needs: \[build, pi-host-bundle\]$/m);
+  assert.match(
+    publishJob,
+    /- name: Verify pi-host bundles for the remote bootstrap[\s\S]*?for arch in x64 arm64[\s\S]*?"pi-host-\$\{version\}-linux-\$\{arch\}\.tar\.gz" "pi-host-\$\{version\}-linux-\$\{arch\}\.tar\.gz\.sha256"/,
+  );
+  assert.match(
+    releaseWorkflowSource,
+    /apps\/pi-host\/dist-bundle\/pi-host-\*-linux-\$\{\{ matrix\.arch \}\}\.tar\.gz\.sha256/,
+  );
 });
 
 test("release artifacts bypass redundant Actions compression", () => {
@@ -137,10 +195,14 @@ test("manual Linux package validation covers the RPM desktop identity", () => {
   assert.match(linuxPackageWorkflowSource, /build-id/);
   assert.match(
     linuxPackageWorkflowSource,
-    /usr\/share\/applications\/pi-desktop\.desktop/,
+    /usr\/share\/applications\/slyy-gen2\.desktop/,
   );
-  assert.match(linuxPackageWorkflowSource, /Icon=pi-desktop/);
-  assert.match(linuxPackageWorkflowSource, /StartupWMClass=pi-desktop/);
+  assert.match(
+    linuxPackageWorkflowSource,
+    /usr\/share\/icons\/hicolor\/512x512\/apps\/slyy-gen2\.png/,
+  );
+  assert.match(linuxPackageWorkflowSource, /Icon=slyy-gen2/);
+  assert.match(linuxPackageWorkflowSource, /StartupWMClass=slyy-gen2/);
   assert.match(
     linuxPackageWorkflowSource,
     /uses: actions\/upload-artifact@v7[\s\S]*path: apps\/desktop\/release\/\*\.rpm/,
@@ -260,16 +322,24 @@ test("release matrix packages both native macOS architectures", () => {
   assert.match(releaseWorkflowSource, /Merge macOS updater metadata[\s\S]*?ruby/);
 });
 
-test("macOS release signing is required on tag pushes", () => {
+test("macOS release signing follows SLYY_MAC_SIGNING_ENABLED on tag pushes", () => {
   assert.match(
     releaseWorkflowSource,
     /workflow_dispatch:\s+inputs:\s+sign_macos:[\s\S]*?default:\s*true[\s\S]*?type:\s*boolean/,
   );
+  // Workflow-level, so the build and publish jobs agree on the signing state.
   assert.ok(
     releaseWorkflowSource.includes(
-      "MACOS_SIGN_RELEASE: ${{ github.event_name != 'workflow_dispatch' || inputs.sign_macos == true }}",
+      "\nenv:\n" +
+        "  # One switch for the build and publish jobs.",
     ),
   );
+  assert.ok(
+    releaseWorkflowSource.includes(
+      "  MACOS_SIGN_RELEASE: ${{ (github.event_name == 'workflow_dispatch' && inputs.sign_macos) || (github.event_name != 'workflow_dispatch' && vars.SLYY_MAC_SIGNING_ENABLED == 'true') }}",
+    ),
+  );
+  assert.equal(releaseWorkflowSource.match(/MACOS_SIGN_RELEASE:/g)?.length, 1);
 
   const unsignedBlock = releaseWorkflowSource.match(
     /- name: Package unsigned macOS installer[\s\S]*?(?=\n      - name:)/,
@@ -312,7 +382,7 @@ test("macOS release signing is required on tag pushes", () => {
   assert.doesNotMatch(signedBlock, /-c\.mac\.identity=/);
   assert.doesNotMatch(signedBlock, /CSC_NAME: "Developer ID Application:/);
   assert.match(signedBlock, /-c\.mac\.notarize=true/);
-  // The single "signing PI-Desktop.app" line electron-builder prints does not
+  // The single "signing Slyy Gen2.app" line electron-builder prints does not
   // tell walking, per-file codesign, silent retries, and the Apple
   // notarization wait apart; the signing trace and the watchdog carry the rest.
   assert.match(
@@ -461,40 +531,4 @@ test("macOS signing instrumentation stays out of the Windows and Linux lanes", (
   const unsignedBlock = stepBlock("Package unsigned macOS installer");
   assert.ok(unsignedBlock, "unsigned macOS debug package step is missing");
   assert.doesNotMatch(unsignedBlock, instrumentation);
-});
-
-test("GitHub releases trigger the CNB mirror pipeline with a JSON payload", () => {
-  assert.match(
-    mirrorToCnbWorkflowSource,
-    /release:\s+types:\s+\[published, edited\]/,
-  );
-  assert.match(
-    mirrorToCnbWorkflowSource,
-    /workflow_dispatch:\s+inputs:\s+tag:/,
-  );
-  assert.match(
-    mirrorToCnbWorkflowSource,
-    /if: github\.repository == 'vastsa\/PI-Desktop'/,
-  );
-  assert.match(
-    mirrorToCnbWorkflowSource,
-    /CNB_MIRROR_TOKEN: \$\{\{\s*secrets\.CNB_MIRROR_TOKEN\s*\}\}/,
-  );
-  assert.match(
-    mirrorToCnbWorkflowSource,
-    /Missing repository secret CNB_MIRROR_TOKEN/,
-  );
-  assert.match(
-    mirrorToCnbWorkflowSource,
-    /https:\/\/api\.cnb\.cool\/aixk\/Pi-Desktop\/-\/build\/start/,
-  );
-  assert.match(mirrorToCnbWorkflowSource, /event: "api_trigger_mirror"/);
-  assert.match(mirrorToCnbWorkflowSource, /env: \{ MIRROR_TAGS: \$tag \}/);
-  assert.match(mirrorToCnbWorkflowSource, /jq -n --arg tag "\$MIRROR_TAG"/);
-  assert.match(mirrorToCnbWorkflowSource, /curl --fail-with-body/);
-  assert.doesNotMatch(
-    mirrorToCnbWorkflowSource,
-    /-d ".*github\.event\.release\.tag_name/,
-    "JSON payload must not interpolate the release tag through YAML string escaping",
-  );
 });

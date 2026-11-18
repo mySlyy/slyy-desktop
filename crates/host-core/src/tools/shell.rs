@@ -717,11 +717,11 @@ mod tests {
 
     #[test]
     fn scratch_dir_uses_posix_separators_only_for_posix_shells() {
-        let scratch = PathBuf::from(r"C:\Users\Lan\AppData\Local\PI Desktop\scratch");
+        let scratch = PathBuf::from(r"C:\Users\Lan\AppData\Local\Slyy Gen2\scratch");
 
         assert_eq!(
             format_scratch_dir_for_shell(Some("posix"), &scratch).to_string_lossy(),
-            "C:/Users/Lan/AppData/Local/PI Desktop/scratch"
+            "C:/Users/Lan/AppData/Local/Slyy Gen2/scratch"
         );
         assert_eq!(
             format_scratch_dir_for_shell(Some("powershell"), &scratch).to_string_lossy(),

@@ -10,7 +10,6 @@ import {
   formatFileInsert,
   normalizeLargePasteThreshold,
   restoreInlineComposerFileReferenceTokens,
-  rewriteIdeographicCommaTrigger,
   serializeComposerFileReferences,
   serializeInlineComposerFileReferences,
   splitComposerDirectoryPrompt,
@@ -73,28 +72,6 @@ describe("detectTrigger — slash mode", () => {
     expect(detectTrigger("hi /cmd", 7)).toMatchObject({ tokenStart: 3, query: "cmd" });
     expect(detectTrigger("hi\n/cmd", 7)).toMatchObject({ tokenStart: 3, query: "cmd" });
     expect(detectTrigger("https://example.com", 8)).toBeNull();
-  });
-});
-
-describe("rewriteIdeographicCommaTrigger", () => {
-  it("turns a leading ideographic comma into the slash trigger", () => {
-    expect(rewriteIdeographicCommaTrigger("、")).toBe("/");
-    expect(rewriteIdeographicCommaTrigger("、rev")).toBe("/rev");
-  });
-
-  it("leaves the mark alone anywhere else in the draft", () => {
-    expect(rewriteIdeographicCommaTrigger("你好、世界")).toBe("你好、世界");
-    expect(rewriteIdeographicCommaTrigger("/cmd 、")).toBe("/cmd 、");
-    expect(rewriteIdeographicCommaTrigger("")).toBe("");
-  });
-
-  it("opens the menu through the ordinary detector once rewritten", () => {
-    const draft = rewriteIdeographicCommaTrigger("、rev");
-    expect(detectTrigger(draft, draft.length)).toMatchObject({
-      mode: "slash",
-      query: "rev",
-      tokenStart: 0,
-    });
   });
 });
 
@@ -212,7 +189,8 @@ describe("applyCompletion", () => {
 describe("compact file references", () => {
   it("derives leaf labels across path separators without changing unicode", () => {
     expect(fileReferenceLabel("src/components/Composer.tsx")).toBe("Composer.tsx");
-    expect(fileReferenceLabel("C:\\work\\界面\\截图.png")).toBe("截图.png");
+    // Non-ASCII path segments (CJK here) are written as escapes.
+    expect(fileReferenceLabel("C:\\work\\\u754C\u9762\\\u622A\u56FE.png")).toBe("\u622A\u56FE.png");
     expect(fileReferenceLabel("src/fallback.ts", "original name.ts")).toBe(
       "original name.ts",
     );
@@ -316,10 +294,10 @@ describe("compact file references", () => {
     const id = "6f1d2c3b-4a59-4e7f-8a90-b1c2d3e4f506";
     const reference = { path: id, kind: "session", token: "\uE001" };
     expect(serializeInlineComposerFileReferences(`look \uE001 now`, [reference])).toBe(
-      `look pi-desktop://session/${id} now`,
+      `look slyy://session/${id} now`,
     );
     expect(serializeComposerFileReferences(`look \uE001 now`, [reference])).toBe(
-      `look pi-desktop://session/${id} now`,
+      `look slyy://session/${id} now`,
     );
     // Token or not, a session reference never becomes an appended @path.
     expect(serializeComposerFileReferences("", [reference])).toBe("");
@@ -331,7 +309,7 @@ describe("agent mentions (ADR 0346)", () => {
   const agents = new Set(["explorer", "code-reviewer"]);
 
   it("reads @name only at a word start and only for a catalog name", () => {
-    expect(findAgentMentions("@explorer 帮我查找一下是否存在沙箱", agents)).toEqual([
+    expect(findAgentMentions("@explorer please check whether a sandbox exists", agents)).toEqual([
       { start: 0, end: 9, name: "explorer" },
     ]);
     expect(findAgentMentions("ask @code-reviewer, then @nobody", agents)).toEqual([
@@ -342,6 +320,8 @@ describe("agent mentions (ADR 0346)", () => {
     expect(findAgentMentions("end with @explorer.", agents)).toEqual([
       { start: 9, end: 18, name: "explorer" },
     ]);
+    // Only ASCII punctuation ends a mention; fullwidth marks are not boundaries.
+    expect(findAgentMentions("@explorer\uFF0C", agents)).toEqual([]);
   });
 
   it("an agent chip serializes to a resolvable @name even mid-word", () => {

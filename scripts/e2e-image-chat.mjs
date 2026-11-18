@@ -25,7 +25,7 @@ const host = new Host(resolveHostBinary(), dataDir);
 await host.start();
 await host.call("workspace.set", { path: project });
 const { provider } = await host.call("providers.create", {
-  name: "本地测试服务",
+  name: "Local test service",
   vendorKey: "custom",
   type: "openai_compatible",
   protocol: "openai_compatible",
@@ -35,7 +35,7 @@ const { provider } = await host.call("providers.create", {
   apiStyle: "chat_completions",
 });
 await host.call("settings.set", {
-  language: "zh-CN",
+  language: "en",
   defaultProviderId: provider.id,
   defaultModelId: "fixture",
   defaultMode: "agent",
@@ -230,13 +230,13 @@ try {
   await waitFor(() => evaluate(`!!document.querySelector('[data-nav="settings"]') && !document.querySelector('.startup-splash')`),30000,"desktop ready");
   await evaluate(`document.querySelector('[data-nav="settings"]').click()`);
   await waitFor(() => evaluate(`!!document.querySelector('.settings-nav')`),10000,"settings nav");
-  // The settings rail groups destinations ("模型" lives in the 智能体 group);
+  // The settings rail groups destinations ("Models" lives in the Agent group);
   // the search box filters the same nav, so locating by query exercises the
   // shipped path instead of a hardcoded button label.
   await evaluate(`(() => {const input=document.querySelector('.settings-search');input.focus();return !!input;})()`);
-  await send("Input.insertText",{text:"模型"});
-  await waitFor(() => evaluate(`[...document.querySelectorAll('.settings-nav-item .settings-nav-label')].some(e=>e.textContent.trim()==='模型')`),10000,"models destination found");
-  await evaluate(`[...document.querySelectorAll('.settings-nav-item')].find(e=>e.querySelector('.settings-nav-label')?.textContent.trim()==='模型').click()`);
+  await send("Input.insertText",{text:"Models"});
+  await waitFor(() => evaluate(`[...document.querySelectorAll('.settings-nav-item .settings-nav-label')].some(e=>e.textContent.trim()==='Models')`),10000,"models destination found");
+  await evaluate(`[...document.querySelectorAll('.settings-nav-item')].find(e=>e.querySelector('.settings-nav-label')?.textContent.trim()==='Models').click()`);
   await waitFor(() => evaluate(`!!document.querySelector('.model-default-row')`),10000,"model defaults");
   await screenshot("settings.png");
   // The image row shows the migrated default binding (provider · model).
@@ -246,8 +246,8 @@ try {
   assert.equal(await evaluate(`document.querySelectorAll('.settings-menu-select-option').length`),3,"both image-marked dual-capability bindings and the pure-image endpoint are offered");
   // Select the chat-default provider's fixture model: a dual-capability model
   // is a legitimate image default (#2253), and the toast confirms the save.
-  await evaluate(`[...document.querySelectorAll('.settings-menu-select-option')].find(e=>e.textContent.includes('本地测试服务')).click()`);
-  await waitFor(() => evaluate(`document.body.innerText.includes('已设为生图模型')`),5000,"settings save success feedback");
+  await evaluate(`[...document.querySelectorAll('.settings-menu-select-option')].find(e=>e.textContent.includes('Local test service')).click()`);
+  await waitFor(() => evaluate(`document.body.innerText.includes('Selected image model')`),5000,"settings save success feedback");
   await waitFor(async () => (await invoke("settingsGet")).infiniteProviderRetry === false,5000,"normalized settings save round trip");
   assert.ok(await evaluate(`!document.body.innerText.includes('infiniteProviderRetry is invalid')`));
   await evaluate(`document.querySelector('[data-nav="back-to-app"]').click()`);
@@ -258,9 +258,9 @@ try {
   // The menu is a source rail plus one pane: only the active section's rows
   // are mounted, so per-source assertions must drive the rail (#2253).
   await waitFor(() => evaluate(`document.querySelectorAll('.composer-model-rail-item').length===2`),5000,"composer model source rail");
-  assert.ok(await evaluate(`(() => {const labels=[...document.querySelectorAll('.composer-model-rail-label')].map(e=>e.textContent);return labels[0]==='本地测试服务' && labels[1]==='Image-only fixture';})()`),"the rail lists both chat-capable sources");
+  assert.ok(await evaluate(`(() => {const labels=[...document.querySelectorAll('.composer-model-rail-label')].map(e=>e.textContent);return labels[0]==='Local test service' && labels[1]==='Image-only fixture';})()`),"the rail lists both chat-capable sources");
   const paneState = (provider) => `(() => {const group=[...document.querySelectorAll('.composer-model-group')].find(e=>e.getAttribute('aria-label')===${JSON.stringify(provider)});if(!group)return null;const options=[...group.querySelectorAll('.composer-model-option')];return {options:options.length,titles:options.map(e=>e.title),checked:options.filter(e=>e.getAttribute('aria-checked')==='true').length};})()`;
-  assert.deepEqual(await evaluate(paneState("本地测试服务")),{options:1,titles:["fixture"],checked:1},"the chat default's fixture model is the active candidate");
+  assert.deepEqual(await evaluate(paneState("Local test service")),{options:1,titles:["fixture"],checked:1},"the chat default's fixture model is the active candidate");
   assert.ok(await evaluate(`![...document.querySelectorAll('.composer-model-option')].some(e=>e.title==='gpt-image-1')`),"a pure image-generation endpoint is never a chat candidate");
   await evaluate(`[...document.querySelectorAll('.composer-model-rail-item')].find(e=>e.querySelector('.composer-model-rail-label')?.textContent==='Image-only fixture').click()`);
   await waitFor(() => evaluate(`document.querySelector('.composer-model-pane')?.querySelector('.composer-model-group')?.getAttribute('aria-label')==='Image-only fixture'`),5000,"image provider section shown by rail");
@@ -280,8 +280,8 @@ try {
     await send("Input.insertText",{text:content});
     await key("Enter",13);
   };
-  await prompt("请生成两张橙色球体、蓝色背景的图片。");
-  await waitFor(() => evaluate(`document.querySelectorAll('.generated-image-preview img').length===1 && document.querySelector('.generated-image-preview img')?.naturalWidth===480 && [...document.querySelectorAll('.generated-image-thumbnails img')].length===2 && document.body.innerText.includes('已生成两张图片')`),60000,"batch images decoded in chat");
+  await prompt("Please generate two images of an orange sphere on a blue background.");
+  await waitFor(() => evaluate(`document.querySelectorAll('.generated-image-preview img').length===1 && document.querySelector('.generated-image-preview img')?.naturalWidth===480 && [...document.querySelectorAll('.generated-image-thumbnails img')].length===2 && document.body.innerText.includes('Generated two images')`),60000,"batch images decoded in chat");
   assert.ok(await evaluate(`document.querySelector('.generated-image-preview img')?.checkVisibility() && !document.querySelector('.generated-image-set')?.closest('[inert]')`), "selected image remains visible outside collapsed tool details");
   assert.equal(await evaluate(`document.querySelectorAll('.generated-image-thumbnails button').length`),2);
   assert.equal(await evaluate(`document.querySelectorAll('.generated-image-thumbnails button[aria-current="true"]').length`),1);
@@ -289,7 +289,7 @@ try {
   mkdirSync(downloadDir);
   await send("Page.setDownloadBehavior", { behavior: "allow", downloadPath: downloadDir });
   assert.ok(await evaluate(`document.querySelector('.generated-image-actions a[download="generated-image-1.png"]')?.href.startsWith('data:image/png;base64,')`));
-  await click("下载", ".generated-image-actions a", true);
+  await click("Download", ".generated-image-actions a", true);
   const downloadedImage = join(downloadDir, "generated-image-1.png");
   const originalImage = model.results[0].value.results[0].path;
   await waitFor(() => existsSync(downloadedImage) && statSync(downloadedImage).size === statSync(originalImage).size,10000,"generated image download");
@@ -302,22 +302,22 @@ try {
   assert.ok(await evaluate(`document.querySelector('.generated-image-thumbnails')?.getBoundingClientRect().right <= innerWidth`),"batch thumbnails stay inside narrow window");
   await send("Emulation.setDeviceMetricsOverride", { ...desktopViewport, deviceScaleFactor: 1, mobile: false });
   assert.ok(await watchImageContinuity('.generated-image-set', '.generated-image-preview img'));
-  await click("生成图片 2", ".generated-image-thumbnails button", true);
+  await click("Generated image 2", ".generated-image-thumbnails button", true);
   await waitFor(() => evaluate(`(() => {const selected=document.querySelectorAll('.generated-image-thumbnails button')[1];const featured=document.querySelector('.generated-image-preview img');return selected?.getAttribute('aria-current')==='true' && featured?.naturalWidth===480 && featured.src===selected.querySelector('img')?.src})()`),5000,"second image selected in chat");
   const cardContinuity = await imageStayedVisible();
   assert.ok(cardContinuity.every(Boolean), `batch image remains painted while switching selection: ${JSON.stringify(cardContinuity)}`);
   assert.ok(await evaluate(`document.querySelector('.generated-image-actions a[download="generated-image-2.png"]')?.href.startsWith('data:image/png;base64,')`));
-  await click("下载", ".generated-image-actions a", true);
+  await click("Download", ".generated-image-actions a", true);
   const secondDownload = join(downloadDir, "generated-image-2.png");
   const secondOriginal = model.results[0].value.results[1].path;
   await waitFor(() => existsSync(secondDownload) && statSync(secondDownload).size === statSync(secondOriginal).size,10000,"selected image download");
   assert.deepEqual(readFileSync(secondDownload),readFileSync(secondOriginal));
   await screenshot("chat-batch-selected-2.png");
-  await click("生成图片 2", ".generated-image-preview", true);
+  await click("Generated image 2", ".generated-image-preview", true);
   await waitFor(() => evaluate(`!!document.querySelector('.generated-image-viewer[open]')`),5000,"image viewer opens");
   assert.equal(await evaluate(`document.querySelectorAll('.generated-image-viewer-thumb').length`),2);
   assert.ok(await evaluate(`document.querySelectorAll('.generated-image-viewer-thumb')[1]?.getAttribute('aria-current') === 'true'`));
-  assert.ok(await evaluate(`!!document.querySelector('.generated-image-viewer-header-actions button[aria-label="在文件夹中显示"]')`));
+  assert.ok(await evaluate(`!!document.querySelector('.generated-image-viewer-header-actions button[aria-label="Show in folder"]')`));
   await waitFor(() => evaluate(`document.querySelector('.generated-image-viewer-viewport img')?.dataset.sized === 'true'`),5000,"viewer image sized");
   await evaluate(`(() => {
     const target = document.querySelectorAll('.generated-image-viewer-thumb img')[0];
@@ -336,7 +336,7 @@ try {
   assert.ok(await evaluate(`document.querySelectorAll('.generated-image-viewer-thumb')[1].getAttribute('aria-current') === 'true'`), "reselecting the current image cancels a pending decode");
   assert.ok(await watchImageContinuity('.generated-image-viewer-viewport', 'img'));
   assert.ok(await watchViewerSizing());
-  await click("上一张图片", ".generated-image-viewer-navigation button", true);
+  await click("Previous image", ".generated-image-viewer-navigation button", true);
   await waitFor(() => evaluate(`document.querySelectorAll('.generated-image-viewer-thumb')[0]?.getAttribute('aria-current') === 'true'`),5000,"first thumbnail selected");
   const viewerContinuity = await imageStayedVisible();
   assert.ok(viewerContinuity.every(Boolean), `viewer image remains painted while switching selection: ${JSON.stringify(viewerContinuity)}`);
@@ -347,7 +347,7 @@ try {
   await waitFor(() => evaluate(`document.querySelectorAll('.generated-image-viewer-thumb')[1]?.getAttribute('aria-current') === 'true'`),5000,"second thumbnail selected");
   assert.ok(await evaluate(`(() => {const image=document.querySelector('.generated-image-viewer-viewport img');const thumb=document.querySelectorAll('.generated-image-viewer-thumb')[1]?.querySelector('img');return !image || image.src === thumb?.src})()`),"viewer never shows a stale selected image");
   await waitFor(() => evaluate(`(() => {const thumb=document.querySelectorAll('.generated-image-viewer-thumb')[1];const image=document.querySelector('.generated-image-viewer-viewport img');return thumb?.getAttribute('aria-current') === 'true' && image?.naturalWidth === 480 && image.src === thumb.querySelector('img')?.src})()`),5000,"viewer navigates to second image");
-  await click("放大", ".generated-image-viewer-zoom button", true);
+  await click("Zoom In", ".generated-image-viewer-zoom button", true);
   await waitFor(() => evaluate(`document.querySelector('.generated-image-viewer-zoom output')?.textContent === '125%'`),5000,"viewer zooms in");
   await screenshot("image-viewer.png");
   await send("Emulation.setDeviceMetricsOverride", {width:600,height:700,deviceScaleFactor:1,mobile:false});
@@ -363,8 +363,8 @@ try {
   const sourceBytes = readFileSync(source);
   assert.equal(model.imageRequests.length,2);
   model.setScenario("edit");
-  await prompt("把第一张图片背景改成绿色，保留橙色球体和原图。");
-  await waitFor(() => evaluate(`document.querySelectorAll('.generated-image-preview img').length===2 && [...document.querySelectorAll('.generated-image-preview img')].every(e=>e.naturalWidth===480) && document.body.innerText.includes('已将第一张图的背景改为绿色')`),60000,"edited image decoded in chat");
+  await prompt("Change the background of the first image to green, keep the orange sphere and the original.");
+  await waitFor(() => evaluate(`document.querySelectorAll('.generated-image-preview img').length===2 && [...document.querySelectorAll('.generated-image-preview img')].every(e=>e.naturalWidth===480) && document.body.innerText.includes('Changed the background of the first image to green')`),60000,"edited image decoded in chat");
   await waitFor(() => evaluate(`!document.querySelector('.assistant-turn.streaming')`),10000,"turn completed");
   await evaluate(`document.querySelectorAll('.turn-process > button[aria-expanded="true"]').forEach(e=>e.click())`);
   await evaluate(`Promise.all(document.getAnimations().filter(a=>a.effect?.getTiming().iterations!==Infinity).map(a=>a.finished.catch(()=>{})))`);
@@ -377,12 +377,12 @@ try {
   assert.notEqual(model.results[1].value.results[0].path,source,"editing creates a new file");
   await invoke("settingsSet", {...await invoke("settingsGet"),imageGeneration:null});
   model.setScenario("unset");
-  await prompt("再生成一张图片。");
-  await waitFor(() => evaluate(`!![...document.querySelectorAll('button')].find(e=>e.textContent.trim()==='配置生图模型' && e.checkVisibility())`),60000,"visible setup action");
-  await waitFor(() => evaluate(`!document.querySelector('.stop-btn') && document.body.innerText.includes('请先到模型设置选择生图模型，再重试。')`),10000,"configuration error turn completed");
+  await prompt("Generate one more image.");
+  await waitFor(() => evaluate(`!![...document.querySelectorAll('button')].find(e=>e.textContent.trim()==='Configure image model' && e.checkVisibility())`),60000,"visible setup action");
+  await waitFor(() => evaluate(`!document.querySelector('.stop-btn') && document.body.innerText.includes('Choose an image model in the model settings first, then retry.')`),10000,"configuration error turn completed");
   await evaluate(`new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))`);
   await screenshot("chat-unconfigured.png");
-  await click("配置生图模型");
+  await click("Configure image model");
   await waitFor(() => evaluate(`!!document.querySelector('.model-default-row')`),10000,"setup action opens model settings");
   assert.equal(model.imageRequests.length,3,"unconfigured generation makes no image request");
   assert.deepEqual(model.failures,[]);

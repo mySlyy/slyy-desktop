@@ -1,6 +1,6 @@
 /**
  * Host chrome styles for plugin slot regions plus the self-dialog tool
- * classes (`docs/plugin-plan/ui/self-dialog/`): p-overlay / p-dialog /
+ * classes (`docs/spec/07-plugins/02-plugin-manifest-schema.md` §3.2): p-overlay / p-dialog /
  * p-notice with the --ds-scrim / --ds-shadow-dialog tokens.
  *
  * The self-dialog classes are drawn inside a layer from `pi.ui.openLayer`
@@ -130,7 +130,7 @@
 .p-notice__dismiss:hover {
   color: var(--ds-text-primary, #ededed);
 }
-/* ---- entryExtra clamp (docs/plugin-plan/ui/entry-extra) --------------- */
+/* ---- entryExtra clamp (docs/spec/07-plugins/02-plugin-manifest-schema.md §3.2) --------------- */
 
 .pi-entry-extra-stack {
   display: block;

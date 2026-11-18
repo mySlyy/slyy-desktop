@@ -546,7 +546,7 @@ export type PluginSessionTruncateResult = {
   discardedCount: number;
 };
 
-/** Resolve a plugin label using the active PI-Desktop locale. */
+/** Resolve a plugin label using the active Slyy locale. */
 export function resolvePluginLocalizedString(
   value: string | PluginLocalizedString | undefined,
   locale: string | undefined,

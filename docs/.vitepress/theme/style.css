@@ -1,5 +1,5 @@
 /*
-  PI-Desktop docs — Apple keynote register.
+  Slyy docs — Apple keynote register.
   Black canvas, extreme type scale, floating product stills, no card chrome.
 */
 
@@ -158,11 +158,6 @@ body {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-}
-
-[lang='zh-CN'] .VPSidebarItem.level-0 > .item > .text {
-  letter-spacing: 0.04em;
-  text-transform: none;
 }
 
 .VPSidebarItem.level-1 .text {

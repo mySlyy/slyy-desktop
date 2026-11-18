@@ -16,7 +16,7 @@ async function fixture(t) {
   t.after(() => rm(root, { recursive: true, force: true }));
   const data = join(root, "data"), project = join(root, "project"), other = join(root, "other");
   await Promise.all([data, project, other].map(path => mkdir(path)));
-  const path = join(root, "outside project & 中文.bin");
+  const path = join(root, "outside project & \u4e2d\u6587.bin");
   const file = await open(path, "w");
   await file.truncate(64 * 1024 * 1024 + 1);
   await file.close();

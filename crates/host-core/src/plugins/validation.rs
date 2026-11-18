@@ -920,7 +920,7 @@ fn is_loopback_host(host: &str) -> bool {
 /// `objects.githubusercontent.com`, `release-assets.githubusercontent.com`,
 /// and `codeload.github.com` without needing a client release each time
 /// GitHub rotates a release-asset host.
-const PACKAGE_HOST_ALLOWLIST: &[&str] = &["github.com", "githubusercontent.com", "cnb.cool"];
+const PACKAGE_HOST_ALLOWLIST: &[&str] = &["github.com", "githubusercontent.com"];
 
 fn host_matches_allowlist_entry(host: &str, allowed: &str) -> bool {
     host == allowed || host.ends_with(&format!(".{allowed}"))

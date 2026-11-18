@@ -86,35 +86,35 @@ const logProgress = (entry) => {
 // ends with a per-turn marker, so the assertion reads the model's real output
 // instead of a fixture echo.
 const TOPICS = [
-  "设计一个跨进程流式 RPC 的背压方案，说明何时必须丢弃、何时必须阻塞，并给出判定公式",
-  "为一份含 50 万行的日志解析器做复杂度分析，指出瓶颈步骤并给出 O(n) 的替代实现思路",
-  "写出一条正则，从混合中英文文本中提取所有形如 v1.2.3-beta.4 的语义化版本号，并说明回溯风险",
-  "为多租户 SQLite 设计索引方案，要求同时支持按租户、时间倒序、状态过滤，解释索引顺序的取舍",
-  "给出一个 JSON Schema，约束嵌套数组中的对象必须含 id/createdAt，且 createdAt 必须是 RFC3339",
-  "分析两个协程同时读写同一 Map 的竞态，给出最小复现步骤和三种修复策略的代价对比",
-  "解释 Unicode 中 U+2028/U+2029 在 JSON、JavaScript、正则中的不同处理，指出跨语言序列化的坑",
-  "审查一段递归下降解析器代码的健壮性，列出它可能栈溢出的三种输入并给出防护措施",
-  "为 Electron 主进程设计一个崩溃恢复状态机，列出所有状态、转移条件与幂等要求",
-  "设计幂等的重试协议：说明幂等键的生成、存储、过期与冲突处理，并指出失败窗口",
-  "推导滑动窗口限流器的精确令牌数公式，比较计数窗口与漏桶在突发流量下的差异",
-  "为一个插件沙箱设计权限模型，说明最小授权、能力提升与审计日志三者的边界",
-  "分析 CRDT 与 OT 在离线协同编辑中的适用场景，给出选择依据与已知反例",
-  "给出一个 B+ 树页分裂的伪代码，标注并发安全的加锁顺序与死锁避免条件",
-  "设计一个端到端加密的本地缓存方案，说明密钥派生、轮换与陈旧密文清理策略",
-  "推导 M/M/1 队列在到达率接近服务率时的平均等待时间，并解释数值不稳定区间",
-  "为增量构建系统设计内容寻址缓存键，说明哪些输入必须参与哈希、哪些必须排除",
-  "解释为什么时间戳排序可能违反因果一致性，给出向量时钟修正方案与空间代价",
-  "设计一个把 10GB 文件切成可并行处理的块的方案，说明校验、断点续传与内存上限",
-  "写出一段代码大纲，检测 React 列表渲染中的 O(n^2) 行为并给出虚拟化改造步骤",
-  "分析浮点累加误差在金融计算中的影响，给出定点数替代方案与舍入规则",
-  "为一个事件总线设计背压与顺序保证，说明分区键选择如何影响全局有序性",
-  "推导一致性哈希在节点数从 3 变为 4 时的迁移比例，并说明虚拟节点如何改善分布",
-  "审查一段依赖注入容器的循环依赖检测逻辑，列出漏检场景与修复方式",
-  "设计可观测性三件套在长会话场景下的采样策略，说明何时必须保留全量追踪",
-  "给出一个把尾递归改成迭代的通用变换步骤，指出哪些语言/场景无法直接套用",
-  "分析多层缓存（内存/L2/磁盘）的写穿与回写权衡，量化脏数据窗口",
-  "为长文本摘要设计分层压缩算法，说明每层保留的信息与丢失的语义",
-  "解释 TLS 1.3 会话恢复（PSK）在移动网络切换下的失效点与容错处理",
+  "Design a backpressure scheme for cross-process streaming RPC: state when data must be dropped, when the producer must block, and give the decision formula",
+  "Analyse the complexity of a log parser handling 500,000 lines, name the bottleneck step and outline an O(n) replacement",
+  "Write a regex that extracts every semantic version such as v1.2.3-beta.4 from mixed-language text and explain its backtracking risk",
+  "Design an index scheme for multi-tenant SQLite that supports tenant, newest-first time order and status filters at once; explain the column order trade-offs",
+  "Give a JSON Schema that requires objects in nested arrays to carry id/createdAt, with createdAt in RFC3339 format",
+  "Analyse the race when two coroutines read and write the same Map, give minimal repro steps and compare the cost of three fixes",
+  "Explain how U+2028/U+2029 are treated differently in JSON, JavaScript and regular expressions, and name the cross-language serialisation pitfalls",
+  "Review the robustness of a recursive-descent parser, list three inputs that can overflow its stack and give the guards",
+  "Design a crash-recovery state machine for the Electron main process with every state, transition condition and idempotency requirement",
+  "Design an idempotent retry protocol: key generation, storage, expiry and conflict handling, and point out the failure window",
+  "Derive the exact token count formula of a sliding-window rate limiter and compare fixed windows with a leaky bucket under bursts",
+  "Design a permission model for a plugin sandbox and draw the line between least privilege, capability elevation and audit logging",
+  "Compare CRDT and OT for offline collaborative editing, give the selection criteria and known counterexamples",
+  "Give pseudocode for a B+ tree page split, marking the lock order for concurrency safety and the deadlock-avoidance conditions",
+  "Design an end-to-end encrypted local cache: key derivation, rotation and cleanup of stale ciphertext",
+  "Derive the mean waiting time of an M/M/1 queue as the arrival rate approaches the service rate and explain the numerically unstable range",
+  "Design content-addressed cache keys for an incremental build system: which inputs must be hashed and which must be excluded",
+  "Explain why timestamp ordering can violate causal consistency and give a vector-clock fix with its space cost",
+  "Design a way to split a 10 GB file into chunks for parallel processing, covering checksums, resumable transfer and the memory ceiling",
+  "Outline code that detects O(n^2) behaviour in React list rendering and give the steps to virtualise it",
+  "Analyse the impact of floating-point accumulation error in financial calculations and give a fixed-point alternative with rounding rules",
+  "Design backpressure and ordering guarantees for an event bus and explain how the partition key choice affects global ordering",
+  "Derive the share of keys that moves under consistent hashing when nodes grow from 3 to 4, and explain how virtual nodes improve the spread",
+  "Review the cycle detection of a dependency-injection container, list the cases it misses and how to fix them",
+  "Design sampling for the three observability pillars in long sessions and state when a full trace must be kept",
+  "Give a general transformation from tail recursion to iteration and name the languages or cases where it does not apply directly",
+  "Analyse write-through versus write-back across memory/L2/disk caches and quantify the dirty-data window",
+  "Design a layered compression algorithm for long-text summaries, stating what each layer keeps and which semantics it loses",
+  "Explain where TLS 1.3 session resumption (PSK) breaks during mobile network handover and how to handle it",
 ].map((task, index) => ({ id: `T${String(index + 1).padStart(2, "0")}`, task }));
 
 const MEMO = "MEMO-ALPHA-7";
@@ -125,19 +125,19 @@ const interruptTurn = 55;
 function promptFor(turn) {
   const topic = TOPICS[(turn - 1) % TOPICS.length];
   const marker = markerFor(turn);
-  const parts = [`第 ${turn} 轮（共 ${plannedTurns} 轮），主题 ${topic.id}：${topic.task}。`];
+  const parts = [`Turn ${turn} of ${plannedTurns}, topic ${topic.id}: ${topic.task}.`];
   if (turn === 1) {
-    parts.push(`请记住口令 ${MEMO}，之后每次被问到时原样回答。`);
+    parts.push(`Remember the passphrase ${MEMO} and repeat it verbatim whenever you are asked for it.`);
   }
   if (memoProbeTurns.has(turn)) {
-    parts.push(`先原样输出第 1 轮给出的口令，再回答问题。`);
+    parts.push(`First output the passphrase from turn 1 verbatim, then answer the question.`);
   }
   if (turn === interruptTurn) {
-    parts.push("这一轮请给出尽可能详细、分多段的完整分析，不要压缩成两句。");
+    parts.push("In this turn give the most detailed, complete analysis you can, in several paragraphs; do not compress it into two sentences.");
   } else {
-    parts.push("约束：结论不超过两句，不要输出代码块，不要复述题目。");
+    parts.push("Constraints: at most two sentences of conclusion, no code blocks, do not restate the question.");
   }
-  parts.push(`回答的最后必须原样包含标记 ${marker}。`);
+  parts.push(`The answer must end with the marker ${marker} verbatim.`);
   return parts.join("\n");
 }
 
@@ -174,7 +174,7 @@ try {
   });
   providerId = provider.id;
   await host.call("settings.set", {
-    language: "zh-CN",
+    language: "en",
     defaultProviderId: providerId,
     defaultModelId: modelId,
     defaultMode: "agent",
@@ -316,7 +316,7 @@ async function attach() {
     "desktop ready",
     60_000,
   );
-  await ipc("settingsSet", { ...(await ipc("settingsGet")), language: "zh-CN", autoGenerateTitle: false });
+  await ipc("settingsSet", { ...(await ipc("settingsGet")), language: "en", autoGenerateTitle: false });
 }
 
 async function openSession(id) {

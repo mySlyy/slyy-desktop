@@ -85,12 +85,12 @@ for (const name of ["first-install", "existing-profile"]) {
       await host.start();
       const { session } = await host.call("session.create", { title: "Conversation survives storage migration" });
       sessionId = session.id;
-      await host.call("settings.set", { language: "zh-CN", theme: "light", enterToSend: false });
+      await host.call("settings.set", { language: "de", theme: "light", enterToSend: false });
       const project = join(config.data, "projects", "saved project");
       await mkdir(project, { recursive: true });
       await host.call("workspace.set", { path: project });
       await host.call("project.memory.set", { path: project, content: "Keep project instructions after moving drives" });
-      const attachment = join(config.data, "attachments", "迁移 attachment.txt");
+      const attachment = join(config.data, "attachments", "\u8fc1\u79fb attachment.txt");
       await mkdir(dirname(attachment), { recursive: true }); await writeFile(attachment, "retained attachment");
       await host.call("session.appendMessage", { sessionId, message: { id: "storage-fixture-message", role: "user", content: "Keep my conversation", createdAt: new Date().toISOString(), attachments: [{ kind: "file", name: "migration.txt", ref: attachment, mimeType: "text/plain" }] } });
       await stopHost(host);
@@ -120,7 +120,7 @@ for (const name of ["first-install", "existing-profile"]) {
         const { session } = await nextHost.call("session.get", { id: sessionId });
         assert.equal(session.messages[0].content, "Keep my conversation");
         assert.equal(await readFile(session.messages[0].attachments[0].ref, "utf8"), "retained attachment");
-        assert.equal(await readFile(join(config.data, "attachments", "迁移 attachment.txt"), "utf8"), "retained attachment");
+        assert.equal(await readFile(join(config.data, "attachments", "\u8fc1\u79fb attachment.txt"), "utf8"), "retained attachment");
         assert.equal((await nextHost.call("settings.get")).enterToSend, false);
         const project = join(pointer.roots.data, "projects", "saved project");
         assert.equal((await nextHost.call("project.memory.get", { path: project })).memory.content, "Keep project instructions after moving drives");

@@ -8,7 +8,7 @@
 //!
 //! Two refusals are unconditional and have no setting, grant option, or
 //! permission mode that reaches them: this application's own windows are never
-//! a target (synthetic input into PI-Desktop would bypass the permission
+//! a target (synthetic input into Slyy would bypass the permission
 //! broker), and a secure input state refuses both inspection and input.
 //!
 //! Since ADR 0344 the grant is automatic and desktop-wide, so the user no
@@ -120,7 +120,7 @@ pub enum PermissionState {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum TargetRefusal {
-    /// A PI-Desktop window. Unconditional.
+    /// A Slyy window. Unconditional.
     #[serde(rename = "self")]
     SelfTarget,
     Denylisted,
@@ -431,7 +431,7 @@ impl Refusal {
             Refusal::GrantExpired => "the computer-use grant is no longer active".into(),
             Refusal::BudgetExhausted => "the grant's action budget is exhausted".into(),
             Refusal::ScopeViolation => "the request resolved outside the granted scope".into(),
-            Refusal::SelfTargetRefused => "PI-Desktop windows are never a target".into(),
+            Refusal::SelfTargetRefused => "Slyy windows are never a target".into(),
             Refusal::TargetDenylisted => "the target is on the denylist".into(),
             Refusal::SecureInputRefused => "secure input is active".into(),
             Refusal::StaleBasis => "the coordinate basis no longer matches the scope".into(),
