@@ -4,6 +4,7 @@ import {
   readSharedTypesSource,
 } from "./helpers/source-contracts.mjs";
 import assert from "node:assert/strict";
+import { readLocaleSource } from "./helpers/locale-source.mjs";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
@@ -82,8 +83,8 @@ test("the switch is macOS-only and says when a restart is needed", async () => {
   assert.match(row, /applied !== null && applied !== translucent/);
 
   const en = await read("../../../packages/i18n/src/locales/en/index.ts");
-  const zh = await read("../../../packages/i18n/src/locales/zh-CN/index.ts");
-  for (const source of [en, zh]) {
+  const de = await readLocaleSource("de");
+  for (const source of [en, de]) {
     for (const key of [
       "windowTranslucency:",
       "windowTranslucencyDesc:",

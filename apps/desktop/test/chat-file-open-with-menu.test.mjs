@@ -17,6 +17,7 @@ import * as jsxRuntime from "react/jsx-runtime";
 import { renderToStaticMarkup } from "react-dom/server";
 import ts from "typescript";
 import { readTranscriptSource } from "./helpers/source-contracts.mjs";
+import { unquoteCatalogKeys } from "./helpers/locale-source.mjs";
 
 const read = (relative) => readFileSync(new URL(relative, import.meta.url), "utf8");
 
@@ -474,7 +475,7 @@ test("HTTP URLs keep their own menu instead of the file open submenu", () => {
 
 test("the reference labels ship in the catalogs the menu reads", () => {
   const en = read("../../../packages/i18n/src/locales/en/index.ts");
-  const zhCN = read("../../../packages/i18n/src/locales/zh-CN/index.ts");
+  const de = unquoteCatalogKeys(read("../../../packages/i18n/src/locales/de/index.ts"));
   assert.match(en, /openWith: "Open with"/);
   assert.match(en, /openWithFileManager: "File Manager"/);
   assert.match(en, /openWithBuiltInBrowser: "Built-in browser"/);
@@ -482,15 +483,15 @@ test("the reference labels ship in the catalogs the menu reads", () => {
   assert.match(en, /defaultBrowserOpenFailed:/);
   assert.match(en, /copyFullPath: "Copy full path"/);
   assert.match(en, /revealFileInFolder: "Show in folder"/);
-  assert.match(zhCN, /revealFileInFolder: "在文件夹中打开"/);
+  assert.match(de, /revealFileInFolder: "[^"]+"/);
   assert.match(en, /copyRelativePath: "Copy relative path"/);
-  assert.match(zhCN, /openWith: "打开方式"/);
-  assert.match(zhCN, /openWithFileManager: "文件管理器"/);
-  assert.match(zhCN, /openWithBuiltInBrowser: "内置浏览器"/);
-  assert.match(zhCN, /openWithDefaultBrowser: "默认浏览器"/);
-  assert.match(zhCN, /defaultBrowserOpenFailed:/);
-  assert.match(zhCN, /copyFullPath: "复制完整地址"/);
-  assert.match(zhCN, /copyRelativePath: "复制相对地址"/);
+  assert.match(de, /openWith: "[^"]+"/);
+  assert.match(de, /openWithFileManager: "[^"]+"/);
+  assert.match(de, /openWithBuiltInBrowser: "[^"]+"/);
+  assert.match(de, /openWithDefaultBrowser: "[^"]+"/);
+  assert.match(de, /defaultBrowserOpenFailed:/);
+  assert.match(de, /copyFullPath: "[^"]+"/);
+  assert.match(de, /copyRelativePath: "[^"]+"/);
 });
 
 test("remote workspace references retain copy actions but never offer local open or reveal actions", () => {

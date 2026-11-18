@@ -159,7 +159,7 @@ test("release workflow publishes the Linux ASAR beside installers", () => {
   );
   assert.match(
     releaseAsarScriptSource,
-    /PI-Desktop-\$\{releaseVersion\}-linux-\$\{releaseArch\}\.asar/,
+    /Slyy-\$\{releaseVersion\}-linux-\$\{releaseArch\}\.asar/,
   );
 });
 
@@ -211,8 +211,8 @@ test("the Linux package config lets the workflow choose the architecture", () =>
     /-linux-\$\{arch\}\.\$\{ext\}$/,
     "the AppImage name carries its architecture",
   );
-  assert.equal(build.deb.artifactName, "pi-desktop_${version}_${arch}.${ext}");
-  assert.equal(build.rpm.artifactName, "pi-desktop-${version}-${arch}.${ext}");
+  assert.equal(build.deb.artifactName, "slyy-gen2_${version}_${arch}.${ext}");
+  assert.equal(build.rpm.artifactName, "slyy-gen2-${version}-${arch}.${ext}");
 });
 
 test("release matrix packages both native macOS architectures", () => {
@@ -230,12 +230,12 @@ test("release matrix packages both native macOS architectures", () => {
   );
   assert.equal(
     JSON.parse(desktopPackageSource).build.mac.artifactName,
-    "PI-Desktop-${version}-${arch}-mac.${ext}",
+    "Slyy-${version}-${arch}-mac.${ext}",
     "macOS ZIP names include the target architecture",
   );
   assert.equal(
     JSON.parse(desktopPackageSource).build.dmg.artifactName,
-    "PI-Desktop-${version}-${arch}.${ext}",
+    "Slyy-${version}-${arch}.${ext}",
     "macOS DMG names include the target architecture",
   );
   assert.match(
@@ -284,7 +284,11 @@ test("macOS release signing is required on tag pushes", () => {
     releaseWorkflowSource,
     /Require macOS signing and notarization secrets[\s\S]*?Missing GitHub Actions secrets for macOS signing/,
   );
-  assert.match(releaseWorkflowSource, /APPLE_TEAM_ID must be DUV63RKYTW/);
+  assert.ok(
+    releaseWorkflowSource.includes('if [[ "${APPLE_TEAM_ID}" != "${{ vars.SLYY_APPLE_TEAM_ID }}" ]]; then'),
+    "APPLE_TEAM_ID is pinned to the SLYY_APPLE_TEAM_ID repository variable",
+  );
+  assert.match(releaseWorkflowSource, /APPLE_TEAM_ID must match the SLYY_APPLE_TEAM_ID/);
 
   const signedBlock = releaseWorkflowSource.match(
     /- name: Package signed and notarized macOS installer[\s\S]*?(?=\n      - name:)/,
@@ -303,7 +307,8 @@ test("macOS release signing is required on tag pushes", () => {
   // electron-builder throws InvalidConfigurationError when an identity name
   // keeps the "Developer ID Application:" prefix, so CSC_NAME carries the bare
   // common name and the CLI must not pass -c.mac.identity.
-  assert.match(signedBlock, /CSC_NAME: "XingYu Liu \(DUV63RKYTW\)"/);
+  assert.match(signedBlock, /CSC_NAME: \$\{\{ vars\.SLYY_MAC_SIGNING_IDENTITY \}\}/);
+  assert.doesNotMatch(releaseWorkflowSource, /DUV63RKYTW|XingYu Liu/);
   assert.doesNotMatch(signedBlock, /-c\.mac\.identity=/);
   assert.doesNotMatch(signedBlock, /CSC_NAME: "Developer ID Application:/);
   assert.match(signedBlock, /-c\.mac\.notarize=true/);
@@ -367,7 +372,13 @@ test("the signed local macOS lane selects the native runner architecture", () =>
   assert.match(releaseMacScriptSource, /MAC_ARCH="\$\{MAC_ARCH:-\$DEFAULT_MAC_ARCH\}"/);
   assert.match(releaseMacScriptSource, /must match the host/);
   assert.match(releaseMacScriptSource, /electron-builder --mac "--\$\{MAC_ARCH\}"/);
-  assert.match(releaseMacScriptSource, /XingYu Liu \(DUV63RKYTW\)/);
+  assert.match(
+    releaseMacScriptSource,
+    /MAC_SIGNING_IDENTITY="\$\{MAC_SIGNING_IDENTITY:\?[^}]*\}"/,
+    "the local lane requires an explicit signing identity",
+  );
+  assert.match(releaseMacScriptSource, /EXPECTED_TEAM_ID="\$\{SLYY_APPLE_TEAM_ID:\?[^}]*\}"/);
+  assert.doesNotMatch(releaseMacScriptSource, /DUV63RKYTW|XingYu Liu/);
   assert.match(
     releaseMacScriptSource,
     /MAC_SIGNING_IDENTITY="\$\{MAC_SIGNING_IDENTITY#Developer ID Application: \}"/,

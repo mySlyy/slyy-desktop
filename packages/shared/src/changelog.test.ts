@@ -13,17 +13,7 @@ const STABLE_FROM = "0.1.1";
 describe("changelog catalog", () => {
   it("keeps shipped locale version sets and highlight counts aligned", () => {
     const en = CHANGELOG.en;
-    const zh = CHANGELOG["zh-CN"];
-    for (const catalog of [
-      zh,
-      CHANGELOG["zh-TW"],
-      CHANGELOG.tr,
-      CHANGELOG.de,
-      CHANGELOG.es,
-      CHANGELOG.fr,
-      CHANGELOG.ko,
-      CHANGELOG["pt-BR"],
-    ]) {
+    for (const catalog of [CHANGELOG.de]) {
       expect(catalog.map((e) => e.version)).toEqual(en.map((e) => e.version));
       for (let i = 0; i < en.length; i += 1) {
         expect(catalog[i]?.highlights.length).toBe(en[i]?.highlights.length);
@@ -139,19 +129,9 @@ describe("changelog catalog", () => {
 
   it("normalizes versions and resolves locales", () => {
     expect(normalizeChangelogVersion(" v0.2.7 ")).toBe("0.2.7");
-    expect(resolveChangelogLocale("zh-CN")).toBe("zh-CN");
-    expect(resolveChangelogLocale("zh-TW")).toBe("zh-TW");
-    expect(resolveChangelogLocale("zh-Hant")).toBe("zh-TW");
-  expect(resolveChangelogLocale("zh_HK")).toBe("zh-TW");
-  expect(resolveChangelogLocale("tr-TR")).toBe("tr");
-  expect(resolveChangelogLocale("de-DE")).toBe("de");
-  expect(resolveChangelogLocale("es-MX")).toBe("es");
-  expect(resolveChangelogLocale("fr-CA")).toBe("fr");
-  expect(resolveChangelogLocale("ko-KR")).toBe("ko");
-  expect(resolveChangelogLocale("ko_KR")).toBe("ko");
-  expect(resolveChangelogLocale("pt")).toBe("pt-BR");
-  expect(resolveChangelogLocale("pt-BR")).toBe("pt-BR");
-  expect(resolveChangelogLocale("pt_BR")).toBe("pt-BR");
+    expect(resolveChangelogLocale("de-DE")).toBe("de");
+    expect(resolveChangelogLocale("de_AT")).toBe("de");
+    expect(resolveChangelogLocale("zh-CN")).toBe("en");
     expect(resolveChangelogLocale("en-US")).toBe("en");
     expect(resolveChangelogLocale()).toBe("en");
   });
@@ -169,9 +149,9 @@ describe("changelog catalog", () => {
   });
 
   it("loads and caches the catalog for the resolved locale", async () => {
-    const catalog = await loadChangelogCatalog("fr-CA");
+    const catalog = await loadChangelogCatalog("de-AT");
 
-    expect(catalog).toBe(CHANGELOG.fr);
-    expect(await loadChangelogCatalog("fr")).toBe(catalog);
+    expect(catalog).toBe(CHANGELOG.de);
+    expect(await loadChangelogCatalog("de")).toBe(catalog);
   });
 });

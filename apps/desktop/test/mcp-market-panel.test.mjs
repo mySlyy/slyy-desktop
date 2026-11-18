@@ -1,15 +1,16 @@
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readLocaleSource } from "./helpers/locale-source.mjs";
 import { BUILTIN_MCP_CATALOG } from "../../../packages/shared/dist/index.js";
 
 const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
 
-const [panel, page, en, zh] = await Promise.all([
+const [panel, page, en, de] = await Promise.all([
   read("../src/components/settings/McpMarketPanel.tsx"),
   read("../src/components/settings/AgentMcpPage.tsx"),
   read("../../../packages/i18n/src/locales/en/index.ts"),
-  read("../../../packages/i18n/src/locales/zh-CN/index.ts"),
+  readLocaleSource("de"),
 ]);
 
 test("market panel installs through the existing upsert path only", () => {
@@ -62,8 +63,8 @@ test("agents page wires the market view with reload on exit", () => {
   assert.match(page, /<McpMarketPanel/);
 });
 
-test("market strings exist in en and zh-CN", () => {
-  for (const locale of [en, zh]) {
+test("market strings exist in en and de", () => {
+  for (const locale of [en, de]) {
     assert.match(locale, /mcpMarket: \{/);
     assert.match(locale, /browse: "/);
     assert.match(locale, /installSuccess: "/);
@@ -74,9 +75,9 @@ test("market strings exist in en and zh-CN", () => {
 });
 
 test("every shipped locale carries the MCP market recovery strings", async () => {
-  const ids = ["en", "zh-CN", "zh-TW", "de", "es", "fr", "ko", "tr", "pt-BR"];
+  const ids = ["en", "de"];
   for (const id of ids) {
-    const locale = await read(`../../../packages/i18n/src/locales/${id}/index.ts`);
+    const locale = await readLocaleSource(id);
     assert.match(locale, /remotePartial: "/, `${id} remotePartial`);
     assert.match(locale, /retry: "/, `${id} retry`);
   }

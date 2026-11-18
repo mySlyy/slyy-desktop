@@ -1,19 +1,20 @@
 import { readMainSource } from "./helpers/source-contracts.mjs";
 import assert from "node:assert/strict";
+import { readLocaleSource } from "./helpers/locale-source.mjs";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const read = (relativePath) =>
   readFile(new URL(relativePath, import.meta.url), "utf8");
 
-const [protocolSource, apiSource, mainSource, sidebarSource, english, chinese] =
+const [protocolSource, apiSource, mainSource, sidebarSource, english, german] =
   await Promise.all([
     read("../../../packages/shared/src/protocol.ts"),
     read("../src/lib/api.ts"),
     readMainSource(),
     read("../src/components/Sidebar.tsx"),
     read("../../../packages/i18n/src/locales/en/index.ts"),
-    read("../../../packages/i18n/src/locales/zh-CN/index.ts"),
+    readLocaleSource("de"),
   ]);
 
 test("open session path is a session-id IPC action, not an arbitrary folder", () => {
@@ -68,13 +69,13 @@ test("session and project copy labels are localized", () => {
   assert.match(english, /copySessionLink:\s*"Copy conversation link"/);
   assert.match(english, /copyName:\s*"Copy project name"/);
   assert.match(english, /copyPath:\s*"Copy project path"/);
-  assert.match(chinese, /copyConversationId:\s*"复制对话 ID"/);
-  assert.match(chinese, /copySessionPath:\s*"复制会话路径"/);
-  assert.match(chinese, /copyName:\s*"复制项目名称"/);
-  assert.match(chinese, /copyPath:\s*"复制项目路径"/);
+  assert.match(german, /copyConversationId:\s*"Gesprächs-ID kopieren"/);
+  assert.match(german, /copySessionPath:\s*"Sitzungspfad kopieren"/);
+  assert.match(german, /copyName:\s*"Projektnamen kopieren"/);
+  assert.match(german, /copyPath:\s*"Projektpfad kopieren"/);
 });
 
 test("developer-only open path label remains localized", () => {
   assert.match(english, /openSessionPath:\s*"Open session path"/);
-  assert.match(chinese, /openSessionPath:\s*"打开会话路径"/);
+  assert.match(german, /openSessionPath:\s*"Sitzungspfad öffnen"/);
 });

@@ -9,20 +9,23 @@ const recentSource = await readFile(
   "utf8",
 );
 
-test("design accent tokens are neutral gray, not blue", () => {
+test("design accent tokens are the single Slyy blue", () => {
+  // The legacy blue ramp stays gone: one brand accent, declared once.
   assert.doesNotMatch(stylesSource, /--blue-\d+/);
   assert.doesNotMatch(stylesSource, /#0285ff/i);
   assert.doesNotMatch(stylesSource, /#339cff/i);
   assert.doesNotMatch(stylesSource, /#99ceff/i);
   assert.doesNotMatch(stylesSource, /#e5f3ff/i);
 
+  assert.match(stylesSource, /--accent-300:\s*#9aa2ff/i);
+  assert.match(stylesSource, /--accent-400:\s*#7a85ff/i);
   assert.match(
     stylesSource,
-    /--ds-accent:\s*var\(--gray-0\)/,
+    /--ds-accent:\s*var\(--accent-400\)/,
   );
   assert.match(
     stylesSource,
-    /--ds-accent-hover:\s*var\(--gray-100\)/,
+    /--ds-accent-hover:\s*var\(--accent-300\)/,
   );
   assert.match(
     stylesSource,
@@ -30,15 +33,15 @@ test("design accent tokens are neutral gray, not blue", () => {
   );
   assert.match(
     stylesSource,
-    /:root\[data-theme="light"\][\s\S]*?--ds-accent:\s*#1a1c1f/,
+    /:root\[data-theme="light"\][\s\S]*?--ds-accent:\s*#2b3bff/i,
   );
   assert.match(
     stylesSource,
-    /:root\[data-theme="light"\][\s\S]*?--ds-accent-hover:\s*#303030/,
+    /:root\[data-theme="light"\][\s\S]*?--ds-accent-hover:\s*#1f2ed0/i,
   );
   assert.match(
     stylesSource,
-    /:root\[data-theme="light"\][\s\S]*?--ds-accent-soft:\s*#5d5d5d/,
+    /:root\[data-theme="light"\][\s\S]*?--ds-accent-soft:\s*#5c5c5c/i,
   );
 });
 

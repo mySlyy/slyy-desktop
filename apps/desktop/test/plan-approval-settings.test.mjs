@@ -8,13 +8,14 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { loadStyles } from "./helpers/styles.mjs";
+import { readLocaleSource } from "./helpers/locale-source.mjs";
 
 const readDesktop = (relativePath) =>
   readFile(new URL(`../${relativePath}`, import.meta.url), "utf8");
 const readPackage = (relativePath) =>
   readFile(new URL(`../../../packages/i18n/${relativePath}`, import.meta.url), "utf8");
 
-const [approvalBar, approvalPreferences, apiSource, storeSource, settingsPage, settingsSearch, styles, english, chinese, planStateSource, composerSource] =
+const [approvalBar, approvalPreferences, apiSource, storeSource, settingsPage, settingsSearch, styles, english, german, planStateSource, composerSource] =
   await Promise.all([
     readDesktop("src/components/PlanApprovalBar.tsx"),
     readDesktop("src/lib/plan-approval-preferences.ts"),
@@ -24,7 +25,7 @@ const [approvalBar, approvalPreferences, apiSource, storeSource, settingsPage, s
     readDesktop("src/lib/settings-search.ts"),
     loadStyles(),
     readPackage("src/locales/en/index.ts"),
-    readPackage("src/locales/zh-CN/index.ts"),
+    readLocaleSource("de"),
     readDesktop("src/lib/plan-mode-state.ts"),
     readComposerSourceSync(),
   ]);
@@ -118,7 +119,7 @@ test("command-shell settings are catalog-driven and use the existing save flow",
 });
 
 test("approval and shell surfaces have locale-backed responsive copy", () => {
-  for (const source of [english, chinese]) {
+  for (const source of [english, german]) {
     assert.match(source, /openArtifact:/);
     assert.match(source, /commandShell:/);
     assert.match(source, /commandShellUnavailable:/);

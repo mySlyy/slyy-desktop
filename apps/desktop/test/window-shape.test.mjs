@@ -50,6 +50,9 @@ function makeScreen(scaleFactor = 1) {
   };
 }
 
+// Rounded-corner geometry is still reachable through theme-requested radii.
+const THEME_RADIUS = 12;
+
 test("default window radius matches the global medium radius token", () => {
   const tokens = readFileSync(new URL("../src/styles/tokens.css", import.meta.url), "utf8");
   const match = tokens.match(/^\s*--radius-md:\s*(\d+(?:\.\d+)?)px;/m);
@@ -58,7 +61,7 @@ test("default window radius matches the global medium radius token", () => {
 });
 
 test("native hit region includes antialiased edge coverage for supported radii", () => {
-  const defaultRegion = roundedWindowHitRegion(100, 80, DEFAULT_WINDOW_CORNER_RADIUS);
+  const defaultRegion = roundedWindowHitRegion(100, 80, THEME_RADIUS);
   assert.deepEqual(defaultRegion[0], { x: 7, y: 0, width: 86, height: 1 });
   assert.deepEqual(defaultRegion[1], { x: 7, y: 79, width: 86, height: 1 });
   assert.deepEqual(defaultRegion.at(-1), { x: 0, y: 12, width: 100, height: 56 });
@@ -75,7 +78,7 @@ test("native hit region uses the actual content-view size", () => {
   const fixture = makeWindow();
   fixture.contentView.getBounds = () => ({ x: 0, y: 0, width: 96, height: 76 });
 
-  installWindowShape(fixture.window, DEFAULT_WINDOW_CORNER_RADIUS);
+  installWindowShape(fixture.window, THEME_RADIUS);
 
   assert.deepEqual(fixture.lastShape[0], { x: 7, y: 0, width: 82, height: 1 });
   assert.deepEqual(fixture.lastShape.at(-1), { x: 0, y: 12, width: 96, height: 52 });
@@ -91,7 +94,7 @@ test("visible radius and native hit region follow size, DPI, and window state", 
     originalSetShape(rects);
   };
 
-  const shape = installWindowShape(fixture.window, DEFAULT_WINDOW_CORNER_RADIUS, screen.screen);
+  const shape = installWindowShape(fixture.window, THEME_RADIUS, screen.screen);
   assert.equal(fixture.borderRadius, 12);
   assert.deepEqual(fixture.lastShape[0], { x: 7, y: 0, width: 86, height: 1 });
 
@@ -148,7 +151,7 @@ test("native region and rounded clip are re-applied after show or restore", () =
   fixture.window.setShape = () => { setShapeCalls += 1; };
   fixture.contentView.setBorderRadius = () => { setBorderRadiusCalls += 1; };
 
-  installWindowShape(fixture.window, DEFAULT_WINDOW_CORNER_RADIUS, screen.screen);
+  installWindowShape(fixture.window, THEME_RADIUS, screen.screen);
   assert.equal(setShapeCalls, 1);
   assert.equal(setBorderRadiusCalls, 1);
 

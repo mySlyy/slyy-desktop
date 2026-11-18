@@ -16,15 +16,8 @@ import {
 } from "../src/features/plugins/install-progress.ts";
 import { de } from "../../../packages/i18n/dist/locales/de/index.js";
 import { en } from "../../../packages/i18n/dist/locales/en/index.js";
-import { es } from "../../../packages/i18n/dist/locales/es/index.js";
-import { fr } from "../../../packages/i18n/dist/locales/fr/index.js";
-import { ko } from "../../../packages/i18n/dist/locales/ko/index.js";
-import { ptBR } from "../../../packages/i18n/dist/locales/pt-BR/index.js";
-import { tr } from "../../../packages/i18n/dist/locales/tr/index.js";
-import { zhCN } from "../../../packages/i18n/dist/locales/zh-CN/index.js";
-import { zhTW } from "../../../packages/i18n/dist/locales/zh-TW/index.js";
 
-const catalogs = { en, "zh-CN": zhCN, "zh-TW": zhTW, de, es, fr, ko, "pt-BR": ptBR, tr };
+const catalogs = { en, de };
 
 const here = dirname(fileURLToPath(import.meta.url));
 const dialogSrc = readFileSync(

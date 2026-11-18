@@ -3,12 +3,13 @@ import assert from "node:assert/strict";
 import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 import { loadStyles } from "./helpers/styles.mjs";
+import { readLocaleSource } from "./helpers/locale-source.mjs";
 
 const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
 
 const [
   english,
-  chinese,
+  german,
   brandLogo,
   icons,
   sidebar,
@@ -20,7 +21,7 @@ const [
   rendererLanguage,
 ] = await Promise.all([
     read("../../../packages/i18n/src/locales/en/index.ts"),
-    read("../../../packages/i18n/src/locales/zh-CN/index.ts"),
+    readLocaleSource("de"),
     read("../src/components/BrandLogo.tsx"),
     read("../src/components/icons.tsx"),
     read("../src/components/Sidebar.tsx"),
@@ -32,45 +33,47 @@ const [
     read("../src/lib/renderer-language.ts"),
   ]);
 
-test("renderer surfaces the PI-Desktop brand instead of the Codex shell brand", () => {
-  assert.match(english, /shellName:\s*"PI-Desktop"/);
-  assert.match(chinese, /shellName:\s*"PI-Desktop"/);
-  assert.match(english, /placeholder:\s*"Ask PI-Desktop to help with anything"/);
-  assert.match(chinese, /placeholder:\s*"让 PI-Desktop 帮你做任何事"/);
+test("renderer surfaces the Slyy brand instead of the Codex shell brand", () => {
+  assert.match(english, /shellName:\s*"Slyy"/);
+  assert.match(german, /shellName:\s*"Slyy"/);
+  assert.match(english, /placeholder:\s*"Ask Slyy to help with anything"/);
+  assert.match(german, /placeholder:\s*"Bitten Sie Slyy um Hilfe bei allem"/);
   assert.doesNotMatch(english, /shellName:\s*"Codex"/);
-  assert.doesNotMatch(chinese, /shellName:\s*"Codex"/);
+  assert.doesNotMatch(german, /shellName:\s*"Codex"/);
   // Codex remains a supported external import source, not the app identity.
   assert.match(english, /importSourceCodex:\s*"Codex"/);
-  assert.match(chinese, /importSourceCodex:\s*"Codex"/);
+  assert.match(german, /importSourceCodex:\s*"Codex"/);
 });
 
 test("app chrome uses the shared brand asset without branding the composer input", async () => {
   // Renderer-sized brand marks, not the 1024px electron-builder installer icons.
-  assert.match(brandLogo, /import brandLogoUrlLight from\s*"\.\.\/assets\/brand\/logo-light\.png"/);
-  assert.match(brandLogo, /import brandLogoUrlDark from\s*"\.\.\/assets\/brand\/logo-dark\.png"/);
+  assert.match(brandLogo, /import slyyMarkUrl from\s*"\.\.\/assets\/brand\/slyy-mark\.svg"/);
   assert.doesNotMatch(brandLogo, /\.\.\/\.\.\/build\//);
   assert.match(brandLogo, /export function BrandLogo/);
-  assert.match(brandLogo, /src=\{.*brandLogoUrl/);
+  assert.match(brandLogo, /src=\{slyyMarkUrl\}/);
   assert.match(icons, /export const IconNewSession/);
   assert.doesNotMatch(icons, /IconCodexHome|IconCompose|IconPiMark|IconPiHome/);
-  await access(new URL("../src/assets/home-mascot-dark.gif", import.meta.url));
-  await access(new URL("../src/assets/home-mascot-light.gif", import.meta.url));
-  await access(new URL("../src/assets/home-mascot-still-dark.png", import.meta.url));
-  await access(new URL("../src/assets/home-mascot-still-light.png", import.meta.url));
-  await assert.rejects(
-    () => access(new URL("../src/assets/home-mascot-groups.png", import.meta.url)),
-  );
+  await access(new URL("../src/assets/brand/slyy-mark.svg", import.meta.url));
+  for (const retired of [
+    "home-mascot-groups.png",
+    "home-mascot-dark.gif",
+    "home-mascot-light.gif",
+    "home-mascot-still-dark.png",
+    "home-mascot-still-light.png",
+    "brand/logo-dark.png",
+    "brand/logo-light.png",
+  ]) {
+    await assert.rejects(
+      () => access(new URL(`../src/assets/${retired}`, import.meta.url)),
+      `${retired} must stay deleted`,
+    );
+  }
   assert.match(chatSurface, /<HomeMascotLogo \/>/);
-  assert.match(mascotLogo, /import mascotMotionDarkUrl from\s*"\.\.\/assets\/home-mascot-dark\.gif"/);
-  assert.match(mascotLogo, /import mascotMotionLightUrl from\s*"\.\.\/assets\/home-mascot-light\.gif"/);
-  assert.match(mascotLogo, /import mascotStillDarkUrl from\s*"\.\.\/assets\/home-mascot-still-dark\.png"/);
-  assert.match(mascotLogo, /import mascotStillLightUrl from\s*"\.\.\/assets\/home-mascot-still-light\.png"/);
+  assert.match(mascotLogo, /import slyyMarkUrl from\s*"\.\.\/assets\/brand\/slyy-mark\.svg"/);
   assert.match(mascotLogo, /className="home-mascot-logo"/);
   assert.match(mascotLogo, /aria-hidden="true"/);
-  assert.match(mascotLogo, /className="home-mascot-motion home-mascot-dark"/);
-  assert.match(mascotLogo, /className="home-mascot-motion home-mascot-light"/);
-  assert.match(mascotLogo, /className="home-mascot-still home-mascot-dark"/);
-  assert.match(mascotLogo, /className="home-mascot-still home-mascot-light"/);
+  assert.match(mascotLogo, /<img src=\{slyyMarkUrl\} alt=""/);
+  assert.doesNotMatch(mascotLogo, /home-mascot-motion|home-mascot-still/);
   assert.doesNotMatch(mascotLogo, /<svg/);
   assert.doesNotMatch(
     mascotLogo,
@@ -82,18 +85,8 @@ test("app chrome uses the shared brand asset without branding the composer input
     styles,
     /\.home-mascot-logo\s*\{[\s\S]*?display:\s*block;[\s\S]*?width:\s*100px;[\s\S]*?height:\s*100px;/,
   );
-  assert.match(
-    styles,
-    /:root:not\(\[data-theme="light"\]\) \.home-mascot-logo \.home-mascot-motion\.home-mascot-dark/,
-  );
-  assert.match(
-    styles,
-    /:root\[data-theme="light"\] \.home-mascot-logo \.home-mascot-motion\.home-mascot-light/,
-  );
-  assert.match(
-    styles,
-    /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.home-mascot-still\.home-mascot-dark,[\s\S]*?\.home-mascot-still\.home-mascot-light[\s\S]*?display:\s*block;/,
-  );
+  assert.match(styles, /\.home-mascot-logo img\s*\{[\s\S]*?display:\s*block;/);
+  assert.doesNotMatch(styles, /\.home-mascot-motion|\.home-mascot-still/);
   assert.match(
     rendererLanguage,
     /if \(request === languageRequest\)\s*document\.documentElement\.lang = target/,

@@ -14,19 +14,20 @@ const notarizeScript = new URL(
   import.meta.url,
 );
 
-const SIGNING_IDENTITY = "Developer ID Application: XingYu Liu (DUV63RKYTW)";
-const SIGNING_IDENTITY_NAME = "XingYu Liu (DUV63RKYTW)";
+const SIGNING_IDENTITY = "Developer ID Application: Example Corp (TEAMID1234)";
+const SIGNING_IDENTITY_NAME = "Example Corp (TEAMID1234)";
 const SUBMISSION_ID = "11111111-2222-3333-4444-555555555555";
 const NOTARY_ENV = {
   APPLE_ID: "release@example.com",
   APPLE_APP_SPECIFIC_PASSWORD: "app-specific-password",
-  APPLE_TEAM_ID: "DUV63RKYTW",
+  APPLE_TEAM_ID: "TEAMID1234",
+  SLYY_APPLE_TEAM_ID: "TEAMID1234",
 };
 
 async function writeSignedAppFixture(release) {
-  const app = join(release, "mac-arm64", "PI-Desktop.app");
+  const app = join(release, "mac-arm64", "Slyy Gen2.app");
   const hostCore = join(app, "Contents", "Resources", "bin", "pi-desktop-host-core");
-  const dmg = join(release, "PI-Desktop-0.14.2-arm64.dmg");
+  const dmg = join(release, "Slyy-0.14.2-arm64.dmg");
   await mkdir(join(app, "Contents", "Resources", "bin"), { recursive: true });
   await writeFile(hostCore, "fixture");
   await writeFile(dmg, "fixture");
@@ -34,7 +35,7 @@ async function writeSignedAppFixture(release) {
 }
 
 async function writeDmgFixture(release) {
-  const dmg = join(release, "PI-Desktop-0.15.1-beta.3-arm64.dmg");
+  const dmg = join(release, "Slyy-0.15.1-beta.3-arm64.dmg");
   await mkdir(release, { recursive: true });
   await writeFile(dmg, "fixture");
   return dmg;
@@ -266,7 +267,16 @@ test("the notarization step fails closed without team-scoped credentials", async
     APPLE_TEAM_ID: "WRONGTEAMID",
   });
   assert.equal(wrongTeam.status, 1);
-  assert.match(wrongTeam.stderr, /APPLE_TEAM_ID must be DUV63RKYTW/);
+  assert.match(wrongTeam.stderr, /APPLE_TEAM_ID must be TEAMID1234/);
+
+  const noPinnedTeam = { ...process.env, ...NOTARY_ENV, NOTARY_LOG: log };
+  delete noPinnedTeam.SLYY_APPLE_TEAM_ID;
+  const noPinnedTeamResult = spawnSync("bash", [notarizeScript.pathname, release], {
+    encoding: "utf8",
+    env: noPinnedTeam,
+  });
+  assert.notEqual(noPinnedTeamResult.status, 0);
+  assert.match(noPinnedTeamResult.stderr, /SLYY_APPLE_TEAM_ID/);
 
   assert.equal(
     await readFile(log, "utf8").catch(() => ""),
@@ -316,7 +326,7 @@ test("macOS release verification requires a notarized Developer ID app and DMG",
 
   assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
   assert.match(result.stdout, /Notarized Developer ID/);
-  assert.match(result.stdout, /PI-Desktop-0\.14\.2-arm64\.dmg/);
+  assert.match(result.stdout, /Slyy-0\.14\.2-arm64\.dmg/);
   assert.match(result.stdout, /host-core sidecar/);
   assert.equal(
     await readFile(staplerLog, "utf8"),
@@ -347,7 +357,11 @@ test("macOS release verification rejects a Developer ID app without notarization
 
   const result = spawnSync("bash", [verifyScript.pathname, release], {
     encoding: "utf8",
-    env: { ...process.env, PATH: `${bin}:${process.env.PATH}` },
+    env: {
+      ...process.env,
+      MAC_SIGNING_IDENTITY: SIGNING_IDENTITY_NAME,
+      PATH: `${bin}:${process.env.PATH}`,
+    },
   });
 
   assert.equal(result.status, 1);

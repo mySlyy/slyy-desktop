@@ -1,18 +1,19 @@
 import { readAppSource } from "./helpers/source-contracts.mjs";
 import assert from "node:assert/strict";
+import { readLocaleSource } from "./helpers/locale-source.mjs";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { loadStyles } from "./helpers/styles.mjs";
 
 const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
 
-const [app, main, splash, css, english, chinese] = await Promise.all([
+const [app, main, splash, css, english, german] = await Promise.all([
   readAppSource(),
   read("../src/main.tsx"),
   read("../src/components/StartupSplash.tsx"),
   loadStyles(),
   read("../../../packages/i18n/src/locales/en/index.ts"),
-  read("../../../packages/i18n/src/locales/zh-CN/index.ts"),
+  readLocaleSource("de"),
 ]);
 
 test("boot path renders a branded startup splash instead of plain status text", () => {
@@ -50,17 +51,17 @@ test("startup splash motion respects reduced-motion and uses design tokens", () 
   );
 });
 
-test("crash and empty-home title copy is catalog-backed in English and Chinese", () => {
+test("crash and empty-home title copy is catalog-backed in English and German", () => {
   assert.match(english, /uiCrashed:\s*"Something went wrong with the interface"/);
-  assert.match(chinese, /uiCrashed:\s*"界面出现了问题"/);
+  assert.match(german, /uiCrashed:\s*"Mit der Schnittstelle ist ein Fehler aufgetreten"/);
   assert.match(app, /i18n\.t\("app\.uiCrashed"\)/);
   assert.match(main, /i18n\.t\("app\.uiCrashed"/);
-  assert.doesNotMatch(main, /PI-Desktop failed to start UI/);
-  assert.match(chinese, /emptyTitle:\s*"今天想做点什么？"/);
+  assert.doesNotMatch(main, /(?:PI-Desktop|Slyy) failed to start UI/);
+  assert.match(german, /emptyTitle:\s*"Was kann ich Ihnen beim Aufbau helfen\?"/);
   assert.match(english, /emptyTitleTemporary:\s*"What would you like to explore temporarily\?"/);
-  assert.match(chinese, /emptyTitleTemporary:\s*"临时聊点什么？"/);
+  assert.match(german, /emptyTitleTemporary:\s*"Was würden Sie gerne vorübergehend erkunden\?"/);
   assert.match(
-    chinese,
-    /emptyTitleInProject:\s*"今天想在 \{\{project\}\} 里做点什么？"/,
+    german,
+    /emptyTitleInProject:\s*"Was können wir in \{\{project\}\} bauen\?"/,
   );
 });

@@ -11,18 +11,20 @@ const uiKit = await readFile(
   "utf8",
 );
 
-test("fixed radii follow the Apple-inspired desktop ladder", () => {
+test("fixed radii follow the square Slyy ladder", () => {
+  // Slyy corners are square: every level of the ladder resolves to 0, while
+  // the level names stay so a contributed theme can round them again.
   const expected = [
-    ["3xs", 4],
-    ["2xs", 6],
-    ["xs", 8],
-    ["sm", 10],
-    ["md", 12],
-    ["md-plus", 14],
-    ["lg", 16],
-    ["lg-plus", 18],
-    ["xl", 20],
-    ["2xl", 24],
+    ["3xs", 0],
+    ["2xs", 0],
+    ["xs", 0],
+    ["sm", 0],
+    ["md", 0],
+    ["md-plus", 0],
+    ["lg", 0],
+    ["lg-plus", 0],
+    ["xl", 0],
+    ["2xl", 0],
   ];
 
   for (const [name, value] of expected) {

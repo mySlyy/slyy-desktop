@@ -7,11 +7,12 @@ import {
   readComposerSource,
 } from "./helpers/source-contracts.mjs";
 import assert from "node:assert/strict";
+import { readLocaleSource } from "./helpers/locale-source.mjs";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
-const [apiSource, appSource, composerSource, settingsSource, commandsSource, storeSource, surfaceSource, transcriptSource, barSource, topbarSource, componentSpec, englishSource, chineseSource, planStateSource, composerCss] =
+const [apiSource, appSource, composerSource, settingsSource, commandsSource, storeSource, surfaceSource, transcriptSource, barSource, topbarSource, componentSpec, englishSource, germanSource, planStateSource, composerCss] =
   await Promise.all([
     read("../src/lib/api.ts"),
     readAppSource(),
@@ -25,7 +26,7 @@ const [apiSource, appSource, composerSource, settingsSource, commandsSource, sto
     read("../src/components/ConversationTopbar.tsx"),
     read("../../../docs/spec/04-ux/08-component-spec.md"),
     read("../../../packages/i18n/src/locales/en/index.ts"),
-    read("../../../packages/i18n/src/locales/zh-CN/index.ts"),
+    readLocaleSource("de"),
     read("../src/lib/plan-mode-state.ts"),
     read("../src/styles/composer.css"),
   ]);
@@ -262,19 +263,19 @@ test("composer configuration is retained on the draft when no session is active"
 
 test("Plan approval labels and remembered modes are locale-backed", () => {
   assert.match(englishSource, /modePlan: "Plan"/);
-  assert.match(chineseSource, /modePlan: "规划"/);
+  assert.match(germanSource, /modePlan: "[^"]+"/);
   assert.match(englishSource, /modeGoal: "Goal"/);
-  assert.match(chineseSource, /modeGoal: "目标"/);
+  assert.match(germanSource, /modeGoal: "[^"]+"/);
   assert.match(englishSource, /approvalRegion: "Plan approval"/);
-  assert.match(chineseSource, /approvalRegion: "规划审批"/);
+  assert.match(germanSource, /approvalRegion: "[^"]+"/);
   assert.match(englishSource, /approvalRegion: "Goal approval"/);
-  assert.match(chineseSource, /approvalRegion: "目标审批"/);
+  assert.match(germanSource, /approvalRegion: "[^"]+"/);
   assert.match(englishSource, /approveAuto: "Approve \(Auto\)"/);
-  assert.match(chineseSource, /approveAuto: "批准（全自动）"/);
+  assert.match(germanSource, /approveAuto: "[^"]+"/);
   assert.doesNotMatch(englishSource, /expiresAt:/);
-  assert.doesNotMatch(chineseSource, /expiresAt:/);
+  assert.doesNotMatch(germanSource, /expiresAt:/);
   assert.match(englishSource, /autoWarning: "Auto runs Bash without asking and may change files\."/);
-  assert.match(chineseSource, /autoWarning: "自动模式会直接运行 Bash，且可能修改文件。"/);
+  assert.match(germanSource, /autoWarning: "[^"]+"/);
   assert.doesNotMatch(englishSource, new RegExp(legacyModeKey));
-  assert.doesNotMatch(chineseSource, new RegExp(legacyModeKey));
+  assert.doesNotMatch(germanSource, new RegExp(legacyModeKey));
 });

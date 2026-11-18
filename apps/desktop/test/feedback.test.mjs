@@ -1,4 +1,5 @@
 import { readSettingsSource, readMainSource } from "./helpers/source-contracts.mjs";
+import { readLocaleSource } from "./helpers/locale-source.mjs";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
@@ -15,7 +16,7 @@ const [
   settingsSource,
   settingsSearchSource,
   enSource,
-  zhSource,
+  deSource,
 ] = await Promise.all([
   read("../../../.github/ISSUE_TEMPLATE/bug_report.yml"),
   read("../../../.github/ISSUE_TEMPLATE/feature_request.yml"),
@@ -26,7 +27,7 @@ const [
   readSettingsSource(),
   read("../src/lib/settings-search.ts"),
   read("../../../packages/i18n/src/locales/en/index.ts"),
-  read("../../../packages/i18n/src/locales/zh-CN/index.ts"),
+  readLocaleSource("de"),
 ]);
 
 function requiredField(source, id) {
@@ -73,7 +74,7 @@ test("Settings Info exposes a Main-owned GitHub feedback action", () => {
   assert.match(settingsSource, /t\("settings\.feedback"\)/);
   assert.match(settingsSource, /api\.openFeedback\(\)/);
   assert.match(settingsSearchSource, /"settings\.feedback"/);
-  for (const source of [enSource, zhSource]) {
+  for (const source of [enSource, deSource]) {
     assert.match(source, /feedback:/);
     assert.match(source, /feedbackDesc:/);
     assert.match(source, /openFeedback:/);

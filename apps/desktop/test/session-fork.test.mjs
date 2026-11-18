@@ -4,6 +4,7 @@ import {
   readMainSourceSync,
 } from "./helpers/source-contracts.mjs";
 import assert from "node:assert/strict";
+import { unquoteCatalogKeys } from "./helpers/locale-source.mjs";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
@@ -57,12 +58,12 @@ test("assistant response fork reuses isolated session snapshots", () => {
 
 test("session fork labels are localized", () => {
   const english = read("../../../packages/i18n/src/locales/en/index.ts");
-  const chinese = read("../../../packages/i18n/src/locales/zh-CN/index.ts");
+  const german = unquoteCatalogKeys(read("../../../packages/i18n/src/locales/de/index.ts"));
 
   assert.match(english, /createBranch:\s*"Branch from here"/);
   assert.match(english, /branchTitle:\s*"\{\{title\}\} \(branch\)"/);
-  assert.match(chinese, /createBranch:\s*"从此处分支"/);
-  assert.match(chinese, /branchTitle:\s*"\{\{title\}\}（分支）"/);
+  assert.match(german, /createBranch:\s*"Verzweigung von hier aus"/);
+  assert.match(german, /branchTitle:\s*"\{\{title\}\} \(Verzweigung\)"/);
 });
 
 test("a fork is recorded even when a newer navigation took over (D-fork-msg-loss)", async () => {

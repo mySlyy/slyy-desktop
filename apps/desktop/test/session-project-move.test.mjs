@@ -1,5 +1,6 @@
 import { readStoreSourceSync, readComposerSourceSync, readMainSourceSync } from "./helpers/source-contracts.mjs";
 import assert from "node:assert/strict";
+import { unquoteCatalogKeys } from "./helpers/locale-source.mjs";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
@@ -139,10 +140,9 @@ test("a composer folder drop asks for an explicit project decision", () => {
 
 test("new drag/drop copy ships in the reviewed locales", () => {
   const en = read("../../../packages/i18n/src/locales/en/index.ts");
-  const zhCN = read("../../../packages/i18n/src/locales/zh-CN/index.ts");
-  const zhTW = read("../../../packages/i18n/src/locales/zh-TW/index.ts");
+  const de = unquoteCatalogKeys(read("../../../packages/i18n/src/locales/de/index.ts"));
 
-  for (const source of [en, zhCN, zhTW]) {
+  for (const source of [en, de]) {
     for (const key of [
       "sessionMoved",
       "moveRunningSessionBlocked",

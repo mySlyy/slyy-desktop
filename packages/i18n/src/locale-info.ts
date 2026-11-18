@@ -8,14 +8,7 @@ export const defaultLocale = "en";
  */
 export const supportedLocales = [
   { id: "en", nativeName: "English", englishName: "English" },
-  { id: "zh-CN", nativeName: "简体中文", englishName: "Chinese (Simplified)" },
-  { id: "zh-TW", nativeName: "繁體中文", englishName: "Chinese (Traditional)" },
   { id: "de", nativeName: "Deutsch", englishName: "German" },
-  { id: "es", nativeName: "Español", englishName: "Spanish" },
-  { id: "tr", nativeName: "Türkçe", englishName: "Turkish" },
-  { id: "fr", nativeName: "Français", englishName: "French" },
-  { id: "ko", nativeName: "한국어", englishName: "Korean" },
-  { id: "pt-BR", nativeName: "Português (Brasil)", englishName: "Portuguese (Brazil)" },
 ] as const;
 
 export type AppLocale = (typeof supportedLocales)[number]["id"];
@@ -50,30 +43,12 @@ export function resolveLocale(input?: string | null): AppLocale {
   const raw = (input || "").trim();
   if (!raw) return "en";
   const lower = raw.replaceAll("_", "-").toLowerCase();
-  if (
-    lower === "zh-tw" ||
-    lower.startsWith("zh-tw-") ||
-    lower === "zh-hant" ||
-    lower.startsWith("zh-hant-") ||
-    lower === "zh-hk" ||
-    lower.startsWith("zh-hk-") ||
-    lower === "zh-mo" ||
-    lower.startsWith("zh-mo-")
-  ) {
-    return "zh-TW";
-  }
-  if (lower === "zh" || lower.startsWith("zh-")) return "zh-CN";
-  if (lower === "tr" || lower.startsWith("tr-")) return "tr";
   if (lower === "de" || lower.startsWith("de-")) return "de";
-  if (lower === "es" || lower.startsWith("es-")) return "es";
-  if (lower === "fr" || lower.startsWith("fr-")) return "fr";
-  if (lower === "ko" || lower.startsWith("ko-")) return "ko";
-  if (lower === "pt" || lower.startsWith("pt-")) return "pt-BR";
   const exact = supportedLocales.find((locale) => locale.id.toLowerCase() === lower);
   if (exact) return exact.id;
   const prefix = supportedLocales.find(
     (locale) =>
-      locale.id !== "zh-CN" && lower.startsWith(`${locale.id.toLowerCase()}-`),
+      lower.startsWith(`${locale.id.toLowerCase()}-`),
   );
   if (prefix) return prefix.id;
   return "en";

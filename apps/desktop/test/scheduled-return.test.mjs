@@ -133,9 +133,9 @@ test("the topbar offers the way back only for a scheduled run's conversation", a
       "another conversation's task is never offered here",
     );
 
-    const localized = await renderTopbar(server, automation, "zh-CN");
-    assert.match(localized, /<span class="ct-back-label">定时任务<\/span>/);
-    assert.match(localized, /aria-label="返回定时任务"/);
+    const localized = await renderTopbar(server, automation, "de");
+    assert.match(localized, /<span class="ct-back-label">Geplant<\/span>/);
+    assert.match(localized, /aria-label="Zurück zu den geplanten Aufgaben"/);
 
     const ordinary = await renderTopbar(server, { id: "session-plain", title: "Plain task" });
     assert.doesNotMatch(ordinary, /ct-back|back-to-scheduled/);

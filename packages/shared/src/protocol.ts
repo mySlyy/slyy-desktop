@@ -1,7 +1,14 @@
 export const PROTOCOL_VERSION = 11 as const;
 export const SCHEMA_VERSION = 16 as const;
-export const APP_ID = "net.aiuo.pi-desktop";
-export const APP_NAME = "PI-Desktop";
+export const APP_ID = "ai.slyy.desktop.gen2";
+/** User-visible product name. */
+export const APP_NAME = "Slyy";
+/**
+ * Frozen installation identity (Electron `app.setName`): names the userData
+ * folder and the safeStorage keychain entry. "Gen2" keeps it apart from the
+ * earlier Slyy Desktop app. Never change it after release.
+ */
+export const APP_INSTALLATION_NAME = "Slyy Gen2";
 export const APP_VERSION = "0.23.0-beta.2";
 
 export const APP_MENU_COMMANDS = [

@@ -22,7 +22,7 @@ const { usageCostText } = await import(
 const i18n = createInstance();
 await i18n.init({
   lng: "en",
-  resources: { en: { translation: catalogs.en }, "zh-CN": { translation: catalogs["zh-CN"] } },
+  resources: { en: { translation: catalogs.en }, de: { translation: catalogs.de } },
   interpolation: { escapeValue: false },
 });
 const t = i18n.t.bind(i18n);
@@ -91,8 +91,8 @@ test("subscription usage is named, with its API-price equivalent as context", ()
   const text = usageCostText(view(op("a", "claude-max", "estimated", 1.5)), t, "en");
   assert.equal(text.text, "Subscription");
   assert.match(text.help, /About \$1\.50 at API prices/);
-  const zh = usageCostText(view(op("a", "claude-max", "estimated", 1.5)), i18n.getFixedT("zh-CN"), "zh-CN");
-  assert.equal(zh.text, "订阅");
+  const de = usageCostText(view(op("a", "claude-max", "estimated", 1.5)), i18n.getFixedT("de"), "de");
+  assert.equal(de.text, "Abo");
 });
 
 test("mixed pay-as-you-go and subscription usage bills only the former", () => {

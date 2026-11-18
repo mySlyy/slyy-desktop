@@ -44,19 +44,19 @@ test("Windows runtime registers the canonical native application identity", () =
   const appId = protocolSource.match(/APP_ID = "([^"]+)"/)?.[1];
   assert.equal(appId, packageJson.build.appId);
   assert.ok(startupSource.includes("app.whenReady()"), "main process readiness hook");
-  assert.match(installationSource, /app\.setName\(APP_NAME\)/);
+  assert.match(installationSource, /app\.setName\(APP_INSTALLATION_NAME\)/);
   assert.match(
     installationSource,
     /process\.platform === "win32"[\s\S]*app\.setAppUserModelId\(APP_ID\)/,
   );
 });
 
-test("Windows packages pin PI-Desktop executable and shortcut names", () => {
-  assert.equal(packageJson.build.win.executableName, "PI-Desktop");
-  assert.equal(packageJson.build.nsis.shortcutName, "PI-Desktop");
+test("Windows packages pin Slyy executable and shortcut names", () => {
+  assert.equal(packageJson.build.win.executableName, "Slyy Gen2");
+  assert.equal(packageJson.build.nsis.shortcutName, "Slyy");
 });
 
-test("Windows packages and windows use the canonical PI-Desktop icon", () => {
+test("Windows packages and windows use the canonical Slyy icon", () => {
   assert.equal(packageJson.build.win.icon, "build/icon.ico");
   assert.deepEqual(
     packageJson.build.win.extraResources.find((resource) => resource.to === "app-icon.ico"),
@@ -76,11 +76,11 @@ test("Windows packages and windows use the canonical PI-Desktop icon", () => {
 });
 
 test("Linux packages align the desktop entry with the Wayland app identity", () => {
-  assert.equal(packageJson.desktopName, "pi-desktop.desktop");
+  assert.equal(packageJson.desktopName, "slyy-gen2.desktop");
   assert.equal(packageJson.build.linux.syncDesktopName, true);
 });
 
-test("macOS development uses the canonical PI-Desktop Dock icon", () => {
+test("macOS development uses the canonical Slyy Dock icon", () => {
   assert.match(
     brandingSource,
     /process\.platform !== "darwin" \|\| !isDevelopmentBuild \|\| !app\.dock/,
@@ -126,7 +126,7 @@ test("macOS development launches from a branded host bundle", () => {
   assert.match(devScriptSource, /CFBundleName", APP_NAME/);
   assert.match(devScriptSource, /CFBundleExecutable", APP_NAME/);
   assert.match(devScriptSource, /CFBundleIconFile", "icon\.icns"/);
-  assert.match(devScriptSource, /BRANDING_SCHEMA = "v4"/);
+  assert.match(devScriptSource, /BRANDING_SCHEMA = "v5"/);
   assert.match(
     devScriptSource,
     /copyFileSync\(iconPath, join\(resources, "icon\.icns"\)\)/,
@@ -226,8 +226,8 @@ test(
         ),
         "macOS-tray-icon",
       );
-      assert.match(plist, /<string>PI-Desktop<\/string>/);
-      assert.match(plist, /<string>net\.aiuo\.pi-desktop\.dev<\/string>/);
+      assert.match(plist, /<string>Slyy Gen2<\/string>/);
+      assert.match(plist, /<string>ai\.slyy\.desktop\.gen2\.dev<\/string>/);
       assert.equal(prepareMacDevelopmentBundle(options), brandedExecutable);
 
       await writeFile(trayIconMacPath, "updated-macOS-tray-icon");

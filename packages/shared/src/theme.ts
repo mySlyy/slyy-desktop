@@ -34,7 +34,7 @@ export type BuiltinTheme = {
  */
 const BUILTIN_THEME_BY_ID: Record<ThemeColorScheme, BuiltinTheme> = {
   light: { id: "light", base: "light", windowBackground: "#ffffff" },
-  dark: { id: "dark", base: "dark", windowBackground: "#181818" },
+  dark: { id: "dark", base: "dark", windowBackground: "#141414" },
 };
 
 /** Picker order for the built-in section, ahead of any contributed theme. */

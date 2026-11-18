@@ -10,7 +10,7 @@ import {
 describe("built-in themes", () => {
   it("declares each palette's window background once", () => {
     expect(builtinWindowBackground("light")).toBe("#ffffff");
-    expect(builtinWindowBackground("dark")).toBe("#181818");
+    expect(builtinWindowBackground("dark")).toBe("#141414");
     expect(BUILTIN_THEMES.map((theme) => theme.id)).toEqual(["light", "dark"]);
     for (const theme of BUILTIN_THEMES) {
       expect(theme.base).toBe(theme.id);

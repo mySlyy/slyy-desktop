@@ -1,15 +1,16 @@
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readLocaleSource } from "./helpers/locale-source.mjs";
 import { BUILTIN_SKILL_CATALOG } from "../../../packages/shared/dist/index.js";
 
 const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
 
-const [panel, page, en, zh] = await Promise.all([
+const [panel, page, en, de] = await Promise.all([
   read("../src/components/settings/SkillMarketPanel.tsx"),
   read("../src/components/settings/AgentSkillsPage.tsx"),
   read("../../../packages/i18n/src/locales/en/index.ts"),
-  read("../../../packages/i18n/src/locales/zh-CN/index.ts"),
+  readLocaleSource("de"),
 ]);
 
 test("skill market installs through the existing create path only", () => {
@@ -46,8 +47,8 @@ test("skills page wires the market view with reload on exit", () => {
   assert.match(page, /<SkillMarketPanel/);
 });
 
-test("skill market strings exist in en and zh-CN", () => {
-  for (const locale of [en, zh]) {
+test("skill market strings exist in en and de", () => {
+  for (const locale of [en, de]) {
     assert.match(locale, /sklm: \{/);
     assert.match(locale, /browse: "/);
     assert.match(locale, /installSuccess: "/);
@@ -199,8 +200,7 @@ test("a proxy fake-IP gets its own copy and names the address it came from", () 
 });
 
 test("every shipped locale carries the new skill market strings", async () => {
-  const { readFile } = await import("node:fs/promises");
-  const ids = ["en", "zh-CN", "zh-TW", "de", "es", "fr", "ko", "tr", "pt-BR"];
+  const ids = ["en", "de"];
   const keys = [
     "previewError",
     "previewPolicyError",
@@ -222,10 +222,7 @@ test("every shipped locale carries the new skill market strings", async () => {
     "remoteStaleSnapshot",
   ];
   for (const id of ids) {
-    const locale = await readFile(
-      new URL(`../../../packages/i18n/src/locales/${id}/index.ts`, import.meta.url),
-      "utf8",
-    );
+    const locale = await readLocaleSource(id);
     for (const key of keys) {
       // Both layouts ship in these files: `key: "text"` on one line, and the
       // long strings broken after the colon. Either one carries the key.

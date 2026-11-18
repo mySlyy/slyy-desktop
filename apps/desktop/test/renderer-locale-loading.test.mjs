@@ -10,17 +10,17 @@ const { applyAppLanguage } = await import("../src/lib/renderer-language.ts");
 const { loadRendererCatalog, loadRendererResources } = await import("../src/lib/renderer-catalogs.ts");
 
 test("renderer locale resources load English fallback and the selected catalog", async () => {
-  const resources = await loadRendererResources("zh-CN");
+  const resources = await loadRendererResources("de");
 
   assert.equal(
     resources.en.translation["app.starting"],
     catalogs.en.app.starting,
   );
   assert.equal(
-    resources["zh-CN"].translation["app.starting"],
-    catalogs["zh-CN"].app.starting,
+    resources.de.translation["app.starting"],
+    catalogs.de.app.starting,
   );
-  assert.deepEqual(await loadRendererCatalog("zh-CN"), catalogs["zh-CN"]);
+  assert.deepEqual(await loadRendererCatalog("de"), catalogs.de);
 });
 
 test("changing the renderer language loads its catalog before switching", async (t) => {
@@ -40,9 +40,9 @@ test("changing the renderer language loads its catalog before switching", async 
     interpolation: { escapeValue: false },
   });
 
-  await applyAppLanguage("zh-CN");
+  await applyAppLanguage("de");
 
-  assert.equal(i18n.language, "zh-CN");
-  assert.equal(i18n.t("app.starting"), catalogs["zh-CN"].app.starting);
-  assert.equal(globalThis.document.documentElement.lang, "zh-CN");
+  assert.equal(i18n.language, "de");
+  assert.equal(i18n.t("app.starting"), catalogs.de.app.starting);
+  assert.equal(globalThis.document.documentElement.lang, "de");
 });

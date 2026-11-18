@@ -1,11 +1,12 @@
 import { readStoreSource, readTranscriptSource } from "./helpers/source-contracts.mjs";
+import { readLocaleSource } from "./helpers/locale-source.mjs";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
 
-const [store, transcript, messagesStyles, chatShellStyles, proseStyles, en, zh] =
+const [store, transcript, messagesStyles, chatShellStyles, proseStyles, en, de] =
   await Promise.all([
     readStoreSource(),
     readTranscriptSource(),
@@ -13,7 +14,7 @@ const [store, transcript, messagesStyles, chatShellStyles, proseStyles, en, zh] 
     read("../src/styles/chat-shell.css"),
     read("../src/styles/prose.css"),
     read("../../../packages/i18n/src/locales/en/index.ts"),
-    read("../../../packages/i18n/src/locales/zh-CN/index.ts"),
+    readLocaleSource("de"),
   ]);
 
 test("active turns show immediate and phase-specific feedback without a progress card", () => {
@@ -152,10 +153,10 @@ test("active turns show immediate and phase-specific feedback without a progress
     /progressUnderstanding|progressWorking|progressChecking|progressFinalizing|progressWaiting/,
   );
   assert.doesNotMatch(
-    zh,
+    de,
     /progressUnderstanding|progressWorking|progressChecking|progressFinalizing|progressWaiting/,
   );
-  for (const catalog of [en, zh]) {
+  for (const catalog of [en, de]) {
     assert.match(catalog, /waitingForModel:/);
     assert.match(catalog, /startingTurn:/);
     assert.match(catalog, /preparingNextRequest:/);

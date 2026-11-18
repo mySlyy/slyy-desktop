@@ -24,13 +24,15 @@ export function AboutSettings({
   return (
     <div className="settings-stack">
       <div className="settings-about-hero">
-        <div className="settings-about-hero-name">{version?.name || "PI-Desktop"}</div>
+        <div className="settings-about-hero-name">{version?.name || "Slyy"}</div>
         <div className="settings-about-hero-version">
           {t("settings.aboutVersion", { version: version?.version ?? "" })}
         </div>
         <div className="settings-about-hero-meta">
           protocol {version?.protocolVersion} · host {version?.hostVersion}
         </div>
+        <div className="settings-about-hero-meta">{t("settings.aboutBrand")}</div>
+        <div className="settings-about-hero-meta">{t("settings.aboutLicense")}</div>
       </div>
       <UpdatesRow
         currentVersion={version?.version}

@@ -54,7 +54,7 @@ test("macOS installs a standard application menu before window creation", () => 
   }
   assert.match(menuSource, /role:\s*"help"/);
   assert.match(menuSource, /resolveLocale\(locale\)/);
-  assert.match(mainSource, /app\.setName\(APP_NAME\)/);
+  assert.match(mainSource, /app\.setName\(APP_INSTALLATION_NAME\)/);
   assert.match(mainSource, /locale:\s*app\.getLocale\(\)/);
   assert.match(menuSource, /Menu\.buildFromTemplate\(template\)/);
   assert.match(menuSource, /Menu\.setApplicationMenu/);

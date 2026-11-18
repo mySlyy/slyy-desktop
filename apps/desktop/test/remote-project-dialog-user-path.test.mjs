@@ -189,7 +189,7 @@ test("remote host page opens a preselected remote project and creates a local pr
         plugin.onResolve({ filter: /\?url$/ }, ({ path }) => ({ path, namespace: "url-asset" }));
         plugin.onLoad({ filter: /.*/, namespace: "url-asset" }, () => ({ contents: 'export default "fixture-asset";', loader: "js" }));
       } }],
-      loader: { ".css": "empty", ".png": "dataurl", ".gif": "dataurl" },
+      loader: { ".css": "empty", ".png": "dataurl", ".gif": "dataurl", ".svg": "dataurl" },
       outfile: join(temp, "renderer.js"), bundle: true, platform: "browser", format: "esm", jsx: "automatic",
       define: { "process.env.NODE_ENV": '"production"', "import.meta.env.DEV": "false" },
       alias: {

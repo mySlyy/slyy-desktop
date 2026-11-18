@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { remoteHostErrorKey } from "../src/lib/remote-host-errors.ts";
-import { remoteEn, remoteZh } from "../src/locales/remote.ts";
+import { remoteEn } from "../src/locales/remote.ts";
 
 test("remoteHostErrorKey maps a failed SSH bootstrap to a dedicated message", () => {
   const error = Object.assign(new Error("ssh command failed with exit code 255: Permission denied, please try again."), {
@@ -29,12 +29,9 @@ test("only an explicit unpublished macOS target gets the platform explanation", 
     assert.equal(remoteHostErrorKey({ code: "HOST_BOOTSTRAP_FAILED", details: { target } }), "remote:hostBootstrapFailed");
   }
   assert.match(remoteEn.hostPlatformUnsupported, /Linux/);
-  assert.match(remoteZh.hostPlatformUnsupported, /macOS/);
 });
 
-test("hostBootstrapFailed has an English and Chinese translation distinct from the generic fallback", () => {
+test("hostBootstrapFailed has an English translation distinct from the generic fallback", () => {
   assert.equal(typeof remoteEn.hostBootstrapFailed, "string");
-  assert.equal(typeof remoteZh.hostBootstrapFailed, "string");
   assert.notEqual(remoteEn.hostBootstrapFailed, remoteEn.operationFailed);
-  assert.notEqual(remoteZh.hostBootstrapFailed, remoteZh.operationFailed);
 });

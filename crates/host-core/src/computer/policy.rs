@@ -80,6 +80,8 @@ const SELF_APP_KEYS: &[&str] = &[
     "pi desktop",
     "com.pi-desktop",
     "pi-desktop-host-core",
+    "ai.slyy.desktop.gen2",
+    "slyy",
 ];
 
 /// Why this window cannot be picked, or `None` when it can.

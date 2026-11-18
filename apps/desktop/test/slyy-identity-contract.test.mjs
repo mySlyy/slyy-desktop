@@ -1,0 +1,55 @@
+// Slyy installation identity is frozen from the first release: updates
+// (Squirrel.Mac designated requirement, NSIS GUID/exe), the userData folder,
+// the safeStorage keychain entry and the data directory all key off these
+// values. Changing one silently breaks updates or strands user data, so any
+// change must be deliberate and fail here first.
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import test from "node:test";
+
+const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
+
+const [pkgText, protocol, dataPaths, updateYml, updater, feedback, tokens] = await Promise.all([
+  read("../package.json"),
+  read("../../../packages/shared/src/protocol.ts"),
+  read("../electron/main/data-paths.ts"),
+  read("../resources/app-update.yml"),
+  read("../electron/main/updater.ts"),
+  read("../../../packages/shared/src/github-feedback.ts"),
+  read("../src/styles/tokens.css"),
+]);
+const pkg = JSON.parse(pkgText);
+const build = pkg.build;
+
+test("installation identity stays frozen", () => {
+  assert.equal(build.appId, "ai.slyy.desktop.gen2");
+  assert.equal(build.productName, "Slyy Gen2");
+  assert.equal(build.extraMetadata.name, "slyy-gen2");
+  assert.equal(build.win.executableName, "Slyy Gen2");
+  assert.equal(build.nsis.guid, "72db17f1-8935-5bae-870f-999d4b7621a6");
+  assert.equal(build.linux.executableName, "slyy-gen2");
+  assert.equal(pkg.desktopName, "slyy-gen2.desktop");
+  assert.match(protocol, /APP_ID = "ai\.slyy\.desktop\.gen2"/);
+  assert.match(protocol, /APP_INSTALLATION_NAME = "Slyy Gen2"/);
+  assert.match(protocol, /APP_NAME = "Slyy"/);
+  assert.match(dataPaths, /INSTALLATION_DATA_DIR_NAME = "\.slyy-gen2"/);
+  assert.match(dataPaths, /DEVELOPMENT_DATA_DIR_NAME = "\.slyy-gen2-dev"/);
+});
+
+test("every update channel points at the Slyy release feed", () => {
+  assert.deepEqual(build.publish, [{ provider: "github", owner: "mySlyy", repo: "slyy-desktop" }]);
+  assert.match(updateYml, /^owner: mySlyy$/m);
+  assert.match(updateYml, /^repo: slyy-desktop$/m);
+  assert.match(updateYml, /^updaterCacheDirName: 'slyy-gen2-updater'$/m);
+  assert.match(updater, /https:\/\/github\.com\/mySlyy\/slyy-desktop\/releases\/latest/);
+  assert.match(feedback, /GITHUB_REPO = "mySlyy\/slyy-desktop"/);
+});
+
+test("the shipped app carries the Slyy visual identity", () => {
+  assert.match(tokens, /--ds-accent: #2b3bff;/);
+  assert.match(tokens, /--radius-md: 0px;/);
+  assert.match(tokens, /--font-sans: "Hanken Grotesk Variable"/);
+  assert.match(tokens, /--font-mono: "Martian Mono Variable"/);
+  assert.deepEqual(build.electronLanguages, ["en-US", "de"]);
+  assert.doesNotMatch(pkgText, /PI-Desktop|vastsa|net\.aiuo/);
+});

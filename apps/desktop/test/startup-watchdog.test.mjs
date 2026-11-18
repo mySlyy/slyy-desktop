@@ -7,6 +7,7 @@
  */
 import { readAppSource } from "./helpers/source-contracts.mjs";
 import assert from "node:assert/strict";
+import { readLocaleSource } from "./helpers/locale-source.mjs";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { DEFAULT_RPC_TIMEOUT_MS } from "@pi-desktop/shared";
@@ -30,8 +31,7 @@ const [
   protocol,
   css,
   english,
-  chinese,
-  traditional,
+  german,
 ] = await Promise.all([
   readAppSource(),
   read("../src/features/app/useStartupWatchdog.ts"),
@@ -42,8 +42,7 @@ const [
   read("../../../packages/shared/src/protocol.ts"),
   loadStyles(),
   read("../../../packages/i18n/src/locales/en/index.ts"),
-  read("../../../packages/i18n/src/locales/zh-CN/index.ts"),
-  read("../../../packages/i18n/src/locales/zh-TW/index.ts"),
+  readLocaleSource("de"),
 ]);
 
 /** Deterministic scheduler so the watchdog is tested without a real clock. */
@@ -148,18 +147,18 @@ test("the diagnostics report states what the renderer already knows", () => {
     phase: "stalled",
     elapsedMs: 181_400,
     platform: "darwin",
-    locale: "zh-CN",
+    locale: "de",
     appVersion: "0.15.2",
     error: "host RPC timeout: settings.get",
     downComponent: "host",
     downMessage: "HOST_UNAVAILABLE",
   });
 
-  assert.match(report, /^PI-Desktop startup diagnostics\n/);
+  assert.match(report, /^Slyy startup diagnostics\n/);
   assert.match(report, /phase: stalled/);
   assert.match(report, /waited: 181s/);
   assert.match(report, /platform: darwin/);
-  assert.match(report, /locale: zh-CN/);
+  assert.match(report, /locale: de/);
   assert.match(report, /app version: 0\.15\.2/);
   assert.match(report, /last startup error: host RPC timeout: settings\.get/);
   assert.match(report, /reported down: host \(HOST_UNAVAILABLE\)/);
@@ -296,8 +295,7 @@ test("the recovery surface layers above the splash and below the window controls
 test("the recovery copy is catalog-backed in every mirrored locale", () => {
   for (const [name, catalog] of [
     ["en", english],
-    ["zh-CN", chinese],
-    ["zh-TW", traditional],
+    ["de", german],
   ]) {
     for (const key of [
       "slowTitle",
@@ -312,8 +310,8 @@ test("the recovery copy is catalog-backed in every mirrored locale", () => {
       assert.match(catalog, new RegExp(`${key}:`), `${name} is missing startup.${key}`);
     }
   }
-  assert.match(english, /stalledTitle: "PI-Desktop couldn't finish starting"/);
-  assert.match(chinese, /stalledTitle: "PI-Desktop 未能完成启动"/);
+  assert.match(english, /stalledTitle: "Slyy couldn't finish starting"/);
+  assert.match(german, /stalledTitle: "Slyy konnte den Start nicht abschließen"/);
   // User-facing copy: the local service is never called a host or a backend.
   const startupDomain = english.match(/\n  startup: \{[\s\S]*?\n  \},/)?.[0] ?? "";
   assert.ok(startupDomain.length > 0, "the English startup domain was not found");

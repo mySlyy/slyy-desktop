@@ -15,7 +15,7 @@
  *   3. packages/shared/src/changelog*.ts has an entry for the version under
  *      every shipped locale, newest-first, with matching highlight counts.
  *   4. packages/shared/src/changelog.test.ts pins the version as newest.
- *   5. README.md and README.zh-CN.md declare the current release line
+ *   5. README.md declares the current release line
  *      (`<major>.<minor>.x`) in their status section.
  * For a prerelease preview, pass the stable version being previewed so the
  * changelog/README checks run against that catalog rather than x.y.z-beta.*.
@@ -151,7 +151,7 @@ try {
 if (catalogs) {
   const enEntries = catalogs.en;
   const expectedVersions = enEntries?.map((entry) => entry.version) ?? [];
-  const requiredLocales = ["en", "zh-CN", "zh-TW", "tr", "de", "es", "fr", "ko", "pt-BR"];
+  const requiredLocales = ["en", "de"];
   for (const locale of requiredLocales) {
     if (!catalogs[locale]) {
       fail("packages/shared/src/changelog.ts", `missing shipped locale catalog: ${locale}`);
@@ -201,7 +201,7 @@ if (!read("packages/shared/src/changelog.test.ts").includes(`"${documentVersion}
 }
 
 // 6. READMEs declare the current release line.
-for (const relPath of ["README.md", "README.zh-CN.md"]) {
+for (const relPath of ["README.md"]) {
   if (!read(relPath).includes(releaseLine)) {
     fail(relPath, `status section does not mention the ${releaseLine} release line`);
   }

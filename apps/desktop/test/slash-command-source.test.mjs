@@ -8,6 +8,7 @@
  * acted on it as an instruction. These tests lock the three outcomes apart.
  */
 import assert from "node:assert/strict";
+import { readLocaleSource } from "./helpers/locale-source.mjs";
 import { register } from "node:module";
 import test from "node:test";
 import { readFile } from "node:fs/promises";
@@ -199,12 +200,12 @@ test("the submit path proves the blocked branch precedes the prompt path", async
 });
 
 test("the shipped locales carry the refusal copy", async () => {
-  const [en, zhCN] = await Promise.all([
+  const [en, de] = await Promise.all([
     read("../../../packages/i18n/src/locales/en/index.ts"),
-    read("../../../packages/i18n/src/locales/zh-CN/index.ts"),
+    readLocaleSource("de"),
   ]);
   assert.match(en, /slashCommandSourceUnavailable:\s*"[^"]+"/);
-  assert.match(zhCN, /slashCommandSourceUnavailable:\s*"[^"]+"/);
+  assert.match(de, /slashCommandSourceUnavailable:\s*"[^"]+"/);
 });
 
 test("a remote session's menu leaves out the local-only visualize skill", async () => {

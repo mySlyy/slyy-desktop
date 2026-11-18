@@ -504,45 +504,6 @@ function publishPanelShape(): void {
 
 function chromeLabels(input = panelLocale()): ChromeLabels {
   const locale = input.replaceAll("_", "-").toLowerCase();
-  const traditionalChinese =
-    locale === "zh-tw" ||
-    locale.startsWith("zh-tw-") ||
-    locale === "zh-hant" ||
-    locale.startsWith("zh-hant-") ||
-    locale === "zh-hk" ||
-    locale.startsWith("zh-hk-") ||
-    locale === "zh-mo" ||
-    locale.startsWith("zh-mo-");
-  if (traditionalChinese) {
-    return {
-      toolbar: "外掛面板視窗控制項",
-      minimize: "最小化",
-      maximize: "最大化",
-      restore: "還原",
-      close: "關閉",
-      safeArea: "開發提示 · 頂部 46px 為拖曳區",
-    };
-  }
-  if (locale.startsWith("ko")) {
-    return {
-      toolbar: "플러그인 패널 창 컨트롤",
-      minimize: "최소화",
-      maximize: "최대화",
-      restore: "복원",
-      close: "닫기",
-      safeArea: "개발 안내 · 상단 46px는 드래그 전용",
-    };
-  }
-  if (locale.startsWith("tr")) {
-    return {
-      toolbar: "Eklenti paneli pencere denetimleri",
-      minimize: "Küçült",
-      maximize: "Büyüt",
-      restore: "Geri yükle",
-      close: "Kapat",
-      safeArea: "Geliştirici ipucu · üst 46 piksel yalnızca sürükleme alanıdır",
-    };
-  }
   if (locale.startsWith("de")) {
     return {
       toolbar: "Plugin-Panel-Fenstersteuerung",
@@ -551,46 +512,6 @@ function chromeLabels(input = panelLocale()): ChromeLabels {
       restore: "Wiederherstellen",
       close: "Schließen",
       safeArea: "Entwicklerhinweis · die oberen 46 px dienen nur zum Ziehen",
-    };
-  }
-  if (locale.startsWith("es")) {
-    return {
-      toolbar: "Controles de ventana del panel del complemento",
-      minimize: "Minimizar",
-      maximize: "Maximizar",
-      restore: "Restaurar",
-      close: "Cerrar",
-      safeArea: "Aviso de desarrollo · los 46 px superiores son solo para arrastrar",
-    };
-  }
-  if (locale.startsWith("fr")) {
-    return {
-      toolbar: "Contrôles de fenêtre du panneau du plugin",
-      minimize: "Réduire",
-      maximize: "Agrandir",
-      restore: "Restaurer",
-      close: "Fermer",
-      safeArea: "Indication de développement · les 46 px supérieurs servent uniquement au déplacement",
-    };
-  }
-  if (locale.startsWith("pt")) {
-    return {
-      toolbar: "Controles de janela do painel do plugin",
-      minimize: "Minimizar",
-      maximize: "Maximizar",
-      restore: "Restaurar",
-      close: "Fechar",
-      safeArea: "Dica de desenvolvimento · os 46px superiores são apenas para arrastar",
-    };
-  }
-  if (locale.startsWith("zh")) {
-    return {
-      toolbar: "插件面板窗口控制",
-      minimize: "最小化",
-      maximize: "最大化",
-      restore: "还原",
-      close: "关闭",
-      safeArea: "开发提示 · 顶部 46px 为拖拽区",
     };
   }
   return {

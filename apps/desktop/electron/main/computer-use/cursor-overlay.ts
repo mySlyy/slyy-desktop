@@ -88,7 +88,7 @@ export function createComputerCursorOverlay(input: {
       try {
         const created = new BrowserWindow({
           ...overlayBounds(bounds),
-          title: "PI-Desktop Computer Use",
+          title: "Slyy Computer Use",
           show: false,
           frame: false,
           transparent: true,

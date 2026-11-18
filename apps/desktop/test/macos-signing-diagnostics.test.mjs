@@ -17,7 +17,7 @@ const inventoryScript = fileURLToPath(
   new URL("../../../scripts/macos-bundle-inventory.mjs", import.meta.url),
 );
 
-const SIGNING_IDENTITY_NAME = "XingYu Liu (DUV63RKYTW)";
+const SIGNING_IDENTITY_NAME = "Example Corp (TEAMID1234)";
 const SIGNING_IDENTITY = `Developer ID Application: ${SIGNING_IDENTITY_NAME}`;
 const NO_IDENTITIES = "  0 valid identities found";
 const MATCHING_IDENTITY = `echo '  1) 0123456789ABCDEF "Developer ID Application: ${SIGNING_IDENTITY_NAME}"'
@@ -133,7 +133,12 @@ exit 0`,
 function runDiagnostics(bin, { args = [], env = {} } = {}) {
   return spawnSync("bash", [diagnosticsScript, ...args], {
     encoding: "utf8",
-    env: { ...BASE_ENV, PATH: `${bin}:${process.env.PATH}`, ...env },
+    env: {
+      ...BASE_ENV,
+      MAC_SIGNING_IDENTITY: SIGNING_IDENTITY_NAME,
+      PATH: `${bin}:${process.env.PATH}`,
+      ...env,
+    },
   });
 }
 
@@ -318,7 +323,7 @@ test("diagnostics never echo signing secrets", async (t) => {
       CSC_KEY_PASSWORD: CSC_PASSWORD_SENTINEL,
       APPLE_ID: APPLE_ID_SENTINEL,
       APPLE_APP_SPECIFIC_PASSWORD: APPLE_PASSWORD_SENTINEL,
-      APPLE_TEAM_ID: "DUV63RKYTW",
+      APPLE_TEAM_ID: "TEAMID1234",
     },
   });
 

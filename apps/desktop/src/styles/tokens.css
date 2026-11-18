@@ -7,9 +7,9 @@
 */
 
 /*
-  Visual system aligned to local Codex desktop (ChatGPT.app / electron-dark).
-  Palette sourced from Codex CSS tokens: gray-0..1000, surface #181818.
-  Accent is neutral gray-scale (not blue) so chrome, markdown, and plugins stay monochrome.
+  Slyy visual system (slyy.ai): ink #0a0a0a, paper #f4f4f2, one blue accent
+  (#2b3bff; #7a85ff tint on dark for AA text and dark-ink fills), square corners,
+  Hanken Grotesk + Martian Mono. Chrome stays neutral; blue marks action/selection.
 */
 
 :root,
@@ -17,23 +17,23 @@
   color-scheme: dark;
   --gray-0: #ffffff;
   --gray-50: #f9f9f9;
-  --gray-75: #f3f3f3;
-  --gray-100: #ededed;
-  --gray-300: #afafaf;
-  --gray-500: #5d5d5d;
-  --gray-550: #4f4f4f;
-  --gray-600: #414141;
-  --gray-700: #303030;
-  --gray-750: #282828;
-  --gray-800: #212121;
-  --gray-900: #181818;
-  --gray-1000: #0d0d0d;
-  /* Neutral accent ramp (replaces legacy blue-* accent). */
-  --accent-50: #f3f3f3;
-  --accent-100: #ededed;
-  --accent-300: #afafaf;
-  --accent-400: #ffffff;
-  --accent-900: #303030;
+  --gray-75: #f4f4f2;
+  --gray-100: #e2e2e2;
+  --gray-300: #a3a3a3;
+  --gray-500: #5c5c5c;
+  --gray-550: #4a4a4a;
+  --gray-600: #3d3d3d;
+  --gray-700: #2e2e2e;
+  --gray-750: #242424;
+  --gray-800: #1c1c1c;
+  --gray-900: #141414;
+  --gray-1000: #0a0a0a;
+  /* Slyy blue accent ramp. */
+  --accent-50: #eef0ff;
+  --accent-100: #dde0ff;
+  --accent-300: #9aa2ff;
+  --accent-400: #7a85ff;
+  --accent-900: #1f2ed0;
 
   --ds-bg-primary: var(--gray-900);
   --ds-settings-rail-bg: var(--ds-bg-under);
@@ -100,13 +100,13 @@
   --ds-tile-deep: color-mix(in oklab, var(--gray-0) 8%, transparent);
   --ds-raised: var(--gray-750);
   --ds-raised-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
-  --ds-accent: var(--gray-0);
-  --ds-accent-hover: var(--gray-100);
+  --ds-accent: var(--accent-400);
+  --ds-accent-hover: var(--accent-300);
   --ds-accent-soft: var(--gray-300);
-  /* Focus rings / resize affordances. Tied to the accent so themes stay monochrome. */
+  /* Focus rings / resize affordances follow the accent. */
   --ds-focus: var(--ds-accent);
   /* Settings fields and shared inset searches keep their built-in tones. */
-  --ds-settings-field-bg: #212121;
+  --ds-settings-field-bg: var(--gray-800);
   --ds-settings-nav-active: color-mix(in oklab, var(--gray-0) 10%, transparent);
   --ds-field-inset-bg: color-mix(in oklab, var(--ds-text-primary) 5%, transparent);
   --ds-field-inset-focus-bg: color-mix(in oklab, var(--ds-text-primary) 7%, transparent);
@@ -226,78 +226,78 @@
 
 :root[data-theme="light"] {
   color-scheme: light;
-  /* Codex electron-light */
+  /* Slyy light: white work surface on paper chrome. */
   --ds-bg-primary: #ffffff;
-  --ds-settings-rail-bg: #f3f3f3;
-  --ds-bg-sidebar: var(--ds-settings-rail-bg, #f3f3f3);
-  --ds-bg-secondary: #f9f9f9;
-  --ds-bg-tertiary: #f3f3f3;
-  --ds-bg-inset: #ededed;
-  --ds-bg-under: #f9f9f9;
+  --ds-settings-rail-bg: #f4f4f2;
+  --ds-bg-sidebar: var(--ds-settings-rail-bg, #f4f4f2);
+  --ds-bg-secondary: #f9f9f7;
+  --ds-bg-tertiary: #f4f4f2;
+  --ds-bg-inset: #e2e2e2;
+  --ds-bg-under: #f9f9f7;
   /* Dock column reads as quiet inset paper on the white chat pane (D419). */
-  --ds-bg-dock: #fafafa;
+  --ds-bg-dock: #f9f9f7;
   --ds-bg-dock-raised: #ffffff;
   --ds-bg-elevated: color-mix(in oklab, #ffffff 70%, transparent);
   --ds-bg-elevated-opaque: #ffffff;
-  --ds-bg-hover: color-mix(in oklab, #1a1c1f 5%, transparent);
-  --ds-bg-active: color-mix(in oklab, #1a1c1f 8%, transparent);
+  --ds-bg-hover: color-mix(in oklab, #0a0a0a 5%, transparent);
+  --ds-bg-active: color-mix(in oklab, #0a0a0a 8%, transparent);
   --ds-bg-composer: #ffffff;
   --ds-sidebar-glass-tint: color-mix(in oklab, var(--ds-bg-sidebar) 55%, transparent);
   --ds-sidebar-glass-sheen-top: color-mix(in oklab, #ffffff 45%, transparent);
   --ds-sidebar-glass-sheen-bottom: color-mix(in oklab, #ffffff 30%, transparent);
-  --ds-bg-chip: color-mix(in oklab, #1a1c1f 4%, transparent);
-  --ds-text-primary: #1a1c1f;
-  --ds-text-secondary: color-mix(in oklab, #1a1c1f 74%, transparent);
-  --ds-text-muted: #5d5d5d;
-  --ds-text-faint: #afafaf;
-  --ds-border-default: color-mix(in oklab, #1a1c1f 8%, transparent);
-  --ds-border-subtle: color-mix(in oklab, #1a1c1f 5%, transparent);
-  --ds-border-strong: color-mix(in oklab, #1a1c1f 12%, transparent);
-  --ds-tile: color-mix(in oklab, #1a1c1f 3.5%, transparent);
-  --ds-tile-hover: color-mix(in oklab, #1a1c1f 6%, transparent);
-  --ds-tile-deep: color-mix(in oklab, #1a1c1f 8%, transparent);
+  --ds-bg-chip: color-mix(in oklab, #0a0a0a 4%, transparent);
+  --ds-text-primary: #0a0a0a;
+  --ds-text-secondary: color-mix(in oklab, #0a0a0a 74%, transparent);
+  --ds-text-muted: #5c5c5c;
+  --ds-text-faint: #a3a3a3;
+  --ds-border-default: color-mix(in oklab, #0a0a0a 8%, transparent);
+  --ds-border-subtle: color-mix(in oklab, #0a0a0a 5%, transparent);
+  --ds-border-strong: color-mix(in oklab, #0a0a0a 12%, transparent);
+  --ds-tile: color-mix(in oklab, #0a0a0a 3.5%, transparent);
+  --ds-tile-hover: color-mix(in oklab, #0a0a0a 6%, transparent);
+  --ds-tile-deep: color-mix(in oklab, #0a0a0a 8%, transparent);
   --ds-raised: #ffffff;
   --ds-raised-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 0 0 0.5px rgba(0, 0, 0, 0.04);
-  /* Light theme accent inverts: dark ink on pale surfaces. */
-  --ds-accent: #1a1c1f;
-  --ds-accent-hover: #303030;
-  --ds-accent-soft: #5d5d5d;
+  /* Slyy brand blue on pale surfaces; white ink on accent fills. */
+  --ds-accent: #2b3bff;
+  --ds-accent-hover: #1f2ed0;
+  --ds-accent-soft: #5c5c5c;
   --ds-focus: var(--ds-accent);
   --ds-settings-field-bg: #ffffff;
-  --ds-settings-nav-active: color-mix(in oklab, #1a1c1f 12%, #ffffff);
-  --ds-field-inset-bg: #f3f3f3;
+  --ds-settings-nav-active: color-mix(in oklab, #0a0a0a 12%, #ffffff);
+  --ds-field-inset-bg: #f4f4f2;
   /* Issue #341: the light values these fills used to hardcode in overrides. */
-  --ds-prose-kbd-fg: #303030;
+  --ds-prose-kbd-fg: #3d3d3d;
   --ds-thinking-code-bg: #f0f0f0;
   --ds-mermaid-canvas: #ffffff;
-  --ds-code-head-bg: color-mix(in oklab, #1a1c1f 3.5%, transparent);
-  --ds-code-hover-bg: color-mix(in oklab, #1a1c1f 6%, transparent);
+  --ds-code-head-bg: color-mix(in oklab, #0a0a0a 3.5%, transparent);
+  --ds-code-hover-bg: color-mix(in oklab, #0a0a0a 6%, transparent);
   /* D148: light drops the scrim to ~28% ink so white dialogs stay readable. */
-  --ds-scrim: color-mix(in oklab, #1a1c1f 28%, transparent);
-  --ds-modal-veil: color-mix(in oklab, #1a1c1f 32%, transparent);
-  --ds-tool-row-bg: color-mix(in oklab, #1a1c1f 2%, transparent);
+  --ds-scrim: color-mix(in oklab, #0a0a0a 28%, transparent);
+  --ds-modal-veil: color-mix(in oklab, #0a0a0a 32%, transparent);
+  --ds-tool-row-bg: color-mix(in oklab, #0a0a0a 2%, transparent);
   --ds-send-disabled-bg: #8e8e90; /* gold disabled send chip */
   --ds-send-disabled-fg: #ffffff;
   --ds-placeholder-ink: #4a4c4f;
   --ds-field-inset-focus-bg: #ffffff;
   /* Off knob stays white on the pale track; on knob keeps white on near-black. */
-  --ds-switch-track-off: color-mix(in oklab, #1a1c1f 10%, transparent);
-  --ds-switch-track-off-hover: color-mix(in oklab, #1a1c1f 18%, transparent);
-  --ds-switch-ring-off: color-mix(in oklab, #1a1c1f 20%, transparent);
+  --ds-switch-track-off: color-mix(in oklab, #0a0a0a 10%, transparent);
+  --ds-switch-track-off-hover: color-mix(in oklab, #0a0a0a 18%, transparent);
+  --ds-switch-ring-off: color-mix(in oklab, #0a0a0a 20%, transparent);
   --ds-switch-knob-off: #ffffff;
   --ds-switch-knob-on: #ffffff;
   --ds-success: #00a240;
   --ds-warning: #e25507;
   --ds-error: #e02e2a;
-  --ds-info: #5d5d5d;
+  --ds-info: #5c5c5c;
   --ds-purple: #7c3aed;
   --ds-shadow-dialog: 0 16px 48px rgba(0, 0, 0, 0.12);
   /* Preserve the opaque light model menu's existing stroke and lift. */
   --ds-shadow-model-menu:
-    0 0 0 0.5px color-mix(in oklab, #1a1c1f 10%, transparent),
+    0 0 0 0.5px color-mix(in oklab, #0a0a0a 10%, transparent),
     0 8px 32px rgba(0, 0, 0, 0.1),
     0 2px 8px rgba(0, 0, 0, 0.06);
-  --ds-elevation-stroke: 0 0 0 0.5px color-mix(in oklab, #1a1c1f 12%, transparent);
+  --ds-elevation-stroke: 0 0 0 0.5px color-mix(in oklab, #0a0a0a 12%, transparent);
   /* Codex elevation-prominent exact (same dark/light formula). */
   --ds-shadow-composer: 0 3px 7.5px #0000000a, 0 0 20px #0000000d;
   --ds-bg-elevated-primary: color-mix(in oklab, #ffffff 70%, transparent);
@@ -337,26 +337,25 @@
     and TSX (enforced by scripts/check-style-tokens.mjs).
   */
   /*
-    Apple-inspired fixed-radius ladder for dense desktop UI. Compact controls
-    remain rounded rectangles; capsules and circles use the explicit shape
-    tokens below. The regular two-pixel rhythm keeps adjacent levels legible
-    and makes concentric nesting predictable.
+    Slyy corners are square: the whole ladder resolves to 0. The level names
+    stay so a contributed theme can round them again; capsules and circles
+    keep the explicit shape tokens below.
   */
-  --radius-3xs: 4px;
-  --radius-2xs: 6px;
-  --radius-xs: 8px;
-  --radius-sm: 10px;
-  --radius-md: 12px;
-  --radius-md-plus: 14px;
-  --radius-lg: 16px;
-  --radius-lg-plus: 18px;
-  --radius-xl: 20px;
-  --radius-2xl: 24px;
+  --radius-3xs: 0px;
+  --radius-2xs: 0px;
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-md-plus: 0px;
+  --radius-lg: 0px;
+  --radius-lg-plus: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
   --radius-full: 9999px;
   --radius-round: 50%;
 
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  --font-mono: ui-monospace, "SFMono-Regular", "SF Mono", Menlo, Consolas, "Liberation Mono",
+  --font-sans: "Hanken Grotesk Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Martian Mono Variable", ui-monospace, "SFMono-Regular", "SF Mono", Menlo, Consolas, "Liberation Mono",
     monospace;
 
   /* Type ramp (Codex metrics; "-plus" = half-step between named sizes) */
