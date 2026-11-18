@@ -166,8 +166,9 @@ Blocking steps:
    non-release bump.
 7. Commit the documentation updates so the tagged commit contains notes and
    accurate version claims for that version (alone or adjacent to the bump).
-8. GitHub Release bodies may still use `generate_release_notes: true` for the
-   web page; they remain web-only and are **not** the in-app notes source.
+8. GitHub Release bodies are written by `release.yml` (platform table and
+   unsigned-build notices); they remain web-only and are **not** the in-app
+   notes source.
 
 Pre-tag checklist:
 
@@ -219,18 +220,23 @@ runtime, verifying the host build, building the Desktop application once, and
 invoking electron-builder. This avoids a redundant Desktop build without
 changing the package scripts or release artifacts.
 
-**Default macOS release policy:** GitHub tag releases Developer ID-sign,
+**Default macOS release policy:** with the repository variable
+`SLYY_MAC_SIGNING_ENABLED=true`, GitHub tag releases Developer ID-sign,
 notarize, staple, and Gatekeeper-verify macOS DMG/ZIP before upload (D450 /
-ADR 0289). Missing signing or notarization secrets fail the job. A
-`workflow_dispatch` run may set `sign_macos: false` only to produce unsigned
-debug artifacts; that path must not be used for a GitHub Release tag. Local
-`scripts/release-macos.sh` remains the explicit signed local lane; `pnpm dist:mac`
-stays unsigned without a configured certificate (D078).
+ADR 0289), and missing signing or notarization secrets fail the job. While the
+variable is unset (Slyy has no Apple secrets yet), tag builds package macOS
+unsigned and the release is published as a GitHub pre-release whose notes state
+that macOS (Gatekeeper warning, no in-app update) and Windows are unsigned
+(ADR `slyy-downstream-branding`). A `workflow_dispatch` run follows its
+`sign_macos` input instead (default `true`); dispatched on a `v*` tag ref it
+also publishes. Local `scripts/release-macos.sh` remains the explicit signed
+local lane; `pnpm dist:mac` stays unsigned without a configured certificate
+(D078).
 
 The macOS matrix uses `macos-15` for arm64 and `macos-15-intel` for Intel x64.
 Each job verifies `uname -m`, passes the matching `--arm64` or `--x64` flag to
 electron-builder, and builds `pi-desktop-host-core` on that same native
-runner. Tag builds and `sign_macos: true` (the dispatch default) receive
+runner. Signed tag builds and `sign_macos: true` (the dispatch default) receive
 `CSC_LINK`, `CSC_KEY_PASSWORD`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, and
 `APPLE_TEAM_ID` only from GitHub Actions secrets, require `APPLE_TEAM_ID` to
 equal the `SLYY_APPLE_TEAM_ID` repository variable, pin the certificate through
@@ -272,8 +278,8 @@ gesture. The app and Applications link are the only items in the window.
 
 The macOS ZIP contains `Slyy Gen2.app` at its root. Neither the DMG nor ZIP
 ships an opening-help note or executable first-launch helper, including local
-and unsigned debug builds. Tagged artifacts remain signed and notarized; the
-unsigned lane is for debugging and does not imply Gatekeeper qualification.
+and unsigned builds. Unsigned macOS artifacts are not Gatekeeper-qualified;
+they ship only as GitHub pre-releases.
 
 DMG, ZIP, NSIS, AppImage, deb, rpm, blockmap, and updater feed outputs are already
 compressed or compression-insensitive. The workflow therefore uploads their
@@ -289,19 +295,53 @@ The Linux updater feeds carry the architecture they were built for:
 channel files `electron-updater` requests on the matching architecture, so a
 lane fails before upload if its own feed is missing.
 
-### 4.4 CNB mirror (removed)
+### 4.4 Release repository (CNB mirror removed)
 
 Upstream PI-Desktop mirrors each GitHub Release to a CNB (cnb.cool) pipeline
-through `.github/workflows/mirror-to-cnb.yml`. Slyy removed that workflow:
-GitHub Releases on `mySlyy/slyy-desktop` are the only artifact source and the
-only electron-updater feed.
+through `.github/workflows/mirror-to-cnb.yml`. Slyy removed that workflow.
 
-### 4.5 GitHub Actions secrets for macOS signing
+The source repository `mySlyy/slyy-desktop` is private, so the publish job
+creates the release in the public repository `mySlyy/releases` under the same
+tag name (`softprops/action-gh-release` with `repository: mySlyy/releases`).
+GitHub Releases on `mySlyy/releases` are the only artifact source, the only
+electron-updater feed (`build.publish`, `resources/app-update.yml`), and the
+source of the remote `pi-host-<version>-linux-<arch>.tar.gz` (+ `.sha256`)
+bundles the SSH bootstrap downloads (`GITHUB_RELEASES_REPO`). The tag is created
+in `mySlyy/releases` on its default branch, so that repository needs at least
+one commit (for example a README). Release notes are written by the workflow
+(`generate_release_notes` would summarize the releases repository's own
+history); the in-app notes remain the changelog catalogs. Releases with a `-`
+in the version or an unsigned macOS build are marked pre-release.
 
-Create these under GitHub → repository `mySlyy/slyy-desktop` → Settings →
-Secrets and variables → Actions. The repository variables
-`SLYY_APPLE_TEAM_ID` and `SLYY_MAC_SIGNING_IDENTITY` hold the frozen Slyy team
-id and certificate common name. Never commit the p12, password, Apple ID, or
+Trigger after the release commit is on `main`:
+
+```bash
+git fetch origin main
+git tag v<version> origin/main
+git push origin v<version>
+```
+
+Never push a tag fetched from upstream PI-Desktop: a local
+`v<version>` created from `upstream` points at upstream code. Delete it first
+(`git tag -d v<version>`).
+
+### 4.5 GitHub Actions secrets
+
+`SLYY_RELEASES_TOKEN` (required for every tag release): a fine-grained personal
+access token, resource owner `mySlyy`, repository access only `mySlyy/releases`,
+repository permission Contents: Read and write (Metadata: Read is implied). The
+default `GITHUB_TOKEN` cannot write to another repository. The `verify` job
+fails a tag run without it before any platform build starts.
+
+```bash
+gh secret set SLYY_RELEASES_TOKEN -R mySlyy/slyy-desktop   # paste the token at the prompt
+```
+
+macOS signing: create these under GitHub → repository `mySlyy/slyy-desktop` →
+Settings → Secrets and variables → Actions, then turn signing on for tag builds
+with `gh variable set SLYY_MAC_SIGNING_ENABLED -R mySlyy/slyy-desktop --body true`.
+The repository variables `SLYY_APPLE_TEAM_ID` and `SLYY_MAC_SIGNING_IDENTITY`
+hold the frozen Slyy team id and certificate common name. Never commit the p12, password, Apple ID, or
 app-specific password. Never `echo` these values in CI.
 
 | Secret | Value |
@@ -397,9 +437,10 @@ above.
 
 ## 5. Verification gates
 
-Unsigned debug artifacts (`workflow_dispatch` with `sign_macos: false`) are
-not Gatekeeper-qualified. Tag releases must pass the signature, notarization,
-and staple checks below or the workflow fails.
+Unsigned macOS artifacts (tag builds without `SLYY_MAC_SIGNING_ENABLED=true`,
+or `workflow_dispatch` with `sign_macos: false`) are not Gatekeeper-qualified
+and publish only as pre-releases. Signed releases must pass the signature,
+notarization, and staple checks below or the workflow fails.
 
 Two separate notarization submissions exist, because Apple notarizes one
 artifact per submission and electron-builder only covers the app:

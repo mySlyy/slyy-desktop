@@ -9,13 +9,14 @@ import test from "node:test";
 
 const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
 
-const [pkgText, protocol, dataPaths, updateYml, updater, feedback, tokens] = await Promise.all([
+const [pkgText, protocol, dataPaths, updateYml, updater, feedback, releases, tokens] = await Promise.all([
   read("../package.json"),
   read("../../../packages/shared/src/protocol.ts"),
   read("../electron/main/data-paths.ts"),
   read("../resources/app-update.yml"),
   read("../electron/main/updater.ts"),
   read("../../../packages/shared/src/github-feedback.ts"),
+  read("../../../packages/shared/src/github-releases.ts"),
   read("../src/styles/tokens.css"),
 ]);
 const pkg = JSON.parse(pkgText);
@@ -36,13 +37,24 @@ test("installation identity stays frozen", () => {
   assert.match(dataPaths, /DEVELOPMENT_DATA_DIR_NAME = "\.slyy-gen2-dev"/);
 });
 
-test("every update channel points at the Slyy release feed", () => {
-  assert.deepEqual(build.publish, [{ provider: "github", owner: "mySlyy", repo: "slyy-desktop" }]);
+// The source repository is private; releases, the update feed and the remote
+// pi-host bundles live in the public mySlyy/releases repository.
+test("every update channel points at the public Slyy releases repository", () => {
+  assert.deepEqual(build.publish, [{ provider: "github", owner: "mySlyy", repo: "releases" }]);
   assert.match(updateYml, /^owner: mySlyy$/m);
-  assert.match(updateYml, /^repo: slyy-desktop$/m);
+  assert.match(updateYml, /^repo: releases$/m);
   assert.match(updateYml, /^updaterCacheDirName: 'slyy-gen2-updater'$/m);
-  assert.match(updater, /https:\/\/github\.com\/mySlyy\/slyy-desktop\/releases\/latest/);
+  assert.match(releases, /GITHUB_RELEASES_REPO = "mySlyy\/releases"/);
+  assert.match(
+    releases,
+    /GITHUB_RELEASES_URL = `https:\/\/github\.com\/\$\{GITHUB_RELEASES_REPO\}\/releases\/latest`/,
+  );
+  assert.match(updater, /RELEASES_URL = GITHUB_RELEASES_URL;/);
+});
+
+test("feedback and source metadata stay on the source repository", () => {
   assert.match(feedback, /GITHUB_REPO = "mySlyy\/slyy-desktop"/);
+  assert.equal(pkg.repository.url, "git+https://github.com/mySlyy/slyy-desktop.git");
 });
 
 test("the shipped app carries the Slyy visual identity", () => {

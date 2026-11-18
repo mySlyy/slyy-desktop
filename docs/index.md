@@ -9,7 +9,7 @@ hero:
   actions:
     - theme: brand
       text: Download
-      link: https://github.com/mySlyy/slyy-desktop/releases/latest
+      link: https://github.com/mySlyy/releases/releases/latest
     - theme: alt
       text: Documentation
       link: /guide/

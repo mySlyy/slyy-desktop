@@ -23,7 +23,7 @@ Frozen identity (guarded by `apps/desktop/test/slyy-identity-contract.test.mjs`)
 | Product / executable file name | `Slyy Gen2` (`slyy-gen2` on Linux) |
 | NSIS GUID | `72db17f1-8935-5bae-870f-999d4b7621a6` |
 | Data directory (passed to host-core via `PI_DESKTOP_DATA_DIR`) | `~/.slyy-gen2` (dev `~/.slyy-gen2-dev`) |
-| Update feed | GitHub `mySlyy/slyy-desktop`, cache `slyy-gen2-updater` |
+| Update feed and release assets | GitHub `mySlyy/releases` (public), cache `slyy-gen2-updater` |
 | macOS signing | repo variables `SLYY_APPLE_TEAM_ID`, `SLYY_MAC_SIGNING_IDENTITY` |
 
 The "Gen2" suffix is a clean cut from the earlier Slyy Desktop app: no shared
@@ -75,8 +75,22 @@ only: ink `#0a0a0a`, paper `#f4f4f2`, accent `#2b3bff` (dark-theme tint
 `#7a85ff` for AA contrast), square radius ladder, Hanken Grotesk and Martian
 Mono (bundled via Fontsource). UI locales: English and German (formal "Sie").
 
-Release: the upstream CNB (cnb.cool) release mirror workflow is removed;
-releases publish to GitHub `mySlyy/slyy-desktop` only.
+Release: the upstream CNB (cnb.cool) release mirror workflow is removed.
+The source repository `mySlyy/slyy-desktop` is private, and users,
+electron-updater and the remote `pi-host` bootstrap cannot read releases from a
+private repository. `release.yml` therefore builds in `mySlyy/slyy-desktop` and
+publishes each `v<version>` release to the public repository `mySlyy/releases`
+(token secret `SLYY_RELEASES_TOKEN`). `electron-builder` `publish`,
+`resources/app-update.yml`, `GITHUB_RELEASES_REPO` (`@pi-desktop/shared`: in-app
+Releases link and `pi-host` downloads) and the README download links point
+there. This moved the update feed once, before the first release, so no
+installed client is stranded. Source, issues and feedback
+(`GITHUB_REPO`) stay on `mySlyy/slyy-desktop`.
+
+macOS signing on tag builds is opt-in through the repository variable
+`SLYY_MAC_SIGNING_ENABLED=true` (requires the Apple secrets). Until it is set,
+tag releases ship unsigned macOS builds as GitHub pre-releases whose notes say
+so; Windows builds are unsigned either way.
 
 ## Consequences
 
@@ -84,3 +98,9 @@ releases publish to GitHub `mySlyy/slyy-desktop` only.
   one-time data import is planned separately.
 - Windows builds stay unsigned until a code-signing certificate exists; set
   `win.publisherName` then so electron-updater verifies installers.
+- Unsigned macOS builds cannot update in-app (Squirrel.Mac requires a valid
+  signature). The updater never offers pre-releases (`allowPrerelease =
+  false`), so while every release is a pre-release no platform updates
+  in-app; users install from `mySlyy/releases` manually.
+- In-app feedback opens `github.com/mySlyy/slyy-desktop/issues/new`, which
+  returns 404 for users without access to the private repository.

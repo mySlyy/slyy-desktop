@@ -7,7 +7,7 @@ appreciate responsible disclosure.
 ## Supported Versions
 
 Security fixes are provided for the latest release published on the
-[GitHub Releases page](https://github.com/mySlyy/slyy-desktop/releases). Older
+[GitHub Releases page](https://github.com/mySlyy/releases/releases). Older
 releases and development builds may not receive security fixes.
 
 ## Reporting a Vulnerability

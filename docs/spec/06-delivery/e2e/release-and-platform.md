@@ -244,23 +244,32 @@
   `development-branding.test.mjs`, `ci-workflow.test.mjs`); Fedora KDE/Wayland
   installation remains runner validation
 
-## E2E-196a: Unsigned macOS debug lane
+## E2E-196a: Unsigned macOS lane and unsigned pre-release
 
-- **Preconditions**: The Release workflow is manually dispatched with
-  `sign_macos: false`; Windows and Linux release credentials are not affected.
-  This path must not be used to publish a GitHub Release tag.
-- **Steps**: 1) Dispatch the Release workflow with `sign_macos: false`. 2)
+- **Preconditions**: Either a `vX.Y.Z[-pre]` tag is pushed while the
+  `SLYY_MAC_SIGNING_ENABLED` repository variable is not `true`, or the Release
+  workflow is dispatched with `sign_macos: false`. `SLYY_RELEASES_TOKEN` exists
+  for tag runs; Windows and Linux lanes are not affected.
+- **Steps**: 1) Push the tag (or dispatch with `sign_macos: false`). 2)
   Confirm both macOS architectures complete ordinary DMG/ZIP packaging without
-  certificate secrets. 3) Inspect the artifacts and workflow steps.
+  certificate secrets. 3) Inspect the artifacts, workflow steps and, for a tag,
+  the release in `mySlyy/releases`.
 - **Expected**: macOS DMG/ZIP artifacts are produced and uploaded without
   Developer ID signatures or notarization, using explicit `-arm64` and `-x64`
   filename markers for their native architecture; macOS staple and Gatekeeper
-  checks are explicitly skipped. Windows/Linux artifacts and the merged updater
-  feed still publish normally. This exception does not satisfy E2E-196c.
-- **Specs linked**: `06-delivery/06-release-runbook.md`
-- **Acceptance**: Quality (debug packaging)
+  checks are explicitly skipped. Windows/Linux artifacts, the `pi-host` bundles
+  and the merged updater feed still publish. A tag run creates the release in
+  `mySlyy/releases` (same tag) marked pre-release, and its notes state that the
+  macOS build is unsigned (Gatekeeper warning, no macOS in-app update) and the
+  Windows build is unsigned. A tag run without `SLYY_RELEASES_TOKEN` fails in
+  `verify` before any platform build. This lane does not satisfy E2E-196c.
+- **Specs linked**: `06-delivery/06-release-runbook.md` §4.3–4.5,
+  ADR `slyy-downstream-branding`
+- **Acceptance**: Quality (release packaging)
 - **Milestone**: M6+
-- **Status**: Opt-in debug lane; tag releases must satisfy E2E-196c.
+- **Status**: Workflow source-contract covered (`ci-workflow.test.mjs`); the
+  release run itself is runner validation. Signed tag releases must satisfy
+  E2E-196c.
 
 ## E2E-196b: macOS packages omit first-launch helper assets
 
@@ -285,7 +294,8 @@
 ## E2E-196c: macOS tag artifacts pass Gatekeeper without a quarantine bypass
 
 - **Preconditions**: A `vX.Y.Z` tag matching `apps/desktop/package.json` is
-  pushed, or the Release workflow is dispatched with `sign_macos: true`
+  pushed with the `SLYY_MAC_SIGNING_ENABLED` repository variable set to `true`,
+  or the Release workflow is dispatched with `sign_macos: true`
   (default); GitHub Actions has `CSC_LINK`, `CSC_KEY_PASSWORD`, `APPLE_ID`,
   `APPLE_APP_SPECIFIC_PASSWORD`, and `APPLE_TEAM_ID` secrets; both native macOS
   runners are available.
@@ -326,7 +336,7 @@
   run list for `mirror-to-cnb.yml`.
 - **Expected**: No CNB (cnb.cool) mirror run exists: Slyy removed
   `mirror-to-cnb.yml`. GitHub Release artifacts and updater feeds on
-  `mySlyy/slyy-desktop` are unchanged.
+  `mySlyy/releases` are unchanged.
 - **Specs linked**: `06-delivery/06-release-runbook.md` §4.4
 - **Acceptance**: Quality (release mirroring)
 - **Milestone**: M6+

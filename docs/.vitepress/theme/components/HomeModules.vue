@@ -54,7 +54,7 @@ const copy = {
   ctaBody: 'macOS · Windows · Linux',
   download: 'Download',
   docs: 'Documentation',
-  downloadHref: 'https://github.com/mySlyy/slyy-desktop/releases/latest',
+  downloadHref: 'https://github.com/mySlyy/releases/releases/latest',
   docsHref: '/guide/',
 }
 </script>
