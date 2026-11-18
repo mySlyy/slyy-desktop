@@ -455,7 +455,6 @@ unless it satisfies all of:
 | `release-assets.githubusercontent.com` | Current release asset origin |
 | `raw.githubusercontent.com` | Catalog and repository-hosted packages |
 | `codeload.github.com` | Repository archive downloads |
-| `cnb.cool` | Mirror catalog and mirrored assets |
 
 Redirects are restricted to HTTPS and re-checked: the effective URL after
 redirection must satisfy the same rules as the initial URL. A custom or
@@ -464,7 +463,7 @@ private catalog does not widen the allowlist for arbitrary third-party hosts.
 
 The official channel's resolve response names mirrors rather than a free-form
 URL list, and those mirrors are the distribution hosts above: the GitHub raw
-repository and the CNB mirror the platform already publishes from. A mirror
+repository and release assets the platform publishes to. A mirror
 entry on any other host is refused exactly like a package URL on that host, so
 the next mirror in the list is tried; if every entry names such a host the
 install fails instead of widening the list. Moving a mirror to a host outside

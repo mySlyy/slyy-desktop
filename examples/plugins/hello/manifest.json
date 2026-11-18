@@ -4,7 +4,7 @@
  "name": "Hello",
  "version": "0.2.0",
  "description": "Slyy sample plugin: command palette + panel + echo tool + skill / theme / background service / message bus",
- "author": "PI-Desktop",
+ "author": "Slyy",
  "main": "main.js",
  "ui": {
  "panel": "renderer/index.html",

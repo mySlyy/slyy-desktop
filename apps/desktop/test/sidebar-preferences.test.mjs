@@ -489,10 +489,10 @@ test("renames a recent project without changing its recency", () => {
 
 test("home switcher lists retained sidebar projects and the active workspace", () => {
   const projects = listSwitcherProjects({
-    openProjectPaths: ["/Users/lan/PI-Desktop", "/Users/lan/pi-desktop-plugins"],
+    openProjectPaths: ["/Users/lan/Slyy-Desktop", "/Users/lan/slyy-desktop-plugins"],
     openProjects: [
-      { path: "/Users/lan/PI-Desktop", name: "PI-Desktop" },
-      { path: "/Users/lan/pi-desktop-plugins", name: "pi-desktop-plugins" },
+      { path: "/Users/lan/Slyy-Desktop", name: "Slyy-Desktop" },
+      { path: "/Users/lan/slyy-desktop-plugins", name: "slyy-desktop-plugins" },
     ],
     workspace: { path: "/Users/lan/other", name: "other" },
     projectMeta: {},
@@ -501,7 +501,7 @@ test("home switcher lists retained sidebar projects and the active workspace", (
 
   assert.deepEqual(
     projects.map((project) => project.name),
-    ["other", "PI-Desktop", "pi-desktop-plugins"],
+    ["other", "Slyy-Desktop", "slyy-desktop-plugins"],
   );
 });
 
@@ -528,22 +528,22 @@ test("home switcher hides archived projects and prefers renamed labels", () => {
 
 test("home switcher search matches name or path and ignores case", () => {
   const projects = [
-    { key: "/tmp/pi-desktop", path: "/tmp/pi-desktop", name: "PI-Desktop", pinned: false },
+    { key: "/tmp/slyy", path: "/tmp/slyy", name: "Slyy", pinned: false },
     {
       key: "/tmp/plugins",
       path: "/tmp/plugins",
-      name: "pi-desktop-plugins",
+      name: "slyy-plugins",
       pinned: false,
     },
   ];
 
   assert.deepEqual(
     filterSwitcherProjects(projects, "PLUGIN").map((project) => project.name),
-    ["pi-desktop-plugins"],
+    ["slyy-plugins"],
   );
   assert.deepEqual(
-    filterSwitcherProjects(projects, "/tmp/pi-desktop").map((project) => project.name),
-    ["PI-Desktop"],
+    filterSwitcherProjects(projects, "/tmp/slyy").map((project) => project.name),
+    ["Slyy"],
   );
   assert.equal(filterSwitcherProjects(projects, "   ").length, 2);
 });

@@ -20,8 +20,9 @@ pub const HOST_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// Data directory name under the home directory, used only when
 /// `PI_DESKTOP_DATA_DIR` is unset (Electron always sets it). Matches the Slyy
-/// installation identity (ADR slyy-downstream-branding); a PI-Desktop
-/// `~/.pi-desktop` is deliberately never read, so the two never share data.
+/// installation identity (ADR slyy-downstream-branding). The
+/// `~/.pi-desktop` of an upstream PI-Desktop install is deliberately never
+/// read, so the two never share data.
 pub const DEFAULT_DATA_DIR_NAME: &str = ".slyy-gen2";
 
 /// The data directory host-core uses when `PI_DESKTOP_DATA_DIR` is unset.

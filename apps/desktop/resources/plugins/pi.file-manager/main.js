@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * File Manager — PI-Desktop plugin main process
+ * File Manager — Slyy plugin main process
  *
  * Plugin id: pi.file-manager
  * View:      contributes.views[0] → views/index.html (right work panel)
@@ -1543,7 +1543,7 @@ async function handleWatch(payload) {
 // All four are O(candidates), with no recursive directory listing: "walk the whole disk to find software" is the
 // easiest wrong version of this feature to write, and also the slowest.
 //
-// Results are cached by **date** for one day in the plugin data directory (editors.json): several PI-Desktop instances
+// Results are cached by **date** for one day in the plugin data directory (editors.json): several Slyy instances
 // share one probe, and reopening the menu on the same day does not query the registry again. A failed write only falls back to the
 // in-process cache, without affecting the feature; with nothing detected the menu keeps only "Default app"; never
 // list an editor that does nothing when clicked.

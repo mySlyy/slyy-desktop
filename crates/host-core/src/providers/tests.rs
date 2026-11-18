@@ -1853,7 +1853,7 @@ fn degraded_model_array_cannot_be_overwritten_by_update() {
 fn header_values_fold_fullwidth_and_reject_non_latin1() {
     let (_dir, db, secrets) = test_context();
     let headers = BTreeMap::from([
-        ("X-Title".to_string(), "PI\u{3000}Desktop".to_string()),
+        ("X-Title".to_string(), "Slyy\u{3000}Gen2".to_string()),
         ("X-Key".to_string(), "1234567\u{FF10}".to_string()),
     ]);
     let provider = create_provider(
@@ -1881,7 +1881,7 @@ fn header_values_fold_fullwidth_and_reject_non_latin1() {
     )
     .unwrap();
     let stored = provider.headers.unwrap();
-    assert_eq!(stored["X-Title"], "PI Desktop");
+    assert_eq!(stored["X-Title"], "Slyy Gen2");
     assert_eq!(stored["X-Key"], "12345670");
 
     // A value with no ASCII counterpart is refused at the boundary and names
@@ -2055,14 +2055,14 @@ fn sync_payloads_keep_only_storable_headers() {
     let mut payload = json!({
         "name": "Custom",
         "headers": {
-            "X-Title": "PI\u{3000}Desktop",
+            "X-Title": "Slyy\u{3000}Gen2",
             "X-Key": "1234567\u{FF10}",
             "X-CJK": "\u{661F}",
             "Authorization": "Bearer secret"
         }
     });
     retain_storable_headers(&mut payload);
-    assert_eq!(payload["headers"]["X-Title"], "PI Desktop");
+    assert_eq!(payload["headers"]["X-Title"], "Slyy Gen2");
     assert_eq!(payload["headers"]["X-Key"], "12345670");
     assert!(payload["headers"].get("X-CJK").is_none());
     assert!(payload["headers"].get("Authorization").is_none());

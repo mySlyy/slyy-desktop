@@ -212,7 +212,7 @@ test("calls the relay must not make are refused before it, and never count again
   cyclic.self = cyclic;
   // 66 bytes short of nothing: 1 + 2 × 32767 bytes of text plus the quotes is
   // 65537 bytes, while its length in characters is only 32770.
-  const oversize = `a${"é".repeat(32_767)}`;
+  const oversize = `a${"\u00e9".repeat(32_767)}`;
   const cases = [
     // No descriptor, no load: the caller's load has already ended.
     ["not running", undefined, "ping", undefined, "PLUGIN_UNLOADED"],
@@ -263,7 +263,7 @@ test("args and answer share one budget of 64KB counted in UTF-8 bytes", async ()
   h.answerWith(async () => "ab");
   assert.equal(await h.call(plugin, "echo", args), "ab");
   // Four characters of JSON text, six bytes.
-  h.answerWith(async () => "éé");
+  h.answerWith(async () => "\u00e9\u00e9");
   await assert.rejects(h.call(plugin, "echo", args), codedAs("PLUGIN_CALL_TOO_LARGE"));
 });
 

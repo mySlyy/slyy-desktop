@@ -86,13 +86,13 @@ describe("loadCustomSystemPrompt", () => {
   });
 
   it("caps content at 64 KiB without splitting UTF-8 characters", async () => {
-    await fixture({ "global/APPEND_SYSTEM.md": "ü".repeat(70_000) });
+    await fixture({ "global/APPEND_SYSTEM.md": "\u00fc".repeat(70_000) });
     const loaded = await loadCustomSystemPrompt(root, {
       project: join(root!, ".pi"),
       global: globalDir!,
     });
     expect(Buffer.byteLength(loaded!.append!, "utf8")).toBeLessThanOrEqual(64 * 1024);
-    expect(loaded!.append!.endsWith("ü")).toBe(true);
+    expect(loaded!.append!.endsWith("\u00fc")).toBe(true);
   });
 
   it("works without a workspace root (global only)", async () => {

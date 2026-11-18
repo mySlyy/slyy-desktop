@@ -6,8 +6,8 @@ describe("canonicalRepositoryUrl", () => {
     expect(canonicalRepositoryUrl("git@github.com:acme/pi-plugin-todo.git")).toBe(
       "https://github.com/acme/pi-plugin-todo",
     );
-    expect(canonicalRepositoryUrl("ssh://git@cnb.cool/acme/todo.git")).toBe(
-      "https://cnb.cool/acme/todo",
+    expect(canonicalRepositoryUrl("ssh://git@git.example.com/acme/todo.git")).toBe(
+      "https://git.example.com/acme/todo",
     );
   });
 

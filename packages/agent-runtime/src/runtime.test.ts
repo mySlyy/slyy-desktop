@@ -3171,8 +3171,8 @@ describe("DesktopAgentRuntime configuration matching", () => {
     expect(truncated?.length).toBe(TOOL_PROGRESS_CAP_CHARS);
     expect(truncated?.indexOf(marker)).toBe(head);
 
-    const within = await flushedBashProgress(["hello ", "😀世界"]);
-    expect(within).toEqual(["hello ", "hello 😀世界"]);
+    const within = await flushedBashProgress(["hello ", "\u{1F600}\u4e16\u754c"]);
+    expect(within).toEqual(["hello ", "hello \u{1F600}\u4e16\u754c"]);
 
     const exact = "e".repeat(TOOL_PROGRESS_CAP_CHARS);
     const [atCap] = await flushedBashProgress([exact]);
@@ -8600,7 +8600,7 @@ describe("DesktopAgentRuntime per-turn context protection", () => {
       timestamp: `2026-07-30T00:00:0${index}Z`,
       message: {
         role: "user",
-        content: `${label}:${"中".repeat(index === 1 ? 50_000 : 100)}`,
+        content: `${label}:${"\u4e2d".repeat(index === 1 ? 50_000 : 100)}`,
         timestamp: index + 1,
       },
     }));

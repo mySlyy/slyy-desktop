@@ -64,11 +64,11 @@ test("TeX math and wrapped HTTP links render through the production Markdown pip
     // A nested linked-host destination must be normalized before the
     // production rehype sanitizer removes its invalid wrapper href.
     const wrappedLink = render(
-      "[#1106](([github.com](https://github.com/vastsa/PI-Desktop/issues/1106)))",
+      "[#1106](([github.com](https://github.com/mySlyy/slyy-desktop/issues/1106)))",
     );
     assert.match(
       wrappedLink,
-      /<a[^>]*href="https:\/\/github\.com\/vastsa\/PI-Desktop\/issues\/1106"/,
+      /<a[^>]*href="https:\/\/github\.com\/mySlyy\/slyy-desktop\/issues\/1106"/,
     );
     assert.match(wrappedLink, /target="_blank"/);
 

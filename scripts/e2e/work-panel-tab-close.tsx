@@ -298,7 +298,7 @@ async function runPluginViewMenuLayerPath(): Promise<PluginViewMenuLayerResult> 
         viewId: "browser",
         ref: "pi.browser/browser",
         title: "Browser",
-        pluginName: "PI-Desktop",
+        pluginName: "Slyy",
         order: 0,
       }],
     });

@@ -110,8 +110,8 @@ const MCP_SERVER_NAME = "slyy";
 /** Generic invoke tool; the only one listed in `tools/list`. */
 const MCP_INVOKE_TOOL = "slyy_invoke";
 /**
- * Pre-rebrand name of the invoke tool. Clients configured against PI-Desktop
- * builds may still call it, so `tools/call` accepts it as an unlisted alias of
+ * Pre-rebrand name of the invoke tool. Clients configured before the rebrand
+ * may still call it, so `tools/call` accepts it as an unlisted alias of
  * the same tool (same schema, same confirm gate).
  */
 const LEGACY_MCP_INVOKE_TOOL = "pi_desktop_invoke";

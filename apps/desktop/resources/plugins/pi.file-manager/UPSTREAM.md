@@ -104,7 +104,7 @@ is recorded here. `UPSTREAM.md` is the provenance record, not a runtime input.
 | `CHANGELOG.md` | 37404 | `8a267874142932202ee5829cf8c892e69e942363a49cd5f5d4734502715ae4fb` |
 | `LICENSE` | 1067 | `ebaec3ae096498a39f6b86e3ac8017e39818fb5aaff80b452349f94bc275ec0d` |
 | `README.md` | 40639 | `f267a4816c49e604233544f0d5f7f533ddeecf2876524c162399537f1564dc45` |
-| `main.js` | 127762 | `0af675845951760c9766ba891e6da36d824f46c25ba325a7998c389b33b10718` |
+| `main.js` | 127750 | `83f123db48d458c97cf7675d2be378ae2f7c6b3975a5e92ac2b54d5cbc8b1f14` |
 | `manifest.json` | 33708 | `4d900c279a8e0183adb68fcff7cc2b075568d7ceb910d81efbe518e24d5cdca1` |
 | `package.json` | 25 | `8005a3491db7d92f36ac66369861589f9c47123d3a7c71e643fc2c06168cd45a` |
 | `remote-workspace.js` | 3757 | `931a579801fd4b334c3d96231aafc7ff52e0c03e7baebbabaf00b4c5e17cc366` |

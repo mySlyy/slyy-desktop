@@ -8,7 +8,7 @@
 //!
 //! Two refusals are unconditional and have no setting, grant option, or
 //! permission mode that reaches them: this application's own windows are never
-//! a target (synthetic input into PI-Desktop would bypass the permission
+//! a target (synthetic input into Slyy would bypass the permission
 //! broker), and a secure input state refuses both inspection and input.
 //!
 //! Since ADR 0344 the grant is automatic and desktop-wide, so the user no
@@ -120,7 +120,7 @@ pub enum PermissionState {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum TargetRefusal {
-    /// A PI-Desktop window. Unconditional.
+    /// A Slyy window. Unconditional.
     #[serde(rename = "self")]
     SelfTarget,
     Denylisted,

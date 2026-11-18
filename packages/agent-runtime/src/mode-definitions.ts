@@ -1,7 +1,7 @@
 /**
  * Where mode definitions come from (ADR mode-definitions).
  *
- * Two sources, mirroring `subagent-definitions.ts`: the modes PI-Desktop
+ * Two sources, mirroring `subagent-definitions.ts`: the modes Slyy
  * ships, inline as Markdown documents, and the user's global
  * `~/.pi/modes/<dir>/mode.md` documents, which Electron main reads and hands
  * in. Workspaces never provide modes. A document in a builtin's own folder

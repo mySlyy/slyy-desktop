@@ -11,7 +11,7 @@ describe("foldFullwidthHeaderValue", () => {
   });
 
   it("folds the ideographic space but keeps interior ASCII text", () => {
-    expect(foldFullwidthHeaderValue("PI\u3000Desktop")).toBe("PI Desktop");
+    expect(foldFullwidthHeaderValue("Slyy\u3000Gen2")).toBe("Slyy Gen2");
   });
 
   it("leaves halfwidth katakana alone", () => {

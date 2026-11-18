@@ -32,7 +32,7 @@ export type JevProbeOptions = {
 };
 
 /**
- * The smallest valid System One request: `bool` is PI-Desktop's public name for
+ * The smallest valid System One request: `bool` is the app's public name for
  * the wire-level `noul` question (see pi-ai's System One transport).
  */
 function probeRequestBody() {

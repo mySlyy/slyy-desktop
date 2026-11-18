@@ -271,12 +271,12 @@ test("Settings → Modes starts documents with valid ids and an exact name", () 
   assert.equal(settingsModel.newModeIdProblem("fresh-mode", CATALOG), null);
 
   const template = settingsModel.simpleModeTemplate("fresh-mode", {
-    description: "Für: \"Zitate\"",
+    description: "F\u00fcr: \"Zitate\"",
     prompt: "Work carefully.",
   });
   assert.equal(
     template,
-    '---\nname: fresh-mode\nlabel: "Fresh mode"\ndescription: "Für: \\"Zitate\\""\npermission: agent\n---\nWork carefully.\n',
+    '---\nname: fresh-mode\nlabel: "Fresh mode"\ndescription: "F\u00fcr: \\"Zitate\\""\npermission: agent\n---\nWork carefully.\n',
   );
 
   const goal = "---\nname: goal\nlabel: Goal\nstages:\n  work:\n    name: inner\n---\nBody name: stays\n";

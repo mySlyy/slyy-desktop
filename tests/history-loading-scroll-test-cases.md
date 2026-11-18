@@ -12,7 +12,7 @@
   (`auto` under reduced motion), keeping visible messages mounted until native
   arrival. Tail-connected loaded pages and cursors remain available, independently
   of mounted-window bounds; no idle TTL or memory reclamation is introduced.
-- Follow-up integration base: official `vastsa/PI-Desktop` main,
+- Follow-up integration base: upstream PI-Desktop main,
   `14b928f3171e9e00b6d2851d67c832812ff61fc7`, including merged PR #2080.
   The continuous-answer jump and pending-page latest-button race both fail on
   this baseline despite the original seven direct-component cases passing.
@@ -24,7 +24,7 @@
   and never reads real sessions or contacts a provider.
 - Close the fixture window to exit and remove its temporary profile.
 
-## Full PI-Desktop manual session
+## Full Slyy manual session
 
 For the complete application (sidebar, project, transcript and Composer), run:
 

@@ -35,13 +35,13 @@ describe("normalizeProviderHeaders", () => {
   it("folds fullwidth values and drops what still cannot be a ByteString", () => {
     expect(
       normalizeProviderHeaders({
-        "X-Title": "PI\u3000Desktop",
+        "X-Title": "Slyy\u3000Gen2",
         "X-Key": "1234567\uFF10",
         "X-CJK": "\u661f",
         "X-Control": "ab\u0000cd",
       }),
     ).toEqual({
-      "X-Title": "PI Desktop",
+      "X-Title": "Slyy Gen2",
       "X-Key": "12345670",
     });
   });

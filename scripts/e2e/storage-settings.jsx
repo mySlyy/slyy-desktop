@@ -9,12 +9,12 @@ import { SettingsPage } from "../../apps/desktop/src/features/settings/SettingsP
 import { useAppStore } from "../../apps/desktop/src/stores/app-store";
 
 const baseline = {
-  dataPath: "/old/PI-Desktop", browserPath: "/old/chromium", managed: true,
+  dataPath: "/old/Slyy", browserPath: "/old/chromium", managed: true,
   cacheBytes: 2 * 1024 * 1024, pendingPath: null, lastError: null,
-  backupPaths: ["/previous/PI-Desktop"],
+  backupPaths: ["/previous/Slyy"],
 };
 let info = { ...baseline };
-let chosen = "/new/PI-Desktop";
+let chosen = "/new/Slyy";
 let settingsReadError = true;
 let readError = false;
 let operationError = false;
@@ -87,7 +87,7 @@ window.storageSettingsProbe = async () => {
   click("settings.storage.choose");
   await settled();
   assert(!scope().querySelector(".settings-storage-confirmation"), "Canceling native picker must not begin migration");
-  chosen = "/new/PI-Desktop";
+  chosen = "/new/Slyy";
   click("settings.storage.choose");
   await settled();
   assert(scope().querySelector(".settings-storage-confirmation").textContent.includes(chosen), "Chosen target must be shown before confirmation");

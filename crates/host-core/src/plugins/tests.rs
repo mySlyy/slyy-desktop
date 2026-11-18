@@ -184,7 +184,7 @@ fn marketplace_uses_highest_semver_when_catalog_versions_are_unsorted() {
             id: "pi.todo".into(),
             name: "Fresh Todo".into(),
             description: "Todo plugin".into(),
-            author: "PI-Desktop".into(),
+            author: "Slyy".into(),
             icon_url: None,
             categories: vec![],
             verified: true,
@@ -292,7 +292,7 @@ fn market_entry_offers_an_update_only_when_the_catalog_is_newer() {
             id: "pi.todo".into(),
             name: "Todo".into(),
             description: "Todo plugin".into(),
-            author: "PI-Desktop".into(),
+            author: "Slyy".into(),
             versions: vec![MarketVersion {
                 version: latest.into(),
                 published_at: "2026-08-12T00:00:00Z".into(),
@@ -1697,7 +1697,7 @@ fn v2_catalog(entry: MarketCatalogEntry) -> MarketCatalogFile {
         schema_version: 2,
         provider_id: "official".into(),
         artifact_base_url: Some(
-            "https://github.com/vastsa/pi-plugin-center/releases/download".into(),
+            "https://github.com/acme/pi-plugin-center/releases/download".into(),
         ),
         plugins: vec![entry],
         ..Default::default()
@@ -1706,10 +1706,10 @@ fn v2_catalog(entry: MarketCatalogEntry) -> MarketCatalogFile {
 
 #[test]
 fn package_downloads_are_restricted_to_distribution_hosts() {
-    let catalog = "https://raw.githubusercontent.com/vastsa/pi-plugin-center/main/catalog.json";
+    let catalog = "https://raw.githubusercontent.com/acme/pi-plugin-center/main/catalog.json";
     // GitHub release entry point and the storage hosts it redirects to.
     for url in [
-            "https://github.com/vastsa/pi-plugin-center/releases/download/acme.todo@1.0.0/acme.todo-1.0.0.piplug",
+            "https://github.com/acme/pi-plugin-center/releases/download/acme.todo@1.0.0/acme.todo-1.0.0.piplug",
             "https://objects.githubusercontent.com/github-production-release-asset/1",
             "https://release-assets.githubusercontent.com/github-production-release-asset/1",
             "https://codeload.github.com/acme/pi-plugin-todo/zip/refs/tags/v1.0.0",
@@ -1739,7 +1739,7 @@ fn a_private_catalog_is_trusted_only_for_its_own_host() {
 
 #[test]
 fn package_urls_reject_credentials_and_plain_http() {
-    let catalog = "https://raw.githubusercontent.com/vastsa/pi-plugin-center/main/catalog.json";
+    let catalog = "https://raw.githubusercontent.com/acme/pi-plugin-center/main/catalog.json";
     let err = package_host_allowed("https://user:pass@github.com/a.piplug", catalog)
         .unwrap_err()
         .to_string();
@@ -1756,21 +1756,21 @@ fn package_urls_reject_credentials_and_plain_http() {
 
 #[test]
 fn relative_package_urls_resolve_against_the_declared_artifact_base() {
-    let catalog = "https://raw.githubusercontent.com/vastsa/pi-plugin-center/main/catalog.json";
+    let catalog = "https://raw.githubusercontent.com/acme/pi-plugin-center/main/catalog.json";
     // v2: the declared base wins, so a release asset is reachable even
     // though it does not live under the catalog directory.
     assert_eq!(
             PluginManager::resolve_package_url(
                 catalog,
-                Some("https://github.com/vastsa/pi-plugin-center/releases/download"),
+                Some("https://github.com/acme/pi-plugin-center/releases/download"),
                 "acme.todo@1.0.0/acme.todo-1.0.0.piplug",
             ),
-            "https://github.com/vastsa/pi-plugin-center/releases/download/acme.todo@1.0.0/acme.todo-1.0.0.piplug"
+            "https://github.com/acme/pi-plugin-center/releases/download/acme.todo@1.0.0/acme.todo-1.0.0.piplug"
         );
     // v1: no declared base, so the catalog directory still anchors it.
     assert_eq!(
         PluginManager::resolve_package_url(catalog, None, "packages/x.piplug"),
-        "https://raw.githubusercontent.com/vastsa/pi-plugin-center/main/packages/x.piplug"
+        "https://raw.githubusercontent.com/acme/pi-plugin-center/main/packages/x.piplug"
     );
     // An absolute URL is passed through for the host allowlist to judge.
     assert_eq!(

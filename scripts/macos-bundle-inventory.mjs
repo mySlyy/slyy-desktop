@@ -12,7 +12,7 @@
 // `getFilePathIfBinary()` (isbinaryfile content detection) for *every* file it
 // walks, so it signs far more than the Mach-O files and nested bundles: any
 // resource that merely looks binary gets its own `codesign` call too. One real
-// signed PI-Desktop.app produced 91 invocations distributed over extensions
+// signed app bundle produced 91 invocations distributed over extensions
 // `.pak` 33, extensionless 24, `.dylib` 12, `.app` 5, `.framework` 4, `.nib` 3,
 // `.dat` 3, `.bin` 3, `.png` 2, `.asar` 1, `.icns` 1. Counting just Mach-O
 // files and nested bundles understates that work by roughly 4x, which is why

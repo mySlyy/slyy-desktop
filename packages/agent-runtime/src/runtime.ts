@@ -899,7 +899,7 @@ const PROGRESS_TURN_NUDGE = [
 /**
  * Some OpenAI-style models emit their internal parallel-call wrapper as
  * assistant text (`to=multi_tool_use.parallel code:{"tool_uses":[…]}`) instead
- * of real tool calls. PI-Desktop has no such tool, so the whole batch lands as
+ * of real tool calls. Slyy has no such tool, so the whole batch lands as
  * prose and silently does nothing — the turn looks finished while no work ran.
  * Rare (2 occurrences across 255 recorded sessions) but indistinguishable from
  * a stuck agent when it happens.

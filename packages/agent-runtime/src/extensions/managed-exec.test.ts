@@ -55,7 +55,7 @@ it("terminates a command whose combined output exceeds maxBuffer and reports tru
 
 it("drops an incomplete UTF-8 suffix at the truncation boundary", async () => {
   const owner = new AbortController();
-  const source = "process.stdout.write(Buffer.from('aé'));setInterval(()=>{},1000);";
+  const source = "process.stdout.write(Buffer.from('a\u00e9'));setInterval(()=>{},1000);";
   const result = await managedExec(process.execPath, ["-e", source], tmpdir(), owner.signal, { maxBuffer: 2 });
   expect(result).toMatchObject({ stdout: "a", truncated: true });
 });

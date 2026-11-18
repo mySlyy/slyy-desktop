@@ -51,7 +51,7 @@ function assert(value: unknown, message: string): asserts value {
 async function markdownLinkInteractionProbe(
   i18n: ReturnType<typeof createInstance>,
 ) {
-  const destination = "https://github.com/vastsa/PI-Desktop/issues/1106";
+  const destination = "https://github.com/mySlyy/slyy-desktop/issues/1106";
   const initialState = useAppStore.getState();
   const openedUrls: string[] = [];
   const host = document.createElement("div");
@@ -73,7 +73,7 @@ async function markdownLinkInteractionProbe(
       root.render(
         <I18nextProvider i18n={i18n}>
           <Markdown
-            source="[#1106](([github.com](https://github.com/vastsa/PI-Desktop/issues/1106)))"
+            source="[#1106](([github.com](https://github.com/mySlyy/slyy-desktop/issues/1106)))"
           />
         </I18nextProvider>,
       ),

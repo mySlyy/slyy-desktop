@@ -61,7 +61,7 @@ test("the skill only names tokens, classes, and libraries the bundled kit provid
   const helperNames = new Set(body.match(/viz\.[a-zA-Z]+/g)?.map((name) => name.slice(4)));
   assert.ok(helperNames.size >= 6);
   for (const name of helperNames) assert.ok(exported.has(name), `viz.${name}`);
-  // Host APIs from the upstream kit that PI-Desktop does not provide.
+  // Host APIs from the upstream kit that Slyy does not provide.
   assert.doesNotMatch(body, /window\.zcode|widgetState|sendFollowUpMessage|openExternal|Tweak|lucide|viz-carousel|render\.py/);
 });
 

@@ -28,7 +28,7 @@ test("a project capability query carries the selected project's path", () => {
 });
 
 test("stored per-project overrides are surfaced, not hidden, in both directions", () => {
-  // vastsa's repro shape on #1964: an override written by the old UI keeps
+  // The repro shape of upstream #1964: an override written by the old UI keeps
   // runtime precedence for its project even after the global default moves.
   // Seeding persisted false and true overrides, the derived map must expose
   // exactly the rows whose effective state disagrees with the default - those

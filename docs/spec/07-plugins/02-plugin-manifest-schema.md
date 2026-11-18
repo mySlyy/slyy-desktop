@@ -123,8 +123,9 @@ Rules:
    (`zh`, `zh-CN`, `zh-Hans`, `zh-SG`) reads `zh-CN`; every other locale reads
    `en`. A plugin is not required to translate itself into the other shipped
    shell locales, so a non-Chinese shell such as Slyy's German shell reads
-   `en`. `zh-CN` stays a contract locale for compatibility with upstream
-   PI-Desktop plugins even though Slyy ships no Chinese shell (ADR 0182).
+   `en`. `zh-CN` stays a contract locale for compatibility with plugins
+   written for upstream PI-Desktop, even though Slyy ships no Chinese shell
+   (ADR 0182).
 2. Both locales and all three fields are required by the plugin repository's
    validator, but the host is permissive: a missing locale, a missing field, or
    an empty string falls back per field to the other contract locale, and from
