@@ -133,9 +133,10 @@ produce the same order.
 
 Text is normalized (case, full-width forms, separators) before comparison, and
 pinyin plus pinyin initials come from `pinyin-pro`
-(`apps/desktop/src/lib/launcher-text.ts`). `wx`, `weixin` and `微信` therefore
-reach the same application, and `pi` finds a plugin named `PI-Desktop` by name
-as well as by pinyin and initials.
+(`apps/desktop/src/lib/launcher-text.ts`). An application with a Chinese name,
+such as WeChat, is therefore reached by its name, its full pinyin (`weixin`),
+and its pinyin initials (`wx`); a Latin name such as `Pi Notes` is found by
+`pi` through its name.
 
 ## 6. Declared triggers
 
@@ -270,7 +271,7 @@ ADR [0343](../../adr/0343-plugin-launcher-local-apps.md) records this decision.
 | `Esc` | leave the all-plugins view, otherwise close the panel |
 
 While an IME composition is active (`event.isComposing` or `keyCode === 229`) no
-key is acted on, so a Chinese IME's candidate Enter or arrow keys never open or
+key is acted on, so an IME's candidate Enter or arrow keys never open or
 move a tile.
 
 ## 12. IPC and security boundary
@@ -346,10 +347,9 @@ the command list inside global search; this document describes the launcher.
    recents header reports the real number of remembered items.
 2. A plugin that declares a trigger receives the typed input as the first tile,
    appears exactly once, and its panel shows the same text.
-3. `wx`, `weixin`, and `微信` all reach the same application.
+3. `wx`, `weixin`, and WeChat's Chinese name all reach the same application.
 4. A plugin and an application with the same name both appear as separate tiles.
-5. `pi` finds PI-Desktop by name, and the same item through pinyin and
-   initials.
+5. `pi` finds an item named `Pi Notes` by name.
 6. Dragging the window wider keeps eight columns per row and survives a restart;
    the height always matches what the panel renders.
 7. A query with more than 24 matches does not grow the window past its cap; the

@@ -393,7 +393,7 @@ started on and a proxy is never silently dropped.
 An ordinary turn that ends with no tool call and no visible assistant text is invisible
 to the user: reasoning is never rendered, so a conclusion written only there
 did not arrive. 15 of 255 recorded sessions ended a turn that way, and the
-user's only recourse was typing "继续".
+user's only recourse was typing "continue".
 
 The runtime detects it at `message_end`: the stop was neither an error nor an
 abort, the message requested no tools (no `toolCall` content part), and the
@@ -502,7 +502,7 @@ with no remaining content still anchors the checkpoint. This changes only the
 model projection: stored history is not rewritten, results are not discarded,
 and historical tools are not executed again (issue #2306).
 
-PI-Desktop uses pi-agent-core for the agent loop and stable agent/event/tool
+Slyy uses pi-agent-core for the agent loop and stable agent/event/tool
 types, and pi-ai for provider-facing requests and message estimation. The
 runtime owns its context projection, LLM-message conversion, token-estimation
 adapter, compaction cut-point selection, and summary generation because the
@@ -526,7 +526,7 @@ For every pi loop turn:
 
 1. pi emits and awaits `turn_end` after the assistant message and all tool
    results for that turn are complete
-2. PI-Desktop rebuilds the context from the full transcript plus the newest
+2. Slyy rebuilds the context from the full transcript plus the newest
    valid checkpoint and estimates the next request budget
 3. below 90% of `hardLimit`, and with no pending model request, the next turn
    proceeds unchanged (a budget reminder may be added to that request)
@@ -746,7 +746,7 @@ counts as running state until durable persistence completes.
 
 The file list a checkpoint carries is read out of the summarized range by pi's
 own collector, which recognizes the lowercase spellings `read` / `write` /
-`edit` — the names pi's tools carry. PI-Desktop registers `Read` / `Write` /
+`edit` — the names pi's tools carry. Slyy registers `Read` / `Write` /
 `Edit`, so the runtime converts exactly those three on the way into pi's
 preparation (`withPiFileOpToolNames`): nothing stored changes, and every other
 tool name is left spelled the way we register it. Without that conversion a
@@ -1858,7 +1858,7 @@ out-of-root files are skipped. The global file and the combined project
 entries have independent 32 KiB UTF-8 budgets, so an oversized global file
 never removes project instructions. A file that exceeds its remaining budget is
 cut on a UTF-8 character boundary and followed by a
-`[PI-Desktop truncated <source>: loaded the first <n> of <total> bytes; ...]`
+`[Slyy truncated <source>: loaded the first <n> of <total> bytes; ...]`
 notice; project files after a truncated one are not loaded. Source paths are
 labelled under `# Project instructions`.
 The sidecar never reads workspace instructions directly. A changed root chain

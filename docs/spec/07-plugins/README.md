@@ -24,7 +24,7 @@ this directory define the normative contracts and implementation boundaries.
 | [14-plugin-roadmap.md](14-plugin-roadmap.md) | Plugin roadmap |
 | [15-plugin-center.md](15-plugin-center.md) | Plugin center (publishing side) |
 | [16-trusted-extensions.md](16-trusted-extensions.md) | Trusted extensions (in-sidecar extension surface) |
-| [17-plugin-glossary.md](17-plugin-glossary.md) | English–Chinese plugin terminology and usage |
+| [17-plugin-glossary.md](17-plugin-glossary.md) | Plugin terminology and usage |
 | [18-plugin-launcher.md](18-plugin-launcher.md) | Plugin launcher surface (`Alt+Space`), triggers, and local applications |
 
 ## Read the code behind the contract
@@ -48,5 +48,4 @@ known differences instead of treating a permissive parser as authorization.
 
 Lifecycle proposals, background-audio types without a device backend, signing
 plans, and center-server architecture are explicitly distinguished from shipped
-runtime APIs. Review pages under `docs/plugin-plan` may describe unimplemented
-hooks; they are not an additional public API.
+runtime APIs.

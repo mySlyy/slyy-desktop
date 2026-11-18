@@ -15,7 +15,7 @@ is not provided by this style repair. See
 
 ## 1. Goals
 
-1. Provide a **single source of truth** for visual tokens, component foundations, and layout metrics across PI-Desktop
+1. Provide a **single source of truth** for visual tokens, component foundations, and layout metrics across Slyy
 2. Ensure **high readability and contrast** in both light and dark themes — this is a developer workstation, not a marketing surface
 3. Map all design decisions to **Tailwind CSS tokens** so that spec → implementation is unambiguous
 4. Enable **future shadcn-like primitive extraction** without re-specifying foundations
@@ -57,7 +57,7 @@ AI-generated page surfaces use concise, task-oriented copy:
 
 ### 3.2 Text selection
 
-PI-Desktop behaves like a desktop application shell, so accidental drag
+Slyy behaves like a desktop application shell, so accidental drag
 selection is suppressed for chrome by default. The selection contract is:
 
 - Navigation, titlebar chrome, buttons, labels, badges, menus, and other
@@ -85,7 +85,8 @@ selection is suppressed for chrome by default. The selection contract is:
 ### 3.3 Locale-aware chrome labels
 
 Section labels that use Latin micro-style (`text-transform: uppercase` +
-`letter-spacing: wide`) must relax under `:lang(zh-CN)`:
+`letter-spacing: wide`) must relax under a CJK `:lang(...)`. Slyy ships only
+en and de, so this inherited upstream rule is currently inert:
 
 - `letter-spacing` returns to `--tracking-normal`
 - `text-transform` is `none` (CJK has no case and wide tracking splits glyphs)
@@ -117,35 +118,32 @@ empty rail outside the panel surface.
 
 ### 3.4 Product identity and marks
 
-The visible product identity is **PI-Desktop**, even where the shell borrows
-Codex as a visual reference. The identity contract is deliberately small:
+The visible product identity is **Slyy** (based on PI-Desktop; frozen identity
+in [ADR slyy-downstream-branding](../../adr/slyy-downstream-branding.md)), even
+where the shell borrows Codex as a visual reference. The identity contract is
+deliberately small:
 
 - The sidebar shell name, settings copy, and composer placeholder use
-  `PI-Desktop`; `Codex` is reserved for the external session-import source or
+  `Slyy`; `Codex` is reserved for the external session-import source or
   historical design-reference text.
-- `build/icon_1024.png` is the canonical shell logo master; the renderer
-  imports the 192x192 marks derived from it under `src/assets/brand/`
-  (ADR 0125). `BrandLogo` imports those
-  through Vite so the renderer bundle, development Dock, and packaged
-  application all use the same visual asset.
-- On macOS, both development and packaged launches expose `PI-Desktop` as the
-  native application-menu name. The native About panel uses the PI-Desktop
-  name, version, and canonical icon; no stock Electron name or icon is visible.
+- The Slyy mark is one brand-blue dot (`src/assets/brand/slyy-mark.svg`),
+  identical in light and dark. `BrandLogo` and `HomeMascotLogo` import it
+  through Vite; `build/icon_1024.png` is the app icon master for the
+  development Dock and packaged application (ADR 0125).
+- On macOS, both development and packaged launches expose `Slyy` as the
+  native application-menu name. The native About panel uses the Slyy
+  name, version, and canonical icon, and credits PI-Desktop (LGPL-3.0); no
+  stock Electron name or icon is visible.
   Development launches use a generated branded host bundle because AppKit
   reads this identity from the host bundle rather than Electron runtime APIs.
-- On Windows, Electron Main registers the canonical `net.aiuo.pi-desktop`
-  AppUserModelID before readiness. The runtime ID, packaged executable name,
-  and NSIS shortcut identity stay aligned so native notifications,
-  notification settings, and taskbar groups identify the app as `PI-Desktop`
-  rather than Electron.
-- The empty-home hero uses a 100px `HomeMascotLogo` GIF: an eight-frame waving
-  mascot compiled from the supplied light and dark action sets, with a short
-  idle hold on the first frame. CSS selects the pair from
-  `document.documentElement[data-theme]`; anything other than `light` uses the
-  dark artwork. Playback is native to the GIF. There is no random pose
-  selection, JavaScript timer, or hover-driven speed change. Reduced motion
-  swaps the GIF for the matching first-frame PNG without changing the 100px
-  slot.
+- On Windows, Electron Main registers the canonical `ai.slyy.desktop.gen2`
+  AppUserModelID before readiness. The runtime ID, packaged executable name
+  (`Slyy Gen2`), and NSIS shortcut identity stay aligned so native
+  notifications, notification settings, and taskbar groups identify the app as
+  Slyy rather than Electron.
+- The empty-home hero uses `HomeMascotLogo`: the static 48px Slyy dot centered
+  in a 100px slot. It replaced the upstream animated mascot GIF; there is no
+  animation, theme-specific artwork, or reduced-motion swap.
   `BrandLogo` remains 20px/18px in the expanded/collapsed sidebar and 64px in
   the startup splash. Composer prompt rows do not render a leading brand icon
   in either home or thread-docked mode.
@@ -1471,7 +1469,7 @@ adjacent form inputs; dense surfaces may override that metric locally.
 ### Don't
 
 - Don't hardcode `#181818` or any hex value in component JSX — use tokens
-- Don't use emoji as icon substitutes (🚀, ✅, ❌ are text, not UI icons)
+- Don't use emoji as icon substitutes (rocket, check-mark or cross emoji are text, not UI icons)
 - Don't add decorative gradients, glass-morphism, or neon effects
 - Don't use `z-index` values outside the defined layers
 - Don't animate for decoration — motion is feedback only
@@ -1510,7 +1508,7 @@ adjacent form inputs; dense surfaces may override that metric locally.
 - Floating composer plate: Codex elevated-primary (`#212121f5` / `color-mix(gray-800 96%, transparent)`) with standard elevation-prominent (`0 0 0 .5px` stroke + `0 3px 7.5px #0000000a` + `0 0 20px #0000000d`); no heavier night-only lift
 - Light workspace chips capsule: elevated gray `#f4f4f4` (not pure white-on-white)
 - Combined workspace chips: elevated translucent plate over main, not flat main gray
-- Stage Manager (macOS only): host re-asserts min bounds while collapsed (permanent watchdog). The watchdog and temporary recovery pin are macOS-only; Windows/Linux bounds recovery stays at the normal window layer so switching to another app never leaves PI-Desktop above it (D447).
+- Stage Manager (macOS only): host re-asserts min bounds while collapsed (permanent watchdog). The watchdog and temporary recovery pin are macOS-only; Windows/Linux bounds recovery stays at the normal window layer so switching to another app never leaves Slyy above it (D447).
 
 ## Destination pages
 

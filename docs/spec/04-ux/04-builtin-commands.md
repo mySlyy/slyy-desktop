@@ -143,14 +143,10 @@ Bundled Skills are active by default and can be disabled globally in Settings
 catalogs; a stale direct load is rejected. This switch does not change agent
 tool availability.
 
-## 9. Ideographic comma opens the slash menu (D405)
+## 9. Ideographic comma slash alias (D405, removed)
 
-A Chinese IME produces `、` (U+3001) where the ASCII `/` is meant, so reaching
-the menu otherwise means switching input methods mid-sentence. When the composer
-is empty, a committed `、` as its first character is rewritten to `/` before
-trigger detection runs, and the ordinary slash menu opens with the same
-insertion, filtering, and send behavior described above.
-
-Only the first character of an empty draft is rewritten. A `、` anywhere else in
-the draft is ordinary punctuation and is never touched, and the alias has no
-effect on the `@` file menu.
+Upstream rewrote an ideographic comma (U+3001, produced by a Chinese IME)
+committed as the first character of an empty draft to `/` so the slash menu
+opened without switching input methods (ADR 0231). Slyy removed this alias on
+2026-11-18: only the ASCII `/` opens the slash menu, and U+3001 is ordinary
+text everywhere in the draft.

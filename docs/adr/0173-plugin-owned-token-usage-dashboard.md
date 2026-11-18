@@ -16,7 +16,7 @@ duplicated a weaker PI-Desktop-only matrix inside Preferences.
 1. Settings has no Usage destination: Preferences is General, AI, and Shortcuts,
    and search does not index a usage tab.
 2. `pi.token-insights` is the user-facing dashboard, and command palette keywords
-   (`usage`, `tokens`, `用量`) open that plugin.
+   (`usage`, `tokens`, and the Chinese word for usage) open that plugin.
 3. Host persistence stays: Electron still sums parent `message_end` usages plus
    `turn_end.subagentUsage` into `session.endTurn.usage`, and
    `stats.getTokenUsageHistory` remains an additive host RPC / IPC for local

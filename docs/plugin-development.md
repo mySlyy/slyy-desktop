@@ -1,7 +1,7 @@
-# PI-Desktop Plugin Development: Zero to One
+# Slyy Plugin Development: Zero to One
 
 This guide is the shortest complete path from an empty folder to a tested
-`.piplug` package. It describes the plugin runtime that PI-Desktop ships today.
+`.piplug` package. It describes the plugin runtime that Slyy ships today.
 The SDK types, host validators, runtime dispatch, and executable tests are the
 implementation evidence. The files under [`docs/spec/07-plugins`](spec/07-plugins/README.md) remain the
 normative contract when this guide and a specification differ.
@@ -50,10 +50,10 @@ surface cross a host-owned permission gateway.
 
 For the recommended app-first path, you need:
 
-- a running PI-Desktop build;
+- a running Slyy build;
 - an empty folder for the plugin; and
 - a text editor.
-- To import a pi extension directory with npm dependencies, a system `npm` executable must be on `PATH`. Release builds ship no standalone Node/npm; without it, PI-Desktop reports a warning and the imported dependency cannot load.
+- To import a pi extension directory with npm dependencies, a system `npm` executable must be on `PATH`. Release builds ship no standalone Node/npm; without it, Slyy reports a warning and the imported dependency cannot load.
 
 For the repository CLI path, use the Node.js and pnpm versions declared in the
 root `package.json` (`engines` and `packageManager`) and a checkout of this
@@ -63,14 +63,14 @@ private workspace packages, so do not assume that `npm install
 
 ## 3. Create the first plugin
 
-### Option A: create it in PI-Desktop
+### Option A: create it in Slyy
 
 1. Open **Plugins** (the Extensions page).
 2. Open the header overflow menu and choose **New plugin from template**.
 3. Choose `panel-basic`.
 4. Select an empty folder.
 
-PI-Desktop writes the starter files, loads the folder as a development plugin,
+Slyy writes the starter files, loads the folder as a development plugin,
 and opens the folder as the active project. The plugin is live immediately.
 
 The four built-in templates are:
@@ -87,7 +87,7 @@ existing project.
 
 ### Option B: create it with the repository CLI
 
-From the PI-Desktop repository root:
+From the Slyy repository root:
 
 ```bash
 pnpm install
@@ -97,7 +97,7 @@ pnpm pi-plugin init panel-basic ../my-first-plugin \
   --name "My First Plugin"
 ```
 
-Then open PI-Desktop, go to **Plugins**, choose **Load development plugin**, and
+Then open Slyy, go to **Plugins**, choose **Load development plugin**, and
 select `../my-first-plugin`.
 
 Use a reverse-domain id for a published plugin, for example
@@ -125,7 +125,7 @@ my-first-plugin/
 - `README.md` explains how to develop and package this particular plugin.
 
 Distribution packages must contain directly executable JavaScript, HTML, CSS,
-and assets. PI-Desktop does not install dependencies or compile TypeScript when
+and assets. Slyy does not install dependencies or compile TypeScript when
 it loads a plugin. If you use TypeScript or third-party packages, bundle or
 compile them into the plugin directory before checking and packing it.
 
@@ -224,7 +224,7 @@ in the [Plugin API](spec/07-plugins/03-plugin-api.md).
 
 ### `renderer/index.html`
 
-PI-Desktop hosts the panel in a frameless window on every platform. The host
+Slyy hosts the panel in a frameless window on every platform. The host
 reserves exactly a transparent 46 CSS px drag band and renders a minimal fixed
 capsule in the top-right corner with minimize, maximize/restore, and close
 buttons. The panel title, toolbar, and all other visible UI belong to the
@@ -435,7 +435,7 @@ page generates controls for `string`, `number`, `boolean`, `select`, `json`, and
 }
 ```
 
-Plugin shortcuts run only in the focused PI-Desktop window and are checked
+Plugin shortcuts run only in the focused Slyy window and are checked
 against the app shortcut map. For OS-global bindings use the separate
 `contributes.globalShortcuts` and
 `pi.keyboard` surface with `keyboard.globalShortcut` (§6.17). The
@@ -478,7 +478,7 @@ the root itself. `net.fetch` accepts HTTP(S) and only reaches hosts allowed by
 because Electron does not expose a cross-platform read-only OS permission API;
 `unknown` means the platform has not reported a result yet, and
 `unsupported` means desktop notifications are unavailable. Native plugin
-notifications are not added to PI-Desktop's durable task notification inbox.
+notifications are not added to Slyy's durable task notification inbox.
 Clicking a delivered notification restores and focuses the main window, but
 does not activate a session.
 
@@ -515,12 +515,12 @@ primary-first `roots`. A stopped or unavailable Host returns `[]`. See the
 - **Reading** may declare the whole tree. **Writing and deleting may not** — a
   whole-tree pattern fails validation, because the egress allowlist is what makes
   a broad read safe and nothing makes a broad write safe.
-- An access outside the declared scope is not an error: PI-Desktop asks the user
+- An access outside the declared scope is not an error: Slyy asks the user
   (Deny / Allow once / Allow this session). Declare the scope you need so your
   plugin does not interrupt them on every call, and expect a refusal to arrive as
   `PERMISSION_DENIED`.
 - Some paths are refused whatever you declare: `.env*`, SSH and cloud
-  credentials, `*.pem`, `.git/**`, and PI-Desktop's own data directory. They do
+  credentials, `*.pem`, `.git/**`, and Slyy's own data directory. They do
   not appear in `fs.glob` results either.
 
 **Deleting.** `own: true` lets you remove files your plugin wrote itself, with no
@@ -581,7 +581,7 @@ Check host support before relying on a policy; old hosts can ignore unknown
 request fields. Never fall back to a raw network request.
 
 ```js
-if (typeof pi.net.getCapabilities !== "function") throw new Error("Upgrade PI-Desktop");
+if (typeof pi.net.getCapabilities !== "function") throw new Error("Upgrade Slyy");
 const capabilities = await pi.net.getCapabilities();
 if (!capabilities.fetchRedirectModes.includes("error")) throw new Error("Unsupported host");
 const response = await pi.net.fetch({ url: endpoint, redirect: "error" });
@@ -677,7 +677,7 @@ conversation: a change list, a file tree, an issue queue.
     "views": [
       {
         "id": "changes",
-        "title": { "en": "Changes", "zh-CN": "改动" },
+        "title": "Changes",
         "icon": "diff",
         "entry": "views/changes.html",
         "order": 10
@@ -718,7 +718,7 @@ plugin's own persisted session partition, and network limited to
 plugin restricted to certain projects does not offer its views in others.
 
 `examples/plugins/hello` ships a working view at `views/greetings.html`, and
-PI-Desktop's own file view is a bundled plugin built the same way —
+Slyy's own file view is a bundled plugin built the same way —
 `apps/desktop/resources/plugins/pi.file-manager` is a complete, non-toy example
 of a view that reaches the workspace over the public bridge: `fs.openDefault`
 and `fs.reveal` for the two actions only the host can perform, and its plugin-owned
@@ -884,7 +884,7 @@ What to know before you use it:
   details, never thrown.
 - **Import existing pi extensions** against the supported-member table in spec 16: Plugins → overflow menu →
   "Import pi extension" wraps a file or directory in a generated plugin. If
-  the directory declares production or optional dependencies, PI-Desktop first
+  the directory declares production or optional dependencies, Slyy first
   runs `npm install --package-lock-only --omit=dev --legacy-peer-deps --no-audit
   --no-fund --ignore-scripts`, validates the generated registry-only lockfile,
   then runs `npm ci` with the same safety flags. Direct dependency specs are
@@ -900,7 +900,7 @@ What to know before you use it:
 ### 6.12 Renderer slots
 
 Every surface above is a window or a page the plugin owns. A **renderer module**
-draws inside PI-Desktop's own window instead: controls in the composer toolbar,
+draws inside Slyy's own window instead: controls in the composer toolbar,
 items on a message's action bar, a block below an assistant reply, the card for
 one of your own Agent tools, a renderer for a fenced code block, or a corner
 layer you manage yourself.
@@ -1213,7 +1213,7 @@ range grants no egress. An absent file scope grants no standing reach;
 out-of-scope file operations still require host-owned consent.
 
 Ask for the smallest set possible. Adding a permission to a loaded development
-plugin does not take effect through hot reload: PI-Desktop stops automatic reload so the new grant can be reviewed. Use the
+plugin does not take effect through hot reload: Slyy stops automatic reload so the new grant can be reviewed. Use the
 plugin row's **More → Reload** action to explicitly review/reload the registered
 folder, or load the development folder again. Widening
 `manifest.fs` counts as adding a permission for this purpose. Removing
@@ -1352,12 +1352,11 @@ Before sharing a package:
 9. Record the printed SHA-256 next to the release artifact.
 
 For the official marketplace, publish on the plugin center,
-[plugins.aiuo.net](https://plugins.aiuo.net): create the plugin, bind the repository it lives in,
+[hub.slyy.ai](https://hub.slyy.ai): create the plugin, bind the repository it lives in,
 tag the version and submit it — from the console, or with the publishing skill over MCP. The
 center packs the files, audits the source, records the SHA-256 and publishes the version, then
-mirrors the catalog and packages to
-[AIUO-Net/pi-desktop-plugins](https://github.com/AIUO-Net/pi-desktop-plugins) for the GitHub
-backup channel. Plugin sources are never hosted in the distribution repository, and pull requests
+mirrors the catalog and packages to a distribution repository for the GitHub backup channel.
+Plugin sources are never hosted in the distribution repository, and pull requests
 that add them are closed.
 
 Signatures are not the current trust primitive. Package SHA-256 and explicit
@@ -1374,7 +1373,7 @@ for roadmap details.
 | Panel does not open | Missing file, `ui.panel`, or permission | Declare the panel path and `ui.panel`; reload for a new grant |
 | View is missing from the work panel menu | Missing `ui.view`, missing entry file, or the plugin's activation scope excludes the open project | Declare `ui.view`, check `views[].entry` exists, and set the scope to Global or to this project |
 | View shows a letter tile instead of an icon | Unknown `views[].icon` token | Use a token from the supported list; `pi-plugin check` warns about unknown ones |
-| `pluginBridge` is unavailable | HTML opened in a normal browser | Test bridge calls inside the PI-Desktop panel |
+| `pluginBridge` is unavailable | HTML opened in a normal browser | Test bridge calls inside the Slyy panel |
 | Tool never appears | Missing contribution, registration, or grant | Align `agentTools`, `registerTool`, and `agent.tool.register`; use Agent mode |
 | Skill never applies | Missing permission or weak metadata | Add `agent.prompt.inject` and specific `name`/`description` front matter |
 | Save reports `PERMISSION_DENIED` | Manifest widened permissions or file scope | Use More → Reload or load the folder again to review the new grant |
@@ -1385,7 +1384,7 @@ for roadmap details.
 
 ## 12. Reference map
 
-- [Example plugins](https://github.com/vastsa/PI-Desktop/tree/main/examples/plugins)
+- [Example plugins](https://github.com/mySlyy/slyy-desktop/tree/main/examples/plugins)
 - [Plugin system overview](spec/07-plugins/01-plugin-system.md)
 - [Manifest schema](spec/07-plugins/02-plugin-manifest-schema.md)
 - [Host API](spec/07-plugins/03-plugin-api.md)
@@ -1393,7 +1392,7 @@ for roadmap details.
 - [Packaging](spec/07-plugins/06-plugin-packaging.md)
 - [Developer experience](spec/07-plugins/10-plugin-devex.md)
 - [Permissions](spec/07-plugins/13-plugin-permissions-matrix.md)
-- [Hello reference plugin](https://github.com/vastsa/PI-Desktop/tree/main/examples/plugins/hello)
+- [Hello reference plugin](https://github.com/mySlyy/slyy-desktop/tree/main/examples/plugins/hello)
 
 ## 13. Complete SDK surface and source map
 
@@ -1451,7 +1450,6 @@ host store state. No renderer action sends a message.
 | `apps/desktop/test/plugin-*.test.mjs` | Host API, lifecycle, invocation scope, and representative plugin paths |
 | `examples/plugins/hello`, `ui-slots-lab`, `fetch-redirect`, `roundtable` | Working contributions and focused probes |
 
-`docs/plugin-plan` contains slot/API review pages and proposed runtime hooks.
-A draft page is not an implemented SDK export. Start with the current SDK and
-runtime when deciding whether a capability exists. The built-in authoring
+Start with the current SDK and runtime when deciding whether a capability
+exists; a proposal in a spec or ADR is not an implemented SDK export. The built-in authoring
 instructions are shipped at `apps/desktop/resources/skills/plugin-development.md`.

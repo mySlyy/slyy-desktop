@@ -1,4 +1,4 @@
-# PI-Desktop Baseline Freeze
+# Slyy Baseline Freeze
 
 > [Session-owned Plan approval permissions](../adr/plan-approval-session-permission.md)
 > makes the Plan/legacy Goal approval default follow the owning Session's effective
@@ -138,7 +138,7 @@
 
 ## Frozen Decisions
 
-1. Product name: **PI-Desktop**
+1. Product name: **Slyy** (based on PI-Desktop; identity per ADR slyy-downstream-branding)
 2. Desktop shell: **Electron**
 3. UI: **React + TypeScript + Vite + Tailwind**
 4. UI language default: **English**
@@ -247,9 +247,9 @@ details:
    execution fields/startup fence
 3. Rust-authoritative Plan policy, shell identity, and process cancellation
 4. one-Agent SubmitPlan/approval/execution state transitions
-5. renderer artifact approval, shell selection, and EN/zh-CN UX
+5. renderer artifact approval, shell selection, and localized UX
 6. focused migration, policy, streaming, timeout, recovery, and rendered
-   EN/zh-CN verification
+   localized verification
 
 The frozen protocol remains v9 and storage schema remains v10. Future changes
 must preserve the automated M6 scenarios E2E-104 through E2E-117 or update the

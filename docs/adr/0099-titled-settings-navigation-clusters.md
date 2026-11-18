@@ -16,10 +16,10 @@ The destination index stays flat and keeps its order, IDs, search behavior, and
 ownership; four localized, non-interactive headings are rendered above the
 existing row clusters, with muted typography and whitespace instead of dividers:
 
-- Personal / 个人: Basics, AI, Shortcuts
-- Agent / 智能体: Instructions, Model configuration
-- Workspace / 工作区: Import, Project archive
-- About / 关于: Info
+- Personal: Basics, AI, Shortcuts
+- Agent: Instructions, Model configuration
+- Workspace: Import, Project archive
+- About: Info
 
 Search still filters one flat index, and a cluster and its heading disappear when
 no destination remains in it.

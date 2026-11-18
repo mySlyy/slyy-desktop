@@ -63,7 +63,7 @@ hides expanded reasoning, reopening restores each row's own answer. Live work ne
 folds — a running turn, or a group owning a running tool or delegation, stays open.
 A folded group is one line whose header states its composition: contained actions
 joined with the locale's list wording, capped at three plus "and more", then the
-call count as a separate token that ellipsizes last (`搜索并读取文件 · 12 次操作`).
+call count as a separate token that ellipsizes last (`Searched and read files · 12 actions`).
 Reasoning is named but is not an operation, and a reasoning-only group counts steps.
 The group header renders no issue counter, because the failed row reports itself.
 

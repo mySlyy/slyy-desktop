@@ -24,14 +24,14 @@ The host is responsible for:
 
 ## 2. Phase strategy
 
-### Phase A ✅
+### Phase A (done)
 - Protocol and data model
 - Local official market provider (`plugins/market/catalog.json`)
 
-### Phase B ✅
+### Phase B (done)
 - Browse/search + download install are implemented against the official provider
-- Official provider: the plugin center, `plugins.aiuo.net` (Phase B originally pointed at the GitHub repository `vastsa/pi-desktop-plugins`; see "Catalog source" below and [ADR 0276](../../adr/0276-official-plugin-channel-and-backup-channels.md))
-- Default catalog URL: `https://plugins.aiuo.net/catalog.json`
+- Official provider: the plugin center, `hub.slyy.ai` (upstream PI-Desktop Phase B originally pointed at the GitHub repository `vastsa/pi-desktop-plugins`, later at `plugins.aiuo.net`; see "Catalog source" below and [ADR 0276](../../adr/0276-official-plugin-channel-and-backup-channels.md))
+- Default catalog URL: `https://hub.slyy.ai/catalog.json`
 - Package URLs may be absolute `https://` / `http://` / `file://`, or a relative path resolved against the catalog's `artifactBaseUrl` when it declares one, and otherwise against the catalog URL
 - HTTPS fetch uses `curl` in host-core
 - curl diagnostics are decoded as UTF-8 first and as the active Windows ANSI
@@ -41,7 +41,7 @@ The host is responsible for:
 ### Catalog source
 
 Plugins → Marketplace always uses the official plugin center catalog at
-`https://plugins.aiuo.net/catalog.json`. The page has no source selector.
+`https://hub.slyy.ai/catalog.json`. The page has no source selector.
 Persisted `pluginMarketSource` and `pluginMarketCustomUrl` values from older
 versions are retained for settings compatibility but ignored; no data migration
 is needed. `PI_DESKTOP_PLUGIN_MARKET_URL` remains available to development and
@@ -192,7 +192,7 @@ not the user's to uninstall; and the installed version survives the next launch
 unless this build ships a strictly newer one, so an app update still reaches a
 user who never installed anything.
 
-### Phase C (partial ✅)
+### Phase C (partial)
 - Auto-update policy + permission-diff gating implemented
 - Ratings: the desktop reads public summaries and reviews (anonymous, no
   account) and links out to the centre for writing; mandatory signing still
@@ -394,7 +394,7 @@ Before publishing or diagnosing a release, run the repository preflight:
 
 ```bash
 pnpm check:marketplace -- \
-  --url https://plugins.aiuo.net/catalog.json \
+  --url https://hub.slyy.ai/catalog.json \
   --plugin <plugin-id>
 ```
 
@@ -599,7 +599,7 @@ disabled and its one action is a real link — "Write a review on the plugin
 center" — that opens the centre's own page in the system browser
 (`browserOpenExternal`), using the host-provided `reviewUrl` for the effective
 centre origin and falling back to
-`https://plugins.aiuo.net/plugins/{encodedId}#reviews`. Reading reviews never
+`https://hub.slyy.ai/plugins/{encodedId}#reviews`. Reading reviews never
 gates or delays install, update, or any other plugin action.
 
 The Extensions list page keeps its overview copy compact: the page header and
@@ -746,7 +746,7 @@ repository, bind it to the plugin, submit the version — and `catalog.json` arr
 
 ### Who writes it (catalog v2)
 
-Repository: [vastsa/pi-plugin-center](https://github.com/vastsa/pi-plugin-center)
+Upstream design reference: [vastsa/pi-plugin-center](https://github.com/vastsa/pi-plugin-center) (Slyy serves the center from `hub.slyy.ai`)
 
 This repository stays the distribution source. What changes is who writes to it:
 the plugin center takes over generating `catalog.json` and publishing
@@ -794,6 +794,6 @@ relative to the installed version, so an upgrade cannot silently widen access
 Authoring documentation lives with the host, and publishing happens on the center:
 
 - Host guide: `docs/plugin-development.md`
-- Publishing: [plugins.aiuo.net](https://plugins.aiuo.net) — console, or the publish skill over MCP
+- Publishing: [hub.slyy.ai](https://hub.slyy.ai) — console, or the publish skill over MCP
 - Built-in templates: `panel-basic`, `agent-tool-basic`, `skill-pack`, `full-demo`
 - Distribution-side contribution guide: `AIUO-Net/pi-desktop-plugins` `CONTRIBUTING.md`

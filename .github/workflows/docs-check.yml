@@ -1,9 +1,9 @@
 name: Docs check
 
 # ci.yml ignores docs/** and **/*.md, so documentation drift was never caught.
-# This workflow runs the documentation checks: the English/Chinese pair check,
-# the whole-tree page/ADR check, the AGENTS.md/CLAUDE.md policy-sync gate, and
-# a VitePress build, which fails on a dead link anywhere in the tree.
+# This workflow runs the documentation checks: the whole-tree page/ADR check,
+# the AGENTS.md/CLAUDE.md policy-sync gate, and a VitePress build, which fails
+# on a dead link anywhere in the tree.
 # `check:release-docs` stays out of CI on purpose because prerelease branches
 # must supply the stable documentation version explicitly.
 
@@ -60,7 +60,7 @@ jobs:
       - name: Check AGENTS.md / CLAUDE.md policy sync
         run: pnpm check:agent-policy
 
-      - name: Check locale pairs and every documentation page
+      - name: Check every documentation page
         run: pnpm docs:check
 
       - name: Build the documentation site (dead links and routes)

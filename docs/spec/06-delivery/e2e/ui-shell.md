@@ -34,7 +34,7 @@
 ## E2E-SETTINGS-ai-tab-pickers-use-in-app-menus
 
 - **Preconditions**: App running with a host that reports at least one configured command shell and at least one catalog shell that is unavailable on this platform.
-- **Steps**: 1) Open Settings → Appearance and open the Theme and Language pickers; note the pill trigger and the opened surface. 2) Open Behavior / 行为. 3) Open the Session defaults card's permission-mode control and select ask, accept-edits, and auto in turn. 4) Open the Session defaults card's Command shell control; inspect the unavailable entries and select an available shell. 5) Dismiss each open menu with Escape and then with an outside press. 6) Close Settings, reopen it, and read both rows.
+- **Steps**: 1) Open Settings → Appearance and open the Theme and Language pickers; note the pill trigger and the opened surface. 2) Open Behavior (German: Verhalten). 3) Open the Session defaults card's permission-mode control and select ask, accept-edits, and auto in turn. 4) Open the Session defaults card's Command shell control; inspect the unavailable entries and select an available shell. 5) Dismiss each open menu with Escape and then with an outside press. 6) Close Settings, reopen it, and read both rows.
 - **Expected**: Both rows open the same anchored menu surface as the Appearance pickers — the app-drawn frame with the shared radius, elevation, border, and theme tokens, a check mark on the current option, and a hover/keyboard highlight — and never a platform-drawn `<select>` popup. Closed triggers size to the current label, capped by the settings control column. Unavailable shells stay listed with their suffix, are not selectable, and cannot become the current value. Escape and an outside press close the menu and restore focus to the trigger; arrow keys move between selectable options with wraparound. The selected permission mode and command shell persist across closing and reopening Settings, and the selected shell stays the only configured-state indicator.
 - **Specs linked**: `04-ux/06-settings-ia.md`, `04-ux/09-interaction-patterns.md`
 - **Acceptance**: A (core shell)
@@ -51,11 +51,11 @@
 - **Milestone**: M5
 - **Status**: Documented
 
-## E2E-044: Development launch uses PI-Desktop Dock branding
+## E2E-044: Development launch uses Slyy Dock branding
 
 - **Preconditions**: macOS development checkout with canonical `build/icon_1024.png`.
 - **Steps**: 1) Run `pnpm dev`. 2) Inspect the running application's Dock icon.
-- **Expected**: The Dock shows the PI-Desktop brand icon, not Electron's default icon; packaged builds continue to use `build/icon.icns`.
+- **Expected**: The Dock shows the Slyy brand icon (the blue dot), not Electron's default icon; packaged builds continue to use `build/icon.icns`.
 - **Specs linked**: `06-delivery/06-release-runbook.md`
 - **Acceptance**: Quality (development shell matches release branding)
 - **Milestone**: M5
@@ -97,7 +97,7 @@
   quick pointer passes, and re-targets to the latest hovered row when the
   pointer changes. Each card shows: the localized session title, the
   mode/permission badge, live status, the readable model display name when
-  known, the project name (or "Temporary" / "临时对话" for scratch rows)
+  known, the project name (or "Temporary" / German "Temporär" for scratch rows)
   with the latest Git branch on the same row, and the row's `Updated`
   timestamp formatted by the active locale without seconds. Ordinary
   sessions do not show a Local task chip, session UUID, separate Provider
@@ -144,7 +144,7 @@
   (#2026). A quiet scrollbar thumb is visible before hover, its reserved
   gutter prevents label shifts, and there is no horizontal overflow or scroll
   chaining into the shell. Repeat with no explicit tab, a `+`-created New tab,
-  few/no plugins, and light/dark themes in English and Chinese. Activate the
+  few/no plugins, and light/dark themes in English and German. Activate the
   last tool, close its view, and confirm the complete launcher returns.
   Open Browser and confirm its native surface opens at unchanged
   bounds. Open its context menu and verify the native popup appears above Browser
@@ -383,7 +383,7 @@
   count; both toolbar actions remain enabled when relevant and clear the
   taskbar badge. The badge also clears when no unread outcomes remain. The
   underlying taskbar button keeps the
-  PI-Desktop `P` icon and PI-Desktop name while the overlay is present.
+  Slyy dot icon and Slyy name while the overlay is present.
 - **Specs linked**: `03-runtime/04-data-storage.md`,
   `03-runtime/06-host-rpc-protocol.md`, `03-runtime/01-ipc-protocol.md`,
   `04-ux/07-ui-design-system.md`, `04-ux/08-component-spec.md`,
@@ -415,7 +415,7 @@
   session, including after the notification has moved to Windows Action Center;
   no event opens the wrong currently selected session. Abort shows neither surface. OS suppression does
   not lose the durable row or surface a misleading app error. Every inspected
-  Windows system surface identifies `PI-Desktop`; no stock Electron application
+  Windows system surface identifies `Slyy`; no stock Electron application
   name or identity is exposed. Duplicate delivery is idempotent: one durable
   id owns at most one live native object, and mark-read/clear closes that
   object so a late activation or renderer event cannot show the old task again.
@@ -448,11 +448,11 @@
 ## E2E-067: Platform application menus and window chrome
 
 - **Preconditions**: Native macOS, Windows, and Linux runners; built desktop
-  app; English and zh-CN locales available. The Windows/Linux harness can set
+  app; English and German locales available. The Windows/Linux harness can set
   `PI_DESKTOP_START_MAXIMIZED=1` before launch so Main maximizes the hidden
   native window before renderer mount.
 - **Steps**: 1) On macOS, launch both `pnpm dev` and a packaged build. Confirm
-  the application-menu title is PI-Desktop, open About PI-Desktop, and inspect
+  the application-menu title is Slyy, open About Slyy, and inspect
   its name, version, and icon. Then open every system menu and invoke New Task, Open
   Project, Settings, global search, sidebar toggle, editing,
   zoom/fullscreen, Window, Help, Logs, and Check for Updates actions. Verify
@@ -484,9 +484,10 @@
   while a window exists and after it closes. 7) Build each target on its
   native runner from a clean release-host directory. On Windows, inspect the
   installed app's taskbar button and Start menu shortcut icon.
-- **Expected**: macOS development and packaged launches show PI-Desktop as the
+- **Expected**: macOS development and packaged launches show Slyy as the
   native application identity, and the About panel uses the canonical
-  PI-Desktop icon; neither surface exposes the stock Electron name or icon.
+  Slyy icon and credits PI-Desktop under LGPL-3.0; neither surface exposes
+  the stock Electron name or icon.
   macOS follows native menu conventions and accelerators.
   Windows/Linux show no application menu inside the window; navigation and
   right-side controls do not collide with drag regions, keyboard shortcuts
@@ -511,7 +512,7 @@
   share one continuous 1px `border-subtle` separator; the control band's
   leading divider uses the same token and its bottom edge does not disappear
   under the window buttons. Unknown actions fail closed. The installed Windows
-  taskbar button and Start menu shortcut use the PI-Desktop icon, never
+  taskbar button and Start menu shortcut use the Slyy icon, never
   Electron's default icon. Each package contains the target-native host binary
   (`.exe` only on Windows). Passing this scenario on Windows/Linux proves
   shell readiness, not first-release qualification.
@@ -577,10 +578,10 @@
 
 ## E2E-069: Platform-specific sidebar header behavior
 
-- **Preconditions**: PI-Desktop is open with the expanded sidebar and a chat
+- **Preconditions**: Slyy is open with the expanded sidebar and a chat
   session is active.
 - **Steps**: 1) Open Extensions on macOS windowed mode. 2) Inspect the expanded
-  sidebar titlebar. 3) Confirm no PI-Desktop logo/title is visible and Collapse
+  sidebar titlebar. 3) Confirm no Slyy logo/title is visible and Collapse
   sidebar appears at the right of the traffic lights. 4) Enter
   fullscreen and inspect the same row. 5) On Windows/Linux, confirm the brand
   remains visible; activate it with a pointer, then with keyboard focus and
@@ -589,13 +590,12 @@
   drag region, and an accessible Collapse button at right; the Logo/Home brand
   is absent in both windowed and fullscreen modes. Global search stays on the
   conversation topbar, shortcuts, and application menu, not the sidebar header.
-  Windows/Linux render the canonical 20px logo beside the 15px shell name; the
+  Windows/Linux render the canonical 20px Slyy dot beside the 15px shell name; the
   complete brand has a localized Home accessible name, visible hover/focus
   feedback, and returns the main pane to chat without clearing the active
-  conversation or workspace. The logo itself is theme-aware: light mode shows
-  `src/assets/brand/logo-light.png`,
-  dark mode shows `src/assets/brand/logo-dark.png`, swapping live with
-  `data-theme` (no reload).
+  conversation or workspace. The logo is `src/assets/brand/slyy-mark.svg`, the
+  same brand-blue dot in light and dark themes, so a `data-theme` change needs
+  no asset swap or reload.
 - **Specs linked**: `04-ux/01-ui-ia.md`, `04-ux/07-ui-design-system.md`,
   `04-ux/08-component-spec.md`
 - **Acceptance**: Quality
@@ -605,7 +605,7 @@
 
 ## E2E-098: Sidebar collapse and expand animate as a docked transition
 
-- **Preconditions**: PI-Desktop is open with the expanded sidebar and an active
+- **Preconditions**: Slyy is open with the expanded sidebar and an active
   chat session; `prefers-reduced-motion` is off.
 - **Steps**: 1) Click Collapse sidebar in the expanded sidebar header (or press
   the sidebar toggle shortcut). 2) Watch the sidebar during collapse. 3) Confirm
@@ -631,7 +631,7 @@
 
 ## E2E-208: Collapsed sidebar does not force a 640px chat band
 
-- **Preconditions**: PI-Desktop is open with an active chat session at a
+- **Preconditions**: Slyy is open with an active chat session at a
   viewport wide enough for the default 760px chat content band; reduced
   motion is off; the user has not resized the band.
 - **Steps**: 1) Record the width of the centered transcript or empty-home
@@ -651,7 +651,7 @@
 
 ## E2E-UI-tooltip-never-outlives-its-trigger: A themed tooltip always retreats
 
-- **Preconditions**: PI-Desktop is open on a session with at least one message
+- **Preconditions**: Slyy is open on a session with at least one message
   toolbar, a sidebar with two retained projects, and a window that can lose
   focus (another application or an OS dialog).
 - **Steps**: 1) Hover an icon-only action and wait for its tooltip. 2) With the
@@ -660,7 +660,7 @@
   a row of adjacent actions. 4) Hover an action, then trigger a sidebar
   re-order or a project expand/collapse that moves its row in the DOM. 5) Hover an
   action, then press Escape. 6) Hover an action, switch to another application,
-  then return to PI-Desktop. 7) Repeat step 1 for the project path tooltip
+  then return to Slyy. 7) Repeat step 1 for the project path tooltip
   (long absolute path), a session row's overflow control, and a message-toolbar
   chip.
 - **Expected**: Each tooltip appears after its delay (300ms, 500ms for the
@@ -679,7 +679,7 @@
 
 ## E2E-UI-row-actions-do-not-swallow-the-row-click: A hidden row action is inert
 
-- **Preconditions**: PI-Desktop is open with two retained projects, each with
+- **Preconditions**: Slyy is open with two retained projects, each with
   at least three sessions, and one active conversation.
 - **Steps**: 1) Without hovering it, click the right-hand gutter of an idle
   session row where its overflow control will appear, and note which
@@ -833,7 +833,7 @@
 - **Covers**: A, Quality / US-UI shell polish
 - **Preconditions**: App launch path available (dev or packaged).
 - **Steps**:
-  1. Launch PI-Desktop.
+  1. Launch Slyy.
   2. Observe the first painted renderer surface before bootstrap completes.
   3. Wait until sessions/settings bootstrap finishes.
   4. Repeat with OS `prefers-reduced-motion: reduce` when available.
@@ -877,41 +877,37 @@
 - **Steps**:
   1. In light mode, open the app shell, an empty chat home, and the expanded sidebar (Windows/Linux) or startup splash.
   2. Inspect the rendered `BrandLogo` source in the sidebar and startup splash,
-     and inspect the light eight-frame `HomeMascotLogo` GIF in the empty-home
-     hero. Hover the mascot and verify that its cadence does not change.
+     and the `HomeMascotLogo` mark in the empty-home hero.
   3. Switch the theme to dark (Settings → Appearance → Interface, or system appearance change).
   4. Re-inspect the same surfaces without reloading.
   5. Switch back to light and re-inspect.
 - **Expected**:
-  - Light and dark mode render `src/assets/brand/logo-light.png` /
-    `src/assets/brand/logo-dark.png`
-    live in the sidebar and startup splash without a window reload.
-  - The empty-home hero renders the 100px eight-frame mascot GIF for the
-    active theme (`home-mascot-light.gif` / `home-mascot-dark.gif`) with a
-    short idle hold and a looping wave. Switching theme swaps the pair live
-    without a window reload. Pointer hover does not change the cadence;
-    under reduced motion the matching still first frame remains visible.
+  - Light and dark mode render the same `src/assets/brand/slyy-mark.svg` dot
+    in the sidebar and startup splash without a window reload.
+  - The empty-home hero renders the static Slyy dot (`slyy-mark.svg`); it
+    replaced the upstream eight-frame mascot GIF and has no animation, so
+    theme changes and reduced motion leave it unchanged.
   - Sizes stay stable across theme changes (sidebar 20px, hero 100px, splash
     64px), and the marks stay decorative with no click, keyboard, or focus
     behavior.
 - **Specs linked**: `04-ux/08-component-spec.md` §3.7, `04-ux/07-ui-design-system.md`
 - **Acceptance**: Quality
 - **Milestone**: M5
-## E2E-077: Theme-aware selection and CJK section labels
+## E2E-077: Theme-aware selection and localized section labels
 
 - **Status**: Partially automated (`user-select.test.mjs`, `interaction-polish.test.mjs`)
 - **Priority**: P2
 - **Covers**: A, Quality / US-UI shell polish
-- **Preconditions**: App running with at least one selectable transcript or input; language can be switched to `zh-CN`.
+- **Preconditions**: App running with at least one selectable transcript or input; language can be switched to `de`.
 - **Steps**:
   1. Select text inside a transcript message or the composer.
   2. Inspect sidebar Sessions/Projects section labels in English.
-  3. Switch the app language to `zh-CN` and re-check the same labels.
+  3. Switch the app language to `de` and re-check the same labels.
   4. Hover jump-latest (when visible), stop, search rows, and profile menu items.
 - **Expected**:
   - Selection highlight uses a neutral text-primary wash (not browser-default blue).
   - Caret/form accent colors stay on the monochrome token ramp.
-  - English section labels may use uppercase + wide tracking; `zh-CN` labels use normal tracking without forced uppercase.
+  - English and German section labels may use uppercase + wide tracking. (The upstream rule that CJK labels drop forced uppercase no longer applies; Slyy ships no CJK locale.)
   - Listed chrome controls ease background/color changes via shared motion tokens.
 - **Specs linked**: `04-ux/07-ui-design-system.md`, `04-ux/08-component-spec.md`
 - **Acceptance**: D147
@@ -964,19 +960,19 @@
   Branch runs do not replace post-integration E2E. Other surfaces in this
   scenario retain manual visual checks.
 
-## E2E-079: User-facing catalog copy in English and Chinese
+## E2E-079: User-facing catalog copy in English and German
 
 - **Status**: Partially automated (`packages/i18n/test/user-facing-copy.test.mjs`, `catalogs.test.mjs`)
 - **Priority**: P2
 - **Covers**: A, Quality / US-UI copy
-- **Preconditions**: App running; language can switch between English and zh-CN.
+- **Preconditions**: App running; language can switch between English and German.
 - **Steps**:
   1. Inspect empty-home hint, sidebar temporary-chat section, and status/connection toasts.
   2. Open Settings → Models and the marketplace refresh action.
-  3. Switch the app language to zh-CN and re-check the same surfaces.
+  3. Switch the app language to German and re-check the same surfaces.
 - **Expected**:
   - Copy explains outcomes in plain product language (AI provider, project, marketplace, connected/limited) rather than host/backend/repo jargon.
-  - English and zh-CN catalogs keep identical keys and interpolation variables.
+  - English and German catalogs keep identical keys and interpolation variables.
   - Crash chrome and empty-home titles remain catalog-backed in both locales.
 - **Specs linked**: `04-ux/02-i18n-english-first.md`
 - **Acceptance**: D149
@@ -985,7 +981,7 @@
 
 ## E2E-AGENTS-002: Global settings and project menus manage instruction files
 
-- **Preconditions**: PI-Desktop is running; a project can be opened.
+- **Preconditions**: Slyy is running; a project can be opened.
 - **Steps**:
   1. Open Settings -> Instructions without an active project and save global
      content.
@@ -1224,16 +1220,16 @@
   modes keep the permission-mode chip and explain their Bash tradeoff.
 
 ## US-UI-05 Locale chrome
-- On a zh-CN system locale, sidebar labels render in Chinese (项目 / 临时会话),
-  with no extra standalone destination rows. The footer plug-shaped Plugins icon
-  exposes the localized accessible name 插件.
-- Empty-thread hero and supporting line are localized Chinese copy; project
+- On a German system locale, sidebar labels render in German (Projekte /
+  Temporäre Chats), with no extra standalone destination rows. The footer
+  plug-shaped Plugins icon exposes the localized accessible name.
+- Empty-thread hero and supporting line are localized German copy; project
   name remains a dotted-underline action when a workspace is open.
-- Composer omits the 本地 workspace label and shows Agent/Plan/Goal plus the
+- Composer omits the Local workspace label and shows Agent/Plan/Goal plus the
   active model ID; both locales expose the Plan and Goal approval copy.
 
 ## US-UI-06 Session title plugin
-- Create a new task and send a first prompt such as "同步代码".
+- Create a new task and send a first prompt such as "Sync the code".
 - The core keeps the localized default title while the prompt is sent and after
   completion. When the Session Titles plugin is enabled and authorized, it may
   generate a title after the first completed turn using its configured prompt,
@@ -1301,12 +1297,10 @@
   macOS sidebar places Collapse sidebar at the right in that same
   row, with no Logo/Home brand or back/forward buttons.
 
-## US-UI-17 PI-Desktop home hero logo
-- On empty chat home, the 100px `HomeMascotLogo` GIF renders above the title
-  as an eight-frame waving mascot with a short idle hold. Light and dark
-  themes each use a dedicated GIF and still PNG.
-- Pointer hover does not change the cadence or geometry; reduced motion shows
-  the matching still first frame. The mascot remains decorative.
+## US-UI-17 Slyy home hero logo
+- On empty chat home, `HomeMascotLogo` renders the static Slyy dot
+  (`src/assets/brand/slyy-mark.svg`) above the title, identical in light and
+  dark themes. It replaced the upstream animated mascot and stays decorative.
 - Title is 28px / weight 400; active project name uses dotted underline (1px, offset 4px).
 - Composer does not render attachment or appshot controls before their payload
   reaches pi end to end.
@@ -1325,9 +1319,9 @@
 ## US-UI-19 Permanent Stage Manager bounds restore (macOS only)
 - On macOS with Stage Manager, shrink or unfocus the PI window until width < 800 or height < 560.
 - Expect the shell to re-assert a Codex-like footprint (~1200×800, min 800×560 capped to the display work area) and keep restoring while still collapsed (not only during the first 20s after launch).
-- The recovery watchdog is macOS-only (D447). On Windows/Linux it must not run at all: the app must never re-layer or re-raise its own window unprompted. Focus another window, then confirm PI-Desktop stays behind it instead of jumping back to the top of the stack, and that a stacking check (`xprop -root _NET_CLIENT_LIST_STACKING`) never shows it returning to the top periodically.
+- The recovery watchdog is macOS-only (D447). On Windows/Linux it must not run at all: the app must never re-layer or re-raise its own window unprompted. Focus another window, then confirm Slyy stays behind it instead of jumping back to the top of the stack, and that a stacking check (`xprop -root _NET_CLIENT_LIST_STACKING`) never shows it returning to the top periodically.
 - Windows regression: trigger tiny-bounds recovery through show, focus, or
-  restore, then Alt+Tab to another app. PI-Desktop must stay behind that app
+  restore, then Alt+Tab to another app. Slyy must stay behind that app
   immediately and after four seconds. Ordinary focus must not resize or raise it;
   hidden/minimized windows keep their state. Recovery must never enable
   always-on-top off macOS.
@@ -1350,8 +1344,7 @@
   capability-filtered radio list in the same popover.
 - In the searchable provider-group list, expect each provider heading to
   read as the visual parent: its `--text-md` treatment is stronger than the
-  indented model rows' normal-weight `--text-sm` treatment. In zh-CN, headings
-  must not force uppercase or wide Latin tracking.
+  indented model rows' normal-weight `--text-sm` treatment.
 - Select provider B/model B, send a prompt, and expect the main-to-sidecar
   `agent.prompt` payload and pi runtime to use B for that session.
 - Switch away and back; expect B and its clamped reasoning level to remain
@@ -1446,7 +1439,7 @@
 ## US-UI-33 Scoped sidebar session groups
 - The home sidebar has no Recents aggregate.
 - It shows one independently collapsible header per retained project path with
-  nested sessions and one `Temporary sessions` / `临时会话` header for
+  nested sessions and one `Temporary chats` / German `Temporäre Chats` header for
   path-less sessions.
 - Project and Temporary headers expose compact scope-specific `+` controls;
   project/session overflow menus expose pin/archive actions; nav row pitch
@@ -1474,8 +1467,8 @@
 - Placeholder and approval chip remain legible on light and dark plates.
 
 ## US-UI-39 Home mark + hero title optical
-- Empty-home PI-Desktop mark is visible (not near-invisible); stroke density remains readable without a decorative ghost effect.
-- Empty-home title with a project uses a readable project label span (short basenames may display as `PI-Desktop` for optical parity).
+- Empty-home Slyy mark is visible (not near-invisible) without a decorative ghost effect.
+- Empty-home title with a project uses a readable project label span (short basenames such as `slyy` stay at optical parity).
 
 ## US-UI-40 Home content width vs rem root
 - At 1200×690 light empty home, composer plate outer width is ~744–760px (not ~640px).
@@ -1503,13 +1496,14 @@
   rail top; Back to app pinned at the rail foot and vertically centred on the
   main shell's sidebar footer icon line; Appearance active pill with an
   accent-tinted fill and an accent glyph.
-- Rail order is exactly Appearance / 外观, Conversation / 对话,
-  Shortcuts / 快捷键, Voice / 语音, Behavior / 行为, Models / 模型,
-  Instructions / 指令, Skills / 技能, MCP, Subagents / 子智能体,
-  Projects / 项目, System / 系统, Cloud sync / 云同步,
-  Remote Hosts / 远程主机, and Info / 信息;
-  the rows are grouped under muted Preferences / 偏好, Agent / 智能体,
-  Workspace / 工作区, and System / 系统 headings without divider lines,
+- Rail order is exactly Appearance / Darstellung, Conversation / Unterhaltung,
+  Shortcuts / Verknüpfungen, Voice / Sprache, Behavior / Verhalten,
+  Models / Modelle, Instructions / Anweisungen, Skills / Fähigkeiten, MCP,
+  Subagents / Subagenten, Projects / Projekte, System, Cloud sync /
+  Cloud-Synchronisierung, Remote Hosts / Remote-Hosts, and Info /
+  Informationen (English / German);
+  the rows are grouped under muted Preferences / Einstellungen, Agent,
+  Workspace / Arbeitsbereich, and System headings without divider lines,
   duplicate destinations, or placeholder rows. The selected page keeps its
   descriptive title, such as Model configuration or Project archive, and opens
   with the rail's glyph at page scale plus — where the destination declares one
@@ -1573,7 +1567,7 @@
 ## US-UI-46 Home-with-project composer chrome
 - Open a project on empty home (no transcript).
 - Expect no workspace controls attached to the plate; there is no legacy draft
-  mark, and the placeholder uses the PI-Desktop copy.
+  mark, and the placeholder uses the Slyy copy.
 - Model chip shows the active model ID; the footer uses the circular local-user
   glyph, two-line Custom / Local profile identity, disclosure chevron, and
   separate Help → Settings Info control.
@@ -1631,7 +1625,7 @@
 ## US-UI-54 Toast variants + lifecycle (D085)
 - Trigger a success (save provider), an error (run with an invalid key), and an
   info toast from a test plugin.
-- Expect a top-center stack on an elevated plate with a tinted variant icon (green ✓ / red ! / info) and an X dismiss per card; newest enters at the top-center anchor and pushes older cards down.
+- Expect a top-center stack on an elevated plate with a tinted variant icon (green check / red ! / info) and an X dismiss per card; newest enters at the top-center anchor and pushes older cards down.
 - Success/info auto-dismiss ~4s, error lingers ~8s; hovering a card pauses its countdown; X removes it immediately.
 - With the stack overlapping the frameless titlebar band, hover still pauses
   the countdown and every X remains clickable instead of dragging the window.
@@ -1777,13 +1771,14 @@
 - Trigger a retriable provider/model failure in the transcript in light and dark themes.
 - Expect the assistant error to use a restrained inline surface with a thin error rail. The localized summary, stable code, and details disclosure share one compact header; the card does not render a second bottom action row.
 - Confirm the details remain expanded on first render, keep the redacted provider response and provider/model IDs, and expose an icon-only copy control with an accessible label/tooltip. On a narrow window, header actions wrap without horizontal overflow. At default and widened chat content widths, the card fills the assistant column; resizing the content band makes the card follow it, and a constrained pane does not overflow.
-- Expect the compact assistant error card itself to expose one localized **Continue** action beside the details disclosure. Click it and expect the app to append the localized continuation prompt (`Continue the current task` / `继续当前任务`) to the same session and start the next turn without truncating the failed turn.
+- Expect the compact assistant error card itself to expose one localized **Continue** action beside the details disclosure. Click it and expect the app to append the localized continuation prompt (English `Continue the user's unfinished task.`, German catalog equivalent) to the same session and start the next turn without truncating the failed turn.
 - For a terminal `PROVIDER_RATE_LIMITED` (including HTTP 429), expect the
   structured assistant error card to remain the only failure surface: it
   exposes exactly one localized **Continue** action and no **Regenerate**
   action, while the generic TurnOutcomeCard is omitted.
 - Click **Continue** and expect the app to append the localized continuation
-  prompt (`Continue the user's unfinished task.` / `继续用户未完成的任务`) to the
+  prompt (`Continue the user's unfinished task.` / German
+  `Mit der unvollendeten Aufgabe des Benutzers fortfahren.`) to the
   same session and start the next turn without truncating the failed turn.
 - Activate the localized **Dismiss** action. Expect the error card to disappear
   from the current transcript view while its underlying error message and raw
@@ -1859,7 +1854,7 @@
   does not suppress a later stage for the same version.
 - When the fixture includes `releaseNotes`, expect a "What's new" section under
   the status message on both the banner and Settings → Info Updates row, using
-  the product UI locale (EN or zh-CN). A fixture without notes omits the
+  the product UI locale (EN or DE). A fixture without notes omits the
   section. Switching language re-resolves the same version's notes without a
   new check.
 
@@ -1966,15 +1961,15 @@
 - **Status**: Partially automated (radius token and shared-control source test)
 
 ## US-UI-73 Composer mode selector has stable width
-- Open the empty home and a docked thread in both English and zh-CN.
+- Open the empty home and a docked thread in both English and German.
 - Open the Composer mode chip and switch between Agent/Plan/Goal several times.
 - Expect the chip to list the three modes as checked menu items, to name only
   the committed mode, and to keep one fixed width sized for the longest built-in
-  label (English "Agent" / zh-CN "智能体") plus its caret; the adjacent Thinking
+  label (English "Agent" / German "Agent") plus its caret; the adjacent Thinking
   and permission controls, send button, and composer shell do not move or
   resize.
 - In Goal, expect the permission chip to remain visible with the same geometry,
-  show Full auto / 全自动, and stay disabled without opening a permission menu.
+  show Full auto / Vollautomatisch, and stay disabled without opening a permission menu.
   The Plan/Goal approval card remains the separate execution-policy control.
 - **Specs linked**: `04-ux/08-component-spec.md` §11.3
 - **Milestone**: M5
@@ -2015,12 +2010,12 @@
 ## E2E-124: Window controls minimize to the taskbar and close to the chosen surface
 
 - **Preconditions**: Built desktop app on macOS, Windows, and Linux; English
-  and zh-CN locales are available; a normal main window is open.
+  and German locales are available; a normal main window is open.
 - **Steps**: 1) On Windows, maximize the focused main window and click its
-  taskbar button; confirm it minimizes while the PI-Desktop taskbar entry
+  taskbar button; confirm it minimizes while the Slyy taskbar entry
   remains. Click the same taskbar button again; after the restore settles,
   confirm the window remains maximized within the display work area and the
-  taskbar stays visible. Cover the window with another app, click the PI-Desktop
+  taskbar stays visible. Cover the window with another app, click the Slyy
   taskbar entry, and confirm it comes to the front without entering the tray. 2) On
 -  macOS, click the traffic-light minimize control and confirm it hides the
   window to the tray. On Windows/Linux, use the renderer minimize control and
@@ -2029,7 +2024,7 @@
   close the Windows/Linux window; confirm it leaves the taskbar and is
   restored by the tray icon. Select Quit and repeat; confirm the process exits.
   4) Open the tray menu and choose Show, then repeat with Quit. 5) Repeat in
-  zh-CN and invoke macOS app activation while the window is tray-hidden.
+  German and invoke macOS app activation while the window is tray-hidden.
 - **Expected**: Windows native taskbar toggling and the Windows/Linux renderer
   minimize controls keep the taskbar entry and round-trip through native
   minimize/restore. Restoring a maximized frameless Windows window keeps it
@@ -2037,10 +2032,10 @@
   on a covered window brings it to the front.
   Close to tray is the only Windows/Linux close path that hides the window,
   while Quit exits. On macOS the menu bar icon is a readable transparent
-  monochrome PI mark without the rounded application tile, and native minimize
+  monochrome Slyy dot without the rounded application tile, and native minimize
   remains tray-resident. Show/click/double-click/app activation restores the
-  existing window; the localized menu contains Show PI-Desktop and Quit
-  PI-Desktop. Quit runs the normal shutdown sequence and leaves no orphan host,
+  existing window; the localized menu contains Show Slyy and Quit
+  Slyy. Quit runs the normal shutdown sequence and leaves no orphan host,
   sidecar, or tray process.
 - **Specs linked**: `03-runtime/01-ipc-protocol.md`,
   `03-runtime/07-process-model.md`,
@@ -2071,7 +2066,7 @@
   duplicate process exits, and the running instance's session list, in-flight
   turn, and `pi.sqlite` are untouched. Step 4 starts normally as an independent
   instance against its own data directory. Step 5 also starts normally: the
-  development build takes its own `userData` and `~/.pi-desktop-dev`, so it
+  development build takes its own `userData` and `~/.slyy-gen2-dev`, so it
   neither waits for nor disturbs the running packaged app. Step 6 starts a clean
   single instance, proving the lock is released on exit and never leaves a stale
   block.
@@ -2082,26 +2077,25 @@
 - **Status**: Unit/source-contract covered; native cross-platform relaunch
   journey Draft (run only in a capable environment when this surface changes)
 
-## E2E-125: Bilingual VitePress documentation entry points remain usable
+## E2E-125: VitePress documentation entry points remain usable
 
 - **Preconditions**: Docs dependencies are installed and the VitePress preview
   server is running from the repository.
 - **Steps**: 1) Open `/` at 1440×900 and verify the English landing page,
-  system map, read-by-intent journeys, reference shelf, global search,
-  Guide/Specs/ADRs navigation, and language selector. 2) Switch to `/zh-CN/`
-  and verify the translated hero, topic map, guides, and Chinese specification
-  index. 3) Open `/zh-CN/spec/README`, follow a specification link, and verify
-  it opens the English page and the sidebar lists the English specifications,
-  including the `06-delivery/e2e/` catalogs. 4) Search in each locale and open
-  a matching result. 5) Repeat the homepage and a long table-heavy
-  specification at 390×844 in light and dark mode.
-- **Expected**: Both locale entry points render without broken links or
+  system map, read-by-intent journeys, reference shelf, global search, and
+  Guide/Specs/ADRs navigation. 2) Open `/spec/README`, follow a specification
+  link, and verify the sidebar lists the specifications, including the
+  `06-delivery/e2e/` catalogs. 3) Search and open a matching result. 4) Repeat
+  the homepage and a long table-heavy specification at 390×844 in light and
+  dark mode.
+- **Expected**: The site renders without broken links or
   page-level horizontal overflow. Landing and reading columns are visually
   centered within their available layout; the mobile hero presents text before
   the system visual. Search returns local results. The mobile navigation opens
   and closes without shifting or obscuring the page. Code blocks and tables
-  remain readable through contained scrolling, theme contrast stays clear, and
-  every Chinese page identifies its English page as the canonical source.
+  remain readable through contained scrolling, and theme contrast stays clear.
+  The site has no `/zh-CN/` locale or language selector: Slyy documentation is
+  English only (2026-11-18).
 - **Specs linked**: `02-architecture/04-documentation-site.md`, ADR 0079, ADR
   chinese-docs-entry-points-only
 - **Acceptance**: Quality, documentation discoverability, responsive layout
@@ -2113,7 +2107,7 @@
 
 - **Preconditions**: App running on macOS with an installed system font
   distinct from the built-in token stack (for example PingFang SC); a clean
-  `~/.pi-desktop` profile.
+  `~/.slyy-gen2` profile.
 - **Steps**:
   1) Open Settings → Appearance and confirm the Interface card shows a Font row
      below Theme and Language with a trigger labeled "System default".
@@ -2127,7 +2121,7 @@
      immediately (only the visible rows are rendered, with an overscan buffer).
   3) Select an installed system family (for example PingFang SC) and confirm the
      trigger label and the whole UI re-render in that family without a reload,
-     including CJK fallback rendering for Chinese text.
+     including CJK fallback rendering for CJK text in user content.
   4) Reopen the picker and confirm the family is still selected, then select
      System default and confirm the UI returns to the built-in token stack
      immediately.
@@ -2146,7 +2140,7 @@
   excluded); the app ships no font files, so no bundled group and no license
   badge appear, and a stored stack that matches no option stays listed first
   under Saved; selection persists as a CSS stack in `AppSettings.fontFamily` and
-  overrides `--font-sans` live; Chinese text stays readable through the
+  overrides `--font-sans` live; CJK text stays readable through the
   system-only CJK fallback tier; the menu is a body-level floating layer that is
   never clipped by the settings card; the option list is windowed with fixed row
   heights and an overscan buffer so only the visible slice is in the DOM, keeping
@@ -2162,7 +2156,7 @@
 
 ## E2E-193: Appearance card sets a global type scale
 
-- **Preconditions**: App running with a clean `~/.pi-desktop` profile and an
+- **Preconditions**: App running with a clean `~/.slyy-gen2` profile and an
   open conversation that shows transcript text, the composer, and the sidebar.
 - **Steps**:
   1) Open Settings → Appearance and confirm the Interface card shows a Font
@@ -2222,7 +2216,7 @@
      second one.
   5) Close the view tab and confirm the panel remains open on the New launcher
      when it was the last tab; press `Cmd/Ctrl + J` again and confirm it hides.
-  6) Repeat step 1 in Chinese and in both light and dark themes, and at the
+  6) Repeat step 1 in German and in both light and dark themes, and at the
      244px panel minimum, confirming the copy wraps rather than clipping.
 - **Expected**: `Cmd/Ctrl + J` reveals the panel without creating a tab, and the
   New launcher lists the same Review/plugin-view entries as its `+`-created
@@ -2283,7 +2277,7 @@
      permission card still shows the command it is asking about.
   9) Enable "reduce motion" and confirm the running dot holds still and the copy
      button appears without a fade.
-  10) Repeat steps 1–3 in Chinese and in both light and dark themes.
+  10) Repeat steps 1–3 in German and in both light and dark themes.
 - **Expected**: A command appears exactly once per row, in the head, alongside a
   copy control that yields it verbatim and a worded outcome that does not rely
   on the dot's color. The outcome reports what the command did — a non-zero or
@@ -2540,7 +2534,7 @@
 
 ## E2E-157: Global scrollbars stay quiet while remaining discoverable
 
-- **Preconditions**: PI-Desktop is open with the expanded sidebar, more
+- **Preconditions**: Slyy is open with the expanded sidebar, more
   temporary sessions than the five-row cap, and enough retained project
   sessions to overflow the Projects region.
 - **Steps**: 1) Inspect the idle Sessions and Projects scrollbars in light and
@@ -2569,7 +2563,7 @@
 
 ## E2E-159: A long transcript keeps a bounded mounted window
 
-- **Preconditions**: PI-Desktop is open on a session whose transcript is
+- **Preconditions**: Slyy is open on a session whose transcript is
   substantially longer than one `session.get` page (several hundred messages,
   including fenced code blocks and expanded tool activity), on a memory-
   constrained Windows machine where the regression was reported.
@@ -2619,7 +2613,7 @@
 
 ## E2E-160: Dragging the window across displays keeps the dropped position
 
-- **Preconditions**: PI-Desktop is open on a machine with two displays arranged
+- **Preconditions**: Slyy is open on a machine with two displays arranged
   side by side, ideally with different work areas (a menu bar or taskbar on one
   only, or different resolutions). Run the case once with the work panel closed
   and once with it open at a committed width.
@@ -2718,7 +2712,7 @@ profiles and redact runtime/user paths. See
 Repeat pixel checks after transferring focus away and back, including a
 PowerShell-launched fixture; activation must not restore the native outline.
 
-- **Preconditions**: PI-Desktop is open in a normal, non-maximized window on
+- **Preconditions**: Slyy is open in a normal, non-maximized window on
   macOS, Windows, or Linux. On Windows, the left, bottom, and right rim must
   have no visible native border. Run the case with the work panel closed and once
   with it open at a committed width.
@@ -2789,7 +2783,7 @@ PowerShell-launched fixture; activation must not restore the native outline.
 
 ## E2E-168: Expanded sidebar width follows an anchored resize gesture
 
-- **Preconditions**: PI-Desktop is open in the chat shell with the sidebar
+- **Preconditions**: Slyy is open in the chat shell with the sidebar
   expanded and a retained project/session visible.
 - **Steps**:
   1. Drag the sidebar's right-edge handle from its default width toward both
@@ -2839,7 +2833,7 @@ PowerShell-launched fixture; activation must not restore the native outline.
 
 ## E2E-170: Shell titlebars use borderless chrome
 
-- **Preconditions**: PI-Desktop is open in chat, at least one destination page,
+- **Preconditions**: Slyy is open in chat, at least one destination page,
   and Settings on a supported light or dark theme. On Windows/Linux, renderer-
   drawn window controls are visible.
 - **Steps**: 1) Inspect the top band on the chat, destination, and Settings
@@ -2895,7 +2889,7 @@ PowerShell-launched fixture; activation must not restore the native outline.
   4) Activate Open GitHub.
 - **Expected**: The row is indexed by Settings search and stays on Info. The
   action calls `pi-desktop/app/openFeedback` with no URL from the renderer.
-  Main opens `https://github.com/vastsa/PI-Desktop/issues/new` with
+  Main opens `https://github.com/mySlyy/slyy-desktop/issues/new` with
   `template=bug_report.yml` and prefills `app-version`, `os`, and
   `environment`. The GitHub bug form still requires description, reproduction
   steps, expected, actual, version, and OS; blank issues remain disabled.
@@ -3084,25 +3078,20 @@ PowerShell-launched fixture; activation must not restore the native outline.
 - **Preconditions**: The repository contains the gallery assets under
   `docs/public/screenshots/app/`; documentation dependencies are installed.
 - **Steps**:
-  1. Open `docs/guide/screenshots.md` and
-     `docs/zh-CN/guide/screenshots.md` from the GitHub file view. Confirm the
+  1. Open `docs/guide/screenshots.md` from the GitHub file view. Confirm the
      gallery images resolve to files under `docs/public/screenshots/`.
-  2. Open the English and Chinese screenshot pages in the VitePress preview.
-     Confirm representative images from the home, panel, and settings sections
-     render.
-  3. Confirm the navigation logo loads `docs/public/app-icon.png` on both
-     locale pages.
-  4. Confirm each locale footer includes an `AIUO.NET` link to
-     `https://aiuo.net`.
+  2. Open the screenshot page in the VitePress preview. Confirm representative
+     images from the home, panel, and settings sections render.
+  3. Confirm the navigation logo loads `docs/public/app-icon.png` (the Slyy
+     dot icon).
+  4. Confirm the footer links `Wapsol GmbH · slyy.ai` to `https://slyy.ai`.
   5. Run `pnpm docs:build` and inspect the generated pages for image load
      failures.
 - **Expected**: GitHub renders every gallery image instead of requesting a
-  repository-root `/screenshots/` path; both VitePress locale pages continue to
-  render the gallery from the same checked-in assets. The navigation uses the
-  app icon, both footers expose the `https://aiuo.net` link, and the docs build
-  succeeds.
-- **Specs linked**: ADR 0079, `docs/README.md`,
-  `docs/guide/screenshots.md`, `docs/zh-CN/guide/screenshots.md`
+  repository-root `/screenshots/` path; the VitePress page renders the gallery
+  from the same checked-in assets. The navigation uses the app icon, the footer
+  exposes the `https://slyy.ai` link, and the docs build succeeds.
+- **Specs linked**: ADR 0079, `docs/README.md`, `docs/guide/screenshots.md`
 - **Acceptance**: Quality
 - **Milestone**: M5
 - **Status**: Static/documentation check covered (`pnpm docs:build` and path
@@ -3123,7 +3112,7 @@ PowerShell-launched fixture; activation must not restore the native outline.
   4. Repeat a link click with Ctrl/Cmd, Shift, and Alt held.
   5. Render and use links whose HTTP(S) destination is wrapped as a nested
      linked-host Markdown destination, such as
-     `[#1106](([github.com](https://github.com/vastsa/PI-Desktop/issues/1106)))`.
+     `[#1106](([github.com](https://github.com/mySlyy/slyy-desktop/issues/1106)))`.
 - **Expected**:
   - Wrapped linked-host destinations resolve to their inner HTTP(S) URL before
     sanitization, so the link is clickable and its right-click menu offers both
@@ -3158,12 +3147,12 @@ PowerShell-launched fixture; activation must not restore the native outline.
 
 ## E2E-239: An older build names the newer data schema instead of looping
 
-- **Preconditions**: a data directory last opened by a newer PI-Desktop whose
+- **Preconditions**: a data directory last opened by a newer Slyy whose
   host-core migrated it past the schema this build supports.
 - **Steps**: 1) Launch the older packaged app on that data directory.
   2) Observe the banner and `logs/app/runtime.log`.
 - **Expected**: host-core exits once; no further restart attempts are logged.
-  The fatal banner says this PI-Desktop is older than the local data, shows
+  The fatal banner says this Slyy is older than the local data, shows
   both schema numbers, and tells the user to install the newer version. The
   data directory is not modified.
 - **Specs linked**: `03-runtime/07-process-model.md` (boot outcomes)
@@ -3632,7 +3621,7 @@ PowerShell-launched fixture; activation must not restore the native outline.
      shell), Execution (infinite retry, scheduled tasks), Computer use last.
   5. Visit System: Network, Storage, Power, and on Windows/Linux Close
      behavior.
-  6. Search the rail for `theme`, `主题`, `proxy`, `scheduled`, `paste`, and
+  6. Search the rail for `theme`, `Design` (German), `proxy`, `scheduled`, `paste`, and
      `permission`. Each query surfaces exactly the destination that renders the
      row, and following a hit scrolls to and flashes that row.
   7. Change one setting on each of the four pages, close Settings, reopen it,

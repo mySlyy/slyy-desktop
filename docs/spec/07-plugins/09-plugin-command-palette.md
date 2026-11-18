@@ -49,7 +49,7 @@ not every Composer entry is a global-search command.
 ## 5. Search rules
 
 The current `commandPaletteSearch` IPC lowercases the query and performs a
-substring match over title, category, and joined keywords. Chinese keywords
+substring match over title, category, and joined keywords. Non-Latin keywords
 are matched as text. An empty query returns the eligible list. Ordering is
 built-in commands, loaded project-eligible plugin commands in registry order,
 then trusted-extension commands. There is no command-specific recently-used

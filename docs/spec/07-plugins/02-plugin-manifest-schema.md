@@ -108,11 +108,11 @@ language:
 
 ```json
 {
-  "name": "小清新待办",
-  "description": "作者原话",
+  "name": "Calm Todo",
+  "description": "The author's own wording",
   "i18n": {
-    "en": { "name": "Todo List", "description": "A calm todo list" },
-    "zh-CN": { "name": "小清新待办", "description": "轻盈的待办清单", "safetyNotes": "只写自己的数据" }
+    "en": { "name": "Todo List", "description": "A calm todo list", "safetyNotes": "Writes only its own data" },
+    "zh-CN": { "name": "...", "description": "...", "safetyNotes": "..." }
   }
 }
 ```
@@ -122,8 +122,9 @@ Rules:
 1. `en` and `zh-CN` are the contract locales. Every Chinese shell locale
    (`zh`, `zh-CN`, `zh-Hans`, `zh-SG`) reads `zh-CN`; every other locale reads
    `en`. A plugin is not required to translate itself into the other shipped
-   shell locales, so `zh-TW` reads English rather than half a `zh-CN` guess
-   (ADR 0182).
+   shell locales, so a non-Chinese shell such as Slyy's German shell reads
+   `en`. `zh-CN` stays a contract locale for compatibility with upstream
+   PI-Desktop plugins even though Slyy ships no Chinese shell (ADR 0182).
 2. Both locales and all three fields are required by the plugin repository's
    validator, but the host is permissive: a missing locale, a missing field, or
    an empty string falls back per field to the other contract locale, and from
@@ -156,7 +157,7 @@ own window to mount UI slot components:
 
 `pi.slots.register` returns a disposer, and every registration is withdrawn when
 the plugin unloads. A self-drawn dialog is not a slot: the plugin opens a layer
-with `pi.ui.openLayer` and draws into it (`docs/plugin-plan/ui/`).
+with `pi.ui.openLayer` and draws into it.
 
 The module runs in the host's own realm, so this is a contract and not a sandbox
 boundary; the two whitelists are what keeps a component inside its own plugin.

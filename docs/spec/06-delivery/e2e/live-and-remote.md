@@ -157,7 +157,7 @@
      During startup, a popup consumes Escape to dismiss itself without
      cancellation; without a consuming popup, the startup-cancel shortcut works.
      Escape never ends a connected call. Repeat visible controls in English and
-     Simplified Chinese and check catalog coverage for all shipped locales.
+     German and check catalog coverage for all shipped locales.
 - **Expected:** Four distinct UI states, deliberate startup and work consent,
   exact-binding readiness, default mute, global cleanup visibility, accessible
   controls and focus return, and no changed IPC, persistence or permission

@@ -1,14 +1,14 @@
 # CLAUDE.md
 
-Policy-Sync: 2026-11-17.1
+Policy-Sync: 2026-11-18.1
 
-Instructions for Claude Code CLI and Claude Cowork on PI-Desktop.
+Instructions for Claude Code CLI and Claude Cowork on Slyy (`mySlyy/slyy-desktop`, based on PI-Desktop).
 
 **Authoritative policy:** [`AGENTS.md`](AGENTS.md). Read it before any non-trivial change. If this file and `AGENTS.md` disagree, follow `AGENTS.md`. Domain specs under `docs/spec/` remain authoritative for product behavior, protocols, and security boundaries.
 
 **Mirror sync:** This file condenses `AGENTS.md` for Claude Code. When policy changes, update both files, keep the shared non-negotiables aligned, and set the same `Policy-Sync:` token in both. Enforced by `pnpm check:agent-policy` (`scripts/check-agent-policy-sync.mjs`).
 
-PI-Desktop is released software with real users. Treat every change as production maintenance, not prototype work.
+Slyy is released software with real users. Treat every change as production maintenance, not prototype work.
 
 Priority order when deciding what to do:
 
@@ -24,7 +24,7 @@ Optimize for changing the system safely, not merely changing it quickly.
 
 ## Interaction language
 
-Reply to the user in the language they used (Chinese request → Chinese answer, kept terse). Keep code, identifiers, comments, commit messages, specs, ADRs, log strings, and repository docs in English. GitHub issue / PR discussion follows the original author's language.
+Reply to the user in the language they used, kept terse. All repository content is English only: code, identifiers, comments, commit messages, specs, ADRs, log strings, and repository docs. The only exception is the German UI catalog (`packages/i18n/src/locales/de`). GitHub issue / PR discussion follows the original author's language.
 
 ---
 
@@ -55,7 +55,7 @@ git worktree add \
 cd <worktree-path>
 ```
 
-Suggested worktree path: `../PI-Desktop-worktrees/<short-description>`.
+Suggested worktree path: `../slyy-desktop-worktrees/<short-description>`.
 
 Branch names: `feat/...`, `fix/...`, `docs/...`, `refactor/...`, `chore/...`.
 

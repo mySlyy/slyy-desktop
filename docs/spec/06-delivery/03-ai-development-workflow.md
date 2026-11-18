@@ -1,6 +1,6 @@
 # 03. AI-Assisted Development Workflow
 
-> Scope: AI agents and human collaborators working on PI-Desktop
+> Scope: AI agents and human collaborators working on Slyy
 > Status: Accepted
 > Cross-references: [00-baseline](../00-baseline.md) · [decisions-log](../08-meta/decisions-log.md) · [acceptance-criteria](02-acceptance-criteria.md) · [e2e-test-plan](04-e2e-test-plan.md) · [change-checklist](05-change-checklist.md) · [ADR index](../../adr/README.md)
 
@@ -8,7 +8,7 @@
 
 ## 1. Core Immutable Rules
 
-The rules below govern every change to the PI-Desktop codebase and documentation. R1–R4 restate the five numbered Immutable Rules in `AGENTS.md` (R4 covers both the merge-back and worktree clean-up rules); R5 and R6 restate its GitHub issue and pull request handling sections. They cannot be relaxed by an agent without explicit human override.
+The rules below govern every change to the Slyy codebase and documentation. R1–R4 restate the five numbered Immutable Rules in `AGENTS.md` (R4 covers both the merge-back and worktree clean-up rules); R5 and R6 restate its GitHub issue and pull request handling sections. They cannot be relaxed by an agent without explicit human override.
 
 ### R1 — Spec-first / Spec-sync
 
@@ -249,8 +249,7 @@ applies to.
 ### GitHub issue templates
 
 `.github/ISSUE_TEMPLATE` is the only public intake path (`blank_issues_enabled:
-false`). English is the source label language; Chinese remains on the same
-fields.
+false`). Every template label and description is English only.
 
 - **Bug report** requires: description, reproduction steps, expected behavior,
   actual behavior, app version, and OS. Logs, extra environment, and
@@ -387,7 +386,7 @@ Which change types require which doc updates.
 | UX change | Related `04-ux/` spec | — | — | New UI scenario | — |
 | Spec-only update | The spec itself | — | — | — | — |
 | Chore (deps, tooling) | — | — | If tooling decision | — | — |
-| **App version release / stable tag** | `06-delivery/06-release-runbook.md` (mandatory version-surface gate before tag: shipped-locale `packages/shared/src/changelog.ts`, its test list, all workspace/Cargo/`APP_VERSION` versions, and the release line in `README.md` + `README.zh-CN.md`) | — | If release policy changes | Confirm E2E-067B still accurate | If milestone ship |
+| **App version release / stable tag** | `06-delivery/06-release-runbook.md` (mandatory version-surface gate before tag: shipped-locale `packages/shared/src/changelog.ts`, its test list, all workspace/Cargo/`APP_VERSION` versions, and the release line in `README.md`) | — | If release policy changes | Confirm E2E-067B still accurate | If milestone ship |
 
 ---
 
@@ -583,7 +582,7 @@ changelog entries in `packages/shared/src/changelog.ts` (English and every
 shipped product locale, with aligned highlight counts) with its `changelog.test.ts` list, every workspace
 `package.json` (including `docs/package.json`), the Cargo workspace version and
 `host-core` lockfile entry, `APP_VERSION`, and the release line stated in
-`README.md` + `README.zh-CN.md`. `node scripts/check-release-docs.mjs` must
+`README.md`. `node scripts/check-release-docs.mjs` must
 pass; `scripts/release.mjs` runs it and refuses to tag otherwise. See
 [06-release-runbook.md §4.1](06-release-runbook.md#41-mandatory-release-version-surface-gate-d164--d260),
 D164, and D260. GitHub release notes are not a substitute.
@@ -617,7 +616,7 @@ D164, and D260. GitHub release notes are not a substitute.
 | Merging a linked pull request that introduces a harm blocker | Violates R6 |
 | Force-pushing a contributor's branch to land a linked pull request | Violates R6; landing fixes go on top of the author's commits |
 | Tagging a stable app release without updating `packages/shared/src/changelog.ts` for every shipped locale | Violates D164 / D345 / release runbook; in-app What's new is empty for that locale and version |
-| Tagging a stable app release while `README.md` / `README.zh-CN.md` still state an older release line, or bypassing `scripts/check-release-docs.mjs` with `--skip-docs-check` | Violates D260 / release runbook; published documentation advertises a version the release no longer matches |
+| Tagging a stable app release while `README.md` still states an older release line, or bypassing `scripts/check-release-docs.mjs` with `--skip-docs-check` | Violates D260 / release runbook; published documentation advertises a version the release no longer matches |
 | Pushing a request branch or opening a PR/MR before the required E2E has run against a candidate that contains latest `origin/main`, or declaring a code-bearing change delivered without that result (except a recorded `NOT RUN` limitation) | Violates R7's fixed order; review would start on an unvalidated commit |
 
 ---

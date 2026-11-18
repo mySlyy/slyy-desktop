@@ -174,7 +174,7 @@ recency only breaks ties between equally relevant matches.
   window from the taskbar/dock window list while the Electron process and
   background work remain alive. It does not persist a minimized geometry or
   dispose the host/sidecar.
-- Double-clicking the PI-Desktop tray icon (or single-clicking on Windows/Linux),
+- Double-clicking the Slyy tray icon (or single-clicking on Windows/Linux),
   choosing Open, or activating the app from the macOS dock restores and focuses the
   existing window. If the window was closed, the same action creates a fresh
   window.
@@ -508,7 +508,7 @@ may be retained while exactly one workspace supplies the visible shell context.
    platform notification derived from the event kind and session title. The
    separate interactive ask/permission/plan path may alert for a focused
    background session while suppressing the exact visible session. On
-   Windows, the banner is attributed to the canonical PI-Desktop
+   Windows, the banner is attributed to the canonical Slyy
    AppUserModelID shared with the NSIS package and taskbar identity. Electron
    retains at most one task-native object per durable id; successful read,
    mark-all-read, and clear actions close the matching objects and retain a
@@ -915,7 +915,8 @@ may be retained while exactly one workspace supplies the visible shell context.
 - Failure copy states that the existing work remains available. The applicable
   failure surface has exactly one **Continue** action and no **Regenerate**
   action. Continue appends the current locale's continuation prompt (`Continue
-  the user's unfinished task.` / `继续用户未完成的任务`) to the same session and
+  the user's unfinished task.` / `Mit der unvollendeten Aufgabe des Benutzers
+  fortfahren.`) to the same session and
   starts a new turn without truncating the failed turn or its completed work.
 - Aborted turns do not render a failure card. Starting a new turn clears the
   previous card, and background-session results remain scoped until that
@@ -1618,10 +1619,10 @@ Project drag/drop follows these patterns:
   that is not part of a composition also ends the composition, so an IME that
   drops `compositionend` (a Windows Chinese IME deleting its composing text)
   cannot leave the menu frozen until the composer unmounts (#929).
-- Composing input updates the draft without rewriting the leading `、` or
-  repainting its native text nodes. On `compositionend`, read the final editor
-  text and apply the slash alias once if composition began in an empty draft.
-  This prevents the IME's commit from appending `、` after an already painted `/`.
+- Composing input updates the draft without repainting its native text nodes;
+  on `compositionend`, read the final editor text. (The upstream ideographic
+  comma slash alias applied at this point was removed in Slyy on 2026-11-18;
+  see `04-builtin-commands.md` §9.)
 - Enter that confirms an IME candidate never sends and never accepts a menu
   item; ↑/↓ during candidate navigation belong to the IME.
 
@@ -1782,7 +1783,7 @@ Project drag/drop follows these patterns:
   the readable model display name (falling back to the provider's readable
   name); workspace name and branch on one row; and **Updated {{when}}**
   without seconds. Temporary/scratch sessions show the localized
-  "Temporary" / "临时对话" placeholder instead of a workspace name. The
+  "Temporary" placeholder instead of a workspace name. The
   card does not show the session UUID, a Local task chip, a separate
   Provider/Model label pair, or the collaboration poll timestamp.
 - For a session with host-owned collaboration activity, the card adds a

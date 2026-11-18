@@ -2,7 +2,7 @@
 
 ## 1. Positioning
 
-PI-Desktop is for developers and power users who want a local agent that can read/modify projects with visible control.
+Slyy is for developers and power users who want a local agent that can read/modify projects with visible control.
 
 It combines:
 
@@ -130,10 +130,13 @@ the internal `page = "chat"` route value; that value is not an operating mode.
 
 ## 8. Naming
 
-- Product: `PI-Desktop`
-- Package: `pi-desktop`
-- Application ID: `net.aiuo.pi-desktop`
-- Window title: `PI-Desktop`
+- Product: `Slyy` (installation name `Slyy Gen2`; based on PI-Desktop)
+- Package: `pi-desktop` (internal workspace name, kept from upstream)
+- Application ID: `ai.slyy.desktop.gen2`
+- Window title: `Slyy`
+
+The frozen identity is defined in
+[ADR slyy-downstream-branding](../../adr/slyy-downstream-branding.md).
 
 ## 9. Platform strategy
 

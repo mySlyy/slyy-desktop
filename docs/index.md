@@ -1,15 +1,15 @@
 ---
 layout: home
-title: PI-Desktop
+title: Slyy
 titleTemplate: A modular desktop workspace for AI agents
 hero:
-  name: PI-Desktop
+  name: Slyy
   text: A desktop workspace for AI agents.
   tagline: Bring projects, agents, models, plugins, and workflows into one persistent desktop environment.
   actions:
     - theme: brand
       text: Download
-      link: https://github.com/vastsa/PI-Desktop/releases/latest
+      link: https://github.com/mySlyy/slyy-desktop/releases/latest
     - theme: alt
       text: Documentation
       link: /guide/

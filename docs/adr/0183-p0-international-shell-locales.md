@@ -4,6 +4,9 @@
 - Date: 2026-09-08
 - Related: ADR 0160, ADR 0182, D346, E2E-091
 
+> **Amended in Slyy (2026-11-18).** Of these catalogs Slyy ships only `de`,
+> next to `en`. The record below is upstream history.
+
 ## Context
 
 The locale registry accepts new languages without picker work, but the shipped

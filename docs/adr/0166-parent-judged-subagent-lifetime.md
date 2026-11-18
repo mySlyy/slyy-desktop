@@ -37,4 +37,4 @@ transcript rows.
 - A progress file the parent reads: rejected, it puts live transcript into the
   parent context and still depends on the model remembering to poll.
 - Survive the turn without auto-resume: rejected, the user would have to send
-  继续 manually.
+  "continue" manually.

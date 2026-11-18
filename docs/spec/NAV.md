@@ -1,4 +1,4 @@
-# PI-Desktop Spec Navigation
+# Slyy Spec Navigation
 
 ## Overview
 - [README.md](README.md)

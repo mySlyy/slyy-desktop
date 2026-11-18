@@ -181,12 +181,12 @@
   available for repackaging validation. The arm64 lane is E2E-192a.
 - **Steps**: 1) Run the tag release workflow. 2) Inspect the published GitHub
   Release assets. 3) Confirm the versioned
-  `PI-Desktop-X.Y.Z-linux-x64.asar` asset is present. 4) Place that archive in
+  `Slyy-X.Y.Z-linux-x64.asar` asset is present. 4) Place that archive in
   the target Electron resources layout with the target package's native host
   and other resources, then launch it with `electron <archive>.asar`.
 - **Expected**: The ASAR is copied byte-for-byte from
   `linux-unpacked/resources/app.asar`, is uploaded alongside the Linux
-  AppImage, deb, and rpm, and the system Electron opens the PI-Desktop application
+  AppImage, deb, and rpm, and the system Electron opens the Slyy application
   archive without requiring the bundled Electron executable.
 - **Specs linked**: `06-delivery/06-release-runbook.md`, `03-runtime/07-process-model.md`
 - **Acceptance**: Quality (release artifact and packaging compatibility)
@@ -201,9 +201,9 @@
 - **Steps**: 1) Run the tag release workflow. 2) Confirm the arm64 lane ran on
   an `aarch64` runner and that the packaged
   `target/release/pi-desktop-host-core` is an AArch64 binary. 3) Inspect the
-  published Release assets for `PI-Desktop-X.Y.Z-linux-arm64.AppImage`,
-  `pi-desktop_X.Y.Z_arm64.deb`, `pi-desktop-X.Y.Z-aarch64.rpm`,
-  `PI-Desktop-X.Y.Z-linux-arm64.asar`, and
+  published Release assets for `Slyy-X.Y.Z-linux-arm64.AppImage`,
+  `slyy-gen2_X.Y.Z_arm64.deb`, `slyy-gen2-X.Y.Z-aarch64.rpm`,
+  `Slyy-X.Y.Z-linux-arm64.asar`, and
   `pi-host-X.Y.Z-linux-arm64.tar.gz` with its `.sha256`. 4) Confirm
   `latest-linux.yml` still lists the x64 AppImage while
   `latest-linux-arm64.yml` lists the arm64 one. 5) Install the arm64 AppImage,
@@ -226,14 +226,14 @@
   for installation and launch.
 - **Steps**: 1) Build the Linux targets and inspect the RPM with `rpm -qip` and
   `rpm -qpl`. 2) Confirm the package contains the application archive,
-  host-core, `pi-desktop.desktop`, and the 512px `pi-desktop` icon. 3) Confirm
+  host-core, `slyy-gen2.desktop`, and the 512px `slyy-gen2` icon. 3) Confirm
   the RPM has no global `/usr/lib/.build-id` links. 4) Install the RPM on the
-  Fedora KDE/Wayland machine and launch PI-Desktop from its desktop entry.
+  Fedora KDE/Wayland machine and launch Slyy from its desktop entry.
   5) Inspect the taskbar grouping and the installed desktop entry.
 - **Expected**: The x64 RPM is produced with the documented name and uploads
-  with the release artifacts. Its desktop entry contains `Icon=pi-desktop` and
-  `StartupWMClass=pi-desktop`; the running Wayland window groups with the
-  PI-Desktop launcher and shows its icon instead of a generic Electron icon.
+  with the release artifacts. Its desktop entry contains `Icon=slyy-gen2` and
+  `StartupWMClass=slyy-gen2`; the running Wayland window groups with the
+  Slyy launcher and shows its icon instead of a generic Electron icon.
   The package remains notify-and-link for updates, and the bundled Electron
   binaries do not create global build-id links.
 - **Specs linked**: `01-product/01-product-scope.md`,
@@ -268,8 +268,8 @@
   ZIP artifacts for at least one native architecture.
 - **Steps**: 1) Inspect the DMG and confirm the app and Applications link are
   the only items in its window. 2) Inspect the ZIP root without extracting the
-  app and confirm neither `PI-Desktop-macOS-opening-help.txt` nor
-  `PI-Desktop-macOS-open.command` is present. 3) Confirm the app remains
+  app and confirm neither the former opening-help text file nor the
+  `open.command` first-launch helper is present. 3) Confirm the app remains
   installable from the ZIP.
 - **Expected**: The DMG contains the branded 720×440 background, the app, and
   the Applications link only. The ZIP contains the app but neither first-launch
@@ -290,8 +290,10 @@
   `APPLE_APP_SPECIFIC_PASSWORD`, and `APPLE_TEAM_ID` secrets; both native macOS
   runners are available.
 - **Steps**: 1) Run the tag workflow. 2) For each macOS architecture, inspect
-  the unpacked app with `codesign -dv --verbose=4` and confirm authority
-  `Developer ID Application: XingYu Liu (DUV63RKYTW)`. 3) Run
+  the unpacked app with `codesign -dv --verbose=4` and confirm the authority is
+  the Slyy Developer ID Application certificate named by the
+  `SLYY_MAC_SIGNING_IDENTITY` repository variable, with team id
+  `SLYY_APPLE_TEAM_ID`. 3) Run
   `codesign --verify --deep --strict --verbose=2`,
   `spctl --assess --type execute --verbose=4`, and `xcrun stapler validate`
   against the app, including `Contents/Resources/bin/pi-desktop-host-core`.
@@ -318,33 +320,27 @@
 
 ## E2E-212: GitHub Release starts the CNB mirror pipeline
 
-- **Preconditions**: Repository secret `CNB_MIRROR_TOKEN` is configured on
-  `vastsa/PI-Desktop`; the CNB pipeline at `aixk/Pi-Desktop` listens for
-  `api_trigger_mirror`; a GitHub Release tag such as `vX.Y.Z` exists with
+- **Preconditions**: A GitHub Release tag such as `vX.Y.Z` exists with
   uploaded artifacts.
-- **Steps**: 1) Publish or edit that GitHub Release, or dispatch
-  `mirror-to-cnb.yml` with the same tag. 2) Inspect the Actions log for the
-  resolved tag and the POST to `api.cnb.cool`. 3) Confirm the CNB pipeline
-  starts with `MIRROR_TAGS` equal to that tag.
-- **Expected**: The job runs only on `vastsa/PI-Desktop`. Manual dispatch
-  without a `vX.Y.Z` tag fails before calling CNB. A missing
-  `CNB_MIRROR_TOKEN` fails closed. The JSON body is built with `jq` (not
-  YAML string interpolation). GitHub Release artifacts and updater feeds are
-  unchanged; CNB is a mirror of the same tag.
-- **Specs linked**: `06-delivery/06-release-runbook.md`
+- **Steps**: 1) Publish or edit that GitHub Release. 2) Inspect the Actions
+  run list for `mirror-to-cnb.yml`.
+- **Expected**: The upstream-only CNB (cnb.cool) mirror job is skipped, because
+  it is guarded to the upstream PI-Desktop repository. GitHub Release artifacts
+  and updater feeds on `mySlyy/slyy-desktop` are unchanged.
+- **Specs linked**: `06-delivery/06-release-runbook.md` §4.4
 - **Acceptance**: Quality (release mirroring)
 - **Milestone**: M6+
-- **Status**: Source-contract covered (`ci-workflow.test.mjs`); live CNB
-  start remains operator validation (run only in a capable environment when this surface changes)
+- **Status**: Not applicable in Slyy (2026-11-18): Slyy publishes to GitHub
+  Releases only; the upstream mirror scenario remains in git history.
 
 ## Boot & Healthcheck
 
 ## E2E-001: App launches and shows main window
 
-- **Preconditions**: macOS arm64 or Intel x64; no prior `~/.pi-desktop` profile. For the
+- **Preconditions**: macOS arm64 or Intel x64; no prior `~/.slyy-gen2` profile. For the
   development lane, workspace package build outputs are absent or older than
   their TypeScript sources.
-- **Steps**: 1) Launch PI-Desktop. In the development lane, use `pnpm dev`.
+- **Steps**: 1) Launch Slyy. In the development lane, use `pnpm dev`.
   2) Observe main window appears. In the macOS development lane, confirm the
   menu-bar tray icon appears.
 - **Expected**: Development launch rebuilds all workspace dependencies before
@@ -405,7 +401,7 @@
 
 ## E2E-004: First-run inline checklist appears
 
-- **Preconditions**: Fresh profile (no `~/.pi-desktop`).
+- **Preconditions**: Fresh profile (no `~/.slyy-gen2`).
 - **Steps**: 1) Launch app on fresh profile. 2) Observe onboarding checklist.
 - **Expected**: Inline checklist is displayed; provider/key items open Settings
   → Agent, and the optional plugin item opens the app-shell Plugins
@@ -504,7 +500,8 @@
 - **Expected**: No Electron "A JavaScript error occurred in the main process"
   dialog with `Error: write EPIPE` from `Logger.log`. NDJSON category logs still
   receive the prompt records. Relaunch still reaches the local host service
-  instead of a fatal "Can't reach the local service" / “无法连接本地服务”
+  instead of a fatal "Can't reach the local service" / German
+  "Kann den lokalen Dienst nicht erreichen"
   status caused by a previous main-process crash.
 - **Specs linked**: `03-runtime/09-logging-and-observability.md`,
   `03-runtime/07-process-model.md`
@@ -522,7 +519,7 @@
 - **Steps**: 1) Launch so the auto-updater check or model discovery issues a
   main-process `net.fetch` / Electron-updater request. 2) Confirm the native
   exception dialog does not appear. 3) Dismiss nothing; wait for a later
-  updater or discovery request. 4) Open `~/.pi-desktop/logs/app/runtime.log`.
+  updater or discovery request. 4) Open `~/.slyy-gen2/logs/app/runtime.log`.
 - **Expected**: No Electron "A JavaScript error occurred in the main process"
   dialog. The app stays running and does not quit. `runtime.log` contains an
   error record with `code: "NON_ASCII_HTTP_HEADER"` and `recoverable: true`.
@@ -666,7 +663,7 @@
 ## E2E-067B: Shipped-locale update notes and full changelog dialog (D164/D345/D349)
 
 - **Preconditions**: The shipped `packages/shared` CHANGELOG contains aligned
-  `en`, `zh-CN`, `zh-TW`, `ko`, and `pt-BR` stable history; product language
+  `en` and `de` stable history; product language
   can be switched.
   For the compact update path, use a packaged or fixture updater state with a
   catalogued `availableVersion`.
@@ -675,8 +672,8 @@
   and close behavior by close control, Escape, and backdrop. 3) Force or wait
   for update discovery so status is manual `available`, in-app `downloading`,
   or `downloaded`; inspect the ambient banner and Settings Updates row, then
-  reopen Release notes. 4) Switch UI language to zh-CN, then zh-TW, then ko,
-  then pt-BR and re-inspect without invoking a new check. 5) Repeat the compact
+  reopen Release notes. 4) Switch UI language to German and re-inspect without
+  invoking a new check. 5) Repeat the compact
   update path with a version absent from the catalog.
 - **Expected**: `UpdateState.releaseNotes` is plain multi-line product
   highlights selected by Main from the shipped-locale catalog — never a
@@ -701,7 +698,7 @@
   tag has been created for the candidate version.
 - **Steps**: 1) Run `node scripts/check-release-docs.mjs` on the aligned tree.
   2) Regress one surface at a time — replace the models.dev catalog with an
-  empty object, remove the newest changelog entry from `en`, then from `zh-CN`,
+  empty object, remove the newest changelog entry from `en`, then from `de`,
   change a highlight count so the locales differ, set `docs/package.json` to
   an older version, and leave the READMEs stating the previous
   `<major>.<minor>.x` release line — then rerun the preflight after each. 3) Run
@@ -725,7 +722,7 @@
 
 ## E2E-070: Native select menus follow the Windows theme across the app
 
-- **Preconditions**: PI-Desktop is running on Windows with light and dark
+- **Preconditions**: Slyy is running on Windows with light and dark
   themes available.
 - **Steps**: 1) In light theme, open remaining native selects (scheduled-task
   form) and confirm Settings pickers on Appearance, Behavior, Model configuration,
@@ -750,7 +747,7 @@
 - **Preconditions**: Native macOS arm64 and Intel x64, Windows x64, and Linux
   x64 packages built from clean release-host directories; a clean application
   profile;
-  English and zh-CN available; external network access can be disabled while
+  English and German available; external network access can be disabled while
   loopback remains available; a deterministic loopback OpenAI-compatible
   fixture provider returns code, KaTeX, Mermaid, and a Bash command.
 - **Steps**:
@@ -765,25 +762,25 @@
      x86_64 packages contain only their declared architecture and that the
      Rust host matches the Electron app. Confirm the shared
      `apps/desktop/package.json` macOS configuration produces arm64 assets named
-     `PI-Desktop-X.Y.Z-arm64.dmg` and `PI-Desktop-X.Y.Z-arm64-mac.zip`, while
-     the Intel assets use `PI-Desktop-X.Y.Z-x64.dmg` and
-     `PI-Desktop-X.Y.Z-x64-mac.zip`; confirm the release directory has both
+     `Slyy-X.Y.Z-arm64.dmg` and `Slyy-X.Y.Z-arm64-mac.zip`, while
+     the Intel assets use `Slyy-X.Y.Z-x64.dmg` and
+     `Slyy-X.Y.Z-x64-mac.zip`; confirm the release directory has both
      DMG and ZIP artifacts and one merged `latest-mac.yml` feed whose URLs and
      checksums match those generated assets.
   4. Inspect the renderer output for its size controls: emitted JS is minified,
      no `.woff` or `.ttf` files are present, only the KaTeX `woff2` faces remain
      (no application font face is emitted any more), and
-     the brand marks are the renderer-sized `assets/brand/logo-*.png` rather
-     than the 1024px installer icons.
+     the brand mark is the renderer-sized `assets/brand/slyy-mark.svg` rather
+     than the 1024px installer icon.
   5. Configure the loopback fixture provider, disable external egress, and
-     launch from a clean profile. Switch between English and Simplified
-     Chinese, request the deterministic response, render common
+     launch from a clean profile. Switch between English and German,
+     request the deterministic response, render common
      JavaScript/TypeScript, Python, Rust, shell, Mermaid, and unknown-language
      fences plus KaTeX and a Mermaid diagram, run the Bash fixture, and verify
      host and agent-sidecar health.
   6. Confirm typography and branding survive the stripped font fallbacks: KaTeX
-     math renders with its own faces, Chinese text in both the UI chrome and
-     assistant output stays readable through the system CJK fallback tier, and
+     math renders with its own faces, CJK text in assistant output stays
+     readable through the system CJK fallback tier, and
      the sidebar plus startup-splash logos render crisply on a HiDPI display.
 - **Expected**: Each macOS package contains exactly one bundled agent sidecar,
   one Rust host matching its declared architecture, and only configured
@@ -800,7 +797,7 @@
   stays readable as plain text. The renderer ships minified chunks, carries no
   legacy `woff`/`truetype` payload, emits no application font face (only the
   KaTeX `woff2` faces remain), and imports only renderer-sized brand marks;
-  math, Chinese text under the CJK fallback tier, and the chrome logos all
+  math, CJK text under the CJK fallback tier, and the chrome logos all
   render correctly. The offline shell starts and all
   fixture capabilities use local packaged assets; provider/update network
   failures do not block startup.
@@ -1018,7 +1015,7 @@
   4) Switch to a second regular Space and confirm Option+Space shows the panel
      there.
   5) Minimize the main window into the tray, switch to another app, then Cmd+Tab
-     back to PI-Desktop and confirm the window returns focused; repeat with a
+     back to Slyy and confirm the window returns focused; repeat with a
      Dock click and with the tray Show item.
   6) With the main window hidden, press Option+Space and confirm only the
      launcher appears — the main window stays hidden until it is restored.
@@ -1026,7 +1023,7 @@
   Dock and Cmd+Tab presence survives launcher warm-up and every launcher
   invocation; the launcher stays focusable, covers all regular Spaces and the
   app's own fullscreen window (overlaying another app's fullscreen Space is
-  out of scope and activates PI-Desktop instead); activation from Cmd+Tab, App
+  out of scope and activates Slyy instead); activation from Cmd+Tab, App
   Exposé, the Dock, or the tray restores a tray-hidden window, while launcher
   and plugin-panel activation leaves it hidden.
 - **Specs linked**: `03-runtime/07-process-model.md`, ADR 0086, ADR 0078,
@@ -1038,13 +1035,13 @@
 ## E2E-211: Windows portable ZIP launches after extraction (D603)
 
 - **Preconditions**: A Windows x64 tag or `dist:win` package has produced both
-  `PI-Desktop-Setup-<version>.exe` and `PI-Desktop-Portable-<version>.zip` from
+  `Slyy-Setup-<version>.exe` and `Slyy-Portable-<version>.zip` from
   the shared electron-builder config; a clean user profile is available; the
   account is a standard user without administrator elevation.
 - **Steps**: 1) Inspect the release directory and `latest.yml`. 2) Extract the
   portable ZIP to a user-writable directory without running the NSIS installer.
-  3) Launch the extracted `PI-Desktop.exe`. 4) Confirm there is no
-  administrator prompt and that the running app has the PI-Desktop icon and
+  3) Launch the extracted `Slyy Gen2.exe`. 4) Confirm there is no
+  administrator prompt and that the running app has the Slyy icon and
   taskbar entry. 5) Open Settings → Info and confirm Manual is selected by
   default; briefly select Automatic to inspect its replacement warning, then
   restore Manual. 6) Invoke Check for Updates. 7) Confirm Settings → Info offers
@@ -1052,13 +1049,13 @@
   extracted executable.
 - **Expected**: Both Windows artifacts are space-free and uploaded. `latest.yml`
   points at the NSIS installer only. The extracted ZIP app starts without a
-  setup wizard or administrator prompt, keeps the normal PI-Desktop taskbar
+  setup wizard or administrator prompt, keeps the normal Slyy taskbar
   identity/icon, uses the existing application data directory, and reports
   update preference `manual` by default and effective update mode `manual`.
   Its `resources/app-update.yml` points to the same GitHub feed, so the manual
   check settles as up-to-date or available instead of failing with `ENOENT`.
   When an update is available, Settings offers the Releases page; it does not
-  download or run `PI-Desktop-Setup-<version>.exe`. Relaunch restores sessions
+  download or run `Slyy-Setup-<version>.exe`. Relaunch restores sessions
   from that same profile.
 - **Specs linked**: `01-product/01-product-scope.md`,
   `06-delivery/06-release-runbook.md`, `03-runtime/07-process-model.md`,
@@ -1109,7 +1106,7 @@
 - **Preconditions**: A clean Windows 11 x64 or ARM64 machine/profile without a
   separately installed Visual C++ Redistributable, Node.js, or another local
   agent runtime; the x64 NSIS installer is available.
-- **Steps**: 1) Install PI-Desktop. 2) Launch it for the first time. 3) Wait
+- **Steps**: 1) Install Slyy. 2) Launch it for the first time. 3) Wait
   for the startup splash to yield to the main shell. 4) Inspect the runtime
   logs, then open Settings → Info.
 - **Expected**: The bundled x64 `pi-desktop-host-core.exe` starts and completes

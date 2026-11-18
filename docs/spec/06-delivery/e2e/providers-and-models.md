@@ -262,7 +262,7 @@ with only Host API controlled. Running-turn configuration remains queued.
 - **Preconditions**: Isolated settings profile and a local OpenAI-compatible fixture that lists a model without credentials; no live or paid provider.
 - **Steps**: 1) Open Settings → Model configuration → Add provider → Custom endpoint. 2) Enter a name and the fixture URL; leave the optional API key empty, without selecting an authentication mode. 3) Confirm model discovery succeeds without a key, select the returned model, and save. 4) Reopen and save without changes, then type a key and save; confirm API-key authentication is restored. 5) Edit an API-key provider and save with a blank input; confirm its key is retained. Reopen and confirm **Clear saved API key** is an icon-only button to the right of the input on the same row, with a localized accessible name and tooltip. Activate it, confirm focus returns to the input, and confirm subsequent discovery does not reuse the stored key. Close without saving and confirm no credential changed. Repeat Clear followed by Save, and Clear followed by a replacement key and Save. 6) Confirm the no-auth provider and model are offered by chat/default-model and subagent selectors. 7) Send a request through the no-auth provider fixture.
 - **Expected**: The custom form has no no-key switch and keeps the key input enabled. An empty or whitespace-only key with no saved credential automatically saves `authKind: "none"` without `secretValue`; a supplied key uses API-key authentication. A blank edit retains an existing key. Clear is staged until Save and a replacement key takes precedence over removal. The enabled no-auth provider with `hasSecret: false` remains selectable for chat, defaults, subagents, and image generation where its model supports that operation. Named cloud presets remain unchanged. Runtime requests contain no API-key or Authorization credentials.
-- **Automation**: `node --test apps/desktop/test/custom-provider-no-api-key-user-path.test.mjs` covers empty/whitespace keys, keyed creation, save/reopen, preservation, staged removal/cancellation, discovery without the old secret, and replacement. `pnpm test:e2e:provider-api-style` renders the production setup form in English and Simplified Chinese with a stubbed model-discovery/API boundary and verifies create/update payloads and chat/default/subagent selector eligibility. `pnpm --filter @pi-desktop/agent-runtime exec vitest run src/provider-binding.test.ts` verifies request headers; `apps/desktop/test/image-generation-default.test.mjs` covers no-auth image-model availability; `cargo test -p host-core --locked switching_provider_to_no_auth_clears_its_api_key` verifies Host persistence and secret removal.
+- **Automation**: `node --test apps/desktop/test/custom-provider-no-api-key-user-path.test.mjs` covers empty/whitespace keys, keyed creation, save/reopen, preservation, staged removal/cancellation, discovery without the old secret, and replacement. `pnpm test:e2e:provider-api-style` renders the production setup form in English and German with a stubbed model-discovery/API boundary and verifies create/update payloads and chat/default/subagent selector eligibility. `pnpm --filter @pi-desktop/agent-runtime exec vitest run src/provider-binding.test.ts` verifies request headers; `apps/desktop/test/image-generation-default.test.mjs` covers no-auth image-model availability; `cargo test -p host-core --locked switching_provider_to_no_auth_clears_its_api_key` verifies Host persistence and secret removal.
 - **Specs linked**: `03-runtime/11-provider-model-system.md`, `03-runtime/12-provider-config-schema.md`, `03-runtime/13-model-catalog-and-selection.md`, `04-ux/06-settings-ia.md`.
 - **Acceptance**: B (model configuration), F (provider persistence), Security.
 - **Milestone**: M2.
@@ -389,8 +389,8 @@ with only Host API controlled. Running-turn configuration remains queued.
   OpenAI-compatible provider.
 - **Expected**: Every OpenCode Go LLM request includes `x-opencode-session`
   equal to the conversation id (or a stable per-call id when no session
-  exists), `x-opencode-client: pi-desktop`, and a `User-Agent` identifying
-  PI-Desktop. Follow-up turns reuse the same session header, and so does the
+  exists), `x-opencode-client: slyy`, and a `User-Agent` identifying
+  Slyy (`slyy/<version>`). Follow-up turns reuse the same session header, and so does the
   compaction summary request, which the harness would otherwise send with no
   headers at all. The generic OpenAI-compatible provider does not receive
   these headers. The gateway does
@@ -542,7 +542,7 @@ with only Host API controlled. Running-turn configuration remains queued.
   run a turn that refreshes the access token. 6) Repeat against OpenCode Go
   and confirm `x-opencode-session` is still present. 7) Repeat against
   Codex/Anthropic OAuth inference. 8) Enter a value holding fullwidth
-  characters (`０`, `１２３`) and confirm the editor says it will be saved as
+  digits (U+FF10 to U+FF19, for example fullwidth `0` and `123`) and confirm the editor says it will be saved as
   half-width, then save and reopen: the stored value is ASCII. 9) Enter a value
   holding Han text or a NUL and confirm the editor warns before saving, then
   save: it is rejected as `HEADERS_INVALID` with the character and its index
@@ -1354,7 +1354,7 @@ with only Host API controlled. Running-turn configuration remains queued.
     surface, exposing one localized **Continue** action and no **Regenerate**
     action; the generic TurnOutcomeCard is omitted. Activating **Continue**
     appends the localized continuation prompt (`Continue the user's unfinished
-    task.` / `继续用户未完成的任务`) to the same session and starts the next turn
+    task.` in English, the German catalog text in German) to the same session and starts the next turn
     without discarding the failed turn.
   - The subagent uses the same ten-retry budget and one visible child bubble;
     its final report is failed only after the budget is exhausted, while
@@ -1638,7 +1638,7 @@ with only Host API controlled. Running-turn configuration remains queued.
 
 ## E2E-PROVIDER-custom-form-excludes-account-formats: Keep account APIs out of new custom services
 
-- **Preconditions**: Isolated profile, English and Simplified Chinese. Seed
+- **Preconditions**: Isolated profile, English and German. Seed
   non-OAuth legacy rows using Codex and Pi account formats, including an OpenAI
   preset URL; use synthetic models and no real credentials. Include a synthetic
   OpenAI Codex OAuth account with one configured model binding.
@@ -1666,15 +1666,15 @@ with only Host API controlled. Running-turn configuration remains queued.
 - **Specs linked**: `03-runtime/11-provider-model-system.md`,
   `03-runtime/12-provider-config-schema.md`, ADR 0095, ADR 0297.
 - **Acceptance**: B (model configuration), Security.
-- **Status**: The Electron/React scenario passed in English and Simplified
-  Chinese: eight scenario groups, four creates and eight provider updates through
+- **Status**: The Electron/React scenario passed upstream in English and the
+  former Chinese locale: eight scenario groups, four creates and eight provider updates through
   the stubbed API; both locales also verify the Codex OAuth search opt-in save.
   Host persistence, live OAuth/model calls and visual layout were not exercised.
   Post-integration main E2E is NOT RUN.
 
 ## E2E-PROVIDER-stepfun-plan-setup: Save the StepFun subscription preset
 
-- **Preconditions**: Isolated Electron profile, English and Simplified Chinese,
+- **Preconditions**: Isolated Electron profile, English and German,
   synthetic API key and a discovered `step-5-preview` model; no live provider.
 - **Steps**: Select StepFun Plan in Add AI service, enter the test key, wait for
   model discovery, explicitly select Step 5 Preview, then save.
@@ -1881,7 +1881,7 @@ with only Host API controlled. Running-turn configuration remains queued.
   `~/.pi/agent/auth.json` plus `~/.pi/agent/models-store.json`, or
   `~/.cc-switch/cc-switch.db`, including two API-key profiles with the same
   endpoint and different keys, one auth-only Pi API-key provider, and
-  optionally one OAuth-only vendor. PI-Desktop may already have an equivalent
+  optionally one OAuth-only vendor. Slyy may already have an equivalent
   provider.
 - **Steps**:
   1. Open Settings → Models and expand **Import from other tools**. Confirm
@@ -2094,7 +2094,7 @@ with only Host API controlled. Running-turn configuration remains queued.
   default-model changes. Failed saves report an error and retain accepted order;
   overlapping moves are blocked and late catalog reads cannot undo a move.
 - Reopen the Composer model menu: groups follow the provider order. Restart the
-  host and renderer and verify persistence. Check English and Chinese labels.
+  host and renderer and verify persistence. Check English and German labels.
 - Automated: `pnpm test:e2e:provider-order` runs the real settings component,
   sandboxed preload, provider IPC registrar, and an isolated Rust host. It uses
   synthetic Chromium pointer/key events and test providers without credentials;
@@ -2211,7 +2211,7 @@ conversation content or credentials. A skipped test remains NOT RUN, not PASS.
   explicit format wins over hostname defaults. Relay advice preserves origin.
 - **Specs:** 03-runtime/12 endpoint guidance; 03-runtime/11 search setup guidance;
   ADR 0297 official-route amendment.
-- **Acceptance:** English/Chinese interaction flows and the previous custom and
+- **Acceptance:** English/German interaction flows and the previous custom and
   Codex account paths pass. Real adapter contracts verify opt-in request routes,
   credentials and search tools. A DeepSeek conversation continues off/on/off,
   retains prior text, and does not replay encrypted search blocks to Completions.
@@ -2392,7 +2392,7 @@ conversation content or credentials. A skipped test remains NOT RUN, not PASS.
 
 - **Setup:** A custom Chat Completions provider with a DeepSeek-family model;
   start with a legacy binding that omits `supportsReasoningEffort`.
-- **Steps:** In English, Chinese and German at 850/1000/1400px widths, open model settings, confirm Auto, select
+- **Steps:** In English and German at 850/1000/1400px widths, open model settings, confirm Auto, select
   Send, save and reopen; repeat for Do not send and Auto. Switch to Responses
   and Anthropic and confirm the Completions-only control is hidden.
 - **Expected:** Each saved binding retains true, false, or null respectively.

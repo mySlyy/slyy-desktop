@@ -5,24 +5,21 @@ import { defineConfig, type DefaultTheme } from 'vitepress'
 
 const docsRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
-type Locale = 'en' | 'zh-CN'
-
 type SpecSection = {
   directory: string
-  en: string
-  zh: string
+  text: string
   collapsed?: boolean
 }
 
 const specSections: SpecSection[] = [
-  { directory: '01-product', en: 'Product', zh: '产品' },
-  { directory: '02-architecture', en: 'Architecture', zh: '架构' },
-  { directory: '03-runtime', en: 'Runtime', zh: '运行时', collapsed: true },
-  { directory: '04-ux', en: 'Experience', zh: '用户体验', collapsed: true },
-  { directory: '05-security', en: 'Security', zh: '安全', collapsed: true },
-  { directory: '06-delivery', en: 'Delivery', zh: '交付', collapsed: true },
-  { directory: '07-plugins', en: 'Plugins', zh: '插件', collapsed: true },
-  { directory: '08-meta', en: 'Decisions & metadata', zh: '决策与元数据', collapsed: true },
+  { directory: '01-product', text: 'Product' },
+  { directory: '02-architecture', text: 'Architecture' },
+  { directory: '03-runtime', text: 'Runtime', collapsed: true },
+  { directory: '04-ux', text: 'Experience', collapsed: true },
+  { directory: '05-security', text: 'Security', collapsed: true },
+  { directory: '06-delivery', text: 'Delivery', collapsed: true },
+  { directory: '07-plugins', text: 'Plugins', collapsed: true },
+  { directory: '08-meta', text: 'Decisions & metadata', collapsed: true },
 ]
 
 const preferredRootFiles = ['README.md', '00-baseline.md', 'NAV.md']
@@ -34,10 +31,7 @@ function titleFromMarkdown(filePath: string): string {
   return source.match(/^#\s+(.+)$/m)?.[1]?.replace(/`/g, '') ?? path.basename(filePath, '.md')
 }
 
-/**
- * Specification pages are English-only; the Chinese locale keeps its own
- * index (`zh-CN/spec/README.md`) and links into these English routes.
- */
+/** Specification pages under `docs/spec/<directory>`, README first. */
 function specItems(directory: string): DefaultTheme.SidebarItem[] {
   const sourceDirectory = path.join(docsRoot, 'spec', directory)
   if (!fs.existsSync(sourceDirectory)) return []
@@ -90,7 +84,7 @@ function projectItems(): DefaultTheme.SidebarItem[] {
     }))
 }
 
-function specSidebar(locale: Locale): DefaultTheme.SidebarItem[] {
+function specSidebar(): DefaultTheme.SidebarItem[] {
   const specRoot = path.join(docsRoot, 'spec')
   const rootFiles = fs.readdirSync(specRoot).filter((file) => file.endsWith('.md'))
   const page = (file: string) => ({
@@ -98,34 +92,31 @@ function specSidebar(locale: Locale): DefaultTheme.SidebarItem[] {
     link: `/spec/${file.slice(0, -3)}`,
   })
   const startItems = preferredRootFiles.filter((file) => rootFiles.includes(file)).map(page)
-  if (locale === 'zh-CN') {
-    startItems[0] = { text: titleFromMarkdown(path.join(docsRoot, 'zh-CN/spec/README.md')), link: '/zh-CN/spec/README' }
-  }
   const referenceItems = rootFiles
     .filter((file) => !preferredRootFiles.includes(file))
     .sort((left, right) => left.localeCompare(right, 'en'))
     .map(page)
 
   return [
-    { text: locale === 'en' ? 'Start here' : '从这里开始', items: startItems },
+    { text: 'Start here', items: startItems },
     ...specSections.map((section) => ({
-      text: locale === 'en' ? section.en : section.zh,
+      text: section.text,
       collapsed: section.collapsed,
       items: specItems(section.directory),
     })),
     ...(referenceItems.length ? [{
-      text: locale === 'en' ? 'Compatibility references' : '兼容性参考',
+      text: 'Compatibility references',
       collapsed: true,
       items: referenceItems,
     }] : []),
   ]
 }
 
-const enSidebar: DefaultTheme.Sidebar = {
+const sidebar: DefaultTheme.Sidebar = {
   '/guide/': [{ text: 'Guide', items: [{ text: 'Start here', link: '/guide/' }, { text: 'Screens', link: '/guide/screenshots' }, { text: 'MCP market', link: '/guide/mcp-market' }] }],
   '/plugin-development': [{ text: 'Plugin authoring', items: [{ text: 'Zero to one', link: '/plugin-development' }, ...specItems('07-plugins')] }],
   '/project/': [{ text: 'Project records', items: projectItems() }],
-  '/spec/': specSidebar('en'),
+  '/spec/': specSidebar(),
   '/adr/': [
     {
       text: 'Architecture decisions',
@@ -139,43 +130,17 @@ const enSidebar: DefaultTheme.Sidebar = {
   ],
 }
 
-const zhSidebar: DefaultTheme.Sidebar = {
-  '/zh-CN/guide/': [{ text: '指南', items: [{ text: '快速开始', link: '/zh-CN/guide/' }, { text: '界面截图', link: '/zh-CN/guide/screenshots' }, { text: 'MCP 市场', link: '/zh-CN/guide/mcp-market' }] }],
-  '/zh-CN/plugin-development': [{ text: '插件开发', items: [{ text: '从零到一', link: '/zh-CN/plugin-development' }, ...specItems('07-plugins')] }],
-  '/zh-CN/spec/': specSidebar('zh-CN'),
-  '/zh-CN/adr/': [
-    {
-      text: '架构决策记录',
-      items: [
-        { text: 'ADR 索引', link: '/zh-CN/adr/' },
-        { text: '文档站决策', link: '/adr/0079-vitepress-documentation-site' },
-        { text: '最新决策（英文）', link: '/spec/08-meta/decisions-log' },
-      ],
-    },
-    { text: '全部英文决策', collapsed: true, items: adrItems() },
-  ],
-}
-
-const enNav: DefaultTheme.NavItem[] = [
+const nav: DefaultTheme.NavItem[] = [
   { text: 'Guide', link: '/guide/' },
   { text: 'Specs', link: '/spec/README' },
   { text: 'ADRs', link: '/adr/README' },
   { text: 'Plugin guide', link: '/plugin-development' },
   { text: 'Privacy policy', link: '/privacy-policy' },
-  { text: 'GitHub', link: 'https://github.com/vastsa/PI-Desktop' },
-]
-
-const zhNav: DefaultTheme.NavItem[] = [
-  { text: '快速开始', link: '/zh-CN/guide/' },
-  { text: '规格', link: '/zh-CN/spec/README' },
-  { text: 'ADR', link: '/zh-CN/adr/' },
-  { text: '插件开发', link: '/zh-CN/plugin-development' },
-  { text: '隐私政策（英文）', link: '/privacy-policy' },
-  { text: 'GitHub', link: 'https://github.com/vastsa/PI-Desktop' },
+  { text: 'GitHub', link: 'https://github.com/mySlyy/slyy-desktop' },
 ]
 
 export default defineConfig({
-  title: 'PI-Desktop',
+  title: 'Slyy',
   description: 'A modular desktop workspace for AI agents',
   // Product shell is dark-base; lock docs to the same charcoal system.
   appearance: 'force-dark',
@@ -185,29 +150,7 @@ export default defineConfig({
     ['meta', { name: 'theme-color', content: '#0d0d0d' }],
     ['meta', { name: 'color-scheme', content: 'dark light' }],
   ],
-  locales: {
-    root: { label: 'English', lang: 'en' },
-    'zh-CN': {
-      label: '简体中文',
-      lang: 'zh-CN',
-      title: 'PI-Desktop 文档',
-      description: '面向 AI 智能体的模块化桌面工作区',
-      themeConfig: {
-        nav: zhNav,
-        sidebar: zhSidebar,
-        search: { provider: 'local', options: { translations: { button: { buttonText: '搜索文档', buttonAriaLabel: '搜索文档' }, modal: { noResultsText: '没有找到相关结果', resetButtonTitle: '清除查询', footer: { selectText: '选择', navigateText: '切换', closeText: '关闭' } } } } },
-        outline: { level: 'deep', label: '本页目录' },
-        docFooter: { prev: '上一页', next: '下一页' },
-        lastUpdated: { text: '最后更新于' },
-        returnToTopLabel: '返回顶部',
-        sidebarMenuLabel: '目录',
-        darkModeSwitchLabel: '外观',
-        langMenuLabel: '切换语言',
-        editLink: { pattern: 'https://github.com/vastsa/PI-Desktop/edit/main/docs/:path', text: '在 GitHub 上编辑此页' },
-        footer: { message: '本地优先 · 模型可替换 · 插件可扩展。 <a href="https://aiuo.net" target="_blank" rel="noreferrer">AIUO.NET</a>', copyright: 'Copyright © 2026 PI-Desktop 贡献者' },
-      },
-    },
-  },
+  lang: 'en',
   markdown: {
     html: false,
     lineNumbers: true,
@@ -215,14 +158,14 @@ export default defineConfig({
   },
   themeConfig: {
     logo: '/app-icon.png',
-    siteTitle: 'PI-Desktop',
+    siteTitle: 'Slyy',
     search: { provider: 'local' },
-    socialLinks: [{ icon: 'github', link: 'https://github.com/vastsa/PI-Desktop' }],
-    editLink: { pattern: 'https://github.com/vastsa/PI-Desktop/edit/main/docs/:path', text: 'Edit this page on GitHub' },
+    socialLinks: [{ icon: 'github', link: 'https://github.com/mySlyy/slyy-desktop' }],
+    editLink: { pattern: 'https://github.com/mySlyy/slyy-desktop/edit/main/docs/:path', text: 'Edit this page on GitHub' },
     outline: { level: 'deep', label: 'On this page' },
     docFooter: { prev: 'Previous', next: 'Next' },
-    footer: { message: 'Local-first · Model-agnostic · Plugin-powered. <a href="https://aiuo.net" target="_blank" rel="noreferrer">AIUO.NET</a>', copyright: 'Copyright © 2026 PI-Desktop contributors' },
-    nav: enNav,
-    sidebar: enSidebar,
+    footer: { message: 'Local-first · Model-agnostic · Plugin-powered. <a href="https://slyy.ai" target="_blank" rel="noreferrer">Wapsol GmbH · slyy.ai</a> · Based on PI-Desktop (LGPL-3.0)', copyright: 'Copyright © 2026 Wapsol GmbH and PI-Desktop contributors' },
+    nav,
+    sidebar,
   },
 })

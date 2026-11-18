@@ -6,7 +6,7 @@
 
 ## Context
 
-Language was a row of preview cards (Auto / 简体中文 / English), so every new
+Language was a row of preview cards (Auto / Simplified Chinese / English), so every new
 locale needed a hard-coded card, sample glyph, and catalog keys for its name.
 The product now ships more than two UI locales, starting with Turkish.
 

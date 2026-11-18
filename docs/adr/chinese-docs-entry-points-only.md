@@ -1,8 +1,13 @@
 # ADR: Chinese documentation keeps entry points only
 
-- Status: Accepted
+- Status: Superseded in Slyy (2026-11-18)
 - Date: 2026-11-16
 - Related: amends ADR 0079
+
+> **Superseded in Slyy.** The Slyy documentation is English only. The
+> `docs/zh-CN/` entry points, the `check-locales.mjs` gate, and the VitePress
+> `zh-CN` locale were removed on 2026-11-18. The record below is kept as
+> upstream history.
 
 ## Context
 

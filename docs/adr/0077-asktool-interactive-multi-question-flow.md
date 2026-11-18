@@ -22,7 +22,7 @@ an unanswered call still needs a stable tool output.
    question at a time.
 3. Skip and decline resolve to `null`, answers carry selected labels and custom
    text, and there is no timeout.
-4. Resolved values become tool content: `question：answer` per line, `\n---\n`
+4. Resolved values become tool content: `question: answer` per line (the upstream build used a full-width colon), `\n---\n`
    between questions, empty for null answers.
 
 Question and option text may use CommonMark or GFM, projected as safe phrasing

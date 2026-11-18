@@ -178,7 +178,7 @@ before publication leaves pending work to recopy from the source. An unavailable
 selected volume refuses startup rather than creating a blank profile elsewhere.
 If the managed installation's default data root is missing, startup pauses before
 loading app services and offers two recovery choices: create a fresh default data
-root or select an existing PI-Desktop storage root. The selected location must
+root or select an existing Slyy storage root. The selected location must
 contain `data/pi.sqlite` or be the data directory containing `pi.sqlite`; its
 pointer is written only after validation. A sibling `browser/` directory is used
 when present, otherwise the installation's current browser root is retained.
@@ -209,14 +209,14 @@ review snapshots, plugin code/data, models, configuration, or logs. Partial clea
 failure remains observable, retains active roots, and can be retried.
 
 
-A packaged installation keeps this tree in `~/.pi-desktop`. A development build
-keeps the same tree in `~/.pi-desktop-dev`, because a shipped app and a
+A packaged installation keeps this tree in `~/.slyy-gen2`. A development build
+keeps the same tree in `~/.slyy-gen2-dev`, because a shipped app and a
 `pnpm dev` host are two installations that have to run at the same time (D599,
 ADR 0094). `PI_DESKTOP_DATA_DIR` replaces either root outright and is resolved
 to an absolute path before it reaches host-core as a child-process variable.
 
 ```text
-~/.pi-desktop/
+~/.slyy-gen2/
  ├── pi.sqlite            # index database (WAL: + -wal/-shm) — host-core only
  ├── pi.sqlite.v6.bak     # archived pre-v7 database (D119 breaking reset)
  ├── pi.sqlite.v8.bak     # exact readable backup before v8→v15 destructive work
@@ -778,8 +778,10 @@ CREATE INDEX idx_session_import_origins_plugin
   the deterministic
   first-prompt fallback, which host-core writes only while the stored title is
   still a recognized placeholder. A placeholder is recognized in every shipped
-  locale, because the renderer writes its localized `chat.untitledTask` label
-  when it creates a session; recognition trims and lowercases the stored title
+  locale (en, de), because the renderer writes its localized `chat.untitledTask`
+  label when it creates a session; Slyy removed the upstream Chinese and Korean
+  legacy placeholder titles from that set on 2026-11-18; recognition trims and
+  lowercases the stored title
   against the placeholder set. Schema v23 retains pre-existing v22 titles as
   `legacy` to protect them from automatic replacement, because historical
   sessions lack provenance to distinguish an untouched placeholder from a
@@ -1358,7 +1360,7 @@ directory (D671) are excluded: artifacts list workspace deliverables only.
 ### 4.11 scheduled_tasks + task_runs — automations
 
 Moves scheduled tasks out of Electron's `scheduled-tasks.json` (D002 fix) and
-adds the run-history the Automations page needs (定时任务 / 运行记录 tabs).
+adds the run-history the Automations page needs (Scheduled tasks / Run history tabs).
 
 ```sql
 CREATE TABLE scheduled_tasks (

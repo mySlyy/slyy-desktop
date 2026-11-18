@@ -68,14 +68,18 @@ selected label; rendering is presentation-only. For each question, content is
 serialized as:
 
 ```text
-question text：answer label 1、answer label 2
+question text<U+FF1A>answer label 1<U+3001>answer label 2
 ```
+
+`<U+FF1A>` is the FULLWIDTH COLON and `<U+3001>` the IDEOGRAPHIC COMMA that
+`formatAskToolOutput` (`packages/shared/src/types/agent.ts`) emits; they are
+written as code points here because the documentation is English-only.
 
 Multiple questions are separated by `\n---\n`. A skipped or unanswered
 question keeps the question text and uses an empty placeholder:
 
 ```text
-question text：
+question text<U+FF1A>
 ```
 
 This format is deterministic, preserves question order, and makes multi-select

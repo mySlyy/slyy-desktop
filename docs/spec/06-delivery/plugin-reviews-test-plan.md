@@ -108,8 +108,8 @@ node node_modules/vitest/vitest.mjs run
 cd ../..
 
 # Review-block and key parity (every locale must print reviewsBlock=1 sevenKeys=7)
-$root = 'C:\Code\ReactProjects\PI-Desktop\.slim\worktrees\plugin-reviews'
-foreach ($l in 'de','en','es','fr','ko','pt-BR','tr','zh-CN','zh-TW') {
+$root = 'C:\src\slyy-desktop'
+foreach ($l in 'de','en') {
   $f = "$root\packages\i18n\src\locales\$l\index.ts"
   $block = (Select-String -Path $f -Pattern '^\s*reviews: \{' -CaseSensitive).Count
   $keys  = (Select-String -Path $f -Pattern 'summaryTitle:|viewAll:|composeHint:|composeCta:|reviewVersion:|filterLabel:|sortLabel:' -CaseSensitive).Count
@@ -285,7 +285,7 @@ state only what the fixture asserts.
 
 | ID | Check | Expected | Status |
 | --- | --- | --- | --- |
-| RVD-I18N-01 | Review strings in all nine locales (`de,en,es,fr,ko,pt-BR,tr,zh-CN,zh-TW`) | Every locale carries exactly one nested `reviews: {` block and all seven key names (`summaryTitle`, `viewAll`, `composeHint`, `composeCta`, `reviewVersion`, `filterLabel`, `sortLabel`); the §2.5 check prints `reviewsBlock=1 sevenKeys=7` per locale; vitest catalogue suite green | `verified` (catalogue 30/30 + shared 1272; locale parity re-checked) |
+| RVD-I18N-01 | Review strings in every shipped locale (`de,en`; the 2026-10 run covered the nine upstream locales) | Every locale carries exactly one nested `reviews: {` block and all seven key names (`summaryTitle`, `viewAll`, `composeHint`, `composeCta`, `reviewVersion`, `filterLabel`, `sortLabel`); the §2.5 check prints `reviewsBlock=1 sevenKeys=7` per locale; vitest catalogue suite green | `verified` (catalogue 30/30 + shared 1272; locale parity re-checked) |
 | RVD-A11Y-01 | Accessible names/states of the drawer surface | `role="dialog"`, `aria-modal="true"`, labelled title; filters/sorts `aria-pressed`; list label; load error `role="alert"`; star rating `role="img"` with a rating label; Tab trap + inert; Escape returns focus | `verified` (2026-10-16 six-probe rerun) |
 | RVD-NARROW-01 | Narrow drawer at 320×720 (real geometry) | `pluginReviewsNarrowDrawerProbe` on the real components with the hidden window resized to 320×720 (`useContentSize`): drawer rect fully inside the viewport; document and drawer-body have no horizontal overflow; 7+ controls (4 sentiment, 2 sort, close, write link) stay inside the drawer; filter/sort `aria-pressed`; body scrolls (`scrollTop > 0`); composer inside the viewport; write link routes `browserOpenExternal(REVIEW_URL)`; close leaves the detail sheet. Harness applies `base.css` and the repo's reduced-motion `animation: none`. **320 is the only asserted narrow width** — 375 is covered by the probe's `<= 375` guard, not a second run | `verified` (2026-10-17 narrow-drawer probe) |
 | RVD-STYLE-01 | `plugins-page-style.test.mjs` — "review surfaces use design tokens in both themes" | Chip tabular numerals; summary uses `--plugins-tile`; scrim uses `--ds-modal-veil`; drawer reserves `--ds-toolbar-height`; composer field token; write link styled | `verified` (2026-10-16 six-file run) |

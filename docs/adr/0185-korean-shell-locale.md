@@ -4,6 +4,8 @@
 - Date: 2026-09-09
 - Related: ADR 0160, ADR 0182, ADR 0183, D349
 
+> **Withdrawn in Slyy (2026-11-18).** Slyy ships only English and German UI catalogs; the `ko` catalog is not shipped. The record below is upstream history.
+
 ## Context
 
 The searchable locale registry already supported complete shell catalogs, but
@@ -12,8 +14,8 @@ distinct language and must not be served by a fallback catalog.
 
 ## Decision
 
-Ship a complete Korean shell catalog in the shared i18n package, named `한국어` /
-`Korean`, and resolve `ko` and regional `ko-*` OS tags to it, including
+Ship a complete Korean shell catalog in the shared i18n package, named by its native
+name / `Korean`, and resolve `ko` and regional `ko-*` OS tags to it, including
 `AppSettings.language` and the Electron Chromium locale allowlist. A Korean
 product changelog catalog mirrors English versions and highlight counts. The
 existing English-first contract holds: identical keys, interpolation variables,

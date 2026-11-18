@@ -30,7 +30,7 @@ Settings is a **full-window page** that replaces the app sidebar + main chrome (
   automatic collapse/restore transitions on the visible shell still animate;
   initial presentation and route restoration do not.
 - Top of rail: traffic-light clearance and the pill **Search settings…**
-- The **Back to app** (`返回应用`) action is pinned to the foot of the rail, not
+- The **Back to app** action is pinned to the foot of the rail, not
   the top: it keeps its chevron + label form as a 32px control, and it shares
   the horizontal band of the main shell's sidebar footer icon row (settings /
   plugins / notifications), so the action does not jump vertically when the
@@ -48,21 +48,21 @@ Settings is a **full-window page** that replaces the app sidebar + main chrome (
   destination is never the landing place for whatever did not fit elsewhere,
   and a subject that belongs to none of them is a missing destination rather
   than an extra card on an unrelated page:
-  1. **Appearance / 外观** — Lucide `Palette` (theme, language, type, chrome)
-  2. **Conversation / 对话** — Lucide `MessageSquare` (transcript presentation and composer input)
-  3. **Shortcuts / 快捷键** — Lucide `Keyboard` (keyboard shortcuts)
-  4. **Voice / 语音** — Lucide `Mic` (Live Voice enablement and provider bindings)
-  5. **Behavior / 行为** — Lucide `SlidersHorizontal` (session defaults, execution, computer use)
-  6. **Models / 模型** — Lucide `Bot` (providers and default model)
-  7. **Instructions / 指令** — Lucide `FileText` (global and project instruction files)
-  8. **Skills / 技能** — Lucide `BookOpen` (reusable agent instructions)
+  1. **Appearance** — Lucide `Palette` (theme, language, type, chrome)
+  2. **Conversation** — Lucide `MessageSquare` (transcript presentation and composer input)
+  3. **Shortcuts** — Lucide `Keyboard` (keyboard shortcuts)
+  4. **Voice** — Lucide `Mic` (Live Voice enablement and provider bindings)
+  5. **Behavior** — Lucide `SlidersHorizontal` (session defaults, execution, computer use)
+  6. **Models** — Lucide `Bot` (providers and default model)
+  7. **Instructions** — Lucide `FileText` (global and project instruction files)
+  8. **Skills** — Lucide `BookOpen` (reusable agent instructions)
   9. **MCP** — Lucide `Server` (agent connections)
-  10. **Subagents / 子智能体** — Lucide `Sparkles` (built-in and personal parallel agents)
-  11. **Projects / 项目** — Lucide `Archive` (durable project index)
-  12. **System / 系统** — Lucide `Monitor` (network, storage, power, window close behavior)
-  13. **Cloud sync / 云同步** — Lucide `CloudDownload` (encrypted portable configuration backup and bidirectional sync; Experimental, all builds)
-  14. **Remote Hosts / 远程主机** — Lucide `Globe` (experimental SSH hosts, sessions, and explicit model copy)
-  15. **Info / 信息** — Lucide `Info` (versions, logs, updates, developer)
+  10. **Subagents** — Lucide `Sparkles` (built-in and personal parallel agents)
+  11. **Projects** — Lucide `Archive` (durable project index)
+  12. **System** — Lucide `Monitor` (network, storage, power, window close behavior)
+  13. **Cloud sync** — Lucide `CloudDownload` (encrypted portable configuration backup and bidirectional sync; Experimental, all builds)
+  14. **Remote Hosts** — Lucide `Globe` (experimental SSH hosts, sessions, and explicit model copy)
+  15. **Info** — Lucide `Info` (versions, logs, updates, developer)
   Rail icons are decorative (`aria-hidden` via the SVG default) and stay
   monochrome with the rail label, except on the selected row, where the glyph
   takes the accent alongside the row's accent-tinted pill; do not reuse
@@ -75,9 +75,9 @@ Settings is a **full-window page** that replaces the app sidebar + main chrome (
   search results.
 - The directory remains a flat searchable list in the same exact order. For
   scanability, the destinations are shown in four titled visual clusters:
-  `Preferences` / `偏好` (Appearance, Conversation, Shortcuts, Voice),
-  `Agent` / `智能体` (Behavior, Models, Instructions, Skills, MCP, Subagents),
-  `Workspace` / `工作区` (Projects), and `System` / `系统` (System, Cloud sync,
+  `Preferences` (Appearance, Conversation, Shortcuts, Voice),
+  `Agent` (Behavior, Models, Instructions, Skills, MCP, Subagents),
+  `Workspace` (Projects), and `System` (System, Cloud sync,
   Remote Hosts, Info; Cloud sync and Remote Hosts are Experimental destinations
   available in all builds). Headings are muted, non-interactive labels at the
   smallest legible type step with letter spacing, and they use whitespace for
@@ -95,12 +95,12 @@ Settings is a **full-window page** that replaces the app sidebar + main chrome (
   what the destination decides. The capability, model and project workbenches
   keep their own opening description and carry no header subtitle, so a page
   never states its purpose twice.
-- **Cloud sync / 云同步** is an Experimental `System` / `系统` destination
+- **Cloud sync** is an Experimental `System` destination
   available in development and packaged builds. Its rail row, page, and
   settings-search hits are available in every build, and both the row and page
   title carry `settings.configSync.experimental`. Developer mode does not gate
   it; sync behavior itself is unchanged.
-- **Remote Hosts / 远程主机** is an Experimental destination in all builds,
+- **Remote Hosts** is an Experimental destination in all builds,
   independent of developer mode. The rail, page and search hits remain available.
   The row and title carry `settings.remoteHosts.experimental`. After pairing,
   each host offers **New project**, reconnect, and remove. New project opens the
@@ -148,7 +148,7 @@ D684.
   - **Language**: a searchable picker row (not a card grid). The closed trigger
     sizes to the current label, capped by the settings control column, and
     shows the current native name, or Match system. The menu pins Auto at the
-    top with the detected language inline (e.g. "Currently 简体中文"), then
+    top with the detected language inline (e.g. "Currently Deutsch"), then
     lists every shipped locale with its native name (endonym, never translated)
     and English name for search and sort. Selection updates `settings.language`.
     Adding a locale is a catalog plus a registry row; the picker does not
@@ -182,7 +182,7 @@ D684.
     live window. Other platforms do not render the row.
   - **Auto language detection** resolves the OS locale through the main process
     (`app.getLocale()`) rather than the renderer's `navigator.language`, and the
-    Auto option shows the detected language inline (e.g. "Currently 简体中文")
+    Auto option shows the detected language inline (e.g. "Currently Deutsch")
   - native select triggers and their opened option lists use the active theme's
     readable foreground/background pairing on macOS, Windows, and Linux; the
     shared native-select contract applies to every app surface
@@ -473,7 +473,7 @@ no speech keys.
 Token usage is **not a Settings destination** (D335 / ADR 0173). Completed-turn
 history stays host-owned (`session.endTurn.usage`, `stats.getTokenUsageHistory`).
 The user-facing dashboard is marketplace plugin `pi.token-insights`, opened from
-the command palette (`usage`, `tokens`, `用量`). Settings search does not index
+the command palette (`usage`, `tokens`). Settings search does not index
 a usage tab.
 
 ### Voice
@@ -930,7 +930,7 @@ system while preserving their different data ownership:
   form state is announced from the shared error region.
 
 ### Instructions (`instructions` tab)
-- Edit the global instruction Markdown used by every PI-Desktop Agent session.
+- Edit the global instruction Markdown used by every Slyy Agent session.
 - Show the resolved instruction-file path and save through the host-backed
   instruction API; project instructions remain managed from the active project
   menu and are resolved after the global layer.
@@ -1076,13 +1076,11 @@ system while preserving their different data ownership:
 
 1. Opening Settings hides the coding app sidebar (full-page takeover)
 2. Rail shows the search pill at the top, the back-to-app action pinned at the
-   foot on the main sidebar's footer icon line, and exactly Appearance / 外观,
-   Conversation / 对话, Shortcuts / 快捷键, Voice / 语音, Behavior / 行为,
-   Models / 模型, Instructions / 指令, Skills / 技能, MCP, Subagents / 子智能体,
-   Projects / 项目, System / 系统, Cloud sync / 云同步 and Remote Hosts /
-   远程主机 (both Experimental, all builds), and Info / 信息 in that order. The
-   rows are grouped under Preferences / 偏好, Agent / 智能体,
-   Workspace / 工作区, and System / 系统. There is no Usage / 用量 destination,
+   foot on the main sidebar's footer icon line, and exactly Appearance,
+   Conversation, Shortcuts, Voice, Behavior, Models, Instructions, Skills, MCP,
+   Subagents, Projects, System, Cloud sync and Remote Hosts (both Experimental,
+   all builds), and Info in that order. The rows are grouped under Preferences,
+   Agent, Workspace, and System. There is no Usage destination,
    and no General or AI destination: those ids resolve to Appearance and
    Behavior without appearing in the rail or in search results.
 3. Appearance is its own destination; the network, storage, power and
