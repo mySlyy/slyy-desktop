@@ -14,7 +14,7 @@ export const de = {
       "setupFailed": "Einrichtung fehlgeschlagen",
       "title": "Läuft in einem eigenen git-Worktree auf {{branch}}",
       "behind": "↓{{count}}",
-      "behindTitle": "Das Projekt hat {{count}} neue(n) Commit(s). Übernimm sie mit „Aus Projekt synchronisieren“ in diese Sitzung.",
+      "behindTitle": "Das Projekt hat {{count}} neue(n) Commit(s). Übernehmen Sie sie mit „Aus Projekt synchronisieren“ in diese Sitzung.",
     },
     "merge": {
       "menu": "In Projekt zusammenführen…",

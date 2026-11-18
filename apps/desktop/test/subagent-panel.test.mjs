@@ -1,5 +1,6 @@
 import { readAppSource, readStoreSource, readTranscriptSource } from "./helpers/source-contracts.mjs";
 import assert from "node:assert/strict";
+import { readLocaleSource } from "./helpers/locale-source.mjs";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
@@ -26,10 +27,7 @@ const englishCatalogSource = await readFile(
   new URL("../../../packages/i18n/src/locales/en/index.ts", import.meta.url),
   "utf8",
 );
-const chineseCatalogSource = await readFile(
-  new URL("../../../packages/i18n/src/locales/zh-CN/index.ts", import.meta.url),
-  "utf8",
-);
+const germanCatalogSource = await readLocaleSource("de");
 
 
 test("a topology node opens a real subagent tab in the work panel", () => {
@@ -124,7 +122,7 @@ test("the tab owns one scroll surface and pins to the latest output", () => {
 test("composer copy names the driver and lives in the field, per locale", () => {
   for (const [locale, source] of [
     ["en", englishCatalogSource],
-    ["zh-CN", chineseCatalogSource],
+    ["de", germanCatalogSource],
   ]) {
     assert.match(source, /subagentReadOnly: "/);
     assert.match(source, /tabs: \{[^}]*subagent: "/s);

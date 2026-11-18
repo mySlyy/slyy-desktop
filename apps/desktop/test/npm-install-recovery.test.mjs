@@ -178,11 +178,11 @@ test("preference write failure warns but does not block the selected npm retry",
 
 test("dialogs use the current locale and tolerate a destroyed parent window", async (t) => {
   const f = fixture(t);
-  const h = harness(f, { locale: "zh-CN", responses: [0], window: { isDestroyed: () => true } });
+  const h = harness(f, { locale: "de", responses: [0], window: { isDestroyed: () => true } });
   await h.run();
   const message = h.events.find((e) => e.kind === "message").config;
-  assert.equal(message.title, catalogs["zh-CN"].plugins.npmMissingTitle);
-  assert.deepEqual(message.buttons, [catalogs["zh-CN"].common.cancel, catalogs["zh-CN"].plugins.npmChoose]);
+  assert.equal(message.title, catalogs.de.plugins.npmMissingTitle);
+  assert.deepEqual(message.buttons, [catalogs.de.common.cancel, catalogs.de.plugins.npmChoose]);
 });
 
 test("missing, malformed and relative npm preferences fall back without accepting arbitrary commands", (t) => {

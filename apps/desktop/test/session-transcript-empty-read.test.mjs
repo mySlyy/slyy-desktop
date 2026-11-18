@@ -8,6 +8,7 @@
  * that emptiness on every later open, and the pane stayed blank until restart.
  */
 import assert from "node:assert/strict";
+import { readLocaleSource } from "./helpers/locale-source.mjs";
 import { register } from "node:module";
 import test from "node:test";
 import { readFile } from "node:fs/promises";
@@ -82,10 +83,10 @@ test("the durable-read cache never stores a suspiciously empty window", () => {
 });
 
 test("both shipped locales carry the diagnosable copy", async () => {
-  const [en, zhCN] = await Promise.all([
+  const [en, de] = await Promise.all([
     read("../../../packages/i18n/src/locales/en/index.ts"),
-    read("../../../packages/i18n/src/locales/zh-CN/index.ts"),
+    readLocaleSource("de"),
   ]);
   assert.match(en, /sessionTranscriptEmpty:\s*"[^"]+"/);
-  assert.match(zhCN, /sessionTranscriptEmpty:\s*"[^"]+"/);
+  assert.match(de, /sessionTranscriptEmpty:\s*"[^"]+"/);
 });

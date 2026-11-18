@@ -7,10 +7,9 @@ import { fileURLToPath } from "node:url";
 
 import { loadStyles } from "./helpers/styles.mjs";
 import { en } from "../../../packages/i18n/dist/locales/en/index.js";
-import { zhCN } from "../../../packages/i18n/dist/locales/zh-CN/index.js";
-import { tr } from "../../../packages/i18n/dist/locales/tr/index.js";
+import { de } from "../../../packages/i18n/dist/locales/de/index.js";
 
-const catalogs = { en, "zh-CN": zhCN, tr };
+const catalogs = { en, de };
 
 const here = dirname(fileURLToPath(import.meta.url));
 const extDir = join(here, "../src/components/extensions");

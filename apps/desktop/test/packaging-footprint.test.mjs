@@ -70,8 +70,7 @@ test("renderer output keeps its size controls", async () => {
     new URL("../src/components/BrandLogo.tsx", import.meta.url),
     "utf8",
   );
-  assert.match(brandLogoSource, /"\.\.\/assets\/brand\/logo-light\.png"/);
-  assert.match(brandLogoSource, /"\.\.\/assets\/brand\/logo-dark\.png"/);
+  assert.match(brandLogoSource, /"\.\.\/assets\/brand\/slyy-mark\.svg"/);
   assert.doesNotMatch(brandLogoSource, /\.\.\/\.\.\/build\//);
 });
 
@@ -139,18 +138,7 @@ test("sandbox preload entries use standalone shared subpath bundles", () => {
 test("packaging keeps only shipped locales and excludes non-runtime artifacts", () => {
   assert.deepEqual(packageJson.build.electronLanguages, [
     "en-US",
-    "zh-CN",
-    // electron-builder uses underscore locale directories in macOS bundles.
-    "zh_CN",
-    "zh-TW",
-    "zh_TW",
-    "tr",
     "de",
-    "es",
-    "fr",
-    "ko",
-    "pt-BR",
-    "pt_BR",
   ]);
   assert.ok(packageJson.build.files.includes("!**/*.map"));
   assert.ok(

@@ -34,7 +34,7 @@ test("light model menu token preserves its opaque surface and original shadow", 
   assert.equal(declaration(menu, "box-shadow"), "var(--ds-shadow-model-menu)");
   assert.equal(
     declaration(rule(tokens, ':root[data-theme="light"]'), "--ds-shadow-model-menu"),
-    "0 0 0 0.5px color-mix(in oklab, #1a1c1f 10%, transparent), " +
+    "0 0 0 0.5px color-mix(in oklab, #0a0a0a 10%, transparent), " +
       "0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.06)",
   );
 });

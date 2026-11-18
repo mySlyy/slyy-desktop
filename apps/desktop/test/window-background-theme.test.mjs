@@ -68,7 +68,7 @@ test("the built-in window palette is declared once", async () => {
     "utf8",
   );
   assert.match(builtinTheme, /windowBackground: "#ffffff"/);
-  assert.match(builtinTheme, /windowBackground: "#181818"/);
+  assert.match(builtinTheme, /windowBackground: "#141414"/);
   for (const relative of [
     "../electron/main/bootstrap/window.ts",
     "../electron/main/plugin-panel-host.ts",
@@ -79,6 +79,6 @@ test("the built-in window palette is declared once", async () => {
     assert.match(source, /builtinWindowBackground/);
     // The dark plate is the distinctive half of the pair; the panel preload
     // still names #ffffff as page ink, which the theme table does not own.
-    assert.doesNotMatch(source, /#181818/);
+    assert.doesNotMatch(source, /#141414/);
   }
 });

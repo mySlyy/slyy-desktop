@@ -7,7 +7,7 @@ const renderer = await import("../src/lib/api.ts");
 const { createProviderCatalogRuntime } = await import("../electron/main/runtime/provider-catalog.ts");
 const { searchSettings } = await import("../src/lib/settings-search.ts");
 const { en } = await import("../../../packages/i18n/src/locales/en/index.ts");
-const { zhCN } = await import("../../../packages/i18n/src/locales/zh-CN/index.ts");
+const { de } = await import("../../../packages/i18n/src/locales/de/index.ts");
 const { flattenCatalog } = await import("../../../packages/i18n/src/locale-info.ts");
 const main = createProviderCatalogRuntime({ getHost: () => null, modelsDevCatalog: {} });
 
@@ -37,10 +37,10 @@ test("scheduled task switch rejects non-boolean writes at renderer and main boun
   }
 });
 
-test("the scheduled task switch remains searchable in Behavior in English and Chinese", () => {
+test("the scheduled task switch remains searchable in Behavior in English and German", () => {
   // The switch withholds scheduled Agent tools and blocks new runs, so it
   // belongs to agent behavior rather than to the chrome (D684).
-  for (const [catalog, query] of [[en, "scheduled tasks"], [zhCN, "定时任务"]]) {
+  for (const [catalog, query] of [[en, "scheduled tasks"], [de, "geplante aufgaben"]]) {
     const copy = flattenCatalog(catalog);
     const hits = searchSettings(query, (key) => copy[key] ?? key);
     assert.ok(hits.some((hit) => hit.tab === "behavior" && hit.rowKey === "settings.scheduledTasks"));

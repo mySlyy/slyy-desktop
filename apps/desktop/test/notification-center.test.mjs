@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { loadStyles } from "./helpers/styles.mjs";
+import { readLocaleSource } from "./helpers/locale-source.mjs";
 
 const componentSource = await readFile(
   new URL("../src/components/NotificationCenter.tsx", import.meta.url),
@@ -12,10 +13,7 @@ const englishCatalog = await readFile(
   new URL("../../../packages/i18n/src/locales/en/index.ts", import.meta.url),
   "utf8",
 );
-const chineseCatalog = await readFile(
-  new URL("../../../packages/i18n/src/locales/zh-CN/index.ts", import.meta.url),
-  "utf8",
-);
+const germanCatalog = await readLocaleSource("de");
 
 test("notification center exposes an accessible sidebar footer trigger and dialog", () => {
   assert.match(componentSource, /<IconBell size=\{14\} aria-hidden \/>/);
@@ -61,8 +59,8 @@ test("notification content is localized and timestamps are relative", () => {
   assert.match(componentSource, /Intl\.DateTimeFormat/);
   assert.match(englishCatalog, /notifications:\s*\{/);
   assert.match(englishCatalog, /failedBodyWithCode:/);
-  assert.match(chineseCatalog, /notifications:\s*\{/);
-  assert.match(chineseCatalog, /failedBodyWithCode:/);
+  assert.match(germanCatalog, /notifications:\s*\{/);
+  assert.match(germanCatalog, /failedBodyWithCode:/);
 });
 
 test("notification popover has bounded desktop and mobile layouts", () => {

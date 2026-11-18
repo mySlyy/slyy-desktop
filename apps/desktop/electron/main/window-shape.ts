@@ -2,8 +2,8 @@ import type { BrowserWindow, Rectangle, Screen } from "electron";
 import { MAX_WINDOW_CORNER_RADIUS } from "@pi-desktop/plugin-sdk";
 import { isWindowFullScreen } from "./window-fullscreen.ts";
 
-/** Matches the renderer's global `--radius-md` token (12px). */
-export const DEFAULT_WINDOW_CORNER_RADIUS = 12;
+/** Matches the renderer's global `--radius-md` token (0px: Slyy corners are square). */
+export const DEFAULT_WINDOW_CORNER_RADIUS = 0;
 const controllers = new WeakMap<BrowserWindow, { setRadius: (radius: number) => number }>();
 
 type WindowShapeScreen = Pick<Screen, "getDisplayMatching" | "on" | "removeListener">;

@@ -5,6 +5,7 @@ import {
   readSharedTypesSource,
 } from "./helpers/source-contracts.mjs";
 import assert from "node:assert/strict";
+import { readLocaleSource } from "./helpers/locale-source.mjs";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { loadStyles } from "./helpers/styles.mjs";
@@ -78,26 +79,7 @@ const enLocaleSource = await readFile(
   new URL("../../../packages/i18n/src/locales/en/index.ts", import.meta.url),
   "utf8",
 );
-const zhLocaleSource = await readFile(
-  new URL("../../../packages/i18n/src/locales/zh-CN/index.ts", import.meta.url),
-  "utf8",
-);
-const trLocaleSource = await readFile(
-  new URL("../../../packages/i18n/src/locales/tr/index.ts", import.meta.url),
-  "utf8",
-);
-const zhTWLocaleSource = await readFile(
-  new URL("../../../packages/i18n/src/locales/zh-TW/index.ts", import.meta.url),
-  "utf8",
-);
-const koLocaleSource = await readFile(
-  new URL("../../../packages/i18n/src/locales/ko/index.ts", import.meta.url),
-  "utf8",
-);
-const ptBRLocaleSource = await readFile(
-  new URL("../../../packages/i18n/src/locales/pt-BR/index.ts", import.meta.url),
-  "utf8",
-);
+const deLocaleSource = await readLocaleSource("de");
 const mainSource = await readFile(
   new URL("../src/main.tsx", import.meta.url),
   "utf8",
@@ -199,8 +181,7 @@ test("settings destinations own one subject each", () => {
   ]) {
     assert.match(settingsSearchSource, new RegExp(key.replaceAll(".", "\\.")));
     assert.match(enLocaleSource, new RegExp(`${key.split(".").at(-1)}:`));
-    assert.match(zhLocaleSource, new RegExp(`${key.split(".").at(-1)}:`));
-    assert.match(trLocaleSource, new RegExp(`${key.split(".").at(-1)}:`));
+    assert.match(deLocaleSource, new RegExp(`${key.split(".").at(-1)}:`));
   }
   assert.match(sharedTypesSource, /contextUsageDisplay\?: ContextUsageDisplay/);
   assert.match(sharedTypesSource, /infiniteProviderRetry\?: boolean/);
@@ -265,10 +246,7 @@ test("General Network card persists a custom HTTP or SOCKS5 proxy and the relaxe
   assert.match(protocolSource, /networkProxyTest: "pi-desktop\/network\/testProxy"/);
   for (const source of [
     enLocaleSource,
-    zhLocaleSource,
-    zhTWLocaleSource,
-    trLocaleSource,
-    koLocaleSource,
+    deLocaleSource,
   ]) {
     assert.match(source, /proxyCustom:/);
     assert.match(source, /proxyUrlPlaceholder:/);
@@ -471,9 +449,7 @@ test("settings nav keeps a flat searchable index with titled visual groups", () 
   ]) {
     assert.match(settingsSearchSource, new RegExp(key.replace(".", "\\.")));
     assert.match(enLocaleSource, new RegExp(`${key.split(".")[1]}:`));
-    assert.match(zhLocaleSource, new RegExp(`${key.split(".")[1]}:`));
-    assert.match(zhTWLocaleSource, new RegExp(`${key.split(".")[1]}:`));
-    assert.match(trLocaleSource, new RegExp(`${key.split(".")[1]}:`));
+    assert.match(deLocaleSource, new RegExp(`${key.split(".")[1]}:`));
   }
   assert.doesNotMatch(settingsSearchSource, /id: "extensions"/);
   const navOrder = [
@@ -556,9 +532,7 @@ test("settings rail uses short parallel labels and descriptive page titles", () 
   for (const key of navKeys) {
     assert.match(settingsSearchSource, new RegExp(key.replaceAll(".", "\\.")));
     assert.match(enLocaleSource, new RegExp(`${key.split(".").at(-1)}:`));
-    assert.match(zhLocaleSource, new RegExp(`${key.split(".").at(-1)}:`));
-    assert.match(zhTWLocaleSource, new RegExp(`${key.split(".").at(-1)}:`));
-    assert.match(trLocaleSource, new RegExp(`${key.split(".").at(-1)}:`));
+    assert.match(deLocaleSource, new RegExp(`${key.split(".").at(-1)}:`));
   }
   assert.match(settingsSearchSource, /titleKey: "settings\.configuration"/);
   assert.match(settingsSearchSource, /titleKey: "settings\.projectArchive"/);
@@ -574,9 +548,7 @@ test("settings rail uses short parallel labels and descriptive page titles", () 
   ]) {
     assert.match(settingsSearchSource, new RegExp(key.replaceAll(".", "\\.")));
     assert.match(enLocaleSource, new RegExp(`${key.split(".").at(-1)}:`));
-    assert.match(zhLocaleSource, new RegExp(`${key.split(".").at(-1)}:`));
-    assert.match(zhTWLocaleSource, new RegExp(`${key.split(".").at(-1)}:`));
-    assert.match(trLocaleSource, new RegExp(`${key.split(".").at(-1)}:`));
+    assert.match(deLocaleSource, new RegExp(`${key.split(".").at(-1)}:`));
   }
   assert.match(settingsPageSource, /className="settings-page-subtitle"/);
   assert.match(settingsSearchSource, /id: "agent",[\s\S]*?keywordKeys/);

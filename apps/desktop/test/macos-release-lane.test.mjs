@@ -27,7 +27,8 @@ const LANE_SCRIPTS = [
   "macos-stapler-retry-shim.sh",
   "macos-bundle-inventory.mjs",
 ];
-const SIGNING_IDENTITY = "Developer ID Application: XingYu Liu (DUV63RKYTW)";
+const SIGNING_IDENTITY_NAME = "Example Corp (TEAMID1234)";
+const SIGNING_IDENTITY = `Developer ID Application: ${SIGNING_IDENTITY_NAME}`;
 const SUBMISSION_ID = "11111111-2222-3333-4444-555555555555";
 
 async function writeStubs(bin, log, repoRoot) {
@@ -43,11 +44,11 @@ exit 0
 printf 'pnpm %s\\n' "$*" >> "${log}"
 case "$*" in
   *electron-builder*)
-    app="${repoRoot}/apps/desktop/release/mac-arm64/PI-Desktop.app"
+    app="${repoRoot}/apps/desktop/release/mac-arm64/Slyy Gen2.app"
     mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources/bin"
-    : > "$app/Contents/MacOS/PI-Desktop"
+    : > "$app/Contents/MacOS/Slyy Gen2"
     : > "$app/Contents/Resources/bin/pi-desktop-host-core"
-    : > "${repoRoot}/apps/desktop/release/PI-Desktop-0.0.0-arm64.dmg"
+    : > "${repoRoot}/apps/desktop/release/Slyy-0.0.0-arm64.dmg"
     ;;
 esac
 exit 0
@@ -107,7 +108,9 @@ test(
         PATH: `${bin}:${process.env.PATH}`,
         APPLE_ID: "release@example.com",
         APPLE_APP_SPECIFIC_PASSWORD: "app-specific-password",
-        APPLE_TEAM_ID: "DUV63RKYTW",
+        APPLE_TEAM_ID: "TEAMID1234",
+        SLYY_APPLE_TEAM_ID: "TEAMID1234",
+        MAC_SIGNING_IDENTITY: SIGNING_IDENTITY_NAME,
         STAPLE_DELAY_SECONDS: "1",
       },
     });
@@ -124,7 +127,7 @@ test(
       /PI_STAPLER_MAX_ATTEMPTS="\$\{PI_STAPLER_MAX_ATTEMPTS:-6\}"/,
       "the local signed lane enables the same bounded app stapling retries",
     );
-    assert.match(builderCall, /-c\.mac\.identity=XingYu Liu \(DUV63RKYTW\)/);
+    assert.match(builderCall, /-c\.mac\.identity=Example Corp \(TEAMID1234\)/);
     assert.match(builderCall, /-c\.mac\.forceCodeSigning=true/);
     assert.match(builderCall, /-c\.mac\.notarize=true/);
     assert.doesNotMatch(

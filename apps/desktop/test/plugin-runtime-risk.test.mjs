@@ -11,11 +11,9 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { en } from "../../../packages/i18n/dist/locales/en/index.js";
-import { zhCN } from "../../../packages/i18n/dist/locales/zh-CN/index.js";
-import { tr } from "../../../packages/i18n/dist/locales/tr/index.js";
-import { ko } from "../../../packages/i18n/dist/locales/ko/index.js";
+import { de } from "../../../packages/i18n/dist/locales/de/index.js";
 
-const catalogs = { en, "zh-CN": zhCN, tr, ko };
+const catalogs = { en, de };
 
 const here = dirname(fileURLToPath(import.meta.url));
 const desktopRoot = join(here, "..");

@@ -4,7 +4,7 @@
 # Local builds without a certificate remain unsigned. This script injects a
 # real signing identity and requires notarization credentials:
 #
-#   MAC_SIGNING_IDENTITY   default: "<Slyy Developer ID common name>" — bare common
+#   MAC_SIGNING_IDENTITY   required: the Slyy Developer ID common name — bare common
 #                          name; electron-builder rejects the
 #                          "Developer ID Application:" prefix
 #   APPLE_ID               Apple ID email for notarization

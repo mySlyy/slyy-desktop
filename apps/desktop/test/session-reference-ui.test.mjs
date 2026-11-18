@@ -205,34 +205,34 @@ test("a referenced conversation renders as a chip naming its own target", () => 
 });
 
 test("the chip speaks the reader's language", () => {
-  locale = "zh-CN";
+  locale = "de";
   store.sessions = [{ id: "session-a", title: "Nightly review" }];
   const html = renderChip();
-  assert.match(html, /会话引用 · Nightly review/);
-  assert.match(html, /title="打开会话 Nightly review"/);
-  assert.match(html, /aria-label="会话引用 · Nightly review"/);
+  assert.match(html, /Unterhaltung · Nightly review/);
+  assert.match(html, /title="Unterhaltung Nightly review öffnen"/);
+  assert.match(html, /aria-label="Unterhaltung · Nightly review"/);
 });
 
 test("a renamed conversation follows through to every message that references it", () => {
-  locale = "zh-CN";
-  store.sessions = [{ id: "session-a", title: "依赖清理顺序（改名后）" }];
+  locale = "de";
+  store.sessions = [{ id: "session-a", title: "Abhängigkeiten aufräumen (umbenannt)" }];
   const renamed = renderChip();
-  assert.match(renamed, /会话引用 · 依赖清理顺序（改名后）/);
-  assert.match(renamed, /title="打开会话 依赖清理顺序（改名后）"/);
+  assert.match(renamed, /Unterhaltung · Abhängigkeiten aufräumen \(umbenannt\)/);
+  assert.match(renamed, /title="Unterhaltung Abhängigkeiten aufräumen \(umbenannt\) öffnen"/);
   assert.doesNotMatch(renamed, /Nightly review/, "the pasted name does not survive a rename");
 
-  store.sessions = [{ id: "session-b", title: "另一段对话" }];
+  store.sessions = [{ id: "session-b", title: "Ein anderes Gespräch" }];
   assert.match(
     renderChip(),
-    /会话引用 · session-/,
+    /Unterhaltung · session-/,
     "an unlisted conversation falls back to the id it points at",
   );
-  assert.doesNotMatch(renderChip(), /另一段对话/, "another conversation's title is not borrowed");
+  assert.doesNotMatch(renderChip(), /Ein anderes Gespräch/, "another conversation's title is not borrowed");
 
   store.sessions = [{ id: "session-a", title: "  " }];
   assert.match(
     renderChip(),
-    /会话引用 · session-/,
+    /Unterhaltung · session-/,
     "an empty title falls back to the id",
   );
   store.sessions = [];
@@ -337,7 +337,7 @@ test("the session Copy submenu exposes the link to every reader", () => {
 });
 test("the reference keys exist in every shipped locale", () => {
   const locales = Object.keys(catalogs);
-  assert.equal(locales.length, 9, "nine locales ship");
+  assert.deepEqual(locales.sort(), ["de", "en"], "English and German ship");
   for (const code of locales) {
     const catalog = catalogs[code];
     for (const [group, key] of [
@@ -355,8 +355,8 @@ test("the reference keys exist in every shipped locale", () => {
       `${code} names the conversation it opens`,
     );
   }
-  assert.equal(catalogs["zh-CN"].nav.copySessionLink, "复制会话链接");
-  assert.equal(catalogs["zh-CN"].chat.sessionReference, "会话引用");
+  assert.equal(catalogs.de.nav.copySessionLink, "Link zur Unterhaltung kopieren");
+  assert.equal(catalogs.de.chat.sessionReference, "Unterhaltung");
 });
 
 test("a session link in the message body renders as that chip", () => {

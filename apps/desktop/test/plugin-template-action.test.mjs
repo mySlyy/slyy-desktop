@@ -1,5 +1,6 @@
 import { readPluginsSourceSync, readMainSourceSync } from "./helpers/source-contracts.mjs";
 import assert from "node:assert/strict";
+import { unquoteCatalogKeys } from "./helpers/locale-source.mjs";
 import test from "node:test";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -26,12 +27,8 @@ const enSrc = readFileSync(
   join(repoRoot, "packages/i18n/src/locales/en/index.ts"),
   "utf8",
 );
-const zhSrc = readFileSync(
-  join(repoRoot, "packages/i18n/src/locales/zh-CN/index.ts"),
-  "utf8",
-);
-const trSrc = readFileSync(
-  join(repoRoot, "packages/i18n/src/locales/tr/index.ts"),
+const deSrc = readFileSync(
+  join(repoRoot, "packages/i18n/src/locales/de/index.ts"),
   "utf8",
 );
 
@@ -82,8 +79,7 @@ test("the renderer template list mirrors the devkit catalogue", () => {
   for (const id of devkit) {
     for (const [locale, source] of [
       ["en", enSrc],
-      ["zh-CN", zhSrc],
-      ["tr", trSrc],
+      ["de", deSrc],
     ]) {
       assert.ok(
         source.includes(`"${id}":`),
@@ -106,8 +102,7 @@ test("the template action is reachable from the menu and the empty state", () =>
     "newFromTemplateOpened",
   ]) {
     assert.ok(enSrc.includes(`${key}:`), `en must define plugins.${key}`);
-    assert.ok(zhSrc.includes(`${key}:`), `zh-CN must define plugins.${key}`);
-    assert.ok(trSrc.includes(`${key}:`), `tr must define plugins.${key}`);
+    assert.ok(unquoteCatalogKeys(deSrc).includes(`${key}:`), `de must define plugins.${key}`);
   }
 });
 

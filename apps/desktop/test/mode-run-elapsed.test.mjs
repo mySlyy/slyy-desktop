@@ -21,7 +21,7 @@ await build({
       import { ModeRunStatusPanel } from "./src/features/modes/ModeRunStatusBar";
       export { modeRunElapsedMs, formatModeRunElapsed } from "./src/features/modes/mode-run-elapsed";
       export { default as EN_TRANSLATION } from "../../packages/i18n/src/locales/en/index";
-      export { default as ZH_TRANSLATION } from "../../packages/i18n/src/locales/zh-CN/index";
+      export { default as DE_TRANSLATION } from "../../packages/i18n/src/locales/de/index";
       export async function renderPanel(run, language, translation) {
         const i18n = createInstance();
         await i18n.init({ lng: language, resources: { [language]: { translation } } });
@@ -43,7 +43,7 @@ await build({
   logLevel: "silent",
 });
 const require = createRequire(import.meta.url);
-const { modeRunElapsedMs, formatModeRunElapsed, renderPanel, EN_TRANSLATION, ZH_TRANSLATION } = require(entry);
+const { modeRunElapsedMs, formatModeRunElapsed, renderPanel, EN_TRANSLATION, DE_TRANSLATION } = require(entry);
 const EN_UNITS = { day: "d", hour: "h", minute: "m", second: "s" };
 const ZH_UNITS = { day: "天", hour: "小时", minute: "分", second: "秒" };
 const translation = (units) => ({
@@ -126,13 +126,13 @@ test("the real status panel renders spaced Latin units in both languages immedia
   assert.ok(html.indexOf("mode-run-elapsed") < html.indexOf("mode-run-actions"));
   const legacy = await renderPanel({ ...RUN, state: "running", revision: 3 }, "en", translation(EN_UNITS));
   assert.match(legacy, /class="mode-run-elapsed"[^>]*>0 s<\/span>/);
-  const chinese = await renderPanel({ ...RUN, revision: 4, elapsedMs: 86_401_000 }, "zh-CN", ZH_TRANSLATION);
-  assert.match(chinese, /class="mode-run-elapsed"[^>]*>1 d 1 s<\/span>/);
-  assert.ok(chinese.includes(ZH_TRANSLATION.modes.run.elapsed.replace("{{duration}}", "1 d 1 s")));
+  const german = await renderPanel({ ...RUN, revision: 4, elapsedMs: 86_401_000 }, "de", DE_TRANSLATION);
+  assert.match(german, /class="mode-run-elapsed"[^>]*>1 d 1 s<\/span>/);
+  assert.ok(german.includes(DE_TRANSLATION.modes.run.elapsed.replace("{{duration}}", "1 d 1 s")));
 });
 
 test("Resume, Pause, Edit and Remove are icon-only with localized accessible names; Stop stays text", async () => {
-  for (const [language, catalog] of [["en", EN_TRANSLATION], ["zh-CN", ZH_TRANSLATION]]) {
+  for (const [language, catalog] of [["en", EN_TRANSLATION], ["de", DE_TRANSLATION]]) {
     for (const state of ["paused", "running"]) {
       const html = await renderPanel({ ...RUN, state }, language, catalog);
       const buttons = [...html.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/g)];

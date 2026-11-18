@@ -97,15 +97,13 @@ test("automatic AI titles stay plugin-owned", () => {
   assert.doesNotMatch(main, /IPC\.invoke\.sessionSummarizeTitle/);
 });
 
-test("the German, French and Spanish placeholders are recognized as default titles (#1755)", async (t) => {
+test("the German placeholders are recognized as default titles (#1755)", async (t) => {
   // The renderer lowercases chat.untitledTask before persisting; the host
   // list and this legacy set must recognize those forms or auto-titling
   // never runs in those locales. nav.newChat resolves through the same
   // two-sided comparison.
   const locales = [
     ["de", "Neue Aufgabe", "Neuer Chat"],
-    ["fr", "Nouvelle tâche", "Nouvelle discussion"],
-    ["es", "Nueva tarea", "Nuevo chat"],
   ];
   for (const [locale, untitled, newChat] of locales) {
     assert.equal(

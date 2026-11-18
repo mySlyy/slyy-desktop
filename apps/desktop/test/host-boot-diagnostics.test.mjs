@@ -4,6 +4,7 @@ import {
   readMainSourceSync,
 } from "./helpers/source-contracts.mjs";
 import assert from "node:assert/strict";
+import { unquoteCatalogKeys } from "./helpers/locale-source.mjs";
 import test from "node:test";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -27,7 +28,7 @@ const lifecycleSrc = readMainModuleSync("runtime/lifecycle.ts");
 const hostSrc = read("electron/main/host-process.ts");
 const appSrc = readAppSourceSync();
 const enSrc = readFileSync(join(repoRoot, "packages/i18n/src/locales/en/index.ts"), "utf8");
-const zhSrc = readFileSync(join(repoRoot, "packages/i18n/src/locales/zh-CN/index.ts"), "utf8");
+const deSrc = unquoteCatalogKeys(readFileSync(join(repoRoot, "packages/i18n/src/locales/de/index.ts"), "utf8"));
 
 const HOST_CORE_LINE =
   "Error: database schema version 14 is newer than supported 13";
@@ -146,7 +147,7 @@ test("the renderer phrases both notices in every locale", () => {
   assert.match(appSrc, /if \(status\.archMismatch\) setArchMismatch\(status\.archMismatch\);/);
   assert.match(appSrc, /t\("status\.archMismatch", \{/);
   assert.match(appSrc, /status\.archNames\.\$\{archMismatch\.platform\}\.\$\{archMismatch\.processArch\}/);
-  for (const src of [enSrc, zhSrc]) {
+  for (const src of [enSrc, deSrc]) {
     assert.match(src, /dbSchemaTooNew:\s*"[^"]*\{\{found\}\}[^"]*\{\{supported\}\}/);
     assert.match(src, /archMismatch:\s*"[^"]*\{\{buildArch\}\}[^"]*\{\{machineArch\}\}/);
     assert.match(src, /dismissArchMismatch: "/);

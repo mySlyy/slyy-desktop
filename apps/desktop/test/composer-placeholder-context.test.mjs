@@ -1,16 +1,17 @@
 import { readComposerSource } from "./helpers/source-contracts.mjs";
+import { readLocaleSource } from "./helpers/locale-source.mjs";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
 
-const [composer, composerStyles, english, chinese, builtinCommands] =
+const [composer, composerStyles, english, german, builtinCommands] =
   await Promise.all([
     readComposerSource(),
     read("../src/styles/composer.css"),
     read("../../../packages/i18n/src/locales/en/index.ts"),
-    read("../../../packages/i18n/src/locales/zh-CN/index.ts"),
+    readLocaleSource("de"),
     read("../electron/main/builtin-commands.ts"),
   ]);
 
@@ -40,9 +41,9 @@ test("both shipped locales provide welcome, command, file, and shortcut guidance
   assert.match(english, /placeholderHint:\s*"Type \/ for commands · @ for files"/);
   assert.match(english, /placeholderHomeHint:\s*"Type \/ for commands · @ for files"/);
   assert.match(english, /placeholderShortcut:\s*"Shift\+Enter for newline · Use Send to submit"/);
-  assert.match(chinese, /placeholderHint:\s*"输入 \/ 使用命令 · @ 引用文件"/);
-  assert.match(chinese, /placeholderHomeHint:\s*"输入 \/ 使用命令 · @ 引用文件"/);
-  assert.match(chinese, /placeholderShortcut:\s*"Shift\+Enter 换行 · 点击发送提交"/);
+  assert.match(german, /placeholderHint:\s*"Geben Sie \/ für Befehle · @ für Dateien ein"/);
+  assert.match(german, /placeholderHomeHint:\s*"Geben Sie \/ für Befehle · @ für Dateien ein"/);
+  assert.match(german, /placeholderShortcut:\s*"Umschalt\+Eingabetaste für Zeilenumbruch · Verwenden Sie Senden, um zu senden"/);
 });
 
 test("the slash hint keeps the core session command aliases available", () => {

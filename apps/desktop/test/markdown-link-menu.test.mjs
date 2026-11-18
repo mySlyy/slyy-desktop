@@ -1,15 +1,13 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { readLocaleSource } from "./helpers/locale-source.mjs";
 
 const markdownSource = await readFile(
   new URL("../src/components/Markdown.tsx", import.meta.url),
   "utf8",
 );
-const koreanCatalog = await readFile(
-  new URL("../../../packages/i18n/src/locales/ko/index.ts", import.meta.url),
-  "utf8",
-);
+const germanCatalog = await readLocaleSource("de");
 
 test("chat links use the shared pointer-anchored menu", () => {
   assert.match(markdownSource, /useContextMenu\(\)/);
@@ -30,7 +28,7 @@ test("copy link feedback follows the clipboard result", () => {
   );
 });
 
-test("Korean ships every chat link setting and menu label", () => {
+test("German ships every chat link setting and menu label", () => {
   for (const key of [
     "linkOpenTarget",
     "linkOpenTargetWorkpanel",
@@ -41,6 +39,6 @@ test("Korean ships every chat link setting and menu label", () => {
     "linkCopied",
     "linkCopyFailed",
   ]) {
-    assert.match(koreanCatalog, new RegExp(`\\b${key}:`), key);
+    assert.match(germanCatalog, new RegExp(`\\b${key}:`), key);
   }
 });

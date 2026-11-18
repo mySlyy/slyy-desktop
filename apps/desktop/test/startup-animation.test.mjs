@@ -8,6 +8,7 @@
  * path is one transition; the bounds are the feature.
  */
 import assert from "node:assert/strict";
+import { readLocaleSource } from "./helpers/locale-source.mjs";
 import { mkdir, mkdtemp, realpath, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -38,14 +39,14 @@ import { loadStyles } from "./helpers/styles.mjs";
 
 const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
 
-const [shell, surface, hook, css, english, chinese, settingsRow, html, preload, windowBoot, startupBoot] =
+const [shell, surface, hook, css, english, german, settingsRow, html, preload, windowBoot, startupBoot] =
   await Promise.all([
     readAppSource(),
     read("../src/components/StartupAnimation.tsx"),
     read("../src/features/app/useStartupAnimation.ts"),
     loadStyles(),
     read("../../../packages/i18n/src/locales/en/index.ts"),
-    read("../../../packages/i18n/src/locales/zh-CN/index.ts"),
+    readLocaleSource("de"),
     read("../src/components/settings/StartupAnimationRows.tsx"),
     read("../index.html"),
     read("../electron/preload/index.ts"),
@@ -463,6 +464,6 @@ test("the settings rows make the folder findable and name the next launch's file
     "startupAnimationSkipWhenReadyDesc",
   ]) {
     assert.match(english, new RegExp(`${key}:`), `en is missing ${key}`);
-    assert.match(chinese, new RegExp(`${key}:`), `zh-CN is missing ${key}`);
+    assert.match(german, new RegExp(`${key}:`), `de is missing ${key}`);
   }
 });

@@ -33,11 +33,11 @@ test("a development build owns a different data directory than the shipped app",
     join(home, DEVELOPMENT_DATA_DIR_NAME),
   );
 
-  // A shipped installation must keep the directory its users already have, so
-  // the split can only have moved the development side.
-  assert.equal(INSTALLATION_DATA_DIR_NAME, ".pi-desktop");
-  assert.equal(DEVELOPMENT_DATA_DIR_NAME, ".pi-desktop-dev");
-  assert.equal(DEVELOPMENT_INSTALLATION_NAME, "PI-Desktop Dev");
+  // The Slyy Gen2 installation owns its own directory, and the development
+  // profile sits beside it rather than inside it.
+  assert.equal(INSTALLATION_DATA_DIR_NAME, ".slyy-gen2");
+  assert.equal(DEVELOPMENT_DATA_DIR_NAME, ".slyy-gen2-dev");
+  assert.equal(DEVELOPMENT_INSTALLATION_NAME, "Slyy Gen2 Dev");
 });
 
 test("PI_DESKTOP_DATA_DIR still overrides either profile", () => {
@@ -101,7 +101,7 @@ test("a development build takes its own userData before the single-instance lock
   // `pnpm dev` quits on arrival.
   const pathsSource = await readMainModule("data-paths.ts");
   const apply = installationSource.indexOf("applyDevelopmentUserData(app, isDevelopmentBuild)");
-  const setName = installationSource.indexOf("app.setName(APP_NAME)");
+  const setName = installationSource.indexOf("app.setName(APP_INSTALLATION_NAME)");
   const lock = installationSource.indexOf("app.requestSingleInstanceLock()");
 
   assert.ok(apply > 0, "main must give the development build its own userData");
@@ -137,7 +137,7 @@ test("main resolves one data directory and publishes it to everything below", ()
   // The plugin runtime resolves this root from the environment rather than
   // taking it as a parameter, so the resolved value has to be the one it reads.
   assert.match(indexSource, /process\.env\.PI_DESKTOP_DATA_DIR = dataDir;/);
-  assert.doesNotMatch(indexSource, /join\(homedir\(\), "\.pi-desktop"\)/);
+  assert.doesNotMatch(indexSource, /join\(homedir\(\), "\.slyy-gen2"\)/);
 
   // Publishing happens after the lock verdict, which reads the same variable:
   // moving the write above `singleInstanceRequired` would make every launch
@@ -154,11 +154,11 @@ test("main resolves one data directory and publishes it to everything below", ()
 test("downstream data directories follow the profile instead of the shipped default", async () => {
   const runtimeSource = await readMainModule("plugin-runtime.ts");
   assert.match(runtimeSource, /const root = desktopDataDir\(\);/);
-  assert.doesNotMatch(runtimeSource, /join\(homedir\(\), "\.pi-desktop"\)/);
+  assert.doesNotMatch(runtimeSource, /join\(homedir\(\), "\.slyy-gen2"\)/);
 
   // The plugin services already receive the resolved directory; the scratch
   // root was the one place that re-derived it.
   const servicesSource = await readMainModule("services/plugin-services.ts");
   assert.match(servicesSource, /return join\(dataDir, "scratch", sessionId\);/);
-  assert.doesNotMatch(servicesSource, /join\(homedir\(\), "\.pi-desktop"\)/);
+  assert.doesNotMatch(servicesSource, /join\(homedir\(\), "\.slyy-gen2"\)/);
 });

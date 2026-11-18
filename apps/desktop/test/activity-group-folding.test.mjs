@@ -74,43 +74,43 @@ test("reasoning stays open only while the live turn is generating it", () => {
 });
 
 test("the group label names what the group did", () => {
-  const t = translator(catalogs["zh-CN"]);
+  const t = translator(catalogs.en);
   const label = (entries, tools, thinking) => {
     const { named, hidden } = activityLabelBuckets(entries);
     return `${activityBucketPhrase(named, hidden, t)} · ${activityOpsText(tools, thinking, t)}`;
   };
   assert.equal(
     label(buckets(["search", 3], ["read", 9]), 12, 0),
-    "搜索并读取文件 · 12 次操作",
+    "search and read files · 12 operations",
   );
-  assert.equal(label(buckets(["read", 9]), 9, 0), "读取文件 · 9 次操作");
-  assert.equal(label(buckets(["run", 8]), 8, 0), "执行命令 · 8 次操作");
+  assert.equal(label(buckets(["read", 9]), 9, 0), "read files · 9 operations");
+  assert.equal(label(buckets(["run", 8]), 8, 0), "run commands · 8 operations");
   assert.equal(
     label(buckets(["thinking", 3], ["search", 3], ["read", 9]), 12, 3),
-    "进行了思考、搜索并读取文件 · 12 次操作",
+    "reasoning, search and read files · 12 operations",
     "reasoning is named but never counted as an operation",
   );
   assert.equal(
     label(buckets(["thinking", 2]), 0, 2),
-    "进行了思考 · 2 段",
+    "reasoning · 2 steps",
     "a reasoning-only group counts steps instead of operations",
   );
 });
 
 test("labels cap at three actions and summarize the rest", () => {
-  const t = translator(catalogs["zh-CN"]);
+  const t = translator(catalogs.en);
   const phrase = (entries) => {
     const { named, hidden } = activityLabelBuckets(entries);
     return activityBucketPhrase(named, hidden, t);
   };
   assert.equal(
     phrase(buckets(["search", 10], ["read", 9], ["edit", 8], ["run", 2])),
-    "搜索、读取文件、编辑文件等",
+    "search, read files, edit files and more",
     "the busiest three are named and the rest is summarized",
   );
   assert.equal(
     phrase(buckets(["run", 5], ["search", 1], ["read", 1], ["edit", 1])),
-    "搜索、读取文件、执行命令等",
+    "search, read files, run commands and more",
     "selection ranks by count, then renders in reading order",
   );
   // Counting up never reshuffles the label: membership is what changes it.
