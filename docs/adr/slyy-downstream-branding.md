@@ -84,8 +84,11 @@ publishes each `v<version>` release to the public repository `mySlyy/releases`
 `resources/app-update.yml`, `GITHUB_RELEASES_REPO` (`@pi-desktop/shared`: in-app
 Releases link and `pi-host` downloads) and the README download links point
 there. This moved the update feed once, before the first release, so no
-installed client is stranded. Source, issues and feedback
-(`GITHUB_REPO`) stay on `mySlyy/slyy-desktop`.
+installed client is stranded. Source and repository metadata stay on
+`mySlyy/slyy-desktop`. In-app bug reports (`GITHUB_REPO`, derived from
+`GITHUB_RELEASES_REPO`) and `package.json` `bugs.url` open issues on
+`mySlyy/releases`, which carries the same `bug_report.yml` form, because the
+private source repository returns 404 to users.
 
 macOS signing on tag builds is opt-in through the repository variable
 `SLYY_MAC_SIGNING_ENABLED=true` (requires the Apple secrets). Until it is set,
@@ -102,5 +105,8 @@ so; Windows builds are unsigned either way.
   signature). The updater never offers pre-releases (`allowPrerelease =
   false`), so while every release is a pre-release no platform updates
   in-app; users install from `mySlyy/releases` manually.
-- In-app feedback opens `github.com/mySlyy/slyy-desktop/issues/new`, which
-  returns 404 for users without access to the private repository.
+- User bug reports land in `mySlyy/releases`; maintainers triage them there
+  and open a linked issue in `mySlyy/slyy-desktop` when code work starts
+  (GitHub cannot transfer issues from a public to a private repository).
+  0.23.0-beta.2 still opens the private repository; later builds use
+  `mySlyy/releases`.

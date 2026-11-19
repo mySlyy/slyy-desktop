@@ -2889,7 +2889,7 @@ PowerShell-launched fixture; activation must not restore the native outline.
   4) Activate Open GitHub.
 - **Expected**: The row is indexed by Settings search and stays on Info. The
   action calls `pi-desktop/app/openFeedback` with no URL from the renderer.
-  Main opens `https://github.com/mySlyy/slyy-desktop/issues/new` with
+  Main opens `https://github.com/mySlyy/releases/issues/new` with
   `template=bug_report.yml` and prefills `app-version`, `os`, and
   `environment`. The GitHub bug form still requires description, reproduction
   steps, expected, actual, version, and OS; blank issues remain disabled.

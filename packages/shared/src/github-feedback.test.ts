@@ -27,7 +27,8 @@ describe("GitHub feedback issue URL", () => {
   it("builds a GitHub issue-form URL with version, OS, and environment filled in", () => {
     const url = new URL(buildBugReportUrl(sample));
     expect(url.origin).toBe("https://github.com");
-    expect(url.pathname).toBe(`/${GITHUB_REPO}/issues/new`);
+    expect(GITHUB_REPO).toBe("mySlyy/releases");
+    expect(url.pathname).toBe("/mySlyy/releases/issues/new");
     expect(url.searchParams.get("template")).toBe(GITHUB_BUG_TEMPLATE);
     expect(url.searchParams.get("app-version")).toBe("0.13.3");
     expect(url.searchParams.get("os")).toBe("macOS");
@@ -49,8 +50,14 @@ describe("GitHub feedback issue URL", () => {
     ).toThrow(/origin/);
     expect(() =>
       assertFeedbackIssueUrl(
-        "https://github.com/mySlyy/slyy-desktop/issues/new?template=feature_request.yml",
+        "https://github.com/mySlyy/releases/issues/new?template=feature_request.yml",
       ),
     ).toThrow(/template/);
+    // The private source repository is not a valid feedback target.
+    expect(() =>
+      assertFeedbackIssueUrl(
+        "https://github.com/mySlyy/slyy-desktop/issues/new?template=bug_report.yml",
+      ),
+    ).toThrow(/path/);
   });
 });

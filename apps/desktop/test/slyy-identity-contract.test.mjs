@@ -52,8 +52,9 @@ test("every update channel points at the public Slyy releases repository", () =>
   assert.match(updater, /RELEASES_URL = GITHUB_RELEASES_URL;/);
 });
 
-test("feedback and source metadata stay on the source repository", () => {
-  assert.match(feedback, /GITHUB_REPO = "mySlyy\/slyy-desktop"/);
+test("feedback goes to the public releases repository; source metadata stays", () => {
+  assert.match(feedback, /GITHUB_REPO = GITHUB_RELEASES_REPO;/);
+  assert.equal(pkg.bugs.url, "https://github.com/mySlyy/releases/issues");
   assert.equal(pkg.repository.url, "git+https://github.com/mySlyy/slyy-desktop.git");
 });
 
