@@ -609,8 +609,10 @@ jobs:
         run: |
           set -euo pipefail
           version="${GITHUB_REF_NAME#v}"
+          # Release title, e.g. "Slyy Desktop 0.23.0-beta.2" (no "v" prefix).
+          echo "RELEASE_TITLE=Slyy Desktop ${version}" >> "$GITHUB_ENV"
           {
-            echo "Slyy ${version}"
+            echo "Slyy Desktop ${version}"
             echo
             if [ "${MACOS_SIGN_RELEASE}" != "true" ]; then
               echo "> [!WARNING]"
@@ -637,8 +639,8 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
-          # D126/D285/D364/D603: all desktop platforms and both native macOS
-          # architectures ship from tag builds — installers, the Windows
+          # D126/D364/D603: all desktop platforms (macOS arm64 only, ADR
+          # slyy-downstream-branding) ship from tag builds — installers, the Windows
           # portable ZIP, the Linux ASAR, blockmaps, the pi-host bundles, and
           # the latest*.yml feeds that drive electron-updater on each platform
           # (in-app for Windows NSIS and Linux AppImage; macOS and Windows ZIP
@@ -648,7 +650,7 @@ jobs:
           # Same tag name as this repository's tag; GitHub creates it in the
           # releases repository on its default branch (no source is shared).
           tag_name: ${{ github.ref_name }}
-          name: Slyy ${{ github.ref_name }}
+          name: ${{ env.RELEASE_TITLE }}
           body_path: release-notes.md
           files: dist/*
           generate_release_notes: false

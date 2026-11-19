@@ -129,6 +129,12 @@ test("releases publish to the public mySlyy/releases repository", () => {
   assert.match(releaseStep, /repository: \$\{\{ env\.RELEASES_REPOSITORY \}\}/);
   assert.match(releaseStep, /token: \$\{\{ secrets\.SLYY_RELEASES_TOKEN \}\}/);
   assert.match(releaseStep, /tag_name: \$\{\{ github\.ref_name \}\}/);
+  // Title "Slyy Desktop <version>" without the tag's "v", set by the notes step.
+  assert.match(releaseStep, /name: \$\{\{ env\.RELEASE_TITLE \}\}/);
+  assert.match(
+    publishJob,
+    /echo "RELEASE_TITLE=Slyy Desktop \$\{version\}" >> "\$GITHUB_ENV"/,
+  );
   assert.match(releaseStep, /body_path: release-notes\.md/);
   assert.match(releaseStep, /generate_release_notes: false/);
   // target_commitish would name a source commit the releases repo lacks.
