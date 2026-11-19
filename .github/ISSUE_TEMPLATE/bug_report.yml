@@ -9,6 +9,8 @@ body:
         Fill every required field so we can reproduce the issue.
 
         Settings → Info shows the app version and can open this form with it filled in.
+
+        Issues are public. Remove API keys, tokens, file paths and personal data from logs and screenshots.
   - type: textarea
     id: description
     attributes:

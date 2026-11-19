@@ -1,4 +1,12 @@
-export const GITHUB_REPO = "mySlyy/slyy-desktop";
+import { GITHUB_RELEASES_REPO } from "./github-releases.js";
+
+/**
+ * Repository that receives in-app bug reports. The source repository
+ * `mySlyy/slyy-desktop` is private (404 for users), so reports go to the
+ * public releases repository, which carries the same `bug_report.yml` form
+ * (ADR `slyy-downstream-branding`).
+ */
+export const GITHUB_REPO = GITHUB_RELEASES_REPO;
 export const GITHUB_BUG_TEMPLATE = "bug_report.yml";
 export const GITHUB_ISSUE_ORIGIN = "https://github.com";
 
