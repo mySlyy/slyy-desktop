@@ -150,7 +150,7 @@ MVP passes when:
 - [x] Long output does not freeze the UI — manual:M3 (per-tool budgets; search 128KB / 4000 lines)
 - [x] Key operations show loading/running state — manual:M2
 - [x] Release package has no duplicate renderer/runtime dependency trees —
-  auto:desktop package contract + native macOS arm64/Intel x64 package audit:E2E-092
+  auto:desktop package contract + native macOS arm64 package audit:E2E-092
 - [ ] Packaged startup and local renderer/runtime capabilities remain available
   offline on every native target — draft:E2E-092
 

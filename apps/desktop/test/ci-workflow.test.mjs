@@ -277,15 +277,13 @@ test("the Linux package config lets the workflow choose the architecture", () =>
   assert.equal(build.rpm.artifactName, "slyy-gen2-${version}-${arch}.${ext}");
 });
 
-test("release matrix packages both native macOS architectures", () => {
+test("release matrix packages macOS for Apple silicon only", () => {
   assert.match(
     releaseWorkflowSource,
     /name: macOS arm64[\s\S]*?os: macos-15[\s\S]*?arch: arm64[\s\S]*?runner_arch: arm64/,
   );
-  assert.match(
-    releaseWorkflowSource,
-    /name: macOS Intel x64[\s\S]*?os: macos-15-intel[\s\S]*?arch: x64[\s\S]*?runner_arch: x86_64/,
-  );
+  // Slyy dropped the Intel lane (ADR slyy-downstream-branding).
+  assert.doesNotMatch(releaseWorkflowSource, /macos-15-intel|mac-x64|Slyy-\$\{version\}-x64/);
   assert.match(
     releaseWorkflowSource,
     /name: Package installers \(\$\{\{ matrix\.dist \}\}\)[\s\S]*?if: matrix\.platform != 'macos'[\s\S]*?run: pnpm --filter @pi-desktop\/desktop run \$\{\{ matrix\.dist \}\} -- --\$\{\{ matrix\.arch \}\}/,
@@ -317,9 +315,10 @@ test("release matrix packages both native macOS architectures", () => {
   );
   assert.match(
     releaseWorkflowSource,
-    /latest-mac-\$\{\{ matrix\.arch \}\}\.yml/,
+    /name: Verify macOS updater feed[\s\S]*?path: Slyy-\$\{version\}-arm64-mac\.zip/,
+    "the single macOS feed points at the arm64 ZIP",
   );
-  assert.match(releaseWorkflowSource, /Merge macOS updater metadata[\s\S]*?ruby/);
+  assert.doesNotMatch(releaseWorkflowSource, /latest-mac-\$\{\{ matrix\.arch \}\}\.yml|Merge macOS updater metadata/);
 });
 
 test("macOS release signing follows SLYY_MAC_SIGNING_ENABLED on tag pushes", () => {

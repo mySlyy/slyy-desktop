@@ -126,7 +126,7 @@ job uses Ubuntu 22.04 so host-core stays on glibc 2.35, then
 `scripts/check-linux-host-glibc.mjs` refuses a binary that needs a newer
 glibc. Each Linux runner (native x64 and arm64) also exports the exact
 app.asar from its own unpacked tree as a versioned release asset; the macOS
-matrix covers arm64 and Intel x64 and
+matrix covers arm64 only (no Intel lane) and
 the publish job assembles the GitHub Release. Tag builds Developer ID-sign,
 notarize, and staple macOS artifacts; `workflow_dispatch` may set
 `sign_macos: false` only for unsigned debug artifacts. See the [release
