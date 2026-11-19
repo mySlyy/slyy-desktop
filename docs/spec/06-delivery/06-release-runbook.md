@@ -234,7 +234,9 @@ also publishes. Local `scripts/release-macos.sh` remains the explicit signed
 local lane; `pnpm dist:mac` stays unsigned without a configured certificate
 (D078).
 
-The macOS matrix has one lane, `macos-15` for arm64; Slyy publishes no Intel
+The macOS matrix has one lane for arm64: GitHub's `macos-15`, or the
+self-hosted Mac when the repository variable `SLYY_MACOS_RUNNER` names its
+label (`slyy-mac`; see "Self-hosted macOS runner" below). Slyy publishes no Intel
 x64 build (ADR slyy-downstream-branding). The job verifies `uname -m`, passes
 `--arm64` to electron-builder, and builds `pi-desktop-host-core` on that same native
 runner. Signed tag builds and `sign_macos: true` (the dispatch default) receive
@@ -361,6 +363,29 @@ base64 -i developer-id-application.p12 | pbcopy
 
 On Linux use `base64 -w0 developer-id-application.p12`. Files that must never
 enter git: `*.p12`, `*.cer`, `*.p8`, `*.mobileprovision`.
+
+### 4.5.1 Self-hosted macOS runner
+
+Hosted macOS minutes cost ten times Linux minutes in a private repository, so
+the macOS release lane can run on a maintainer Mac instead.
+
+- Runner: official `actions/runner` (osx-arm64), registered on this repository
+  only, name `slyy-mac-arm64`, label `slyy-mac`, installed under
+  `~/actions-runner/slyy-desktop` as a launchd user service (`./svc.sh
+  start|stop|status`).
+- Routing: repository variable `SLYY_MACOS_RUNNER=slyy-mac`. Delete the
+  variable to fall back to GitHub's `macos-15`. If the Mac is asleep or
+  offline, the job waits in the queue (up to 24 hours).
+- Isolation: the runner `.env` sets `RUSTUP_HOME` and `CARGO_HOME` to
+  `_home/` inside the runner directory, so `rustup default` in the workflow
+  does not change the maintainer's toolchain. Checkout cleans the work tree
+  each run.
+- Risk: jobs run as the logged-in user with access to that user's files,
+  keychain and SSH keys. Only collaborators with write access can start
+  workflows in this private repository. A dedicated macOS user account for
+  the runner limits the blast radius and is the recommended setup.
+- Remove: `./svc.sh uninstall`, then `./config.sh remove --token <removal
+  token from repository Settings > Actions > Runners>`.
 
 ### 4.6 macOS signing observability and timeouts
 
