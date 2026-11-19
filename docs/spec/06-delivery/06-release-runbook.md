@@ -1,6 +1,6 @@
 # 06. Desktop Release Runbook
 
-> Scope: D126/D285/D603 tag artifacts for macOS arm64 and Intel x64, Windows x64,
+> Scope: D126/D603 tag artifacts for macOS arm64 (no Intel x64), Windows x64,
 > and Linux x64 and arm64, including the Linux system-Electron ASAR assets;
 > macOS signing/notarization remains the detailed qualification lane below.
 > Cross-references: [milestones](01-mvp-milestones.md) · [process model](../03-runtime/07-process-model.md) · [security](../05-security/01-security.md)
@@ -58,7 +58,7 @@ when macOS `iconutil` is available, without overwriting the canonical source.
    - `SLYY_APPLE_TEAM_ID` — the frozen Slyy team id; `APPLE_TEAM_ID` must equal
      it or `scripts/release-macos.sh` stops
 3. Rust toolchain and pnpm workspace installed. The Rust toolchain must run on
-   the native macOS runner: arm64 for Apple Silicon or x86_64 for Intel.
+   the native macOS runner (arm64 for the published Apple Silicon build).
 
 ## 3. What the build ships
 
@@ -203,6 +203,7 @@ Artifacts land in `apps/desktop/release/` (DMG + ZIP + blockmaps).
 `scripts/release-macos.sh` defaults to the host architecture and accepts
 `MAC_ARCH=arm64` or `MAC_ARCH=x64` only when that architecture matches the
 host. This keeps the native Rust host sidecar and Electron package aligned.
+Slyy publishes arm64 only; an x64 build is for local testing.
 
 ### 4.3 GitHub tag and manual workflow
 
@@ -233,9 +234,9 @@ also publishes. Local `scripts/release-macos.sh` remains the explicit signed
 local lane; `pnpm dist:mac` stays unsigned without a configured certificate
 (D078).
 
-The macOS matrix uses `macos-15` for arm64 and `macos-15-intel` for Intel x64.
-Each job verifies `uname -m`, passes the matching `--arm64` or `--x64` flag to
-electron-builder, and builds `pi-desktop-host-core` on that same native
+The macOS matrix has one lane, `macos-15` for arm64; Slyy publishes no Intel
+x64 build (ADR slyy-downstream-branding). The job verifies `uname -m`, passes
+`--arm64` to electron-builder, and builds `pi-desktop-host-core` on that same native
 runner. Signed tag builds and `sign_macos: true` (the dispatch default) receive
 `CSC_LINK`, `CSC_KEY_PASSWORD`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, and
 `APPLE_TEAM_ID` only from GitHub Actions secrets, require `APPLE_TEAM_ID` to
@@ -263,10 +264,10 @@ tickets on the app and DMG.
 
 The shared electron-builder configuration applies the architecture-labelled
 pattern at the macOS platform level for ZIPs and overrides it at the DMG target
-level. Both public architectures are therefore explicit: the arm64 lane
+level. The published architecture is therefore explicit: the arm64 lane
 publishes `Slyy-<version>-arm64.dmg` and
-`Slyy-<version>-arm64-mac.zip`, while the Intel x64 lane publishes
-`Slyy-<version>-x64.dmg` and `Slyy-<version>-x64-mac.zip`. This
+`Slyy-<version>-arm64-mac.zip`; a local x64 build would be labelled
+`-x64`. This
 applies to both unsigned and signed macOS lanes, including local release builds,
 and ensures each generated updater feed references its architecture-labelled
 asset names and matching checksums. Before upload, each macOS runner requires
@@ -609,7 +610,7 @@ their electron-updater manifests. Run a target command on that target OS:
 
 ```text
 macOS Apple Silicon: pnpm --filter @pi-desktop/desktop run dist:mac -- --arm64
-macOS Intel:         pnpm --filter @pi-desktop/desktop run dist:mac -- --x64
+macOS Intel (local only, not published): pnpm --filter @pi-desktop/desktop run dist:mac -- --x64
 Windows: pnpm --filter @pi-desktop/desktop dist:win
 Linux:   pnpm --filter @pi-desktop/desktop dist:linux -- --x64|--arm64
 ```
@@ -629,8 +630,6 @@ Native-runner output matrix:
 
 - macOS arm64: `Slyy-<version>-arm64.dmg` and
   `Slyy-<version>-arm64-mac.zip`
-- macOS Intel x64: `Slyy-<version>-x64.dmg` and
-  `Slyy-<version>-x64-mac.zip`
 - Windows x64: NSIS installer `Slyy-Setup-<version>.exe` and portable
   ZIP `Slyy-Portable-<version>.zip`
 - Linux x64 and arm64: AppImage `Slyy-<version>-linux-<arch>.AppImage`, deb

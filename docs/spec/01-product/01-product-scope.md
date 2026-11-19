@@ -59,7 +59,7 @@ across devices without synchronizing conversation history or source files.
 
 ## 4. Current shipped scope
 
-- Electron desktop app for macOS arm64 and Intel x64, Windows x64, and Linux x64 and arm64 release lanes
+- Electron desktop app for macOS arm64, Windows x64, and Linux x64 and arm64 release lanes
 - English default UI + i18n framework
 - Session create/switch/restore
 - Multi-provider configuration
@@ -143,6 +143,6 @@ The frozen identity is defined in
 | Platform | MVP | Notes |
 |---|---|---|
 | macOS Apple Silicon | Published | Primary development and acceptance platform; signing/notarization remains credential-gated |
-| macOS Intel | Published | Native x64 DMG/ZIP release lane; signing/notarization remains credential-gated |
+| macOS Intel | Not published | Slyy ships Apple silicon only (ADR slyy-downstream-branding); local `dist:mac -- --x64` builds still work |
 | Windows x64 | Published | NSIS installer, portable ZIP, and in-app update lane for NSIS; native qualification continues |
 | Linux x64 and arm64 | Published | AppImage, deb, and rpm packages; AppImage update lane; glibc 2.35+ (Ubuntu 22.04, Debian 12, Fedora 36+); native qualification continues |

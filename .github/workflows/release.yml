@@ -7,7 +7,7 @@
 #   git push origin <branch> v0.2.0        # push → this workflow builds & publishes
 #
 # Builds installers for every platform defined in the electron-builder config
-# (macOS dmg/zip arm64 and x64, Windows NSIS and portable ZIP x64, Linux
+# (macOS dmg/zip arm64 only, Windows NSIS and portable ZIP x64, Linux
 # AppImage/deb/rpm x64 and arm64), each
 # with its native pi-desktop-host-core Rust sidecar. The Linux app.asar is also
 # exported as a system-Electron repackaging asset, and all outputs — with their
@@ -127,13 +127,6 @@ jobs:
             arch: arm64
             runner_arch: arm64
             artifact: mac-arm64
-            platform: macos
-            dist: dist:mac
-          - name: macOS Intel x64
-            os: macos-15-intel
-            arch: x64
-            runner_arch: x86_64
-            artifact: mac-x64
             platform: macos
             dist: dist:mac
           - name: Windows x64
@@ -423,10 +416,6 @@ jobs:
             esac
           done
 
-      - name: Disambiguate macOS update metadata
-        if: matrix.platform == 'macos'
-        run: mv apps/desktop/release/latest-mac.yml apps/desktop/release/latest-mac-${{ matrix.arch }}.yml
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
@@ -578,37 +567,23 @@ jobs:
       - name: List artifacts
         run: ls -la dist/
 
-      - name: Merge macOS updater metadata
+      - name: Verify macOS updater feed
+        # Slyy ships Apple silicon only (ADR slyy-downstream-branding), so
+        # electron-builder's single latest-mac.yml is the feed as is. It must
+        # point electron-updater at the arm64 ZIP.
         working-directory: dist
         run: |
           set -euo pipefail
-          ruby <<'RUBY'
-          require "yaml"
-
-          paths = Dir["latest-mac-*.yml"].sort
-          expected_paths = ["latest-mac-arm64.yml", "latest-mac-x64.yml"]
-          abort "Expected both macOS updater feeds" unless paths == expected_paths
-
-          feeds = paths.map do |path|
-            YAML.safe_load(File.read(path), permitted_classes: [], aliases: false)
-          end
-          versions = feeds.map { |feed| feed.fetch("version") }.uniq
-          abort "macOS updater feeds disagree on version" unless versions.length == 1
-
-          files = feeds.flat_map { |feed| feed.fetch("files") }
-            .uniq { |file| file.fetch("url") }
-          zip = files.find { |file| file.fetch("url").end_with?(".zip") }
-          abort "macOS updater feeds contain no ZIP" if zip.nil?
-
-          merged = feeds.first.merge(
-            "version" => versions.first,
-            "files" => files,
-            "path" => zip.fetch("url"),
-            "sha512" => zip.fetch("sha512"),
-          )
-          File.write("latest-mac.yml", merged.to_yaml)
-          RUBY
-          rm latest-mac-arm64.yml latest-mac-x64.yml
+          version="${GITHUB_REF_NAME#v}"
+          if [ ! -f latest-mac.yml ]; then
+            echo "::error::Expected the macOS updater feed latest-mac.yml"
+            exit 1
+          fi
+          if ! grep -qx "path: Slyy-${version}-arm64-mac.zip" latest-mac.yml; then
+            echo "::error::latest-mac.yml must point at Slyy-${version}-arm64-mac.zip"
+            cat latest-mac.yml
+            exit 1
+          fi
 
       - name: Verify pi-host bundles for the remote bootstrap
         # apps/desktop/electron/main/remote/pi-host-release.ts downloads
@@ -634,8 +609,10 @@ jobs:
         run: |
           set -euo pipefail
           version="${GITHUB_REF_NAME#v}"
+          # Release title, e.g. "Slyy Desktop 0.23.0-beta.2" (no "v" prefix).
+          echo "RELEASE_TITLE=Slyy Desktop ${version}" >> "$GITHUB_ENV"
           {
-            echo "Slyy ${version}"
+            echo "Slyy Desktop ${version}"
             echo
             if [ "${MACOS_SIGN_RELEASE}" != "true" ]; then
               echo "> [!WARNING]"
@@ -652,7 +629,6 @@ jobs:
             echo "| Platform | Download |"
             echo "| --- | --- |"
             echo "| macOS Apple silicon | \`Slyy-${version}-arm64.dmg\` |"
-            echo "| macOS Intel | \`Slyy-${version}-x64.dmg\` |"
             echo "| Windows x64 | \`Slyy-Setup-${version}.exe\` (portable: \`Slyy-Portable-${version}.zip\`) |"
             echo "| Linux x64 / arm64 | AppImage, deb, rpm |"
             echo
@@ -663,8 +639,8 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
-          # D126/D285/D364/D603: all desktop platforms and both native macOS
-          # architectures ship from tag builds — installers, the Windows
+          # D126/D364/D603: all desktop platforms (macOS arm64 only, ADR
+          # slyy-downstream-branding) ship from tag builds — installers, the Windows
           # portable ZIP, the Linux ASAR, blockmaps, the pi-host bundles, and
           # the latest*.yml feeds that drive electron-updater on each platform
           # (in-app for Windows NSIS and Linux AppImage; macOS and Windows ZIP
@@ -674,7 +650,7 @@ jobs:
           # Same tag name as this repository's tag; GitHub creates it in the
           # releases repository on its default branch (no source is shared).
           tag_name: ${{ github.ref_name }}
-          name: Slyy ${{ github.ref_name }}
+          name: ${{ env.RELEASE_TITLE }}
           body_path: release-notes.md
           files: dist/*
           generate_release_notes: false

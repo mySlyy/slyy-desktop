@@ -23,7 +23,7 @@ Download the installer for your platform from
 
 | Platform | Package | Updates |
 | --- | --- | --- |
-| macOS (Apple silicon, Intel) | `Slyy-<version>-<arch>.dmg` | in-app |
+| macOS (Apple silicon) | `Slyy-<version>-arm64.dmg` | in-app |
 | Windows x64 | `Slyy-Setup-<version>.exe` | in-app |
 | Windows x64 (no install) | ZIP / portable | manual |
 | Linux | AppImage (in-app), deb / rpm (manual) | |

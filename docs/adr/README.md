@@ -197,7 +197,7 @@ git history.
 | 0142 | Allow non-loopback HTTP MCP endpoints with explicit risk disclosure | Accepted |
 | 0143 | Make Session Titles User-Renamable | Accepted |
 | 0144 | Allow User-Configured Thinking-Level Overrides | Accepted |
-| 0145 | Publish Native macOS Intel Artifacts | Accepted (amended by D353 / 0191) |
+| 0145 | Publish Native macOS Intel Artifacts | Accepted (amended by D353 / 0191; Intel lane removed in Slyy, see slyy-downstream-branding) |
 | 0146 | Assign outer and inner work-panel resize ownership by boundary | Superseded by 0151 |
 | 0147 | A2A Protocol Stack for Subagent Coordination | Superseded by 0165 |
 | 0148 | Explicitly disable application keyboard shortcuts | Accepted |

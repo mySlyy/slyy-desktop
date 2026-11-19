@@ -86,7 +86,7 @@ levels does not waive the relevant E2E gate.
 
 | Requirement | Detail |
 |---|---|
-| Platform | macOS arm64 and Intel x64, Windows x64, and Linux x64 and arm64 release targets (D126/D285, D638 / ADR 0318) |
+| Platform | macOS arm64, Windows x64, and Linux x64 and arm64 release targets (D126/D285, D638 / ADR 0318) |
 | Profile | Clean `~/.pi-desktop` profile (no prior config) |
 | Fixtures | Sample project directory (`examples/fixtures/sample-project/`) |
 | Sample plugin | `examples/plugins/hello` loaded from local path |
@@ -404,5 +404,5 @@ This test plan spec is accepted when:
 - [ ] Traceability matrix is complete (scenarios ↔ acceptance ↔ milestones).
 - [ ] Scenario template is defined and all entries follow it.
 - [ ] AI update rules are documented and cross-linked to workflow spec.
-- [ ] Environment requirements match baseline (native macOS arm64/Intel x64,
+- [ ] Environment requirements match baseline (native macOS arm64,
   clean profile).

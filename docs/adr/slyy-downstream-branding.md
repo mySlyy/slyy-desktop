@@ -110,5 +110,11 @@ so; Windows builds are unsigned either way.
   (GitHub cannot transfer issues from a public to a private repository).
   0.23.0-beta.2 still opens the private repository; later builds use
   `mySlyy/releases`.
+- macOS releases are Apple silicon (arm64) only. The Intel x64 lane of
+  upstream D285 / ADR 0145 is removed from `release.yml`: one fewer macOS
+  runner per release and about 270 MB less per release in `mySlyy/releases`.
+  `latest-mac.yml` is electron-builder's single arm64 feed, checked before
+  publish. Intel Macs get no build; local `dist:mac -- --x64` still works
+  for testing, and the Rosetta hint (E2E-240) stays for such builds.
 - Private vulnerability reporting is enabled on `mySlyy/releases`;
   `SECURITY.md` and the issue picker link there for the same reason.

@@ -347,7 +347,7 @@
 
 ## E2E-001: App launches and shows main window
 
-- **Preconditions**: macOS arm64 or Intel x64; no prior `~/.slyy-gen2` profile. For the
+- **Preconditions**: macOS arm64; no prior `~/.slyy-gen2` profile. For the
   development lane, workspace package build outputs are absent or older than
   their TypeScript sources.
 - **Steps**: 1) Launch Slyy. In the development lane, use `pnpm dev`.
@@ -754,7 +754,7 @@
 
 ## E2E-092: Packaged runtime is self-contained without duplicate dependencies
 
-- **Preconditions**: Native macOS arm64 and Intel x64, Windows x64, and Linux
+- **Preconditions**: Native macOS arm64, Windows x64, and Linux
   x64 packages built from clean release-host directories; a clean application
   profile;
   English and German available; external network access can be disabled while
@@ -768,15 +768,12 @@
      modules, source maps, tests/examples/declarations, Chromium locales, and
      native prebuild targets.
   3. On each macOS package, run `file` (or `lipo -info`) against the app
-     executable and `Resources/bin/pi-desktop-host-core`; confirm arm64 and
-     x86_64 packages contain only their declared architecture and that the
-     Rust host matches the Electron app. Confirm the shared
-     `apps/desktop/package.json` macOS configuration produces arm64 assets named
-     `Slyy-X.Y.Z-arm64.dmg` and `Slyy-X.Y.Z-arm64-mac.zip`, while
-     the Intel assets use `Slyy-X.Y.Z-x64.dmg` and
-     `Slyy-X.Y.Z-x64-mac.zip`; confirm the release directory has both
-     DMG and ZIP artifacts and one merged `latest-mac.yml` feed whose URLs and
-     checksums match those generated assets.
+     executable and `Resources/bin/pi-desktop-host-core`; confirm the arm64
+     package contains only arm64 and that the Rust host matches the Electron
+     app. Confirm the shared `apps/desktop/package.json` macOS configuration
+     produces `Slyy-X.Y.Z-arm64.dmg` and `Slyy-X.Y.Z-arm64-mac.zip`; confirm
+     the release directory has both and one `latest-mac.yml` feed whose path,
+     URLs and checksums match those assets. No x64 macOS asset is published.
   4. Inspect the renderer output for its size controls: emitted JS is minified,
      no `.woff` or `.ttf` files are present, only the KaTeX `woff2` faces remain
      (no application font face is emitted any more), and
@@ -1134,8 +1131,8 @@
 
 ## E2E-240: An Intel macOS build on Apple Silicon points at the native download
 
-- **Preconditions**: Apple Silicon Mac; the x64 macOS package installed and
-  running under Rosetta 2.
+- **Preconditions**: Apple Silicon Mac; a locally built x64 macOS package
+  (Slyy publishes none) installed and running under Rosetta 2.
 - **Steps**: 1) Launch the app. 2) Read the banner under the title bar.
   3) Click its dismiss action.
 - **Expected**: The app boots normally. A dismissible hint says this is the

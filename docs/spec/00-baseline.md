@@ -33,8 +33,8 @@
 > `0.4.7` lifts D010's macOS-only release scope through D126: tag builds
 > publish installers and electron-updater feeds for macOS arm64, Windows x64,
 > and Linux x64 and arm64.
-> D285 adds a native macOS Intel x64 tag lane alongside the arm64 lane; both
-> macOS architectures publish DMG/ZIP artifacts from their matching runners.
+> D285 added a native macOS Intel x64 tag lane; Slyy drops it again and
+> publishes macOS for Apple silicon (arm64) only (ADR slyy-downstream-branding).
 > `0.4.8` moves the durable Projects index out of the home sidebar and into
 > Settings as the fifth **Project archive** destination through D133 / ADR 0026.
 > `0.4.9` made the pinned pi-ai catalog authoritative for known-model metadata
@@ -170,8 +170,9 @@
 25. Plugin package format: **`.piplug` (zip)**
 26. Plugin trust first step: **sha256 checksum; signature later**
 27. First release platform: **macOS arm64 only** — lifted in `0.4.7`/D126;
-    tag builds now publish native macOS arm64 and Intel x64, Windows x64, and
-    Linux x64 and arm64 AppImage, deb, and rpm artifacts
+    tag builds now publish native macOS arm64 (no Intel x64 since the Slyy
+    fork), Windows x64, and Linux x64 and arm64 AppImage, deb, and rpm
+    artifacts
 28. TS schema library: **typebox**
 29. i18n library: **i18next**
 30. Bash: **non-interactive, streamed, and resolved from the selectable shell
