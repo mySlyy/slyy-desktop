@@ -532,3 +532,15 @@ test("macOS signing instrumentation stays out of the Windows and Linux lanes", (
   assert.ok(unsignedBlock, "unsigned macOS debug package step is missing");
   assert.doesNotMatch(unsignedBlock, instrumentation);
 });
+
+test("the signing diagnostics step runs only on the signed lane, with the Slyy identity", () => {
+  // The script exits when MAC_SIGNING_IDENTITY is unset; running it on an
+  // unsigned build failed both macOS lanes of the first Slyy release.
+  const block =
+    releaseWorkflowSource.match(
+      /- name: Diagnose macOS signing environment[^]*?(?=\n      - name:)/,
+    )?.[0] ?? "";
+  assert.ok(block, "signing diagnostics step is missing");
+  assert.match(block, /if: matrix\.platform == 'macos' && env\.MACOS_SIGN_RELEASE == 'true'/);
+  assert.match(block, /MAC_SIGNING_IDENTITY: \$\{\{ vars\.SLYY_MAC_SIGNING_IDENTITY \}\}/);
+});

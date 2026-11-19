@@ -262,7 +262,11 @@ jobs:
         # Xcode tools, Apple timestamp reachability) before electron-builder
         # imports the certificate. Informational: the Developer ID identity is
         # absent here by design and is imported from CSC_LINK during packaging.
-        if: matrix.platform == 'macos'
+        # Signed lane only: the script needs the Slyy identity name, and an
+        # unsigned build has no signing environment to diagnose.
+        if: matrix.platform == 'macos' && env.MACOS_SIGN_RELEASE == 'true'
+        env:
+          MAC_SIGNING_IDENTITY: ${{ vars.SLYY_MAC_SIGNING_IDENTITY }}
         run: scripts/macos-signing-diagnostics.sh
 
       - name: Require macOS signing and notarization secrets
