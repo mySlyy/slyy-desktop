@@ -286,7 +286,7 @@ test("the Linux package config lets the workflow choose the architecture", () =>
 test("release matrix packages macOS for Apple silicon only", () => {
   assert.match(
     releaseWorkflowSource,
-    /name: macOS arm64[\s\S]*?os: macos-15[\s\S]*?arch: arm64[\s\S]*?runner_arch: arm64/,
+    /name: macOS arm64[\s\S]*?os: \$\{\{ vars\.SLYY_MACOS_RUNNER \|\| 'macos-15' \}\}[\s\S]*?arch: arm64[\s\S]*?runner_arch: arm64/,
   );
   // Slyy dropped the Intel lane (ADR slyy-downstream-branding).
   assert.doesNotMatch(releaseWorkflowSource, /macos-15-intel|mac-x64|Slyy-\$\{version\}-x64/);

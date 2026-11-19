@@ -123,7 +123,10 @@ jobs:
       matrix:
         include:
           - name: macOS arm64
-            os: macos-15
+            # Repository variable SLYY_MACOS_RUNNER routes this lane to the
+            # self-hosted Mac (label `slyy-mac`, Apple silicon) to save hosted
+            # macOS minutes; unset falls back to GitHub's macos-15.
+            os: ${{ vars.SLYY_MACOS_RUNNER || 'macos-15' }}
             arch: arm64
             runner_arch: arm64
             artifact: mac-arm64
