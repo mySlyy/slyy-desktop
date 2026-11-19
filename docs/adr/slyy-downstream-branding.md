@@ -110,3 +110,5 @@ so; Windows builds are unsigned either way.
   (GitHub cannot transfer issues from a public to a private repository).
   0.23.0-beta.2 still opens the private repository; later builds use
   `mySlyy/releases`.
+- Private vulnerability reporting is enabled on `mySlyy/releases`;
+  `SECURITY.md` and the issue picker link there for the same reason.

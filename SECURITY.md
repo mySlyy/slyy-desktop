@@ -16,9 +16,10 @@ releases and development builds may not receive security fixes.
 pull requests, or discussions.**
 
 Report vulnerabilities privately through GitHub's private vulnerability
-reporting (Security Advisories):
+reporting (Security Advisories) on the public releases repository (the source
+repository is private):
 
-<https://github.com/mySlyy/slyy-desktop/security/advisories/new>
+<https://github.com/mySlyy/releases/security/advisories/new>
 
 Please include as much of the following information as you can:
 
