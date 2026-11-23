@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Settings: Sharing activity</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=Martian+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2b3bff}a:hover{color:#1f2ed0}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 100%; min-height: 800px; box-sizing: border-box; background: rgba(10,10,10,0.32); padding: 28px 24px; display: flex; justify-content: center; align-items: flex-start; color: #0a0a0a; font-family: 'Hanken Grotesk', system-ui, sans-serif; font-size: 14px;">
+<div role="dialog" aria-label="Settings" style="width: 100%; max-width: 1180px; min-height: 740px; display: flex; flex-wrap: wrap; background: #ffffff; box-shadow: 0 16px 48px rgba(0,0,0,0.18); position: relative;">
+  <a href="Main.dc.html" aria-label="Close settings" style="position: absolute; top: 12px; right: 12px; padding: 8px; color: #3d3d3d; display: inline-flex;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></a>
+  <nav aria-label="Settings" style="flex: 1 1 240px; max-width: 270px; min-width: 0; box-sizing: border-box; padding: 16px 12px; display: flex; flex-direction: column; gap: 10px; background: #f9f9f7; border-right: 1px solid #e2e2e2;">
+    <label for="settings-search" style="position: absolute; left: -9999px;">Search settings</label><input id="settings-search" placeholder="Search settings…" style="border: 1px solid #a3a3a3; padding: 8px 10px; font-size: 14px; font-family: inherit;">
+    <div style="display: flex; flex-direction: column; gap: 1px;"><div style="font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #5c5c5c; padding: 4px 8px;">Preferences</div>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Appearance</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Conversation</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Shortcuts</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Live voice</a>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 1px;"><div style="font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #5c5c5c; padding: 4px 8px;">Agent</div>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Behavior</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Models</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Instructions</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Skills</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">MCP</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Subagents</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Modes</a>
+      <a href="SettingsTools.dc.html" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Tools<span style="font-family: 'Martian Mono', monospace; font-size: 9px; color: #2b3bff; font-weight: 400;">NEW</span></a>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 1px;"><div style="font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #5c5c5c; padding: 4px 8px;">Workspace</div>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Projects</a>
+      <a href="Spaces.dc.html" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Spaces<span style="font-family: 'Martian Mono', monospace; font-size: 9px; color: #2b3bff; font-weight: 400;">NEW</span></a>
+      <a href="SettingsSources.dc.html" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Sources<span style="font-family: 'Martian Mono', monospace; font-size: 9px; color: #2b3bff; font-weight: 400;">NEW</span></a>
+      <a href="SettingsSharing.dc.html" aria-current="page" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center; background: #e2e2e2; font-weight: 600;">Sharing activity<span style="font-family: 'Martian Mono', monospace; font-size: 9px; color: #2b3bff; font-weight: 400;">NEW</span></a>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 1px;"><div style="font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #5c5c5c; padding: 4px 8px;">System</div>
+      <a href="SettingsAccount.dc.html" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Account &amp; devices<span style="font-family: 'Martian Mono', monospace; font-size: 9px; color: #2b3bff; font-weight: 400;">NEW</span></a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">System</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Info</a>
+    </div>
+    <p style="margin: auto 0 0; font-size: 11px; color: #5c5c5c; line-height: 1.4; padding: 0 8px;">Cloud sync and Remote hosts are gone: your Slyy VM keeps every device in sync.</p>
+  </nav>
+
+  <main style="flex: 999 1 640px; min-width: 0; background: #ffffff; box-sizing: border-box; padding: 28px 32px; display: flex; flex-direction: column; gap: 22px;">
+    <div style="display: flex; flex-direction: column; gap: 6px; max-width: 680px;">
+      <h1 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.01em;">Sharing activity</h1>
+      <p style="margin: 0; color: #5c5c5c; line-height: 1.5;">What the steward agents shared from your space, automatically and within your source choices. Nothing here needed your input. You can take any item back.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px;">
+      <div style="background: #f4f4f2; padding: 14px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 26px; font-weight: 600;">7</span><span style="font-size: 12px; color: #5c5c5c;">items shared to your team or dept, last 30 days</span></div>
+      <div style="background: #f4f4f2; padding: 14px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 26px; font-weight: 600;">3</span><span style="font-size: 12px; color: #5c5c5c;">shared after filtering out personal details</span></div>
+      <div style="background: #0a0a0a; color: #ffffff; padding: 14px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 26px; font-weight: 600;">0</span><span style="font-size: 12px; color: #d4d4d4;">items from only-me sources ever shared</span></div>
+    </div>
+
+    <div style="overflow-x: auto; border: 1px solid #e2e2e2;">
+      <table style="width: 100%; min-width: 820px; border-collapse: collapse; font-size: 13px;">
+        <thead>
+          <tr style="background: #f4f4f2; text-align: left; font-size: 11px; font-family: 'Martian Mono', monospace; letter-spacing: 0.05em; text-transform: uppercase; color: #5c5c5c;">
+            <th style="padding: 9px 12px; font-weight: 500;">Item</th><th style="padding: 9px 12px; font-weight: 500;">From source</th><th style="padding: 9px 12px; font-weight: 500;">Shared to</th><th style="padding: 9px 12px; font-weight: 500;">Why</th><th style="padding: 9px 12px; font-weight: 500;">When</th><th style="padding: 9px 12px; font-weight: 500;"><span style="position: absolute; left: -9999px;">Action</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2;"><strong>Dunning steps for EU suppliers</strong><div style="color: #5c5c5c;">Memory</div></td><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2;">Odoo · Accounting<div style="color: #5c5c5c;">Shareable</div></td><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2; font-family: 'Martian Mono', monospace; font-size: 12px;">#team</td><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2;">Used by 4 colleagues this month; no duplicate in team space</td><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2;">20 Nov</td><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2;"><button type="button" style="border: 1px solid #e2e2e2; background: #ffffff; padding: 6px 10px; cursor: pointer;">Take back</button></td></tr>
+          <tr><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2;"><strong>Supplier payment terms summary</strong><div style="color: #5c5c5c;">Artifact</div></td><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2;">SharePoint · Finance<div style="color: #5c5c5c;">Shareable</div></td><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2; font-family: 'Martian Mono', monospace; font-size: 12px;">#team → #dept</td><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2;">Team steward agent promoted; dept agent matched it to Controlling</td><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2;">18 Nov</td><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2;"><button type="button" style="border: 1px solid #e2e2e2; background: #ffffff; padding: 6px 10px; cursor: pointer;">Take back</button></td></tr>
+          <tr><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2;"><strong>"Invoices above 5,000 € need a second approver"</strong><div style="color: #5c5c5c;">Memory, filtered</div></td><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2;">OneDrive<div style="color: #5c5c5c;">After filtering</div></td><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2; font-family: 'Martian Mono', monospace; font-size: 12px;">#team</td><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2;">General rule; names and file references removed</td><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2;">15 Nov</td><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2;"><button type="button" style="border: 1px solid #e2e2e2; background: #ffffff; padding: 6px 10px; cursor: pointer;">Take back</button></td></tr>
+          <tr><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2;"><strong>Brandt Logistik reminder thread</strong><div style="color: #5c5c5c;">Memory</div></td><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2;">Mailbox<div style="color: #0a0a0a; font-weight: 600;">Only me</div></td><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2; color: #5c5c5c;">Stayed in My space</td><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2;">Only-me source: never offered to a steward agent. The same overdue fact was shared from Odoo instead.</td><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2;">14 Nov</td><td style="padding: 11px 12px; border-top: 1px solid #e2e2e2; color: #5c5c5c;">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin: 0; font-size: 12px; color: #5c5c5c;">Taking an item back removes it from the team or dept space in one commit. Items forked by colleagues keep a note that the original was withdrawn.</p>
+  </main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

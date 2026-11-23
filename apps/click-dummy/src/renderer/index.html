@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!--
+  Strict CSP: only bundled scripts, no eval, no network.
+  'unsafe-inline' for styles is required because the wireframes style every
+  element through its style attribute.
+-->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slyy Click-Dummy</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="shell.css">
+<style id="dc-screen-style"></style>
+</head>
+<body id="dummy-body">
+<div id="dummy-screen" class="dummy-screen"></div>
+
+<div id="dummy-overview" class="dummy-overview" hidden>
+  <div id="dummy-overview-inner" class="dummy-overview-inner">
+    <div id="dummy-overview-head" class="dummy-overview-head">
+      <h1 id="dummy-overview-title">Wireframes</h1>
+      <p id="dummy-overview-lede">Click-dummy of the Slyy Desktop wireframes. Nothing here talks to a model, a source or a server: every screen is a clickable mock.</p>
+    </div>
+    <ol id="dummy-overview-list" class="dummy-overview-list"></ol>
+    <p id="dummy-overview-keys" class="dummy-overview-keys">Screens menu or Cmd+1 to Cmd+9 jumps to a screen. Cmd+0 opens this overview. Cmd+[ and Cmd+] go back and forward. Cmd+Shift+R resets all clicks.</p>
+  </div>
+</div>
+
+<div id="dummy-badge" class="dummy-badge" role="navigation" aria-label="Click-dummy">
+  <button id="dummy-badge-back" type="button" aria-label="Back" title="Back (Cmd+[)">&#8249;</button>
+  <button id="dummy-badge-overview" type="button" title="All screens (Cmd+0)">Click-dummy · <span id="dummy-badge-label">Overview</span></button>
+  <button id="dummy-badge-forward" type="button" aria-label="Forward" title="Forward (Cmd+])">&#8250;</button>
+</div>
+
+<script src="dc_core.js"></script>
+<script src="dc_runtime.js"></script>
+<script src="screens.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

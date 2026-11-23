@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Connect a source</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=Martian+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2b3bff}a:hover{color:#1f2ed0}
+button,input{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 100%; min-height: 800px; box-sizing: border-box; background: rgba(10,10,10,0.32); display: flex; align-items: center; justify-content: center; padding: 32px 16px; font-family: 'Hanken Grotesk', system-ui, sans-serif; color: #0a0a0a; font-size: 14px;">
+  <div role="dialog" aria-labelledby="dlg-title" style="width: 100%; max-width: 720px; background: #ffffff; box-shadow: 0 16px 48px rgba(0,0,0,0.18); display: flex; flex-direction: column;">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; border-bottom: 1px solid #e2e2e2;">
+      <h1 id="dlg-title" style="margin: 0; font-size: 18px; font-weight: 600;">Connect a mailbox</h1>
+      <a href="SettingsSources.dc.html" aria-label="Close" style="display: inline-flex; padding: 8px; color: #3d3d3d;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></a>
+    </div>
+
+    <div style="padding: 20px 22px; display: flex; flex-direction: column; gap: 20px;">
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <sc-for list="{{types}}" as="t" hint-placeholder-count="6">
+          <button type="button" onClick="{{t.pick}}" aria-pressed="{{t.sel}}" style="{{t.style}}">{{t.label}}</button>
+        </sc-for>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;"><label for="srv" style="font-size: 12px; color: #3d3d3d;">IMAP server</label><input id="srv" value="imap.wapsol.de" style="border: 1px solid #a3a3a3; padding: 9px 10px; font-size: 14px;"></div>
+        <div style="display: flex; flex-direction: column; gap: 6px;"><label for="usr" style="font-size: 12px; color: #3d3d3d;">Email address</label><input id="usr" value="anna@wapsol.de" style="border: 1px solid #a3a3a3; padding: 9px 10px; font-size: 14px;"></div>
+        <div style="display: flex; flex-direction: column; gap: 6px; grid-column: 1 / -1;"><label for="pw" style="font-size: 12px; color: #3d3d3d;">App password</label><input id="pw" type="password" value="xxxxxxxxxxxx" style="border: 1px solid #a3a3a3; padding: 9px 10px; font-size: 14px;"><span style="font-size: 12px; color: #5c5c5c;">Stored only in your own Slyy VM. Your agent's tools never see it.</span></div>
+      </div>
+
+      <fieldset style="border: 0; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px;">
+        <legend style="font-size: 15px; font-weight: 600; padding: 0 0 4px;">Whose questions may this mailbox help answer?</legend>
+        <p style="margin: 0; font-size: 13px; color: #5c5c5c;">The only decision you make. Slyy applies it automatically from now on.</p>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px;">
+          <sc-for list="{{scopes}}" as="s" hint-placeholder-count="3">
+            <button type="button" role="radio" aria-checked="{{s.sel}}" onClick="{{s.pick}}" style="{{s.style}}">
+              <span style="display: flex; justify-content: space-between; gap: 6px; align-items: baseline;"><strong style="font-size: 14px;">{{s.label}}</strong><span style="{{s.badgeStyle}}">{{s.badge}}</span></span>
+              <span style="font-size: 12px; line-height: 1.45; color: #3d3d3d; text-align: left;">{{s.text}}</span>
+            </button>
+          </sc-for>
+        </div>
+      </fieldset>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 14px 22px; border-top: 1px solid #e2e2e2; background: #f9f9f7;">
+      <span style="font-size: 12px; color: #5c5c5c;">You can change this later in Settings › Sources.</span>
+      <div style="display: flex; gap: 8px;">
+        <a href="SettingsSources.dc.html" style="padding: 10px 14px; text-decoration: none; color: #0a0a0a; border: 1px solid #e2e2e2;">Cancel</a>
+        <a href="SettingsSources.dc.html" style="padding: 10px 14px; text-decoration: none; color: #ffffff; background: #2b3bff; font-weight: 600;">Connect</a>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { type: 'imap', scope: 'me' };
+  }
+  renderVals() {
+    const { type, scope } = this.state;
+    const T = [['imap', 'Mailbox (IMAP)'], ['m365', 'Microsoft 365'], ['gdrive', 'Google Drive'], ['web', 'Web research'], ['db', 'Database'], ['other', 'Other']];
+    const S = [
+      ['me', 'Only me', 'Recommended', 'Answers your own questions only. Nothing from it reaches colleagues or your spaces.'],
+      ['filter', 'After filtering', '', 'General facts may reach your spaces automatically, without names, addresses, quotes or personal data.'],
+      ['share', 'Shareable', '', 'May help colleagues. Each still sees only what the source itself allows them.']
+    ];
+    return {
+      types: T.map(([v, l]) => ({
+        label: l, sel: type === v,
+        pick: () => this.setState({ type: v }),
+        style: 'padding: 8px 12px; font-size: 13px; cursor: pointer; border: 1px solid ' + (type === v ? '#2b3bff' : '#e2e2e2') + '; background: ' + (type === v ? '#e6e8ff' : '#ffffff') + '; color: #0a0a0a;'
+      })),
+      scopes: S.map(([v, l, b, t]) => ({
+        label: l, badge: b, text: t, sel: scope === v,
+        pick: () => this.setState({ scope: v }),
+        badgeStyle: b ? 'font-size: 10px; font-family: Martian Mono, monospace; color: #2b3bff;' : 'display: none;',
+        style: 'display: flex; flex-direction: column; gap: 6px; text-align: left; padding: 12px; cursor: pointer; background: ' + (scope === v ? '#e6e8ff' : '#ffffff') + '; border: ' + (scope === v ? '2px solid #2b3bff' : '1px solid #e2e2e2') + '; color: #0a0a0a; font-family: inherit;'
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

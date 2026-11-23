@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Composer menus</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=Martian+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2b3bff}a:hover{color:#1f2ed0}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 100%; min-height: 800px; box-sizing: border-box; background: #f4f4f2; color: #0a0a0a; font-family: 'Hanken Grotesk', system-ui, sans-serif; font-size: 14px; padding: 32px; display: flex; flex-direction: column; gap: 24px;">
+  <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px;">
+    <h1 style="margin: 0; font-size: 22px; font-weight: 600;">Composer menus</h1>
+    <a href="Main.dc.html">← Back to the chat</a>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; align-items: start;">
+    <div style="background: #ffffff; border: 1px solid #e2e2e2; box-shadow: 0 8px 24px rgba(0,0,0,0.08); padding: 8px; display: flex; flex-direction: column; gap: 2px;">
+      <div style="font-size: 12px; color: #5c5c5c; padding: 4px 8px;">Mode</div>
+      <div style="padding: 8px; background: #e6e8ff; display: flex; flex-direction: column;"><strong>Agent</strong><span style="font-size: 12px; color: #5c5c5c;">Works step by step with tools</span></div>
+      <div style="padding: 8px; display: flex; flex-direction: column;"><strong>Plan</strong><span style="font-size: 12px; color: #5c5c5c;">Proposes a plan first</span></div>
+      <div style="padding: 8px; display: flex; flex-direction: column;"><strong>Goal</strong><span style="font-size: 12px; color: #5c5c5c;">Runs until a goal is met</span></div>
+      <div style="font-size: 12px; color: #5c5c5c; padding: 8px 8px 4px; border-top: 1px solid #e2e2e2;">Your modes</div>
+      <div style="padding: 8px;">Month-end close</div>
+    </div>
+
+    <div style="background: #ffffff; border: 1px solid #e2e2e2; box-shadow: 0 8px 24px rgba(0,0,0,0.08); padding: 8px; display: flex; flex-direction: column; gap: 2px;">
+      <div style="font-size: 12px; color: #5c5c5c; padding: 4px 8px;">Permissions</div>
+      <div style="padding: 8px;">Default</div>
+      <div style="padding: 8px;">Ask every time</div>
+      <div style="padding: 8px; background: #e6e8ff; display: flex; justify-content: space-between;"><strong>Accept edits</strong><span>✓</span></div>
+      <div style="padding: 8px; color: #8a8a8a; display: flex; flex-direction: column;"><span>Auto</span><span style="font-size: 12px;">Capped by Dept · Finance</span></div>
+      <p style="margin: 0; padding: 8px; font-size: 12px; color: #5c5c5c; border-top: 1px solid #e2e2e2;">Approvals that are still needed also reach your phone.</p>
+    </div>
+
+    <div style="background: #ffffff; border: 2px solid #2b3bff; box-shadow: 0 8px 24px rgba(0,0,0,0.08); padding: 8px; display: flex; flex-direction: column; gap: 2px;">
+      <div style="font-size: 12px; color: #5c5c5c; padding: 4px 8px; display: flex; justify-content: space-between;">Sources <span style="font-family: 'Martian Mono', monospace; font-size: 9px; color: #2b3bff;">NEW</span></div>
+      <div style="padding: 7px 8px; display: flex; justify-content: space-between; gap: 6px;"><span>✓ Mailbox</span><span style="font-size: 11px; font-weight: 600;">Only me</span></div>
+      <div style="padding: 7px 8px; display: flex; justify-content: space-between; gap: 6px;"><span>✓ Web research</span><span style="font-size: 11px; font-weight: 600;">Only me</span></div>
+      <div style="padding: 7px 8px; display: flex; justify-content: space-between; gap: 6px; color: #5c5c5c;"><span>&#160;&#160;&#160;OneDrive</span><span style="font-size: 11px; color: #1f2ed0;">Filtered</span></div>
+      <div style="padding: 7px 8px; display: flex; justify-content: space-between; gap: 6px;"><span>✓ Odoo</span><span style="font-size: 11px; color: #5c5c5c;">Shareable</span></div>
+      <div style="padding: 7px 8px; display: flex; justify-content: space-between; gap: 6px; color: #5c5c5c;"><span>&#160;&#160;&#160;SAP S/4</span><span style="font-size: 11px;">Shareable</span></div>
+      <div style="padding: 7px 8px; display: flex; justify-content: space-between; gap: 6px;"><span>✓ SharePoint</span><span style="font-size: 11px; color: #5c5c5c;">Shareable</span></div>
+      <p style="margin: 0; padding: 8px; font-size: 12px; color: #5c5c5c; border-top: 1px solid #e2e2e2;">Applies to the next message. Full list in the Sources tab.</p>
+    </div>
+
+    <div style="background: #ffffff; border: 1px solid #e2e2e2; box-shadow: 0 8px 24px rgba(0,0,0,0.08); padding: 8px; display: flex; flex-direction: column; gap: 2px;">
+      <div style="font-size: 12px; color: #5c5c5c; padding: 4px 8px;">Model</div>
+      <div style="padding: 7px 8px; background: #e6e8ff; display: flex; flex-direction: column;"><strong>mistral/glm-5.3-flash</strong><span style="font-size: 12px; color: #5c5c5c;">EU-hosted · fast</span></div>
+      <div style="padding: 7px 8px; display: flex; flex-direction: column;"><span>mistral-large-3</span><span style="font-size: 12px; color: #5c5c5c;">EU-hosted · reasoning</span></div>
+      <div style="padding: 7px 8px; display: flex; flex-direction: column;"><span>Local · qwen-coder</span><span style="font-size: 12px; color: #5c5c5c;">Wapsol GPU</span></div>
+      <div style="padding: 8px; border-top: 1px solid #e2e2e2; display: flex; justify-content: space-between; font-size: 13px;"><span>Thinking</span><span>Medium ⌄</span></div>
+      <div style="padding: 8px; display: flex; justify-content: space-between; font-size: 13px;"><span>Context used</span><span>17% · 41.2K</span></div>
+    </div>
+
+    <div style="background: #ffffff; border: 1px solid #e2e2e2; box-shadow: 0 8px 24px rgba(0,0,0,0.08); padding: 8px; display: flex; flex-direction: column; gap: 2px;">
+      <div style="font-size: 12px; color: #5c5c5c; padding: 4px 8px;">Typing # or /</div>
+      <div style="padding: 7px 8px; display: flex; flex-direction: column;"><span style="font-family: 'Martian Mono', monospace; font-size: 12px;">#mem</span><span style="font-size: 12px; color: #5c5c5c;">Note this in My space memory</span></div>
+      <div style="padding: 7px 8px; display: flex; flex-direction: column;"><span style="font-family: 'Martian Mono', monospace; font-size: 12px;">#team · #dept · #org</span><span style="font-size: 12px; color: #5c5c5c;">Offer to that space; the steward agent decides</span></div>
+      <div style="padding: 7px 8px; display: flex; flex-direction: column;"><span style="font-family: 'Martian Mono', monospace; font-size: 12px;">@Odoo · @Mailbox</span><span style="font-size: 12px; color: #5c5c5c;">Use only this source for the message</span></div>
+      <div style="padding: 7px 8px; display: flex; flex-direction: column;"><span style="font-family: 'Martian Mono', monospace; font-size: 12px;">/skills · /subagents</span><span style="font-size: 12px; color: #5c5c5c;">Slash commands, as today</span></div>
+    </div>
+  </div>
+
+  <div style="max-width: 760px; width: 100%; margin: 0 auto; border: 1px solid #e2e2e2; background: #ffffff;">
+    <div style="padding: 14px; color: #5c5c5c; font-size: 15px;">Ask Slyy to help with anything</div>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; padding: 6px 10px 10px;">
+      <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;"><span>+</span><span>Agent ⌄</span><span>Accept edits ⌄</span><span style="border: 1px solid #2b3bff; background: #e6e8ff; padding: 4px 8px;">Sources 4/6 ⌄</span></div>
+      <div style="display: flex; gap: 12px; align-items: center;"><span>17%</span><span>mistral/glm-5.3-fla… ⌄</span><span aria-hidden="true" style="width: 30px; height: 30px; border-radius: 50%; background: #2b3bff; display: inline-block;"></span></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

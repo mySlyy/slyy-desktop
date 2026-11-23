@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Why this answer</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=Martian+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2b3bff}a:hover{color:#1f2ed0}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 100%; min-height: 800px; display: flex; flex-wrap: wrap; background: #f4f4f2; color: #0a0a0a; font-family: 'Hanken Grotesk', system-ui, sans-serif; font-size: 14px;">
+  <main style="flex: 999 1 520px; min-width: 0; background: #ffffff; padding: 28px 32px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px; opacity: 0.55;">
+    <a href="Main.dc.html" style="font-size: 13px;">← Back to the chat</a>
+    <div style="align-self: flex-end; max-width: 80%; background: #f4f4f2; padding: 12px 14px;">Which supplier invoices are overdue, and has anyone written to me about them?</div>
+    <p style="margin: 0; line-height: 1.55;">Four supplier invoices are overdue, totalling 18,420 € <sup>1</sup>. Two suppliers have emailed you about them <sup>2</sup>.</p>
+    <div style="height: 180px; border: 1px solid #e2e2e2; background: #f9f9f7;"></div>
+  </main>
+
+  <aside aria-label="Why this answer" style="flex: 1 1 440px; max-width: 520px; min-width: 0; background: #ffffff; border-left: 1px solid #e2e2e2; box-sizing: border-box; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: -8px 0 24px rgba(0,0,0,0.06);">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="margin: 0; font-size: 17px; font-weight: 600;">Why this answer</h2>
+      <a href="Main.dc.html" aria-label="Close" style="display: inline-flex; padding: 8px; color: #3d3d3d;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></a>
+    </div>
+    <p style="margin: 0; font-size: 13px; color: #5c5c5c; line-height: 1.45;">Everything that went into the context for this answer. Exclude an item or a whole source, then answer again.</p>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">
+      <div style="background: #f4f4f2; padding: 10px;"><div style="font-size: 20px; font-weight: 600;">{{countItems}}</div><div style="font-size: 11px; color: #5c5c5c;">items in context</div></div>
+      <div style="background: #f4f4f2; padding: 10px;"><div style="font-size: 20px; font-weight: 600;">{{countSources}}</div><div style="font-size: 11px; color: #5c5c5c;">sources</div></div>
+      <div style="background: #f4f4f2; padding: 10px;"><div style="font-size: 20px; font-weight: 600;">{{countOnlyMe}}</div><div style="font-size: 11px; color: #5c5c5c;">from only-me sources</div></div>
+    </div>
+    <sc-for list="{{items}}" as="it" hint-placeholder-count="5">
+      <div style="{{it.cardStyle}}">
+        <div style="display: flex; justify-content: space-between; gap: 8px; align-items: baseline;">
+          <span style="font-family: 'Martian Mono', monospace; font-size: 11px; color: #2b3bff;">[{{it.ref}}] {{it.source}}</span>
+          <span style="{{it.scopeStyle}}">{{it.scope}}</span>
+        </div>
+        <div style="font-weight: 600;">{{it.title}}</div>
+        <div style="font-size: 12px; color: #5c5c5c; line-height: 1.4;">{{it.snippet}}</div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" onClick="{{it.toggle}}" style="border: 1px solid #e2e2e2; background: #ffffff; padding: 6px 10px; font-size: 12px; cursor: pointer;">{{it.toggleLabel}}</button>
+          <button type="button" onClick="{{it.toggleSource}}" style="border: 0; background: transparent; padding: 6px 4px; font-size: 12px; color: #2b3bff; cursor: pointer;">{{it.sourceLabel}}</button>
+        </div>
+      </div>
+    </sc-for>
+    <div style="margin-top: auto; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: space-between; border-top: 1px solid #e2e2e2; padding-top: 12px;">
+      <span style="font-size: 12px; color: #5c5c5c;">{{footerText}}</span>
+      <a href="Main.dc.html" style="background: #2b3bff; color: #ffffff; text-decoration: none; padding: 9px 14px; font-weight: 600;">Answer again</a>
+    </div>
+  </aside>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { off: {}, srcOff: {} };
+  }
+  renderVals() {
+    const base = [
+      { id: 'a', ref: 1, source: 'Odoo · Accounting', src: 'odoo', scope: 'Shareable', me: false, title: '4 vendor bills past due (account.move)', snippet: 'Filter: posted, payment state not paid, due date before 22 Nov. Read with your Odoo user.' },
+      { id: 'b', ref: 2, source: 'Mailbox (IMAP)', src: 'mail', scope: 'Only me', me: true, title: 'Brandt Logistik: payment reminder', snippet: '14 Nov · "… invoice BILL/2026/0912 is now 14 days overdue …"' },
+      { id: 'c', ref: 2, source: 'Mailbox (IMAP)', src: 'mail', scope: 'Only me', me: true, title: 'Kessler GmbH: question about invoice 0931', snippet: '18 Nov · "… could you confirm the payment date …"' },
+      { id: 'd', ref: '·', source: 'Team · Accounts Payable', src: 'team', scope: 'Team instruction', me: false, title: 'Always state amounts in EUR with supplier and due date', snippet: 'Promoted 3 Oct by the team steward agent.' },
+      { id: 'e', ref: '·', source: 'Org · Wapsol', src: 'org', scope: 'Mandatory', me: false, title: 'Never commit to payment dates in answers', snippet: "Mandatory org instruction. Can't be excluded." }
+    ];
+    const { off, srcOff } = this.state;
+    const isOut = (x) => off[x.id] || srcOff[x.src];
+    const items = base.map((x) => {
+      const out = isOut(x);
+      const locked = x.src === 'org';
+      return {
+        ...x,
+        cardStyle: 'display: flex; flex-direction: column; gap: 6px; padding: 12px; border: 1px solid ' + (out ? '#e2e2e2' : (x.me ? '#0a0a0a' : '#e2e2e2')) + '; background: ' + (out ? '#f9f9f7' : '#ffffff') + '; opacity: ' + (out ? '0.55' : '1') + ';',
+        scopeStyle: 'font-size: 11px; padding: 2px 6px; ' + (x.me ? 'background: #0a0a0a; color: #ffffff;' : 'background: #e6e8ff; color: #0a0a0a;'),
+        toggleLabel: locked ? 'Mandatory · always included' : (off[x.id] ? 'Include this item' : 'Exclude this item'),
+        sourceLabel: locked ? '' : (srcOff[x.src] ? 'Turn ' + x.source.split(' ·')[0] + ' back on' : 'Turn off ' + x.source.split(' ·')[0] + ' for this session'),
+        toggle: () => { if (!locked) this.setState({ off: { ...off, [x.id]: !off[x.id] } }); },
+        toggleSource: () => { if (!locked) this.setState({ srcOff: { ...srcOff, [x.src]: !srcOff[x.src] } }); }
+      };
+    });
+    const inCtx = base.filter((x) => !isOut(x));
+    const changed = base.length - inCtx.length;
+    return {
+      items,
+      countItems: inCtx.length,
+      countSources: new Set(inCtx.map((x) => x.src)).size,
+      countOnlyMe: inCtx.filter((x) => x.me).length,
+      footerText: changed ? changed + ' item' + (changed > 1 ? 's' : '') + ' excluded. The next answer is built without them.' : 'Nothing excluded.'
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Space tools: Team Accounts Payable</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=Martian+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2b3bff}a:hover{color:#1f2ed0}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 100%; min-height: 800px; display: flex; flex-wrap: wrap; background: #f4f4f2; color: #0a0a0a; font-family: 'Hanken Grotesk', system-ui, sans-serif; font-size: 14px;">
+  <nav aria-label="Spaces" style="flex: 1 1 232px; max-width: 260px; min-width: 0; box-sizing: border-box; padding: 16px 12px; display: flex; flex-direction: column; gap: 14px; border-right: 1px solid #e2e2e2;">
+    <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 18px; letter-spacing: -0.025em; padding: 0 6px;"><span style="width: 14px; height: 14px; border-radius: 50%; background: #2b3bff; display: inline-block;"></span>slyy</div>
+    <a href="Main.dc.html" style="font-size: 13px; padding: 0 8px;">← Back to chats</a>
+    <div style="display: flex; flex-direction: column; gap: 2px;">
+      <div style="font-family: 'Martian Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #5c5c5c; padding: 0 8px 6px;">Spaces</div>
+      <a href="#" style="padding: 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between;">My space <span style="font-size: 12px; color: #5c5c5c;">private</span></a>
+      <a href="#" aria-current="page" style="padding: 8px; color: #0a0a0a; text-decoration: none; background: #e6e8ff; font-weight: 600; margin-left: 0;">Team · Accounts Payable</a>
+      <a href="#" style="padding: 8px; color: #0a0a0a; text-decoration: none;">Dept · Finance</a>
+      <a href="#" style="padding: 8px; color: #0a0a0a; text-decoration: none;">Org · Wapsol</a>
+    </div>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; background: #ffffff; box-sizing: border-box; padding: 24px 28px; display: flex; flex-direction: column; gap: 18px;">
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+      <span style="font-family: 'Martian Mono', monospace; font-size: 11px; color: #5c5c5c;">Org · Wapsol › Dept · Finance › Team</span>
+      <h1 style="margin: 0; font-size: 24px; font-weight: 600;">Accounts Payable</h1>
+      <span style="font-size: 13px; color: #5c5c5c;">9 members · steward: Jonas Keller · steward agent on</span>
+    </div>
+    <div role="tablist" aria-label="Space sections" style="display: flex; gap: 0; border-bottom: 1px solid #e2e2e2; flex-wrap: wrap;">
+      <a href="Spaces.dc.html" style="padding: 10px 14px; color: #5c5c5c; text-decoration: none;">Knowledge</a>
+      <button type="button" role="tab" aria-selected="false" style="border: 0; background: transparent; padding: 10px 14px; color: #5c5c5c; cursor: pointer;">Shared workspaces</button>
+      <button type="button" role="tab" aria-selected="false" style="border: 0; background: transparent; padding: 10px 14px; color: #5c5c5c; cursor: pointer;">Members</button>
+      <button type="button" role="tab" aria-selected="true" style="border: 0; border-bottom: 2px solid #2b3bff; background: transparent; padding: 10px 14px; font-weight: 600; cursor: pointer;">Tools</button>
+    </div>
+    <div style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline;">
+      <p style="margin: 0; color: #5c5c5c; max-width: 620px; line-height: 1.5;">Tool policy for every member. You can narrow what Org and Dept allow, never widen it. Edits by the team steward only; each change is a commit.</p>
+      <span style="font-size: 12px; color: #5c5c5c;">Editing as Jonas Keller · steward</span>
+    </div>
+    <div style="overflow-x: auto; border: 1px solid #e2e2e2;">
+      <table style="width: 100%; min-width: 760px; border-collapse: collapse; font-size: 13px;">
+        <thead><tr style="background: #f4f4f2; text-align: left; font-size: 11px; font-family: 'Martian Mono', monospace; letter-spacing: 0.05em; text-transform: uppercase; color: #5c5c5c;"><th style="padding: 9px 12px; font-weight: 500;">Rule</th><th style="padding: 9px 12px; font-weight: 500;">Org</th><th style="padding: 9px 12px; font-weight: 500;">Dept · Finance</th><th style="padding: 9px 12px; font-weight: 500;">Team · Accounts Payable</th></tr></thead>
+        <tbody>
+          <tr><td style="padding: 10px 12px; border-top: 1px solid #e2e2e2;"><strong>Highest permission level</strong></td><td style="padding: 10px 12px; border-top: 1px solid #e2e2e2; color: #5c5c5c;">Auto</td><td style="padding: 10px 12px; border-top: 1px solid #e2e2e2; color: #5c5c5c;">Accept edits</td><td style="padding: 10px 12px; border-top: 1px solid #e2e2e2;"><label for="cap" style="position: absolute; left: -9999px;">Team cap</label><select id="cap" style="border: 1px solid #a3a3a3; padding: 6px 8px; font: inherit;"><option>Accept edits</option><option>Ask every time</option><option disabled>Auto · above Dept cap</option></select></td></tr>
+          <tr><td style="padding: 10px 12px; border-top: 1px solid #e2e2e2;"><strong>Provisioned for members</strong></td><td style="padding: 10px 12px; border-top: 1px solid #e2e2e2; color: #5c5c5c;">—</td><td style="padding: 10px 12px; border-top: 1px solid #e2e2e2; color: #5c5c5c;">SAP Principal Bridge</td><td style="padding: 10px 12px; border-top: 1px solid #e2e2e2;"><span style="background: #e6e8ff; padding: 2px 7px;">Odoo Toolkit</span> <a href="#">+ Add approved tool</a></td></tr>
+          <tr><td style="padding: 10px 12px; border-top: 1px solid #e2e2e2;"><strong>Denied</strong></td><td style="padding: 10px 12px; border-top: 1px solid #e2e2e2; color: #5c5c5c;">Computer use (except IT)</td><td style="padding: 10px 12px; border-top: 1px solid #e2e2e2; color: #5c5c5c;">Bash</td><td style="padding: 10px 12px; border-top: 1px solid #e2e2e2;"><a href="#">+ Deny a tool</a></td></tr>
+          <tr><td style="padding: 10px 12px; border-top: 1px solid #e2e2e2;"><strong>Always needs approval</strong></td><td style="padding: 10px 12px; border-top: 1px solid #e2e2e2; color: #5c5c5c;">email.send</td><td style="padding: 10px 12px; border-top: 1px solid #e2e2e2; color: #5c5c5c;">—</td><td style="padding: 10px 12px; border-top: 1px solid #e2e2e2;"><span style="background: #e6e8ff; padding: 2px 7px;">odoo.write</span> <a href="#">+ Add</a></td></tr>
+          <tr><td style="padding: 10px 12px; border-top: 1px solid #e2e2e2;"><strong>Allowed hosts</strong></td><td style="padding: 10px 12px; border-top: 1px solid #e2e2e2; color: #5c5c5c;">*.wapsol.de, approved SaaS</td><td style="padding: 10px 12px; border-top: 1px solid #e2e2e2; color: #5c5c5c;">*.wapsol.de</td><td style="padding: 10px 12px; border-top: 1px solid #e2e2e2;"><span style="background: #e6e8ff; padding: 2px 7px;">erp.wapsol.de</span> <span style="background: #e6e8ff; padding: 2px 7px;">*.wapsol.de</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: space-between; background: #f4f4f2; padding: 12px;">
+      <span style="font-size: 13px;"><strong>Effective for members:</strong> Accept edits · Odoo Toolkit, SAP Bridge · no Bash, no computer use · odoo.write and email.send need approval · erp.wapsol.de, *.wapsol.de</span>
+      <button type="button" style="border: 0; background: #2b3bff; color: #ffffff; padding: 9px 14px; font-weight: 600;">Save policy</button>
+    </div>
+  </main>
+
+  <aside aria-label="Policy history" style="flex: 1 1 280px; max-width: 320px; min-width: 0; box-sizing: border-box; padding: 20px 16px; display: flex; flex-direction: column; gap: 12px; border-left: 1px solid #e2e2e2;">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 600;">Policy history</h2>
+    <p style="margin: 0; font-size: 12px; color: #5c5c5c; line-height: 1.45;">Tool rights are security decisions: humans only, no steward agent. Every change is a commit, also sent to the AUD VM.</p>
+    <div style="background: #ffffff; padding: 10px; display: flex; flex-direction: column; gap: 2px; font-size: 12px;"><strong>v14 · odoo.write needs approval</strong><span style="color: #5c5c5c;">Jonas Keller · 12 Nov</span></div>
+    <div style="background: #ffffff; padding: 10px; display: flex; flex-direction: column; gap: 2px; font-size: 12px;"><strong>v13 · Provision Odoo Toolkit</strong><span style="color: #5c5c5c;">Jonas Keller · 3 Oct</span></div>
+    <div style="background: #ffffff; padding: 10px; display: flex; flex-direction: column; gap: 2px; font-size: 12px;"><strong>Dept v8 · Bash denied for Finance</strong><span style="color: #5c5c5c;">Dept steward · 1 Sep · inherited</span></div>
+    <a href="#" style="font-size: 12px;">Undo last change</a>
+  </aside>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

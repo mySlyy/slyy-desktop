@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Settings: Tools</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=Martian+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2b3bff}a:hover{color:#1f2ed0}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 100%; min-height: 800px; box-sizing: border-box; background: rgba(10,10,10,0.32); padding: 28px 24px; display: flex; justify-content: center; align-items: flex-start; color: #0a0a0a; font-family: 'Hanken Grotesk', system-ui, sans-serif; font-size: 14px;">
+<div role="dialog" aria-label="Settings" style="width: 100%; max-width: 1180px; min-height: 740px; display: flex; flex-wrap: wrap; background: #ffffff; box-shadow: 0 16px 48px rgba(0,0,0,0.18); position: relative;">
+  <a href="Main.dc.html" aria-label="Close settings" style="position: absolute; top: 12px; right: 12px; padding: 8px; color: #3d3d3d; display: inline-flex;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></a>
+  <nav aria-label="Settings" style="flex: 1 1 240px; max-width: 270px; min-width: 0; box-sizing: border-box; padding: 16px 12px; display: flex; flex-direction: column; gap: 10px; background: #f9f9f7; border-right: 1px solid #e2e2e2;">
+    <label for="settings-search" style="position: absolute; left: -9999px;">Search settings</label><input id="settings-search" placeholder="Search settings…" style="border: 1px solid #a3a3a3; padding: 8px 10px; font-size: 14px; font-family: inherit;">
+    <div style="display: flex; flex-direction: column; gap: 1px;"><div style="font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #5c5c5c; padding: 4px 8px;">Preferences</div>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Appearance</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Conversation</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Shortcuts</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Live voice</a>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 1px;"><div style="font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #5c5c5c; padding: 4px 8px;">Agent</div>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Behavior</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Models</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Instructions</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Skills</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">MCP</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Subagents</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Modes</a>
+      <a href="SettingsTools.dc.html" aria-current="page" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center; background: #e2e2e2; font-weight: 600;">Tools<span style="font-family: 'Martian Mono', monospace; font-size: 9px; color: #2b3bff; font-weight: 400;">NEW</span></a>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 1px;"><div style="font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #5c5c5c; padding: 4px 8px;">Workspace</div>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Projects</a>
+      <a href="Spaces.dc.html" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Spaces<span style="font-family: 'Martian Mono', monospace; font-size: 9px; color: #2b3bff; font-weight: 400;">NEW</span></a>
+      <a href="SettingsSources.dc.html" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Sources<span style="font-family: 'Martian Mono', monospace; font-size: 9px; color: #2b3bff; font-weight: 400;">NEW</span></a>
+      <a href="SettingsSharing.dc.html" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Sharing activity<span style="font-family: 'Martian Mono', monospace; font-size: 9px; color: #2b3bff; font-weight: 400;">NEW</span></a>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 1px;"><div style="font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #5c5c5c; padding: 4px 8px;">System</div>
+      <a href="SettingsAccount.dc.html" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Account &amp; devices<span style="font-family: 'Martian Mono', monospace; font-size: 9px; color: #2b3bff; font-weight: 400;">NEW</span></a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">System</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Info</a>
+    </div>
+    <p style="margin: auto 0 0; font-size: 11px; color: #5c5c5c; line-height: 1.4; padding: 0 8px;">Cloud sync and Remote hosts are gone: your Slyy VM keeps every device in sync.</p>
+  </nav>
+
+  <main style="flex: 999 1 640px; min-width: 0; background: #ffffff; box-sizing: border-box; padding: 28px 32px; display: flex; flex-direction: column; gap: 18px;">
+    <div style="display: flex; flex-direction: column; gap: 6px; max-width: 700px;">
+      <h1 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.01em;">Tools</h1>
+      <p style="margin: 0; color: #5c5c5c; line-height: 1.5;">What your agent may use while you work in <strong style="color: #0a0a0a;">Team · Accounts Payable</strong>. Your org sets the limit; your dept and team can only narrow it. Turn off what you don't need and add optional tools.</p>
+    </div>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+      <div style="flex: 1 1 220px; background: #f4f4f2; padding: 12px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; color: #5c5c5c;">Highest permission level</span><strong>Accept edits</strong><span style="font-size: 12px; color: #5c5c5c;">Capped by Dept · Finance</span></div>
+      <div style="flex: 1 1 220px; background: #f4f4f2; padding: 12px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; color: #5c5c5c;">Always need approval</span><strong>odoo.write · email.send</strong><span style="font-size: 12px; color: #5c5c5c;">Set by Org and Team</span></div>
+      <div style="flex: 1 1 220px; background: #f4f4f2; padding: 12px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; color: #5c5c5c;">Tools on now</span><strong>{{onCount}} of {{total}}</strong><span style="font-size: 12px; color: #5c5c5c;">Changes apply to your next message</span></div>
+    </div>
+    <div style="overflow-x: auto; border: 1px solid #e2e2e2;">
+      <table style="width: 100%; min-width: 820px; border-collapse: collapse; font-size: 13px;">
+        <thead>
+          <tr style="background: #f4f4f2; text-align: left; font-size: 11px; font-family: 'Martian Mono', monospace; letter-spacing: 0.05em; text-transform: uppercase; color: #5c5c5c;">
+            <th style="padding: 9px 12px; font-weight: 500;">Tool</th><th style="padding: 9px 12px; font-weight: 500;">Kind</th><th style="padding: 9px 12px; font-weight: 500;">From</th><th style="padding: 9px 12px; font-weight: 500;">Rule</th><th style="padding: 9px 12px; font-weight: 500;">For you</th>
+          </tr>
+        </thead>
+        <tbody>
+          <sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+            <tr>
+              <td style="padding: 10px 12px; border-top: 1px solid #e2e2e2;"><strong>{{r.name}}</strong></td>
+              <td style="padding: 10px 12px; border-top: 1px solid #e2e2e2; color: #5c5c5c;">{{r.kind}}</td>
+              <td style="padding: 10px 12px; border-top: 1px solid #e2e2e2;"><span style="{{r.fromStyle}}">{{r.from}}</span></td>
+              <td style="padding: 10px 12px; border-top: 1px solid #e2e2e2; color: #3d3d3d;">{{r.rule}}</td>
+              <td style="padding: 10px 12px; border-top: 1px solid #e2e2e2;">
+                <sc-if value="{{r.locked}}" hint-placeholder-val="{{false}}"><span style="font-size: 12px; color: #5c5c5c;">{{r.lockText}}</span></sc-if>
+                <sc-if value="{{r.free}}" hint-placeholder-val="{{true}}"><button type="button" onClick="{{r.toggle}}" aria-pressed="{{r.on}}" aria-label="{{r.aria}}" style="{{r.trackStyle}}"><span aria-hidden="true" style="{{r.knobStyle}}"></span></button></sc-if>
+              </td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin: 0; font-size: 12px; color: #5c5c5c; line-height: 1.5;">Having a tool is not the same as seeing data: the Odoo Toolkit still works with your own Odoo rights, and your source choices decide whose answers its results may feed.</p>
+  </main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { on: { odoo: true, office: false, explorer: true, reviewer: false, browser: true } };
+  }
+  renderVals() {
+    const on = this.state.on;
+    const R = [
+      { id: 'files', name: 'Read, Write, Edit, Glob, Grep', kind: 'Built-in', from: 'Org', rule: 'Always on', lock: 'Always on' },
+      { id: 'bash', name: 'Bash', kind: 'Built-in', from: 'Dept · Finance', rule: 'Denied for Finance', lock: 'Off · denied by Dept', deny: true },
+      { id: 'browser', name: 'Panel browser', kind: 'Built-in', from: 'Org', rule: 'Only erp.wapsol.de, *.wapsol.de' },
+      { id: 'odoo', name: 'Odoo Toolkit', kind: 'Plugin', from: 'Team · Accounts Payable', rule: 'Provisioned; odoo.write needs approval' },
+      { id: 'mail', name: 'email.send', kind: 'Source tool', from: 'Org', rule: 'Always needs approval', lock: 'On · approval each time' },
+      { id: 'office', name: 'Office Documents', kind: 'Skill', from: 'Org', rule: 'Optional' },
+      { id: 'explorer', name: 'Explorer', kind: 'Subagent', from: 'Org', rule: 'Optional' },
+      { id: 'reviewer', name: 'Code reviewer', kind: 'Subagent', from: 'Org', rule: 'Optional' },
+      { id: 'cu', name: 'Computer use', kind: 'Built-in', from: 'Org', rule: 'IT only', lock: 'Off · IT only', deny: true }
+    ];
+    const rows = R.map((r) => {
+      const locked = !!r.lock;
+      const isOn = locked ? !r.deny : !!on[r.id];
+      return {
+        ...r, locked, free: !locked, on: isOn, lockText: r.lock || '',
+        aria: (isOn ? 'Turn off ' : 'Turn on ') + r.name,
+        toggle: () => { if (!locked) this.setState({ on: { ...on, [r.id]: !on[r.id] } }); },
+        fromStyle: 'font-size: 12px; padding: 2px 7px; ' + (r.from === 'Org' ? 'background: #0a0a0a; color: #ffffff;' : r.from.indexOf('Dept') === 0 ? 'background: #3d3d3d; color: #ffffff;' : 'background: #e6e8ff; color: #0a0a0a;'),
+        trackStyle: 'width: 38px; height: 22px; border-radius: 999px; border: 1px solid ' + (isOn ? '#2b3bff' : '#a3a3a3') + '; background: ' + (isOn ? '#2b3bff' : '#ffffff') + '; padding: 0; position: relative; cursor: pointer;',
+        knobStyle: 'position: absolute; top: 2px; left: ' + (isOn ? '18px' : '2px') + '; width: 16px; height: 16px; border-radius: 50%; background: ' + (isOn ? '#ffffff' : '#a3a3a3') + ';'
+      };
+    });
+    return { rows, onCount: rows.filter((r) => r.on).length, total: rows.length };
+  }
+}
+</script>
+</body>
+</html>

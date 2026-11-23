@@ -59,3 +59,5 @@ electron.vite.config.*.mjs
 
 .playwright-cli
 worktrees
+# Click-dummy installers
+apps/click-dummy/release/

@@ -1,0 +1,58 @@
+{
+  "name": "@pi-desktop/click-dummy",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Clickable macOS mock of the Slyy Desktop wireframes (no backend, no models)",
+  "author": "Wapsol GmbH",
+  "main": "out/main/main.cjs",
+  "scripts": {
+    "build": "node scripts/build_screens.mjs",
+    "start": "node scripts/build_screens.mjs && electron .",
+    "test": "node --test test/*.test.mjs",
+    "dist:mac": "node scripts/build_screens.mjs && node ../desktop/node_modules/electron-builder/cli.js --mac dmg --arm64 --publish never"
+  },
+  "devDependencies": {
+    "@fontsource-variable/hanken-grotesk": "5.3.0",
+    "@fontsource-variable/martian-mono": "5.3.0",
+    "electron": "^43.4.1"
+  },
+  "build": {
+    "appId": "ai.slyy.clickdummy",
+    "productName": "Slyy Click-Dummy",
+    "copyright": "Copyright © 2026 Wapsol GmbH",
+    "directories": {
+      "output": "release",
+      "buildResources": "resources"
+    },
+    "files": [
+      "out/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "electronLanguages": [
+      "en-US",
+      "de"
+    ],
+    "publish": null,
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64"
+          ]
+        }
+      ],
+      "category": "public.app-category.productivity",
+      "icon": "../desktop/build/icon.icns",
+      "hardenedRuntime": true,
+      "entitlements": "resources/entitlements.mac.plist",
+      "entitlementsInherit": "resources/entitlements.mac.plist",
+      "notarize": false
+    },
+    "dmg": {
+      "title": "Slyy Click-Dummy ${version}",
+      "artifactName": "slyy-click-dummy-${version}-mac-${arch}.${ext}"
+    }
+  }
+}

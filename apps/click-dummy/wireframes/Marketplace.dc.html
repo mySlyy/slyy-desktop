@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Plugin marketplace</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=Martian+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2b3bff}a:hover{color:#1f2ed0}
+button,input{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 100%; min-height: 800px; display: flex; flex-wrap: wrap; background: #f4f4f2; color: #0a0a0a; font-family: 'Hanken Grotesk', system-ui, sans-serif; font-size: 14px;">
+  <nav aria-label="Sidebar" style="flex: 1 1 228px; max-width: 250px; min-width: 0; box-sizing: border-box; padding: 14px 10px; display: flex; flex-direction: column; gap: 4px; border-right: 1px solid #e2e2e2;">
+    <span style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 17px; letter-spacing: -0.025em; padding: 0 6px 12px;"><span style="width: 13px; height: 13px; border-radius: 50%; background: #2b3bff; display: inline-block;"></span>slyy</span>
+    <a href="Main.dc.html" style="padding: 7px 8px; color: #0a0a0a; text-decoration: none;">New task</a>
+    <a href="Scheduled.dc.html" style="padding: 7px 8px; color: #0a0a0a; text-decoration: none;">Scheduled</a>
+    <a href="Marketplace.dc.html" aria-current="page" style="padding: 7px 8px; color: #0a0a0a; text-decoration: none; background: #e2e2e2; font-weight: 600;">Plugin marketplace</a>
+  </nav>
+  <main style="flex: 999 1 640px; min-width: 0; background: #ffffff; box-sizing: border-box; padding: 28px 32px; display: flex; flex-direction: column; gap: 18px;">
+    <div style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: flex-end;">
+      <div style="display: flex; flex-direction: column; gap: 6px; max-width: 640px;">
+        <h1 style="margin: 0; font-size: 24px; font-weight: 600;">Plugin marketplace</h1>
+        <p style="margin: 0; color: #5c5c5c; line-height: 1.5;">Plugins, skills and MCP servers approved by your organisation. Plugins that connect to data show up as sources and follow your source choices.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px;"><label for="mq" style="font-size: 12px; color: #5c5c5c;">Search</label><input id="mq" placeholder="Search plugins" style="border: 1px solid #a3a3a3; padding: 8px 10px; width: 240px;"></div>
+    </div>
+    <div role="tablist" aria-label="Catalog" style="display: flex; gap: 0; border-bottom: 1px solid #e2e2e2; flex-wrap: wrap;">
+      <button type="button" role="tab" aria-selected="true" style="border: 0; border-bottom: 2px solid #2b3bff; background: transparent; padding: 9px 14px; font-weight: 600;">Plugins</button>
+      <button type="button" role="tab" aria-selected="false" style="border: 0; background: transparent; padding: 9px 14px; color: #5c5c5c;">Skills</button>
+      <button type="button" role="tab" aria-selected="false" style="border: 0; background: transparent; padding: 9px 14px; color: #5c5c5c;">MCP servers</button>
+      <button type="button" role="tab" aria-selected="false" style="border: 0; background: transparent; padding: 9px 14px; color: #5c5c5c;">Installed · 6</button>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px;">
+      <div style="border: 1px solid #e2e2e2; padding: 14px; display: flex; flex-direction: column; gap: 8px;"><div style="display: flex; justify-content: space-between; gap: 8px;"><strong>Odoo Toolkit</strong><span style="font-size: 11px; padding: 2px 6px; background: #e6e8ff;">Source</span></div><span style="font-size: 13px; color: #5c5c5c;">Query and update Odoo records with your own Odoo rights.</span><span style="font-size: 12px; color: #5c5c5c;">Wapsol · approved by IT</span><button type="button" style="align-self: flex-start; border: 1px solid #e2e2e2; background: #ffffff; padding: 6px 12px;">Installed</button></div>
+      <div style="border: 1px solid #e2e2e2; padding: 14px; display: flex; flex-direction: column; gap: 8px;"><div style="display: flex; justify-content: space-between; gap: 8px;"><strong>SAP Principal Bridge</strong><span style="font-size: 11px; padding: 2px 6px; background: #e6e8ff;">Source</span></div><span style="font-size: 13px; color: #5c5c5c;">SAP S/4 access through SSO principal propagation.</span><span style="font-size: 12px; color: #5c5c5c;">Wapsol · approved by IT</span><button type="button" style="align-self: flex-start; border: 0; background: #2b3bff; color: #ffffff; padding: 7px 12px; font-weight: 600;">Install</button></div>
+      <div style="border: 1px solid #e2e2e2; padding: 14px; display: flex; flex-direction: column; gap: 8px;"><div style="display: flex; justify-content: space-between; gap: 8px;"><strong>Signature (Onwyn Sign)</strong><span style="font-size: 11px; padding: 2px 6px; background: #f4f4f2;">Tool</span></div><span style="font-size: 13px; color: #5c5c5c;">Sign, seal and check documents from the chat.</span><span style="font-size: 12px; color: #5c5c5c;">Wapsol</span><button type="button" style="align-self: flex-start; border: 0; background: #2b3bff; color: #ffffff; padding: 7px 12px; font-weight: 600;">Install</button></div>
+      <div style="border: 1px solid #e2e2e2; padding: 14px; display: flex; flex-direction: column; gap: 8px;"><div style="display: flex; justify-content: space-between; gap: 8px;"><strong>LinkedIn Contact Leads</strong><span style="font-size: 11px; padding: 2px 6px; background: #f4f4f2;">Subagent</span></div><span style="font-size: 13px; color: #5c5c5c;">File-side prep for LinkedIn work; browsing stays in the panel.</span><span style="font-size: 12px; color: #5c5c5c;">Marketing team</span><button type="button" style="align-self: flex-start; border: 1px solid #e2e2e2; background: #ffffff; padding: 6px 12px;">Installed</button></div>
+      <div style="border: 1px solid #e2e2e2; padding: 14px; display: flex; flex-direction: column; gap: 8px;"><div style="display: flex; justify-content: space-between; gap: 8px;"><strong>Office Documents</strong><span style="font-size: 11px; padding: 2px 6px; background: #f4f4f2;">Skill</span></div><span style="font-size: 13px; color: #5c5c5c;">Create and edit Word, Excel and PowerPoint files.</span><span style="font-size: 12px; color: #5c5c5c;">Wapsol</span><button type="button" style="align-self: flex-start; border: 0; background: #2b3bff; color: #ffffff; padding: 7px 12px; font-weight: 600;">Install</button></div>
+      <div style="border: 1px dashed #a3a3a3; padding: 14px; display: flex; flex-direction: column; gap: 8px; color: #5c5c5c;"><strong style="color: #0a0a0a;">Development plugin</strong><span style="font-size: 13px;">Load a plugin from a local folder, as in PI-Desktop today.</span><button type="button" style="align-self: flex-start; border: 1px solid #e2e2e2; background: #ffffff; padding: 6px 12px;">Load folder…</button></div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

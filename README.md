@@ -49,6 +49,9 @@ Validate with `pnpm typecheck`, `pnpm lint` and `pnpm test`.
 Architecture, specs and ADRs live under [`docs/`](docs/); contributor rules are
 in [`AGENTS.md`](AGENTS.md).
 
+A clickable macOS mock of the design wireframes lives in `apps/click-dummy`
+([docs](docs/project/click-dummy.md)): `pnpm --filter @pi-desktop/click-dummy dist:mac`.
+
 ## Origin and license
 
 Slyy is based on [PI-Desktop](https://github.com/vastsa/PI-Desktop) and its Pi

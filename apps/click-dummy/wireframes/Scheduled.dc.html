@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scheduled tasks</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=Martian+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2b3bff}a:hover{color:#1f2ed0}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 100%; min-height: 800px; display: flex; flex-wrap: wrap; background: #f4f4f2; color: #0a0a0a; font-family: 'Hanken Grotesk', system-ui, sans-serif; font-size: 14px;">
+  <nav aria-label="Sidebar" style="flex: 1 1 228px; max-width: 250px; min-width: 0; box-sizing: border-box; padding: 14px 10px; display: flex; flex-direction: column; gap: 4px; border-right: 1px solid #e2e2e2;">
+    <span style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 17px; letter-spacing: -0.025em; padding: 0 6px 12px;"><span style="width: 13px; height: 13px; border-radius: 50%; background: #2b3bff; display: inline-block;"></span>slyy</span>
+    <a href="Main.dc.html" style="padding: 7px 8px; color: #0a0a0a; text-decoration: none;">New task</a>
+    <a href="Scheduled.dc.html" aria-current="page" style="padding: 7px 8px; color: #0a0a0a; text-decoration: none; background: #e2e2e2; font-weight: 600;">Scheduled</a>
+    <a href="Marketplace.dc.html" style="padding: 7px 8px; color: #0a0a0a; text-decoration: none;">Plugin marketplace</a>
+  </nav>
+  <main style="flex: 999 1 640px; min-width: 0; background: #ffffff; box-sizing: border-box; padding: 28px 32px; display: flex; flex-direction: column; gap: 20px;">
+    <div style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: flex-end;">
+      <div style="display: flex; flex-direction: column; gap: 6px; max-width: 640px;">
+        <h1 style="margin: 0; font-size: 24px; font-weight: 600;">Scheduled</h1>
+        <p style="margin: 0; color: #5c5c5c; line-height: 1.5;">Recurring tasks run in your own Slyy VM, also when your computer is off. Each task keeps its own source selection.</p>
+      </div>
+      <button type="button" style="border: 0; background: #0a0a0a; color: #ffffff; padding: 10px 14px; font-weight: 600; cursor: pointer;">+ New scheduled task</button>
+    </div>
+    <div style="overflow-x: auto; border: 1px solid #e2e2e2;">
+      <table style="width: 100%; min-width: 820px; border-collapse: collapse; font-size: 13px;">
+        <thead>
+          <tr style="background: #f4f4f2; text-align: left; font-size: 11px; font-family: 'Martian Mono', monospace; letter-spacing: 0.05em; text-transform: uppercase; color: #5c5c5c;">
+            <th style="padding: 9px 12px; font-weight: 500;">Task</th><th style="padding: 9px 12px; font-weight: 500;">When</th><th style="padding: 9px 12px; font-weight: 500;">Sources</th><th style="padding: 9px 12px; font-weight: 500;">Last run</th><th style="padding: 9px 12px; font-weight: 500;">Next</th><th style="padding: 9px 12px; font-weight: 500;">On</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding: 12px; border-top: 1px solid #e2e2e2;"><strong>Overdue invoices digest</strong><div style="color: #5c5c5c;">Accounts Payable · Agent · Accept edits</div></td><td style="padding: 12px; border-top: 1px solid #e2e2e2;">Weekdays 07:30</td><td style="padding: 12px; border-top: 1px solid #e2e2e2;">Odoo, Mailbox <span style="font-weight: 600;">(only me)</span></td><td style="padding: 12px; border-top: 1px solid #e2e2e2;">Today 07:30 · done</td><td style="padding: 12px; border-top: 1px solid #e2e2e2;">Mon 07:30</td><td style="padding: 12px; border-top: 1px solid #e2e2e2;"><span aria-label="On" style="display: inline-block; width: 38px; height: 22px; border-radius: 999px; background: #2b3bff; position: relative;"><span style="position: absolute; top: 3px; left: 19px; width: 16px; height: 16px; border-radius: 50%; background: #ffffff;"></span></span></td></tr>
+          <tr><td style="padding: 12px; border-top: 1px solid #e2e2e2;"><strong>Month-end close checklist</strong><div style="color: #5c5c5c;">Finance · Mode: Month-end close</div></td><td style="padding: 12px; border-top: 1px solid #e2e2e2;">Last workday, 16:00</td><td style="padding: 12px; border-top: 1px solid #e2e2e2;">Odoo, SAP, Dept · Finance</td><td style="padding: 12px; border-top: 1px solid #e2e2e2;">31 Oct · waiting for approval</td><td style="padding: 12px; border-top: 1px solid #e2e2e2;">28 Nov 16:00</td><td style="padding: 12px; border-top: 1px solid #e2e2e2;"><span aria-label="On" style="display: inline-block; width: 38px; height: 22px; border-radius: 999px; background: #2b3bff; position: relative;"><span style="position: absolute; top: 3px; left: 19px; width: 16px; height: 16px; border-radius: 50%; background: #ffffff;"></span></span></td></tr>
+          <tr><td style="padding: 12px; border-top: 1px solid #e2e2e2;"><strong>LinkedIn engagement</strong><div style="color: #5c5c5c;">Marketing · Goal</div></td><td style="padding: 12px; border-top: 1px solid #e2e2e2;">Daily 09:00</td><td style="padding: 12px; border-top: 1px solid #e2e2e2;">Web research <span style="font-weight: 600;">(only me)</span></td><td style="padding: 12px; border-top: 1px solid #e2e2e2;">Yesterday · done</td><td style="padding: 12px; border-top: 1px solid #e2e2e2;">—</td><td style="padding: 12px; border-top: 1px solid #e2e2e2;"><span aria-label="Off" style="display: inline-block; width: 38px; height: 22px; border-radius: 999px; border: 1px solid #a3a3a3; box-sizing: border-box; position: relative;"><span style="position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #a3a3a3;"></span></span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin: 0; font-size: 12px; color: #5c5c5c;">A run that needs an approval sends a push to your phone. Missed runs are skipped, as today.</p>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

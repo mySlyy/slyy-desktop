@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Slyy chat with work panel and source selection</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=Martian+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2b3bff}a:hover{color:#1f2ed0}
+button,textarea{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 100%; min-height: 800px; display: flex; flex-wrap: wrap; background: #f4f4f2; color: #0a0a0a; font-family: 'Hanken Grotesk', system-ui, sans-serif; font-size: 14px;">
+
+  <nav aria-label="Sidebar" style="flex: 1 1 228px; max-width: 250px; min-width: 0; box-sizing: border-box; padding: 14px 10px; display: flex; flex-direction: column; gap: 14px; border-right: 1px solid #e2e2e2;">
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 6px;">
+      <span style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 17px; letter-spacing: -0.025em;"><span style="width: 13px; height: 13px; border-radius: 50%; background: #2b3bff; display: inline-block;"></span>slyy</span>
+      <button type="button" aria-label="Toggle sidebar" style="border: 0; background: transparent; padding: 6px; cursor: pointer; color: #3d3d3d;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16"/><path d="M9 4v16"/></svg></button>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 1px;">
+      <a href="#" style="display: flex; align-items: center; gap: 10px; padding: 7px 8px; color: #0a0a0a; text-decoration: none;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16"/><path d="M12 8v8M8 12h8"/></svg>New task</a>
+      <a href="Scheduled.dc.html" style="display: flex; align-items: center; gap: 10px; padding: 7px 8px; color: #0a0a0a; text-decoration: none;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>Scheduled</a>
+      <a href="Marketplace.dc.html" style="display: flex; align-items: center; gap: 10px; padding: 7px 8px; color: #0a0a0a; text-decoration: none;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 3v5M15 3v5M6 8h12v4a6 6 0 0 1-12 0zM12 18v3"/></svg>Plugin marketplace</a>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 1px;">
+      <div style="font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #5c5c5c; padding: 0 8px 4px;">Recent</div>
+      <a href="#" style="padding: 6px 8px; background: #e2e2e2; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; gap: 8px; font-weight: 600;"><span>Overdue invoices</span><span style="font-weight: 400; color: #5c5c5c; font-size: 12px;">Accounts Payable</span></a>
+      <a href="#" style="padding: 6px 8px; color: #3d3d3d; text-decoration: none; display: flex; justify-content: space-between; gap: 8px;"><span>Q3 cash forecast</span><span style="color: #5c5c5c; font-size: 12px;">Finance</span></a>
+      <a href="#" style="padding: 6px 8px; color: #3d3d3d; text-decoration: none; display: flex; justify-content: space-between; gap: 8px;"><span>LinkedIn</span><span style="color: #5c5c5c; font-size: 12px;">Marketing</span></a>
+      <a href="#" style="padding: 6px 8px; color: #5c5c5c; text-decoration: none; font-size: 13px;">Load 6 more…</a>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 1px;">
+      <div style="font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #5c5c5c; padding: 0 8px 4px;">Projects</div>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none;">⌄ Accounts Payable</a>
+      <a href="#" style="padding: 6px 8px 6px 28px; color: #0a0a0a; text-decoration: none; background: #e2e2e2;">Overdue invoices</a>
+      <a href="#" style="padding: 6px 8px 6px 28px; color: #3d3d3d; text-decoration: none;">Supplier onboarding</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none;">› Finance</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none;">› Marketing</a>
+    </div>
+    <div style="margin-top: auto; position: relative; display: flex; flex-direction: column;">
+      <sc-if value="{{spaceMenu}}" hint-placeholder-val="{{false}}">
+        <div role="menu" aria-label="Choose the space you work in" style="position: absolute; bottom: 100%; left: 0; right: 0; margin-bottom: 6px; background: #ffffff; border: 1px solid #e2e2e2; box-shadow: 0 8px 24px rgba(0,0,0,0.12); padding: 6px; display: flex; flex-direction: column; gap: 2px; z-index: 3;">
+          <div style="font-size: 12px; color: #5c5c5c; padding: 4px 6px; line-height: 1.4;">Work in: sets instructions, memory and default sources for new chats</div>
+          <sc-for list="{{spaces}}" as="sp" hint-placeholder-count="4">
+            <button type="button" role="menuitemradio" aria-checked="{{sp.sel}}" onClick="{{sp.pick}}" style="{{sp.style}}"><span>{{sp.name}}</span><span style="{{sp.badgeStyle}}">{{sp.badge}}</span></button>
+          </sc-for>
+          <a href="Spaces.dc.html" style="padding: 8px 6px; font-size: 13px; border-top: 1px solid #e2e2e2;">Browse spaces</a>
+        </div>
+      </sc-if>
+      <button type="button" onClick="{{toggleSpaceMenu}}" aria-expanded="{{spaceMenu}}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; border: 1px solid #e2e2e2; background: #ffffff; padding: 8px 10px; cursor: pointer; text-align: left;">
+        <span style="display: flex; flex-direction: column; min-width: 0;"><span style="font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: #5c5c5c;">Working in</span><span style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{activeSpace}}</span></span>
+        <span style="display: flex; align-items: center; gap: 6px; flex: 0 0 auto;"><span style="{{newBadgeStyle}}">{{newBadge}}</span><span aria-hidden="true">⌃</span></span>
+      </button>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 8px;">
+      <a href="SettingsSources.dc.html" style="display: flex; align-items: center; gap: 8px; color: #0a0a0a; text-decoration: none; padding: 6px 0;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Settings</a>
+      <span style="font-size: 12px; color: #5c5c5c;">v1.0.0</span>
+    </div>
+  </nav>
+
+  <main style="flex: 999 1 520px; min-width: 0; display: flex; flex-direction: column; background: #ffffff; position: relative;">
+    <header style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 20px; flex-wrap: wrap;">
+      <div style="display: flex; gap: 8px; align-items: center; color: #5c5c5c; font-size: 13px; flex-wrap: wrap;"><span style="background: #e6e8ff; color: #0a0a0a; padding: 2px 7px;">{{activeSpace}}</span><span>/</span><span>Accounts Payable</span><span>/</span><strong style="color: #0a0a0a;">Overdue invoices</strong></div>
+      <div style="display: flex; gap: 2px; background: #f4f4f2;">
+        <button type="button" aria-label="New chat" style="border: 0; background: transparent; padding: 8px; cursor: pointer;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7v6M9 10h6"/></svg></button>
+        <button type="button" aria-label="Search" style="border: 0; background: transparent; padding: 8px; cursor: pointer;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg></button>
+      </div>
+    </header>
+
+    <div style="flex: 1 1 auto; display: flex; gap: 12px; padding: 8px 20px 0;">
+      <div aria-hidden="true" style="flex: 0 0 10px; display: flex; flex-direction: column; gap: 7px; padding-top: 40px;">
+        <span style="height: 1px; background: #a3a3a3;"></span><span style="height: 1px; background: #a3a3a3;"></span><span style="height: 1px; background: #a3a3a3;"></span><span style="height: 1px; background: #a3a3a3;"></span><span style="height: 1px; background: #a3a3a3;"></span><span style="height: 2px; background: #0a0a0a;"></span>
+      </div>
+      <div style="flex: 1 1 auto; min-width: 0; max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; padding-bottom: 16px;">
+        <div style="align-self: flex-end; max-width: 80%; background: #f4f4f2; padding: 12px 14px; line-height: 1.5;">Which supplier invoices are overdue, and has anyone written to me about them?</div>
+        <a href="AnswerSources.dc.html" style="display: flex; gap: 8px; align-items: center; color: #5c5c5c; text-decoration: none; font-size: 13px; border-bottom: 1px solid #e2e2e2; padding-bottom: 10px;">Finished · 19s · 2 tools · 6 sources <span aria-hidden="true">›</span></a>
+        <p style="margin: 0; line-height: 1.55;">Four supplier invoices are overdue, totalling 18,420 € <sup><a href="AnswerSources.dc.html">1</a></sup>. Two suppliers have emailed you about them <sup><a href="AnswerSources.dc.html">2</a></sup>.</p>
+        <div style="overflow-x: auto; border: 1px solid #e2e2e2;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <thead><tr style="background: #f4f4f2; text-align: left;"><th style="padding: 7px 10px; font-weight: 600;">Supplier</th><th style="padding: 7px 10px; font-weight: 600; text-align: right;">Amount</th><th style="padding: 7px 10px; font-weight: 600;">Due</th><th style="padding: 7px 10px; font-weight: 600;">Email</th></tr></thead>
+            <tbody>
+              <tr><td style="padding: 7px 10px; border-top: 1px solid #e2e2e2;">Brandt Logistik</td><td style="padding: 7px 10px; border-top: 1px solid #e2e2e2; text-align: right;">7,950 €</td><td style="padding: 7px 10px; border-top: 1px solid #e2e2e2;">31 Oct</td><td style="padding: 7px 10px; border-top: 1px solid #e2e2e2;">Reminder, 14 Nov</td></tr>
+              <tr><td style="padding: 7px 10px; border-top: 1px solid #e2e2e2;">Kessler GmbH</td><td style="padding: 7px 10px; border-top: 1px solid #e2e2e2; text-align: right;">5,120 €</td><td style="padding: 7px 10px; border-top: 1px solid #e2e2e2;">5 Nov</td><td style="padding: 7px 10px; border-top: 1px solid #e2e2e2;">Query, 18 Nov</td></tr>
+              <tr><td style="padding: 7px 10px; border-top: 1px solid #e2e2e2;">Nordpack AG</td><td style="padding: 7px 10px; border-top: 1px solid #e2e2e2; text-align: right;">3,610 €</td><td style="padding: 7px 10px; border-top: 1px solid #e2e2e2;">8 Nov</td><td style="padding: 7px 10px; border-top: 1px solid #e2e2e2;">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12px;">
+          <span style="color: #5c5c5c;">Answered from</span>
+          <sc-for list="{{usedChips}}" as="c" hint-placeholder-count="4">
+            <a href="AnswerSources.dc.html" style="{{c.style}}">{{c.label}}</a>
+          </sc-for>
+        </div>
+        <sc-if value="{{stale}}" hint-placeholder-val="{{false}}">
+          <div role="status" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; padding: 10px 12px; background: #e6e8ff; font-size: 13px;">
+            <span>{{staleText}}</span>
+            <button type="button" onClick="{{reanswer}}" style="border: 0; background: #2b3bff; color: #ffffff; padding: 8px 12px; font-weight: 600; cursor: pointer;">Answer again with current sources</button>
+          </div>
+        </sc-if>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap; font-size: 12px; color: #5c5c5c;">
+          <span style="background: #f4f4f2; padding: 3px 8px;">mistral/glm-5.3-flash</span>
+          <span style="background: #f4f4f2; padding: 3px 8px;">34 tokens/s · 41.2K</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding: 0 20px 18px; position: relative;">
+      <sc-if value="{{srcPop}}" hint-placeholder-val="{{false}}">
+        <div role="dialog" aria-label="Sources for this chat" style="position: absolute; bottom: 118px; left: 20px; right: 20px; max-width: 380px; background: #ffffff; border: 1px solid #e2e2e2; box-shadow: 0 8px 28px rgba(0,0,0,0.12); padding: 10px; display: flex; flex-direction: column; gap: 2px; z-index: 2;">
+          <div style="font-size: 12px; color: #5c5c5c; padding: 2px 6px 6px;">Sources for this chat · changes apply to the next message</div>
+          <sc-for list="{{flat}}" as="s" hint-placeholder-count="6">
+            <button type="button" onClick="{{s.toggle}}" role="menuitemcheckbox" aria-checked="{{s.on}}" style="display: flex; align-items: center; gap: 10px; border: 0; background: transparent; padding: 7px 6px; cursor: pointer; text-align: left;">
+              <span aria-hidden="true" style="{{s.boxStyle}}">{{s.tick}}</span>
+              <span style="flex: 1 1 auto;">{{s.name}}</span>
+              <span style="{{s.scopeStyle}}">{{s.scope}}</span>
+            </button>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="max-width: 700px; margin: 0 auto; border: 1px solid #e2e2e2; background: #ffffff; box-shadow: 0 3px 8px rgba(0,0,0,0.04);">
+        <label for="composer" style="position: absolute; left: -9999px;">Message</label>
+        <textarea id="composer" rows="2" placeholder="Ask Slyy to help with anything" style="width: 100%; box-sizing: border-box; border: 0; resize: none; padding: 14px; font-size: 15px; outline-offset: -2px;"></textarea>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: space-between; padding: 6px 8px 8px;">
+          <div style="display: flex; flex-wrap: wrap; gap: 2px; align-items: center;">
+            <button type="button" aria-label="Attach" style="border: 0; background: transparent; padding: 8px; cursor: pointer;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+            <a href="ComposerMenus.dc.html" style="display: inline-flex; gap: 6px; align-items: center; padding: 7px 8px; color: #0a0a0a; text-decoration: none;"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/></svg>Agent ⌄</a>
+            <a href="ComposerMenus.dc.html" style="padding: 7px 8px; color: #0a0a0a; text-decoration: none;">Accept edits ⌄</a>
+            <button type="button" onClick="{{toggleSrcPop}}" aria-expanded="{{srcPop}}" style="border: 1px solid #2b3bff; background: #e6e8ff; padding: 6px 9px; cursor: pointer; font-size: 13px; color: #0a0a0a;">{{srcButton}}</button>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <span style="font-size: 13px; display: inline-flex; gap: 5px; align-items: center;"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#e2e2e2" stroke-width="3"/><path d="M12 3a9 9 0 0 1 6 2.3" fill="none" stroke="#0a0a0a" stroke-width="3"/></svg>17%</span>
+            <a href="ComposerMenus.dc.html" style="font-size: 13px; color: #0a0a0a; text-decoration: none;">mistral/glm-5.3-fla… ⌄</a>
+            <button type="button" aria-label="Send" style="width: 32px; height: 32px; border: 0; border-radius: 50%; background: #2b3bff; color: #ffffff; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <aside aria-label="Work panel" style="flex: 1 1 380px; max-width: 460px; min-width: 0; display: flex; flex-direction: column; border-left: 1px solid #e2e2e2; background: #ffffff; position: relative;">
+    <div role="tablist" aria-label="Work panel tabs" style="display: flex; align-items: center; gap: 2px; padding: 8px; border-bottom: 1px solid #e2e2e2; flex-wrap: wrap;">
+      <sc-for list="{{tabs}}" as="t" hint-placeholder-count="4">
+        <button type="button" role="tab" aria-selected="{{t.sel}}" onClick="{{t.pick}}" style="{{t.style}}">{{t.label}}</button>
+      </sc-for>
+      <button type="button" aria-label="New tab" onClick="{{toggleMenu}}" aria-expanded="{{menu}}" style="border: 0; background: transparent; padding: 6px 8px; cursor: pointer; font-size: 16px;">+</button>
+    </div>
+    <sc-if value="{{menu}}" hint-placeholder-val="{{false}}">
+      <div role="menu" aria-label="New tab" style="position: absolute; top: 46px; right: 8px; width: 220px; background: #f9f9f7; border: 1px solid #e2e2e2; box-shadow: 0 8px 24px rgba(0,0,0,0.1); padding: 8px; display: flex; flex-direction: column; gap: 2px; z-index: 2;">
+        <div style="font-size: 12px; color: #5c5c5c; padding: 4px 8px;">New</div>
+        <sc-for list="{{menuItems}}" as="m" hint-placeholder-count="4">
+          <button type="button" role="menuitem" onClick="{{m.pick}}" style="border: 0; background: transparent; text-align: left; padding: 8px; cursor: pointer; display: flex; justify-content: space-between;">{{m.label}}<span style="{{m.newStyle}}">NEW</span></button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{tabSources}}" hint-placeholder-val="{{true}}">
+      <div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; overflow: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;"><h2 style="margin: 0; font-size: 15px; font-weight: 600;">Source Selection</h2><a href="SettingsSources.dc.html" style="font-size: 12px;">Manage</a></div>
+        <p style="margin: 0; font-size: 12px; color: #5c5c5c;">{{contextSummary}} · the dot marks what the last answer used</p>
+        <sc-for list="{{groups}}" as="g" hint-placeholder-count="3">
+          <div style="display: flex; flex-direction: column;">
+            <div style="font-family: 'Martian Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #5c5c5c; padding: 6px 0 2px;">{{g.title}}</div>
+            <sc-for list="{{g.items}}" as="s" hint-placeholder-count="3">
+              <div style="display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid #e2e2e2;">
+                <span aria-hidden="true" style="{{s.dotStyle}}"></span>
+                <div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column;"><span style="font-weight: 500;">{{s.name}}</span><span style="{{s.scopeStyle}}">{{s.scope}}</span></div>
+                <button type="button" onClick="{{s.toggle}}" aria-pressed="{{s.on}}" aria-label="{{s.aria}}" style="{{s.trackStyle}}"><span aria-hidden="true" style="{{s.knobStyle}}"></span></button>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{tabOdoo}}" hint-placeholder-val="{{false}}">
+      <div style="display: flex; flex-direction: column; flex: 1 1 auto;">
+        <div style="display: flex; gap: 8px; align-items: center; padding: 8px 10px; border-bottom: 1px solid #e2e2e2; font-size: 13px; color: #5c5c5c;"><span>‹ › ↻</span><span style="flex: 1 1 auto; background: #f4f4f2; padding: 6px 10px; color: #0a0a0a;">https://erp.wapsol.de/odoo</span></div>
+        <div style="flex: 1 1 auto; background: #f4f4f2; padding: 24px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; align-content: start;">
+          <sc-for list="{{odooApps}}" as="a" hint-placeholder-count="12">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 11px; color: #3d3d3d;"><span aria-hidden="true" style="width: 44px; height: 44px; background: #ffffff; border: 1px solid #e2e2e2;"></span>{{a}}</div>
+          </sc-for>
+        </div>
+        <p style="margin: 0; padding: 8px 12px; font-size: 12px; color: #5c5c5c;">Panel browser runs in your own VM and logs in as you, like every source.</p>
+      </div>
+    </sc-if>
+    <sc-if value="{{tabReview}}" hint-placeholder-val="{{false}}">
+      <div style="padding: 16px; display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+        <strong>Review · 2 files changed</strong>
+        <div style="font-family: 'Martian Mono', monospace; font-size: 12px; background: #f4f4f2; padding: 10px; line-height: 1.7;">reports/overdue.md <span style="color: #1f2ed0;">+18</span><br>memory.jsonl <span style="color: #1f2ed0;">+2</span></div>
+        <div style="height: 220px; border: 1px dashed #a3a3a3; display: flex; align-items: center; justify-content: center; color: #5c5c5c;">Diff view</div>
+      </div>
+    </sc-if>
+    <sc-if value="{{tabFiles}}" hint-placeholder-val="{{false}}">
+      <div style="padding: 16px; display: flex; flex-direction: column; gap: 4px; font-size: 13px;">
+        <strong style="padding-bottom: 6px;">Files · workspace</strong>
+        <span>▸ reports</span><span>▸ exports</span><span style="padding-left: 16px;">overdue-2026-11.csv</span><span>memory.jsonl</span><span>AGENTS.md</span>
+      </div>
+    </sc-if>
+  </aside>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      tab: 'sources', menu: false, srcPop: false,
+      space: 'team', spaceMenu: false, newBy: { mine: 0, team: 1, dept: 2, org: 0 },
+      extraTabs: [],
+      on: { mail: true, web: true, onedrive: false, odoo: true, sap: false, sharepoint: true, myspace: true, team: true, dept: true, org: true },
+      answeredWith: { mail: true, web: false, onedrive: false, odoo: true, sap: false, sharepoint: false, myspace: false, team: true, dept: false, org: true }
+    };
+  }
+  renderVals() {
+    const S = [
+      { g: 'Personal sources', id: 'mail', name: 'Mailbox (IMAP)', scope: 'Only me', items: 3, kind: 'me' },
+      { g: 'Personal sources', id: 'web', name: 'Web research', scope: 'Only me', items: 0, kind: 'me' },
+      { g: 'Personal sources', id: 'onedrive', name: 'OneDrive', scope: 'After filtering', items: 0, kind: 'filter' },
+      { g: 'Company sources', id: 'odoo', name: 'Odoo · Accounting', scope: 'Shareable', items: 12, kind: 'share' },
+      { g: 'Company sources', id: 'sap', name: 'SAP S/4 · FI', scope: 'Shareable', items: 0, kind: 'share' },
+      { g: 'Company sources', id: 'sharepoint', name: 'SharePoint · Finance', scope: 'Shareable', items: 0, kind: 'share' },
+      { g: 'Spaces', id: 'myspace', name: 'My space', scope: 'Private', items: 0, kind: 'me' },
+      { g: 'Spaces', id: 'team', name: 'Team · Accounts Payable', scope: 'Instructions, memory', items: 2, kind: 'space' },
+      { g: 'Spaces', id: 'dept', name: 'Dept · Finance', scope: 'Instructions', items: 0, kind: 'space' },
+      { g: 'Spaces', id: 'org', name: 'Org · Wapsol', scope: 'Mandatory · always on', items: 1, kind: 'mandatory' }
+    ];
+    const st = this.state, on = st.on, used = st.answeredWith;
+    const toggle = (id) => () => { if (id !== 'org') this.setState({ on: { ...on, [id]: !on[id] } }); };
+    const scopeStyle = (k) => 'font-size: 11px; color: ' + (k === 'me' ? '#0a0a0a; font-weight: 600' : k === 'filter' ? '#1f2ed0' : '#5c5c5c') + ';';
+    const groups = [];
+    S.forEach((s) => {
+      let grp = groups.find((x) => x.title === s.g);
+      if (!grp) { grp = { title: s.g, items: [] }; groups.push(grp); }
+      const isOn = !!on[s.id], locked = s.id === 'org';
+      grp.items.push({
+        name: s.name, scope: s.scope, on: isOn, toggle: toggle(s.id),
+        aria: (isOn ? 'Turn off ' : 'Turn on ') + s.name,
+        scopeStyle: scopeStyle(s.kind),
+        dotStyle: 'width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; background: ' + (used[s.id] ? '#2b3bff' : 'transparent') + '; border: 1px solid ' + (used[s.id] ? '#2b3bff' : '#e2e2e2') + ';',
+        trackStyle: 'flex: 0 0 auto; width: 38px; height: 22px; border-radius: 999px; border: 1px solid ' + (isOn ? '#2b3bff' : '#a3a3a3') + '; background: ' + (isOn ? '#2b3bff' : '#ffffff') + '; padding: 0; position: relative; cursor: ' + (locked ? 'not-allowed' : 'pointer') + '; opacity: ' + (locked ? '0.55' : '1') + ';',
+        knobStyle: 'position: absolute; top: 2px; left: ' + (isOn ? '18px' : '2px') + '; width: 16px; height: 16px; border-radius: 50%; background: ' + (isOn ? '#ffffff' : '#a3a3a3') + ';'
+      });
+    });
+    const flat = S.filter((s) => s.g !== 'Spaces').map((s) => ({
+      name: s.name, scope: s.scope, on: !!on[s.id], toggle: toggle(s.id), tick: on[s.id] ? '✓' : '',
+      scopeStyle: scopeStyle(s.kind),
+      boxStyle: 'width: 16px; height: 16px; border: 1px solid ' + (on[s.id] ? '#2b3bff' : '#a3a3a3') + '; background: ' + (on[s.id] ? '#2b3bff' : '#ffffff') + '; color: #ffffff; font-size: 11px; display: inline-flex; align-items: center; justify-content: center;'
+    }));
+    const activeCount = S.filter((s) => on[s.id]).length;
+    const activeItems = S.filter((s) => on[s.id]).reduce((n, s) => n + s.items, 0);
+    const removed = S.filter((s) => used[s.id] && !on[s.id]);
+    const chipBase = 'display: inline-flex; padding: 4px 8px; text-decoration: none; font-size: 12px;';
+    const usedChips = S.filter((s) => used[s.id]).map((s) => ({
+      label: s.name.split(' · ')[0] + (s.items ? ' · ' + s.items : '') + (s.kind === 'me' ? ' · only me' : '') + (!on[s.id] ? ' · now off' : ''),
+      style: chipBase + (on[s.id] ? 'background: #e6e8ff; color: #0a0a0a;' : 'background: #ffffff; color: #5c5c5c; border: 1px dashed #a3a3a3; text-decoration: line-through;')
+    }));
+    const SP = [['mine', 'My space'], ['team', 'Team · Accounts Payable'], ['dept', 'Dept · Finance'], ['org', 'Org · Wapsol']];
+    const newTotal = Object.values(st.newBy).reduce((a, b) => a + b, 0);
+    const spaceVals = {
+      spaceMenu: st.spaceMenu,
+      toggleSpaceMenu: () => this.setState({ spaceMenu: !st.spaceMenu }),
+      activeSpace: SP.find(([id]) => id === st.space)[1],
+      newBadge: newTotal ? newTotal + ' new' : '',
+      newBadgeStyle: newTotal ? 'font-size: 11px; background: #2b3bff; color: #ffffff; padding: 2px 6px;' : 'display: none;',
+      spaces: SP.map(([id, name]) => ({
+        name, sel: st.space === id,
+        badge: st.newBy[id] ? st.newBy[id] + ' new' : '',
+        badgeStyle: st.newBy[id] ? 'font-size: 11px; color: #2b3bff;' : 'display: none;',
+        pick: () => this.setState({ space: id, spaceMenu: false, newBy: { ...st.newBy, [id]: 0 } }),
+        style: 'display: flex; justify-content: space-between; gap: 8px; border: 0; padding: 8px 6px; cursor: pointer; text-align: left; font-size: 13px; background: ' + (st.space === id ? '#e6e8ff' : 'transparent') + '; font-weight: ' + (st.space === id ? '600' : '400') + ';'
+      }))
+    };
+    const tabDefs = [['sources', 'Sources'], ['odoo', 'Odoo – Home'], ['review', 'Review'], ['files', 'Files']];
+    const tabs = tabDefs.map(([v, l]) => ({
+      label: l, sel: st.tab === v, pick: () => this.setState({ tab: v, menu: false }),
+      style: 'border: 0; padding: 6px 10px; font-size: 13px; cursor: pointer; background: ' + (st.tab === v ? '#f4f4f2' : 'transparent') + '; outline: ' + (st.tab === v ? '1px solid #0a0a0a' : 'none') + '; color: #0a0a0a;'
+    }));
+    const menuItems = [['review', 'Review', false], ['odoo', 'Browser', false], ['files', 'File Manager', false], ['sources', 'Sources', true]].map(([v, l, n]) => ({
+      label: l, pick: () => this.setState({ tab: v, menu: false }),
+      newStyle: n ? 'font-family: Martian Mono, monospace; font-size: 9px; color: #2b3bff;' : 'display: none;'
+    }));
+    return {
+      ...spaceVals,
+      groups, flat, usedChips, tabs, menuItems,
+      menu: st.menu, srcPop: st.srcPop,
+      toggleMenu: () => this.setState({ menu: !st.menu }),
+      toggleSrcPop: () => this.setState({ srcPop: !st.srcPop }),
+      srcButton: 'Sources ' + S.filter((s) => s.g !== 'Spaces' && on[s.id]).length + '/' + S.filter((s) => s.g !== 'Spaces').length + ' ⌄',
+      tabSources: st.tab === 'sources', tabOdoo: st.tab === 'odoo', tabReview: st.tab === 'review', tabFiles: st.tab === 'files',
+      odooApps: ['Discussion', 'Calendar', 'Contacts', 'CRM', 'Sales', 'Invoicing', 'Accounting', 'Documents', 'Project', 'Purchase', 'Employees', 'Settings'],
+      contextSummary: activeCount + ' sources on · ' + activeItems + ' items ready',
+      stale: removed.length > 0,
+      staleText: removed.map((s) => s.name.split(' · ')[0]).join(', ') + ' turned off: context rebuilt without it.',
+      reanswer: () => { const next = {}; Object.keys(on).forEach((k) => { next[k] = on[k] && used[k]; }); this.setState({ answeredWith: next }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

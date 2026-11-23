@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Settings: Account and devices</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=Martian+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2b3bff}a:hover{color:#1f2ed0}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 100%; min-height: 800px; box-sizing: border-box; background: rgba(10,10,10,0.32); padding: 28px 24px; display: flex; justify-content: center; align-items: flex-start; color: #0a0a0a; font-family: 'Hanken Grotesk', system-ui, sans-serif; font-size: 14px;">
+<div role="dialog" aria-label="Settings" style="width: 100%; max-width: 1180px; min-height: 740px; display: flex; flex-wrap: wrap; background: #ffffff; box-shadow: 0 16px 48px rgba(0,0,0,0.18); position: relative;">
+  <a href="Main.dc.html" aria-label="Close settings" style="position: absolute; top: 12px; right: 12px; padding: 8px; color: #3d3d3d; display: inline-flex;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></a>
+  <nav aria-label="Settings" style="flex: 1 1 240px; max-width: 270px; min-width: 0; box-sizing: border-box; padding: 16px 12px; display: flex; flex-direction: column; gap: 10px; background: #f9f9f7; border-right: 1px solid #e2e2e2;">
+    <label for="settings-search" style="position: absolute; left: -9999px;">Search settings</label><input id="settings-search" placeholder="Search settings…" style="border: 1px solid #a3a3a3; padding: 8px 10px; font-size: 14px; font-family: inherit;">
+    <div style="display: flex; flex-direction: column; gap: 1px;"><div style="font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #5c5c5c; padding: 4px 8px;">Preferences</div>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Appearance</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Conversation</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Shortcuts</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Live voice</a>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 1px;"><div style="font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #5c5c5c; padding: 4px 8px;">Agent</div>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Behavior</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Models</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Instructions</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Skills</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">MCP</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Subagents</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Modes</a>
+      <a href="SettingsTools.dc.html" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Tools<span style="font-family: 'Martian Mono', monospace; font-size: 9px; color: #2b3bff; font-weight: 400;">NEW</span></a>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 1px;"><div style="font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #5c5c5c; padding: 4px 8px;">Workspace</div>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Projects</a>
+      <a href="Spaces.dc.html" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Spaces<span style="font-family: 'Martian Mono', monospace; font-size: 9px; color: #2b3bff; font-weight: 400;">NEW</span></a>
+      <a href="SettingsSources.dc.html" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Sources<span style="font-family: 'Martian Mono', monospace; font-size: 9px; color: #2b3bff; font-weight: 400;">NEW</span></a>
+      <a href="SettingsSharing.dc.html" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Sharing activity<span style="font-family: 'Martian Mono', monospace; font-size: 9px; color: #2b3bff; font-weight: 400;">NEW</span></a>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 1px;"><div style="font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #5c5c5c; padding: 4px 8px;">System</div>
+      <a href="SettingsAccount.dc.html" aria-current="page" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center; background: #e2e2e2; font-weight: 600;">Account &amp; devices<span style="font-family: 'Martian Mono', monospace; font-size: 9px; color: #2b3bff; font-weight: 400;">NEW</span></a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">System</a>
+      <a href="#" style="padding: 6px 8px; color: #0a0a0a; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">Info</a>
+    </div>
+    <p style="margin: auto 0 0; font-size: 11px; color: #5c5c5c; line-height: 1.4; padding: 0 8px;">Cloud sync and Remote hosts are gone: your Slyy VM keeps every device in sync.</p>
+  </nav>
+
+  <main style="flex: 999 1 640px; min-width: 0; background: #ffffff; box-sizing: border-box; padding: 28px 32px; display: flex; flex-direction: column; gap: 24px;">
+    <h1 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.01em;">Account &amp; devices</h1>
+
+    <section style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap; border: 1px solid #e2e2e2; padding: 16px;">
+      <span aria-hidden="true" style="width: 44px; height: 44px; border-radius: 50%; background: #0a0a0a; color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-weight: 600;">AW</span>
+      <div style="flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+        <strong>Anna Weber</strong>
+        <span style="font-size: 13px; color: #5c5c5c;">anna.weber@wapsol.de · signed in with Wapsol SSO</span>
+        <span style="font-size: 13px; color: #5c5c5c;">Team Accounts Payable · Dept Finance · Org Wapsol</span>
+      </div>
+      <a href="#" style="padding: 9px 12px; border: 1px solid #e2e2e2; color: #0a0a0a; text-decoration: none;">Sign out</a>
+    </section>
+
+    <section style="display: flex; gap: 20px; flex-wrap: wrap; align-items: stretch;">
+      <div style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 10px;">
+        <h2 style="margin: 0; font-size: 15px; font-weight: 600;">Paired devices</h2>
+        <div style="border: 1px solid #e2e2e2;">
+          <div style="display: flex; gap: 12px; align-items: center; padding: 12px 14px; flex-wrap: wrap;"><div style="flex: 1 1 200px; min-width: 0;"><strong>MacBook Pro</strong><div style="font-size: 12px; color: #5c5c5c;">This device · Slyy 1.0.0</div></div><span style="font-size: 12px; color: #5c5c5c;">Active now</span></div>
+          <div style="display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-top: 1px solid #e2e2e2; flex-wrap: wrap;"><div style="flex: 1 1 200px; min-width: 0;"><strong>iPhone 15</strong><div style="font-size: 12px; color: #5c5c5c;">Push on · paired 2 Nov</div></div><button type="button" style="border: 1px solid #e2e2e2; background: #ffffff; padding: 6px 10px; cursor: pointer;">Revoke</button></div>
+          <div style="display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-top: 1px solid #e2e2e2; flex-wrap: wrap;"><div style="flex: 1 1 200px; min-width: 0;"><strong>Windows laptop</strong><div style="font-size: 12px; color: #5c5c5c;">Last seen 9 days ago</div></div><button type="button" style="border: 1px solid #e2e2e2; background: #ffffff; padding: 6px 10px; cursor: pointer;">Revoke</button></div>
+        </div>
+      </div>
+      <div style="flex: 1 1 280px; min-width: 0; border: 1px solid #e2e2e2; padding: 16px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start;">
+        <h2 style="margin: 0; font-size: 15px; font-weight: 600;">Pair a phone</h2>
+        <div role="img" aria-label="Pairing QR code placeholder" style="width: 160px; height: 160px; background: #f4f4f2; border: 1px dashed #a3a3a3; display: flex; align-items: center; justify-content: center; font-family: 'Martian Mono', monospace; font-size: 11px; color: #5c5c5c;">QR code</div>
+        <p style="margin: 0; font-size: 13px; color: #5c5c5c; line-height: 1.45;">Open Slyy on your phone and scan. The code works once and expires in 5 minutes.</p>
+      </div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 8px;">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600;">Your Slyy</h2>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px;">
+        <div style="background: #f4f4f2; padding: 12px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; color: #5c5c5c;">Runs on</span><strong>Your own VM, Wapsol EU</strong></div>
+        <div style="background: #f4f4f2; padding: 12px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; color: #5c5c5c;">Version</span><strong>1.0.0 · up to date</strong></div>
+        <div style="background: #f4f4f2; padding: 12px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; color: #5c5c5c;">Last backup</span><strong>Today, 03:12</strong></div>
+      </div>
+    </section>
+  </main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
