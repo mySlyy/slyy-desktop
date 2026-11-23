@@ -1,0 +1,92 @@
+/*
+ * shell.css - chrome of the app around the wireframe screens.
+ * The screens style themselves inline; this file only covers the overview
+ * page.
+ */
+:root {
+	--shell-ink: #0a0a0a;
+	--shell-muted: #5c5c5c;
+	--shell-line: #e2e2e2;
+	--shell-ground: #f4f4f2;
+	--shell-accent: #2b3bff;
+	--shell-accent-tint: #e6e8ff;
+}
+
+html,
+body {
+	margin: 0;
+	background: var(--shell-ground);
+	color: var(--shell-ink);
+	font-family: "Hanken Grotesk", system-ui, sans-serif;
+}
+
+.shell-screen {
+	min-height: 100vh;
+}
+
+/* Overview: list of all artboards in canvas order. */
+.shell-overview {
+	min-height: 100vh;
+	box-sizing: border-box;
+	padding: 48px 32px 96px;
+}
+
+.shell-overview-inner {
+	max-width: 960px;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+.shell-overview-head h1 {
+	margin: 0 0 8px;
+	font-size: 28px;
+	font-weight: 600;
+	letter-spacing: -0.02em;
+}
+
+.shell-overview-head p,
+.shell-overview-keys {
+	margin: 0;
+	color: var(--shell-muted);
+	line-height: 1.5;
+	max-width: 680px;
+}
+
+.shell-overview-keys {
+	font-size: 13px;
+}
+
+.shell-overview-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 12px;
+}
+
+.shell-overview-list a {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 16px;
+	min-height: 44px;
+	background: #ffffff;
+	border: 1px solid var(--shell-line);
+	color: var(--shell-ink);
+	text-decoration: none;
+}
+
+.shell-overview-list a:hover,
+.shell-overview-list a:focus-visible {
+	border-color: var(--shell-accent);
+	background: var(--shell-accent-tint);
+}
+
+.shell-overview-list .file {
+	font-family: "Martian Mono", ui-monospace, monospace;
+	font-size: 11px;
+	color: var(--shell-muted);
+}

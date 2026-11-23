@@ -34,6 +34,7 @@ import { readdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { isIndependentlyVersioned } from "./release-version-check.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const version = process.argv[2];
@@ -53,6 +54,8 @@ function bumpPackageJson(relPath) {
   const file = path.join(root, relPath);
   if (!existsSync(file)) return;
   const pkg = JSON.parse(readFileSync(file, "utf8"));
+  // Own release train (e.g. apps/desktop-wireframes): keep its version.
+  if (isIndependentlyVersioned(pkg)) return;
   if (pkg.version === version) return;
   pkg.version = version;
   writeFileSync(file, JSON.stringify(pkg, null, 2) + "\n");

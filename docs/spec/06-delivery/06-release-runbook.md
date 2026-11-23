@@ -328,6 +328,15 @@ Never push a tag fetched from upstream PI-Desktop: a local
 `v<version>` created from `upstream` points at upstream code. Delete it first
 (`git tag -d v<version>`).
 
+`mySlyy/releases` also carries a second, independent release train: the
+wireframes build of Slyy Desktop (`apps/desktop-wireframes`), tagged
+`desktop-wireframes-v<version>` plus the rolling `desktop-wireframes-channel`
+feed release, all pre-releases and never "latest"
+(`.github/workflows/release-desktop-wireframes.yml`,
+[docs](../../project/desktop-wireframes.md)). Its package is marked
+`"releaseTrain": "independent"`, so `scripts/release.mjs` does not bump it and
+`check:release-docs` does not compare it.
+
 ### 4.5 GitHub Actions secrets
 
 `SLYY_RELEASES_TOKEN` (required for every tag release): a fine-grained personal

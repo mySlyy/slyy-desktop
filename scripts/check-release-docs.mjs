@@ -32,6 +32,7 @@ import { createRequire } from "node:module";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import path from "node:path";
 import {
+  isIndependentlyVersioned,
   isModelsDevProviderCatalog,
   resolveReleaseDocumentCheck,
 } from "./release-version-check.mjs";
@@ -67,7 +68,10 @@ for (const group of ["apps", "packages"]) {
   }
 }
 for (const relPath of packageFiles) {
-  const found = JSON.parse(read(relPath)).version;
+  const pkg = JSON.parse(read(relPath));
+  // Own release train (e.g. apps/desktop-wireframes): not in the lockstep.
+  if (isIndependentlyVersioned(pkg)) continue;
+  const found = pkg.version;
   if (found !== surfaceVersion) fail(relPath, `version is ${found}, expected ${surfaceVersion}`);
 }
 

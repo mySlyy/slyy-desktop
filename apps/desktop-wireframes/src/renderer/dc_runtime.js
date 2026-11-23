@@ -109,7 +109,7 @@
 	/**
 	 * A mounted screen: owns the logic instance and re-renders into `mount`.
 	 * Instances are cached by the shell, so a screen keeps its state while
-	 * the user navigates around the click-dummy.
+	 * the user navigates around the wireframes.
 	 */
 	class ScreenHost {
 		constructor(file, mount) {

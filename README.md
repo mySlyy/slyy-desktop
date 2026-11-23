@@ -49,8 +49,9 @@ Validate with `pnpm typecheck`, `pnpm lint` and `pnpm test`.
 Architecture, specs and ADRs live under [`docs/`](docs/); contributor rules are
 in [`AGENTS.md`](AGENTS.md).
 
-A clickable macOS mock of the design wireframes lives in `apps/click-dummy`
-([docs](docs/project/click-dummy.md)): `pnpm --filter @pi-desktop/click-dummy dist:mac`.
+The design wireframes ship as an installable macOS app with in-app updates
+from `apps/desktop-wireframes` ([docs](docs/project/desktop-wireframes.md)),
+released as `desktop-wireframes-v<version>`.
 
 ## Origin and license
 

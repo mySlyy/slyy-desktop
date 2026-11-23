@@ -1,0 +1,310 @@
+# Release pipeline: Slyy Desktop wireframes app (apps/desktop-wireframes)
+#
+# Trigger: push a tag `desktop-wireframes-vX.Y.Z` that matches
+# apps/desktop-wireframes/package.json "version":
+#
+#   git tag desktop-wireframes-v0.1.1 && git push origin desktop-wireframes-v0.1.1
+#
+# workflow_dispatch builds, signs and notarizes but never publishes (dry run).
+#
+# Same release path as the real app (release.yml), macOS arm64 only:
+# verify -> package on the self-hosted Mac (SLYY_MACOS_RUNNER) -> Developer ID
+# signing + notarization of the app -> notarize + staple the DMG -> verify ->
+# publish to the public mySlyy/releases with SLYY_RELEASES_TOKEN.
+#
+# It never touches the real app's channel: its tags do not match `v*.*.*`
+# (release.yml), its releases are pre-releases and never "latest", and its
+# update feed lives in the rolling `desktop-wireframes-channel` release:
+#
+#   desktop-wireframes-vX.Y.Z    DMG, ZIP, blockmaps, latest-mac.yml, .sha256
+#   desktop-wireframes-channel   latest-mac.yml only (replaced on every
+#                                release; URLs point at the versioned release)
+#
+# The installed app's electron-updater reads the channel's latest-mac.yml
+# (generic provider, see apps/desktop-wireframes/package.json "publish").
+# The versioned release is created first, so the feed never points at
+# missing files. See docs/project/desktop-wireframes.md.
+
+name: Release Desktop Wireframes
+
+on:
+  push:
+    tags: ['desktop-wireframes-v*.*.*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  RELEASES_REPOSITORY: mySlyy/releases
+  CHANNEL_TAG: desktop-wireframes-channel
+  APP_DIR: apps/desktop-wireframes
+
+concurrency:
+  group: release-desktop-wireframes-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify (tag, unit tests)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Require the releases-repository token on tag builds
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          SLYY_RELEASES_TOKEN: ${{ secrets.SLYY_RELEASES_TOKEN }}
+        run: |
+          if [ -z "${SLYY_RELEASES_TOKEN}" ]; then
+            echo "::error::Missing GitHub Actions secret SLYY_RELEASES_TOKEN (Contents read/write on ${RELEASES_REPOSITORY})."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v7
+
+      - name: Compare tag with apps/desktop-wireframes/package.json
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          set -euo pipefail
+          TAG_VERSION="${GITHUB_REF_NAME#desktop-wireframes-v}"
+          APP_VERSION="$(node -p "require('./${APP_DIR}/package.json').version")"
+          if [ "$TAG_VERSION" != "$APP_VERSION" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match ${APP_DIR}/package.json version ${APP_VERSION}."
+            exit 1
+          fi
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Unit tests
+        run: pnpm --filter @pi-desktop/desktop-wireframes test
+
+  build:
+    name: Build macOS arm64 (signed, notarized)
+    needs: verify
+    # Self-hosted Mac (label slyy-mac) when SLYY_MACOS_RUNNER is set, as in
+    # release.yml; GitHub's macos-15 otherwise.
+    runs-on: ${{ vars.SLYY_MACOS_RUNNER || 'macos-15' }}
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Verify native runner architecture
+        run: |
+          if [ "$(uname -m)" != "arm64" ]; then
+            echo "::error::Expected an arm64 runner, got $(uname -m)."
+            exit 1
+          fi
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        # electron-builder comes from @pi-desktop/desktop's dev dependencies
+        # (see the app's dist:mac script), so the full workspace is installed.
+        run: pnpm install --frozen-lockfile
+
+      - name: Require macOS signing and notarization secrets
+        env:
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+          missing=()
+          [[ -n "${CSC_LINK}" ]] || missing+=(CSC_LINK)
+          [[ -n "${CSC_KEY_PASSWORD}" ]] || missing+=(CSC_KEY_PASSWORD)
+          [[ -n "${APPLE_ID}" ]] || missing+=(APPLE_ID)
+          [[ -n "${APPLE_APP_SPECIFIC_PASSWORD}" ]] || missing+=(APPLE_APP_SPECIFIC_PASSWORD)
+          [[ -n "${APPLE_TEAM_ID}" ]] || missing+=(APPLE_TEAM_ID)
+          if ((${#missing[@]} > 0)); then
+            echo "::error::Missing GitHub Actions secrets for macOS signing/notarization: ${missing[*]}"
+            exit 1
+          fi
+          if [[ "${APPLE_TEAM_ID}" != "${{ vars.SLYY_APPLE_TEAM_ID }}" ]]; then
+            echo "::error::APPLE_TEAM_ID must match the SLYY_APPLE_TEAM_ID repository variable."
+            exit 1
+          fi
+
+      - name: Compile the wireframe screens
+        working-directory: apps/desktop-wireframes
+        run: node scripts/build_screens.mjs
+
+      - name: Package signed and notarized app (DMG + ZIP)
+        working-directory: apps/desktop-wireframes
+        env:
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          CSC_NAME: ${{ vars.SLYY_MAC_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          # Same diagnostics and bounds as release.yml (see its comments).
+          DEBUG: "electron-osx-sign*,electron-notarize*"
+          PI_SIGNING_TIMEOUT_SECONDS: "1800"
+          PI_SIGNING_STALL_SECONDS: "300"
+          PI_STAPLER_MAX_ATTEMPTS: "6"
+          PI_STAPLER_RETRY_DELAY_SECONDS: "10"
+        # electron-builder is called directly, not through `pnpm run dist:mac --
+        # ...`: pnpm 12 forwards the literal `--`, after which electron-builder
+        # treats the -c overrides as positional arguments and drops them.
+        run: |
+          set -euo pipefail
+          node ../../scripts/macos-signing-watchdog.mjs \
+            --label "desktop-wireframes:dist:mac" \
+            -- node ../desktop/node_modules/electron-builder/cli.js \
+              --mac --arm64 --publish never \
+              -c.mac.forceCodeSigning=true \
+              -c.mac.notarize=true
+
+      - name: Notarize and staple the DMG
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          SLYY_APPLE_TEAM_ID: ${{ vars.SLYY_APPLE_TEAM_ID }}
+          PI_SIGNING_TIMEOUT_SECONDS: "1200"
+          PI_SIGNING_STALL_SECONDS: "300"
+        run: |
+          set -euo pipefail
+          node scripts/macos-signing-watchdog.mjs \
+            --label "desktop-wireframes:notarize-dmg" \
+            -- scripts/notarize-and-staple-macos-release-dmg.sh "${APP_DIR}/release"
+
+      - name: Verify signature, notarization and staples
+        env:
+          MAC_SIGNING_IDENTITY: ${{ vars.SLYY_MAC_SIGNING_IDENTITY }}
+          PI_STAPLER_MAX_ATTEMPTS: "6"
+          PI_STAPLER_RETRY_DELAY_SECONDS: "10"
+        run: |
+          set -euo pipefail
+          app="${APP_DIR}/release/mac-arm64/Slyy Desktop.app"
+          dmg="$(ls "${APP_DIR}"/release/slyy-desktop-*-mac-arm64.dmg)"
+          identity="Developer ID Application: ${MAC_SIGNING_IDENTITY#Developer ID Application: }"
+          info="$(codesign -dv --verbose=4 "$app" 2>&1)"
+          printf '%s\n' "$info"
+          [[ "$info" == *"Authority=${identity}"* ]] || { echo "::error::$app is not signed with ${identity}"; exit 1; }
+          codesign --verify --deep --strict --verbose=2 "$app"
+          assessment="$(spctl --assess --type execute --verbose=4 "$app" 2>&1)"
+          printf '%s\n' "$assessment"
+          [[ "$assessment" == *"source=Notarized Developer ID"* ]] || { echo "::error::Gatekeeper does not see $app as notarized"; exit 1; }
+          for f in "$app" "$dmg"; do
+            PI_XCRUN_REAL="$(command -v xcrun)" bash scripts/macos-stapler-retry-shim.sh stapler validate "$f"
+          done
+
+      - name: Point the update feed at this release, write checksums
+        run: |
+          set -euo pipefail
+          cd "${APP_DIR}/release"
+          ls -la
+          version="$(node -p "require('../package.json').version")"
+          tag="desktop-wireframes-v${version}"
+          # The feed's ZIP entry (the one electron-updater downloads) hashes the
+          # final ZIP of the notarized app. The DMG was stapled afterwards, so
+          # its feed hash is stale and informational only; the .sha256 files
+          # written below are the authoritative checksums.
+          node ../scripts/feed_urls.mjs latest-mac.yml "$tag" "${RELEASES_REPOSITORY}"
+          cat latest-mac.yml
+          for f in slyy-desktop-*-mac-arm64.dmg slyy-desktop-*-mac-arm64.zip; do
+            shasum -a 256 "$f" > "$f.sha256"
+          done
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: desktop-wireframes-mac-arm64
+          if-no-files-found: error
+          compression-level: 0
+          path: |
+            apps/desktop-wireframes/release/slyy-desktop-*-mac-arm64.dmg
+            apps/desktop-wireframes/release/slyy-desktop-*-mac-arm64.zip
+            apps/desktop-wireframes/release/*.blockmap
+            apps/desktop-wireframes/release/*.sha256
+            apps/desktop-wireframes/release/latest-mac.yml
+
+  publish:
+    name: Publish (mySlyy/releases)
+    if: startsWith(github.ref, 'refs/tags/desktop-wireframes-v')
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: desktop-wireframes-mac-arm64
+          path: dist
+
+      - name: Verify the update feed
+        working-directory: dist
+        run: |
+          set -euo pipefail
+          ls -la
+          version="${GITHUB_REF_NAME#desktop-wireframes-v}"
+          base="https://github.com/${RELEASES_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/"
+          grep -qx "version: ${version}" latest-mac.yml || { echo "::error::latest-mac.yml is not version ${version}"; cat latest-mac.yml; exit 1; }
+          grep -qx "path: ${base}slyy-desktop-${version}-mac-arm64.zip" latest-mac.yml || { echo "::error::latest-mac.yml must point at the ${GITHUB_REF_NAME} ZIP"; cat latest-mac.yml; exit 1; }
+          sha256sum -c ./*.sha256
+
+      - name: Write release notes
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#desktop-wireframes-v}"
+          echo "RELEASE_TITLE=Slyy Desktop ${version}" >> "$GITHUB_ENV"
+          {
+            echo "Slyy Desktop ${version}, built from the design wireframes (macOS, Apple silicon)."
+            echo
+            echo "| Download | |"
+            echo "| --- | --- |"
+            echo "| \`slyy-desktop-${version}-mac-arm64.dmg\` | installer (signed, notarized) |"
+            echo "| \`slyy-desktop-${version}-mac-arm64.zip\` | in-app update package |"
+            echo
+            echo "Installed copies update in place: Slyy Desktop > Check for Updates…"
+            echo "Verify a download with \`shasum -a 256 -c slyy-desktop-${version}-mac-arm64.dmg.sha256\`."
+          } > release-notes.md
+          cat release-notes.md
+
+      - name: Create the versioned release
+        uses: softprops/action-gh-release@v3
+        with:
+          repository: ${{ env.RELEASES_REPOSITORY }}
+          token: ${{ secrets.SLYY_RELEASES_TOKEN }}
+          tag_name: ${{ github.ref_name }}
+          name: ${{ env.RELEASE_TITLE }}
+          body_path: release-notes.md
+          files: dist/*
+          generate_release_notes: false
+          # Never "latest": that slot belongs to the real app's releases.
+          prerelease: true
+          make_latest: 'false'
+
+      - name: Move the update channel to this release
+        env:
+          GH_TOKEN: ${{ secrets.SLYY_RELEASES_TOKEN }}
+        run: |
+          set -euo pipefail
+          if ! gh release view "${CHANNEL_TAG}" -R "${RELEASES_REPOSITORY}" >/dev/null 2>&1; then
+            gh release create "${CHANNEL_TAG}" -R "${RELEASES_REPOSITORY}" \
+              --prerelease --latest=false \
+              --title "Slyy Desktop update channel" \
+              --notes "Update feed of Slyy Desktop (wireframes build). Holds only latest-mac.yml, which points at the newest desktop-wireframes-vX.Y.Z release. Download installers from those releases, not from here."
+          fi
+          gh release upload "${CHANNEL_TAG}" dist/latest-mac.yml -R "${RELEASES_REPOSITORY}" --clobber
+          gh release view "${CHANNEL_TAG}" -R "${RELEASES_REPOSITORY}" --json assets -q '.assets[].name'

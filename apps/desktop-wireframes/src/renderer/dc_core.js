@@ -1,5 +1,5 @@
 /*
- * dc_core.js - pure, DOM-free helpers of the click-dummy template runtime.
+ * dc_core.js - pure, DOM-free helpers of the wireframe template runtime.
  *
  * The wireframes are Design Component files (`*.dc.html`) exported from the
  * "Slyy Desktop Wireframes" canvas. Their markup uses `{{ path }}` holes that

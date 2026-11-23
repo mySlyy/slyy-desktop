@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  isIndependentlyVersioned,
   isModelsDevProviderCatalog,
   resolveReleaseDocumentCheck,
 } from "./release-version-check.mjs";
@@ -36,5 +37,12 @@ test("accepts a models.dev provider catalog with model records", () => {
 test("rejects invalid or empty models.dev catalogs", () => {
   for (const value of [null, [], {}, { provider: {} }, { provider: null }]) {
     assert.equal(isModelsDevProviderCatalog(value), false);
+  }
+});
+
+test("only an explicit independent release train opts out of the version lockstep", () => {
+  assert.equal(isIndependentlyVersioned({ releaseTrain: "independent" }), true);
+  for (const pkg of [{}, { releaseTrain: "desktop" }, { releaseTrain: true }, null, undefined, "independent"]) {
+    assert.equal(isIndependentlyVersioned(pkg), false, JSON.stringify(pkg));
   }
 });

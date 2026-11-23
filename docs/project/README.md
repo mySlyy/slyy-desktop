@@ -10,4 +10,4 @@ Retired records remain available in git history.
 - [Pi coding agent design review](pi-coding-agent-design-review.md)
 - [Hosted search contract verification](hosted-search-contract-verification.md)
 - [Windows native snap replay](windows-native-snap-replay.md) and its evidence under `windows-native-snap-evidence/`
-- [Wireframe click-dummy (macOS)](click-dummy.md): build and update the clickable mock of the design canvas
+- [Slyy Desktop wireframes build (macOS)](desktop-wireframes.md): the design canvas as an installable, updatable app, and its release train

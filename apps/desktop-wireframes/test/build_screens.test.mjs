@@ -1,6 +1,6 @@
 /*
  * Tests of the wireframe compiler (scripts/build_screens.mjs) against the
- * real canvas export in wireframes/. IDs: T-CD-1xx.
+ * real canvas export in wireframes/. IDs: T-DW-1xx.
  */
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
@@ -39,12 +39,12 @@ function loadScreens(screens) {
 	return registered;
 }
 
-test("T-CD-101 every artboard in canvas.json exists on disk", () => {
+test("T-DW-101 every artboard in canvas.json exists on disk", () => {
 	for (const f of canvas.order) assert.ok(files.includes(f), `${f} missing in wireframes/`);
 	assert.equal(files.length, canvas.order.length);
 });
 
-test("T-CD-102 every wireframe compiles; loops/ifs become templates", () => {
+test("T-DW-102 every wireframe compiles; loops/ifs become templates", () => {
 	for (const s of compileAll()) {
 		assert.ok(s.title.length > 0, `${s.file} title`);
 		assert.ok(!/<sc-(for|if)\b/.test(s.template), `${s.file} still has sc-* tags`);
@@ -53,18 +53,18 @@ test("T-CD-102 every wireframe compiles; loops/ifs become templates", () => {
 	}
 });
 
-test("T-CD-103 unsupported design tags fail the build", () => {
+test("T-DW-103 unsupported design tags fail the build", () => {
 	const src =
 		'<title>x</title><x-dc><dc-import name="Card"></dc-import></x-dc><script type="text/x-dc">class Component extends DCLogic {}</script>';
 	assert.throws(() => compileScreen("Bad.dc.html", src), /dc-import/);
 });
 
-test("T-CD-104 missing logic class fails the build", () => {
+test("T-DW-104 missing logic class fails the build", () => {
 	const src = '<title>x</title><x-dc><div></div></x-dc><script type="text/x-dc">class Other {}</script>';
 	assert.throws(() => compileScreen("Bad.dc.html", src), /DCLogic/);
 });
 
-test("T-CD-105 generated screens.js runs and every renderVals() succeeds", () => {
+test("T-DW-105 generated screens.js runs and every renderVals() succeeds", () => {
 	const screens = compileAll();
 	const loaded = loadScreens(screens);
 	assert.equal(loaded.length, screens.length);
@@ -74,7 +74,7 @@ test("T-CD-105 generated screens.js runs and every renderVals() succeeds", () =>
 	}
 });
 
-test("T-CD-106 top-level holes resolve to a value from renderVals()", () => {
+test("T-DW-106 top-level holes resolve to a value from renderVals()", () => {
 	const screens = compileAll();
 	const loaded = loadScreens(screens);
 	for (const { meta, Component } of loaded) {
@@ -90,7 +90,7 @@ test("T-CD-106 top-level holes resolve to a value from renderVals()", () => {
 	}
 });
 
-test("T-CD-108 numbered titles sort numerically, else canvas order stays", () => {
+test("T-DW-108 numbered titles sort numerically, else canvas order stays", () => {
 	const t = (title) => ({ title });
 	assert.deepEqual(
 		sortByNumber([t("1 · a"), t("8 · b"), t("10 · c"), t("3 · d")]).map((s) => s.title),
@@ -101,7 +101,7 @@ test("T-CD-108 numbered titles sort numerically, else canvas order stays", () =>
 	assert.equal(sortByNumber(compileAll())[0].file, "Main.dc.html", "start screen is artboard 1");
 });
 
-test("T-CD-107 click handlers change state and re-rendered values", () => {
+test("T-DW-107 click handlers change state and re-rendered values", () => {
 	const loaded = loadScreens(compileAll());
 	const main = loaded.find((s) => s.meta.file === "Main.dc.html");
 	assert.ok(main, "Main.dc.html registered");

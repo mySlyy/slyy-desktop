@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!--
+  Strict CSP: only bundled scripts, no eval, no network.
+  'unsafe-inline' for styles is required because the wireframes style every
+  element through its style attribute.
+-->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slyy Desktop</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="shell.css">
+<style id="dc-screen-style"></style>
+</head>
+<body id="shell-body">
+<div id="shell-screen" class="shell-screen"></div>
+
+<div id="shell-overview" class="shell-overview" hidden>
+  <div id="shell-overview-inner" class="shell-overview-inner">
+    <div id="shell-overview-head" class="shell-overview-head">
+      <h1 id="shell-overview-title">All screens</h1>
+      <p id="shell-overview-lede">Every screen of Slyy Desktop. Pick one to open it.</p>
+    </div>
+    <ol id="shell-overview-list" class="shell-overview-list"></ol>
+    <p id="shell-overview-keys" class="shell-overview-keys">Screens menu or Cmd+1 to Cmd+9 jumps to a screen. Cmd+0 opens this overview. Cmd+[ and Cmd+] go back and forward. Cmd+Shift+R starts over.</p>
+  </div>
+</div>
+
+<script src="dc_core.js"></script>
+<script src="dc_runtime.js"></script>
+<script src="screens.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -22,3 +22,14 @@ export function isModelsDevProviderCatalog(value) {
       ),
   );
 }
+
+/**
+ * Workspace packages that ship on their own release train (own tag prefix,
+ * own version) opt out of the desktop version lockstep with
+ * `"releaseTrain": "independent"` in their package.json. scripts/release.mjs
+ * does not bump them and check-release-docs.mjs does not compare them.
+ * Today: apps/desktop-wireframes (tags desktop-wireframes-vX.Y.Z).
+ */
+export function isIndependentlyVersioned(pkg) {
+  return Boolean(pkg && typeof pkg === "object" && pkg.releaseTrain === "independent");
+}

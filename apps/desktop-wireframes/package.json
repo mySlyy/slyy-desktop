@@ -1,15 +1,20 @@
 {
-  "name": "@pi-desktop/click-dummy",
+  "name": "@pi-desktop/desktop-wireframes",
+  "productName": "Slyy Desktop",
   "private": true,
   "version": "0.1.0",
-  "description": "Clickable macOS mock of the Slyy Desktop wireframes (no backend, no models)",
+  "releaseTrain": "independent",
+  "description": "Slyy Desktop, built from the design wireframes (macOS, Apple silicon)",
   "author": "Wapsol GmbH",
   "main": "out/main/main.cjs",
   "scripts": {
     "build": "node scripts/build_screens.mjs",
     "start": "node scripts/build_screens.mjs && electron .",
     "test": "node --test test/*.test.mjs",
-    "dist:mac": "node scripts/build_screens.mjs && node ../desktop/node_modules/electron-builder/cli.js --mac dmg --arm64 --publish never"
+    "dist:mac": "node scripts/build_screens.mjs && node ../desktop/node_modules/electron-builder/cli.js --mac --arm64 --publish never"
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.9"
   },
   "devDependencies": {
     "@fontsource-variable/hanken-grotesk": "5.3.0",
@@ -17,8 +22,8 @@
     "electron": "^43.4.1"
   },
   "build": {
-    "appId": "ai.slyy.clickdummy",
-    "productName": "Slyy Click-Dummy",
+    "appId": "ai.slyy.desktop.wireframes",
+    "productName": "Slyy Desktop",
     "copyright": "Copyright © 2026 Wapsol GmbH",
     "directories": {
       "output": "release",
@@ -33,11 +38,24 @@
       "en-US",
       "de"
     ],
-    "publish": null,
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "https://github.com/mySlyy/releases/releases/download/desktop-wireframes-channel",
+        "channel": "latest",
+        "updaterCacheDirName": "slyy-desktop-wireframes-updater"
+      }
+    ],
     "mac": {
       "target": [
         {
           "target": "dmg",
+          "arch": [
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
           "arch": [
             "arm64"
           ]
@@ -48,11 +66,12 @@
       "hardenedRuntime": true,
       "entitlements": "resources/entitlements.mac.plist",
       "entitlementsInherit": "resources/entitlements.mac.plist",
-      "notarize": false
+      "notarize": false,
+      "artifactName": "slyy-desktop-${version}-mac-${arch}.${ext}"
     },
     "dmg": {
-      "title": "Slyy Click-Dummy ${version}",
-      "artifactName": "slyy-click-dummy-${version}-mac-${arch}.${ext}"
+      "title": "Slyy Desktop ${version}",
+      "artifactName": "slyy-desktop-${version}-mac-${arch}.${ext}"
     }
   }
 }

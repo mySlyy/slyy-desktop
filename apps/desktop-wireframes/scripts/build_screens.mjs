@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * build_screens.mjs - assemble the click-dummy app into `out/`.
+ * build_screens.mjs - assemble the desktop wireframes app into `out/`.
  *
  * Input:
  *   wireframes/canvas.json      canvas index (artboard order + titles)
@@ -40,7 +40,7 @@ function mustMatch(re, text, what, file) {
  */
 export function compileScreen(file, source, canvasTitle) {
 	for (const tag of UNSUPPORTED_TAGS) {
-		if (source.includes(`<${tag}`)) throw new Error(`${file}: <${tag}> is not supported by the click-dummy runtime`);
+		if (source.includes(`<${tag}`)) throw new Error(`${file}: <${tag}> is not supported by the desktop wireframes runtime`);
 	}
 	const docTitle = mustMatch(/<title>([\s\S]*?)<\/title>/i, source, "<title>", file).trim();
 	const body = mustMatch(/<x-dc>([\s\S]*?)<\/x-dc>/i, source, "<x-dc> body", file);
@@ -159,5 +159,5 @@ export function build({ appDir = APP_DIR, withFonts = true } = {}) {
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
 	const { screens, outDir } = build();
-	console.log(`click-dummy: compiled ${screens.length} screens into ${path.relative(process.cwd(), outDir) || "."}`);
+	console.log(`desktop-wireframes: compiled ${screens.length} screens into ${path.relative(process.cwd(), outDir) || "."}`);
 }
