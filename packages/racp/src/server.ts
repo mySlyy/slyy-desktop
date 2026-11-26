@@ -251,6 +251,18 @@ export class RacpServer {
     }
   }
 
+  /** Drop every connection of a revoked device; its token no longer authenticates. */
+  disconnectSubject(subject: string): number {
+    let closed = 0;
+    for (const connection of [...this.connections.values()]) {
+      if (connection.principal.subject !== subject) continue;
+      connection.close(4401, "device revoked");
+      this.release(connection);
+      closed += 1;
+    }
+    return closed;
+  }
+
   private traceId(): string {
     return `trace_${randomUUID()}`;
   }
@@ -336,6 +348,7 @@ export class RacpServer {
           lastSafeCursor,
         });
       },
+      disconnectSubject: (subject) => this.disconnectSubject(subject),
       log: this.options.log,
     };
     return handler(context, (params ?? {}) as Record<string, unknown>);

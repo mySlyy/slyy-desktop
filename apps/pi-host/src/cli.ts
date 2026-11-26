@@ -7,6 +7,7 @@ import { parseArgs, resolveConfig } from "./config.js";
  * stdout carries exactly the lines a bootstrap script parses:
  *   PI_HOST_READY {"hostId":..,"port":..,"version":..}
  *   PI_HOST_PAIRING_TOKEN {"token":..,"expiresAt":..}   (with --pair)
+ *   PI_HOST_MOBILE_PAIRING {"qr":..,"expiresAt":..}      (with --pair-mobile --public-url)
  * Everything else is structured stderr.
  */
 async function main(): Promise<void> {
@@ -26,6 +27,8 @@ async function main(): Promise<void> {
         "  --port <n>                loopback port (default 0 = pick free)",
         "  --host <addr>             bind address; loopback only",
         "  --pair                    print a single-use pairing token at start",
+        "  --public-url <wss-url>    gateway URL phones use (wss://<host>/v1/racp/ws)",
+        "  --pair-mobile             print a phone pairing QR payload at start",
         "  --pairing-lifetime-ms <n> pairing token lifetime (default 600000)",
         "  --host-core <path>        pi-desktop-host-core binary",
         "  --sidecar <path>          agent sidecar entry",
@@ -42,7 +45,16 @@ async function main(): Promise<void> {
   process.stdout.write(`PI_HOST_READY ${JSON.stringify({ hostId: app.hostId, host: app.address.host, port: app.address.port, version: (await import("@pi-desktop/shared")).APP_VERSION })}\n`);
   if (config.pair) {
     const pairing = await app.issuePairingToken(config.pairingLifetimeMs);
-    process.stdout.write(`PI_HOST_PAIRING_TOKEN ${JSON.stringify(pairing)}\n`);
+    process.stdout.write(`PI_HOST_PAIRING_TOKEN ${JSON.stringify({ token: pairing.token, expiresAt: pairing.expiresAt })}\n`);
+  }
+  if (config.pairMobile && config.publicUrl) {
+    const shared = await import("@pi-desktop/shared");
+    const pairing = await app.issuePairingToken(
+      Math.min(config.pairingLifetimeMs, shared.RACP_PAIRING_MAX_LIFETIME_MS),
+      [...shared.RACP_MOBILE_DEVICE_ROLES],
+    );
+    const qr = shared.encodeMobilePairing({ url: config.publicUrl, token: pairing.token, expiresAt: pairing.expiresAt });
+    process.stdout.write(`PI_HOST_MOBILE_PAIRING ${JSON.stringify({ qr, expiresAt: pairing.expiresAt })}\n`);
   }
   const stop = (signal: string) => {
     app.log("info", "signal received", { signal });

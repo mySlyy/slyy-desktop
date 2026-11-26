@@ -2455,5 +2455,174 @@
         "minimum": 1
       }
     }
+  },
+  "DeviceSummary": {
+    "type": "object",
+    "required": [
+      "deviceId",
+      "label",
+      "roles",
+      "createdAt"
+    ],
+    "properties": {
+      "deviceId": {
+        "type": "string",
+        "minLength": 1
+      },
+      "label": {
+        "type": "string"
+      },
+      "roles": {
+        "type": "array",
+        "items": {
+          "anyOf": [
+            {
+              "type": "string",
+              "const": "viewer"
+            },
+            {
+              "type": "string",
+              "const": "controller"
+            },
+            {
+              "type": "string",
+              "const": "approver"
+            },
+            {
+              "type": "string",
+              "const": "owner"
+            }
+          ]
+        }
+      },
+      "createdAt": {
+        "type": "string"
+      },
+      "lastSeenAt": {
+        "type": "string"
+      },
+      "revokedAt": {
+        "type": "string"
+      }
+    }
+  },
+  "IssuePairingParams": {
+    "type": "object",
+    "properties": {
+      "roles": {
+        "type": "array",
+        "items": {
+          "anyOf": [
+            {
+              "type": "string",
+              "const": "viewer"
+            },
+            {
+              "type": "string",
+              "const": "controller"
+            },
+            {
+              "type": "string",
+              "const": "approver"
+            },
+            {
+              "type": "string",
+              "const": "owner"
+            }
+          ]
+        },
+        "minItems": 1,
+        "maxItems": 4
+      },
+      "lifetimeMs": {
+        "type": "integer",
+        "minimum": 30000,
+        "maximum": 600000
+      }
+    },
+    "additionalProperties": false
+  },
+  "IssuePairingResult": {
+    "type": "object",
+    "required": [
+      "token",
+      "expiresAt",
+      "roles"
+    ],
+    "properties": {
+      "token": {
+        "type": "string",
+        "minLength": 1
+      },
+      "expiresAt": {
+        "type": "string"
+      },
+      "roles": {
+        "type": "array",
+        "items": {
+          "anyOf": [
+            {
+              "type": "string",
+              "const": "viewer"
+            },
+            {
+              "type": "string",
+              "const": "controller"
+            },
+            {
+              "type": "string",
+              "const": "approver"
+            },
+            {
+              "type": "string",
+              "const": "owner"
+            }
+          ]
+        },
+        "minItems": 1
+      }
+    }
+  },
+  "PairResult": {
+    "type": "object",
+    "required": [
+      "deviceId",
+      "deviceToken",
+      "roles"
+    ],
+    "properties": {
+      "deviceId": {
+        "type": "string",
+        "minLength": 1
+      },
+      "deviceToken": {
+        "type": "string",
+        "minLength": 1
+      },
+      "roles": {
+        "type": "array",
+        "items": {
+          "anyOf": [
+            {
+              "type": "string",
+              "const": "viewer"
+            },
+            {
+              "type": "string",
+              "const": "controller"
+            },
+            {
+              "type": "string",
+              "const": "approver"
+            },
+            {
+              "type": "string",
+              "const": "owner"
+            }
+          ]
+        },
+        "minItems": 1
+      }
+    }
   }
 }

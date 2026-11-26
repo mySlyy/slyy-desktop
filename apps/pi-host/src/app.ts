@@ -13,7 +13,7 @@ import {
   listPendingToolRequests,
 } from "@pi-desktop/host-runtime";
 import { DeviceTokenAuthenticator, RacpServer, bindRacpWebSocket, type RacpHostOperations, type WsBinding } from "@pi-desktop/racp";
-import { APP_VERSION, type AgentEventEnvelope } from "@pi-desktop/shared";
+import { APP_VERSION, type AgentEventEnvelope, type RacpRole } from "@pi-desktop/shared";
 
 import type { PiHostConfig } from "./config.js";
 import { FileCredentialStore, loadOrCreateHostId } from "./credentials.js";
@@ -31,7 +31,7 @@ export type PiHostApp = {
   server: RacpServer;
   log: HostLogger;
   /** Mint a single-use pairing token for the bootstrap channel. */
-  issuePairingToken(lifetimeMs: number): Promise<{ token: string; expiresAt: string }>;
+  issuePairingToken(lifetimeMs: number, roles?: RacpRole[]): Promise<{ token: string; expiresAt: string; roles: RacpRole[] }>;
   stop(): Promise<void>;
 };
 
@@ -283,7 +283,7 @@ export async function startPiHost(config: PiHostConfig, options: { log?: HostLog
     authenticator,
     server,
     log,
-    issuePairingToken: (lifetimeMs) => authenticator.issuePairingToken(lifetimeMs),
+    issuePairingToken: (lifetimeMs, roles) => authenticator.issuePairingToken(lifetimeMs, roles),
     async stop() {
       if (state.stopping) return;
       state.stopping = true;

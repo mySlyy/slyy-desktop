@@ -599,6 +599,9 @@ session root as working directory and stream through `terminal.output`.
 | `connection/pair` | authenticated | Exchange the single-use pairing token presented on the upgrade for a device credential (security §3.4); only valid on a pairing connection (D448) |
 | `project/register` | owner | Register a Host directory as a project: the Host canonicalizes and validates the path and returns the project id (D448) |
 | `project/browse` | owner | List directories under a Host path, bounded, for the remote folder picker (D448) |
+| `device/issuePairing` | owner | Mint a single-use pairing token whose device receives the roles chosen here (default `controller` + `approver`, lifetime ≤ 10 min); used for phone pairing (ADR `slyy-gateway-mode`) |
+| `device/list` | owner | List paired devices (id, label, roles, timestamps); never returns token hashes |
+| `device/revoke` | owner | Revoke a device credential and close its live connections with code 4401 |
 
 ### 6.2.1 Local-Agent workspace services
 

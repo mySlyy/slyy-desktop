@@ -2,7 +2,7 @@ import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { isIP } from "node:net";
 
 import type { Principal } from "@pi-desktop/agent-host";
-import { RACP_DEVICE_TOKEN_PREFIX, RACP_PAIRING_TOKEN_PREFIX, type RacpRole } from "@pi-desktop/shared";
+import { RACP_DEVICE_TOKEN_PREFIX, RACP_PAIRING_TOKEN_PREFIX, type RacpDeviceSummary, type RacpRole } from "@pi-desktop/shared";
 
 /**
  * Credentials for the header profile (security §3.1, §3.4). A device token
@@ -24,6 +24,8 @@ export type DeviceRecord = {
 export type PairingRecord = {
   tokenHash: string;
   expiresAt: string;
+  /** Roles the paired device receives; absent on records minted before roles existed (= owner). */
+  roles?: RacpRole[];
   /** Set once exchanged; a second exchange is refused. */
   consumedAt?: string;
 };
@@ -178,16 +180,34 @@ export class DeviceTokenAuthenticator {
     return null;
   }
 
-  /** Mint a single-use pairing token; the caller hands it over the bootstrap channel. */
-  async issuePairingToken(lifetimeMs: number): Promise<{ token: string; expiresAt: string }> {
-    const token = newPairingToken();
-    const expiresAt = new Date(this.now() + lifetimeMs).toISOString();
-    await this.store.savePairing({ tokenHash: hashToken(token), expiresAt });
-    return { token, expiresAt };
+  /** Paired devices for display; the stored token hash never leaves the Host. */
+  async listDevices(): Promise<RacpDeviceSummary[]> {
+    const devices = await this.store.listDevices();
+    return devices.map(({ tokenHash: _hash, ...summary }) => ({ ...summary, roles: [...summary.roles] }));
   }
 
-  /** Exchange a pairing token (already authenticated on the upgrade) for a device credential. */
-  async pair(tokenHash: string, label: string, roles: RacpRole[]): Promise<{ deviceId: string; token: string }> {
+  async revokeDevice(deviceId: string): Promise<boolean> {
+    return this.store.revokeDevice(deviceId, new Date(this.now()).toISOString());
+  }
+
+  /** Mint a single-use pairing token; the caller hands it over the bootstrap channel. */
+  async issuePairingToken(
+    lifetimeMs: number,
+    roles?: RacpRole[],
+  ): Promise<{ token: string; expiresAt: string; roles: RacpRole[] }> {
+    const token = newPairingToken();
+    const expiresAt = new Date(this.now() + lifetimeMs).toISOString();
+    const granted: RacpRole[] = roles && roles.length > 0 ? [...new Set(roles)] : ["owner"];
+    await this.store.savePairing({ tokenHash: hashToken(token), expiresAt, ...(roles ? { roles: granted } : {}) });
+    return { token, expiresAt, roles: granted };
+  }
+
+  /**
+   * Exchange a pairing token (already authenticated on the upgrade) for a
+   * device credential. The roles chosen when the token was minted win over
+   * `fallbackRoles`, so a phone code can never yield an owner device.
+   */
+  async pair(tokenHash: string, label: string, fallbackRoles: RacpRole[]): Promise<{ deviceId: string; token: string; roles: RacpRole[] }> {
     const consumedAt = new Date(this.now()).toISOString();
     const pairing = await this.store.findPairing(tokenHash);
     if (!pairing) throw pairingError("PAIRING_FAILED", "the pairing token is unknown");
@@ -197,6 +217,7 @@ export class DeviceTokenAuthenticator {
     if (!(await this.store.consumePairing(tokenHash, consumedAt))) {
       throw pairingError("PAIRING_FAILED", "the pairing token was already used");
     }
+    const roles = pairing.roles && pairing.roles.length > 0 ? [...pairing.roles] : [...fallbackRoles];
     const token = newDeviceToken();
     const deviceId = `dev_${randomBytes(9).toString("base64url")}`;
     await this.store.saveDevice({
@@ -206,7 +227,7 @@ export class DeviceTokenAuthenticator {
       tokenHash: hashToken(token),
       createdAt: consumedAt,
     });
-    return { deviceId, token };
+    return { deviceId, token, roles };
   }
 }
 

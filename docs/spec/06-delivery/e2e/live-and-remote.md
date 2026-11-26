@@ -740,3 +740,23 @@ ancestor opens after a project switch, and restored local
 editing/Browser/editor detection. No model, user profile or external SSH server
 participates. Real SSH transport and native Windows/Linux behavior require
 their separate platform acceptance.
+
+## E2E-GATEWAY-mobile-pairs-through-gateway: A phone pairs and is revoked through the Rust gateway
+
+- **Preconditions**: Isolated data directory; real `pi-host` on loopback with
+  `--pair --pair-mobile --public-url`; host-core in `--gateway` mode in front
+  of it. No model provider, user profile or external network.
+- **Steps**: 1) Probe `/healthz`. 2) Parse the printed phone pairing payload.
+  3) Connect through the gateway with the pairing token and call
+  `connection/pair`. 4) Reconnect with the device token; list sessions; try
+  `device/issuePairing` and `project/register`. 5) Present an unknown and the
+  used pairing token. 6) As the owner device, `device/list` then
+  `device/revoke` the phone; retry the phone's token.
+- **Expected**: Health answers 200 unauthenticated; the pairing connection
+  has no roles; the phone receives exactly `controller` + `approver` and may
+  list sessions but not mint devices or register projects; unknown and reused
+  tokens fail with `REMOTE_AUTH_FAILED`; the device list carries no token
+  hash; revocation reports one closed connection, the phone's socket drops,
+  and its token is refused afterwards.
+- **Automation**: `pnpm test:e2e:gateway-mobile`
+- **Status**: Automated

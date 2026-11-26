@@ -99,6 +99,32 @@ describe("RACP-WS handshake and authentication", () => {
     expect(stored?.label).toBe("my laptop");
   });
 
+  it("pairs a phone with the roles the owner chose, lists it, and revokes it live", async () => {
+    const h = await harness();
+    const owner = await h.connect(OWNER_TOKEN);
+    const issued = await owner.client.request<{ token: string; expiresAt: string; roles: string[] }>("device/issuePairing", {});
+    expect(issued.roles).toEqual(["controller", "approver"]);
+    const pairing = await h.connect(issued.token);
+    const paired = await pairing.client.request<{ deviceId: string; deviceToken: string; roles: string[] }>("connection/pair", { deviceLabel: "Anna's iPhone" });
+    expect(paired.roles).toEqual(["controller", "approver"]);
+    const phone = await h.connect(paired.deviceToken);
+    expect(phone.client.initialized?.principal.roles).toEqual(["controller", "approver"]);
+    // A phone may watch and act, but cannot mint more devices or manage the Host.
+    await expect(phone.client.request("device/issuePairing", {})).rejects.toMatchObject({ code: "FORBIDDEN" });
+    await expect(phone.client.request("device/list")).rejects.toMatchObject({ code: "FORBIDDEN" });
+    await expect(phone.client.request<{ sessions: unknown[] }>("session/list")).resolves.toMatchObject({ sessions: expect.any(Array) });
+
+    const listed = await owner.client.request<{ devices: Array<Record<string, unknown>> }>("device/list");
+    const entry = listed.devices.find((device) => device.deviceId === paired.deviceId);
+    expect(entry).toMatchObject({ label: "Anna's iPhone", roles: ["controller", "approver"] });
+    expect(entry).not.toHaveProperty("tokenHash");
+
+    const revoked = await owner.client.request<{ revoked: boolean; disconnected: number }>("device/revoke", { deviceId: paired.deviceId });
+    expect(revoked).toEqual({ revoked: true, disconnected: 1 });
+    await expect(h.connect(paired.deviceToken)).rejects.toMatchObject({ code: "REMOTE_AUTH_FAILED" });
+    await expect(owner.client.request("device/issuePairing", { lifetimeMs: 3_600_000 })).rejects.toMatchObject({ code: "INVALID_ARGUMENT" });
+  });
+
   it("refuses an expired pairing token and a pairing call on a device connection", async () => {
     const h = await harness();
     const expired = newPairingToken();

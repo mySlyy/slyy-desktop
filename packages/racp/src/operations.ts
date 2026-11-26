@@ -7,6 +7,9 @@ import {
   RacpCursorSchema,
   RacpInputResponseSchema,
   RacpRequestContextSchema,
+  RacpIssuePairingParamsSchema,
+  RACP_MOBILE_DEVICE_ROLES,
+  RACP_PAIRING_MAX_LIFETIME_MS,
   type RacpCursor,
   type RacpLimits,
   type RacpOperation,
@@ -32,6 +35,8 @@ export type OperationContext = {
   now: () => number;
   deliverEvent: (envelope: RacpEventEnvelope) => void;
   closeSubscription: (subscriptionId: string, error: RacpError, lastSafeCursor: RacpCursor) => void;
+  /** Close every live connection authenticated as this device; returns how many. */
+  disconnectSubject: (subject: string) => number;
   log: (level: "info" | "warn" | "error", message: string, data?: Record<string, unknown>) => void;
 };
 
@@ -150,7 +155,27 @@ export function createOperations(): Map<RacpOperation, OperationHandler> {
     });
     context.log("info", "device paired", { deviceId: paired.deviceId, connectionId: context.connection.id });
     // The pairing connection stays unprivileged: the client reconnects with the device token.
-    return { deviceId: paired.deviceId, deviceToken: paired.token, roles: ["owner"] };
+    return { deviceId: paired.deviceId, deviceToken: paired.token, roles: paired.roles };
+  });
+  handlers.set("device/issuePairing", async (context, params) => {
+    const input = check(RacpIssuePairingParamsSchema, params);
+    const issued = await context.authenticator.issuePairingToken(
+      input.lifetimeMs ?? RACP_PAIRING_MAX_LIFETIME_MS / 2,
+      input.roles ?? [...RACP_MOBILE_DEVICE_ROLES],
+    );
+    context.log("info", "pairing token issued", { roles: issued.roles, expiresAt: issued.expiresAt, by: context.principal.subject });
+    return issued;
+  });
+  handlers.set("device/list", async (context) => {
+    const devices = await context.authenticator.listDevices();
+    return { devices };
+  });
+  handlers.set("device/revoke", async (context, params) => {
+    const input = check(Type.Object({ deviceId: Type.String({ minLength: 1 }) }, { additionalProperties: false }), params);
+    const revoked = await context.authenticator.revokeDevice(input.deviceId);
+    const disconnected = revoked ? context.disconnectSubject(input.deviceId) : 0;
+    context.log("info", "device revoke", { deviceId: input.deviceId, revoked, disconnected, by: context.principal.subject });
+    return { revoked, disconnected };
   });
   handlers.set("host/list", async () => {
     throw new RacpError("METHOD_NOT_FOUND", "host/list exists only behind a Gateway");

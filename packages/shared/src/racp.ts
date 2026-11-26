@@ -630,6 +630,12 @@ export const RACP_OPERATIONS = {
   "project/register": { role: "owner", profile: "remote-host", mutation: true },
   /** List directories under a Host path, for the remote folder picker; bounded and owner-only. */
   "project/browse": { role: "owner", profile: "remote-host", mutation: false },
+  /** Mint a single-use pairing token whose device gets the roles the owner chose (e.g. a phone). */
+  "device/issuePairing": { role: "owner", profile: "remote-host", mutation: true },
+  /** Paired devices without credential material, for Settings › Devices. */
+  "device/list": { role: "owner", profile: "remote-host", mutation: false },
+  /** Revoke a device credential and drop its live connections. */
+  "device/revoke": { role: "owner", profile: "remote-host", mutation: true },
 } as const satisfies Record<string, RacpOperationSpec>;
 export type RacpOperation = keyof typeof RACP_OPERATIONS;
 
@@ -897,6 +903,47 @@ export function racpErrorIsRegistered(code: RacpErrorCode): boolean {
 // Schema bundle (generated fixtures are derived from this object)
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Devices (remote-host profile; Slyy mobile pairing)
+// ---------------------------------------------------------------------------
+
+const RacpRoleSchema = Type.Union([Type.Literal("viewer"), Type.Literal("controller"), Type.Literal("approver"), Type.Literal("owner")]);
+
+/** Pairing tokens live at most ten minutes; the QR code says five. */
+export const RACP_PAIRING_MAX_LIFETIME_MS = 10 * 60 * 1000;
+/** A phone may watch, start turns and approve, but not manage the Host. */
+export const RACP_MOBILE_DEVICE_ROLES: readonly RacpRole[] = ["controller", "approver"];
+
+export const RacpDeviceSummarySchema = Type.Object({
+  deviceId: Type.String({ minLength: 1 }),
+  label: Type.String(),
+  roles: Type.Array(RacpRoleSchema),
+  createdAt: Type.String(),
+  lastSeenAt: Type.Optional(Type.String()),
+  revokedAt: Type.Optional(Type.String()),
+});
+export type RacpDeviceSummary = Static<typeof RacpDeviceSummarySchema>;
+
+export const RacpIssuePairingParamsSchema = Type.Object({
+  roles: Type.Optional(Type.Array(RacpRoleSchema, { minItems: 1, maxItems: 4 })),
+  lifetimeMs: Type.Optional(Type.Integer({ minimum: 30_000, maximum: RACP_PAIRING_MAX_LIFETIME_MS })),
+}, { additionalProperties: false });
+export type RacpIssuePairingParams = Static<typeof RacpIssuePairingParamsSchema>;
+
+export const RacpIssuePairingResultSchema = Type.Object({
+  token: Type.String({ minLength: 1 }),
+  expiresAt: Type.String(),
+  roles: Type.Array(RacpRoleSchema, { minItems: 1 }),
+});
+export type RacpIssuePairingResult = Static<typeof RacpIssuePairingResultSchema>;
+
+export const RacpPairResultSchema = Type.Object({
+  deviceId: Type.String({ minLength: 1 }),
+  deviceToken: Type.String({ minLength: 1 }),
+  roles: Type.Array(RacpRoleSchema, { minItems: 1 }),
+});
+export type RacpPairResult = Static<typeof RacpPairResultSchema>;
+
 export const RACP_SCHEMAS = {
   WorkspacePluginFilesRequest: WorkspacePluginFilesRequestSchema,
   WorkspacePluginFilesResult: WorkspacePluginFilesResultSchema,
@@ -920,5 +967,9 @@ export const RACP_SCHEMAS = {
   RemoteError: RacpRemoteErrorSchema,
   Limits: RacpLimitsSchema,
   Policy: RacpPolicySchema,
+  DeviceSummary: RacpDeviceSummarySchema,
+  IssuePairingParams: RacpIssuePairingParamsSchema,
+  IssuePairingResult: RacpIssuePairingResultSchema,
+  PairResult: RacpPairResultSchema,
 } as const;
 export type RacpSchemaName = keyof typeof RACP_SCHEMAS;

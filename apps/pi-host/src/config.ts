@@ -1,4 +1,5 @@
 import { existsSync } from "node:fs";
+import { isMobileRacpEndpoint } from "@pi-desktop/shared";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -15,6 +16,10 @@ export type PiHostConfig = {
   nodeBinary: string;
   /** Print a fresh single-use pairing token at start and exit once it is consumed or expired. */
   pair: boolean;
+  /** Print a phone pairing QR payload (controller + approver) for `publicUrl`. */
+  pairMobile: boolean;
+  /** The gateway URL phones reach this Host at, e.g. `wss://anna.wapsol.slyy.ai/v1/racp/ws`. */
+  publicUrl?: string;
   pairingLifetimeMs: number;
   /** Where the folder picker may browse; defaults to the user's home. */
   browseRoot: string;
@@ -88,6 +93,14 @@ export function resolveConfig(args: CliArgs, env: NodeJS.ProcessEnv = process.en
     throw Object.assign(new Error(`invalid port ${String(args.port ?? env.PI_HOST_PORT)}`), { errorCode: "INVALID_ARGUMENT" });
   }
   const level = String(args["log-level"] ?? env.PI_HOST_LOG_LEVEL ?? "info");
+  const publicUrl = args["public-url"] ?? env.PI_HOST_PUBLIC_URL;
+  if (publicUrl !== undefined && (typeof publicUrl !== "string" || !isMobileRacpEndpoint(publicUrl))) {
+    throw Object.assign(new Error("--public-url must be wss://<host>/v1/racp/ws"), { errorCode: "INVALID_ARGUMENT" });
+  }
+  const pairMobile = args["pair-mobile"] === true || args["pair-mobile"] === "true";
+  if (pairMobile && !publicUrl) {
+    throw Object.assign(new Error("--pair-mobile needs --public-url"), { errorCode: "INVALID_ARGUMENT" });
+  }
   return {
     dataDir,
     host: String(args.host ?? env.PI_HOST_BIND ?? "127.0.0.1"),
@@ -96,6 +109,8 @@ export function resolveConfig(args: CliArgs, env: NodeJS.ProcessEnv = process.en
     sidecarEntry: args.sidecar ? resolve(String(args.sidecar)) : firstExisting(sidecarCandidates(), "agent sidecar entry"),
     nodeBinary: String(args.node ?? env.PI_HOST_NODE ?? process.execPath),
     pair: args.pair === true || args.pair === "true",
+    pairMobile,
+    ...(publicUrl ? { publicUrl } : {}),
     pairingLifetimeMs: Number(args["pairing-lifetime-ms"] ?? DEFAULT_PAIRING_LIFETIME_MS),
     browseRoot: resolve(String(args["browse-root"] ?? env.PI_HOST_BROWSE_ROOT ?? homedir())),
     logLevel: level === "warn" || level === "error" ? level : "info",

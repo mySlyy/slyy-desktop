@@ -70,6 +70,7 @@ export * from "./chat-content-width.js";
 export * from "./startup-animation.js";
 export * from "./radial-menu.js";
 export * from "./racp.js";
+export * from "./mobile-pairing.js";
 export * from "./trusted-extensions.js";
 export * from "./provider-retry.js";
 export * from "./message-stream.js";

@@ -26,6 +26,15 @@ describe("config", () => {
     expect(() => resolveConfig({ "host-core": "/bin/hc", sidecar: "/s.js", port: "abc" }, {})).toThrow(/invalid port/);
     expect(resolveConfig({ "host-core": "/bin/hc", sidecar: "/s.js", "log-level": "warn" }, {}).logLevel).toBe("warn");
   });
+
+  it("requires a TLS gateway URL before printing a phone pairing code", () => {
+    const base = { "host-core": "/bin/hc", sidecar: "/s.js" };
+    const url = "wss://anna.wapsol.slyy.ai/v1/racp/ws";
+    expect(resolveConfig({ ...base, "pair-mobile": true, "public-url": url }, {})).toMatchObject({ pairMobile: true, publicUrl: url });
+    expect(resolveConfig(base, { PI_HOST_PUBLIC_URL: url }).publicUrl).toBe(url);
+    expect(() => resolveConfig({ ...base, "pair-mobile": true }, {})).toThrow(/needs --public-url/);
+    expect(() => resolveConfig({ ...base, "public-url": "ws://anna.wapsol.slyy.ai/v1/racp/ws" }, {})).toThrow(/must be wss/);
+  });
 });
 
 describe("identity and credentials", () => {
