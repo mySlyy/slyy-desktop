@@ -1,0 +1,75 @@
+name: macOS components
+
+# The Mac half of Slyy on every change: host-core (including gateway mode
+# and its TLS listener), the phone-pairing E2E through the gateway, and an
+# unsigned Apple-silicon app bundle. Always GitHub-hosted: this repository
+# is public, and pull requests from forks must never run on the
+# self-hosted Mac that the release lane may use.
+
+on:
+  push:
+    branches: [main, slyy-desktop-main]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+  workflow_dispatch:
+
+concurrency:
+  group: macos-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  macos:
+    name: host-core, gateway E2E, unsigned app (Apple silicon)
+    runs-on: macos-15
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Test host-core (gateway TLS included)
+        run: cargo test -p host-core --locked
+
+      - name: Build host-core
+        run: cargo build -p host-core --locked
+
+      - name: Build workspace packages and the agent sidecar bundle
+        run: |
+          pnpm build:js
+          pnpm -C packages/agent-runtime bundle
+
+      - name: Phone pairs through the gateway (E2E)
+        run: pnpm test:e2e:gateway-mobile
+
+      - name: Package unsigned app bundle
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: pnpm --filter @pi-desktop/desktop run pack -- --mac --arm64
+
+      - name: Upload unsigned app
+        uses: actions/upload-artifact@v7
+        with:
+          name: slyy-macos-arm64-unsigned
+          path: apps/desktop/release/mac-arm64/*.app
+          retention-days: 7
+          if-no-files-found: error
