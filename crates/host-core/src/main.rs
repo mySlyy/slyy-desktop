@@ -9,6 +9,7 @@ mod data_relocation;
 mod db;
 mod file_batches;
 mod file_resources;
+mod gateway;
 mod keyboard;
 mod mcp_servers;
 mod mode_runs;
@@ -72,6 +73,12 @@ async fn main() -> anyhow::Result<()> {
         )
         .with_writer(std::io::stderr)
         .init();
+
+    // Gateway mode is a separate process role: it relays device connections
+    // to pi-host and never opens the data directory or SQLite.
+    if gateway::requested() {
+        return gateway::run_from_args().await;
+    }
 
     let data_dir = std::env::var("PI_DESKTOP_DATA_DIR")
         .map(std::path::PathBuf::from)

@@ -34,6 +34,12 @@ rand = "0.10"
 reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "http2"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+# Gateway mode (docs/adr/slyy-gateway-mode.md): TLS termination and the
+# RACP-WS relay. ring matches the provider reqwest already pulls in.
+futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
+httparse = "1"
+tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "tls12", "logging"] }
+tokio-tungstenite = { version = "0.30", default-features = false, features = ["handshake"] }
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { version = "0.61.2", features = [
@@ -55,3 +61,4 @@ libc = "0.2"
 
 [dev-dependencies]
 tempfile = "3"
+rcgen = { version = "0.14", default-features = false, features = ["ring", "pem"] }
